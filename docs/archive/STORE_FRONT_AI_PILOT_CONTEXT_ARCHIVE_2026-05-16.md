@@ -1,0 +1,1326 @@
+# Storefront AI Pilot Context
+
+Tactical guide for the controlled rollout of the Cesarin AI assistant.
+
+## Current Phase & Reliability
+- **Phase:** 3.2C CLOSED - Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
+- **Status:** **OPERATIONAL - PRODUCT_SEARCH Hold-Lift Achieved; AI Reliability / Evals / Operational Excellence Phase 1 accepted under the frozen harness.**
+- **Current Freeze Truth:** Storefront and Cesarin OS/admin coding fronts remain closed under current scope. The accepted Phase 1 reliability lane is now closed for its defined scope as well: the authenticated harness remains the standing regression gate, and no new storefront/admin/provider implementation front is opened by this note.
+- **No-Write Customer-Intelligence Smoke Readiness Truth**: The accepted commit `0795c51de54842df4dbf496855f785cd83ba45ba` (`test: add no-write customer intelligence smoke readiness`) is canonized as a local/tested no-write smoke-readiness contract for `customer-intelligence`. The implementation changed only `src/lib/customer-intelligence-no-write-smoke.ts`, `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`, `src/services/concierge.service.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, `supabase/functions/customer-intelligence/index.ts`, and `supabase/functions/customer-intelligence/no-write-smoke.ts`; no docs/canon, workflow, package, env, secret, Supabase migration, or Supabase seed file changed in the implementation commit. The explicit contract identity is `customer_intelligence_no_write_v1`. For authenticated `concierge_chat` knowledge handoff, the contract suppresses `ai_customer_memory` persistence, Edge `ai_analytics` insert, QA Judge invocation, and client/service capsule telemetry; the response exposes auditable `no_write_smoke` metadata; scope mismatch is rejected instead of silently broadening suppression. Normal production behavior remains unchanged when the smoke flag/contract is absent, and existing non-smoke `knowledge_rag_foundation` telemetry remains intact. Accepted validation passed: focused no-write smoke/service harness tests (`2` files / `5` tests), targeted ESLint with `0` errors and existing warnings only, `npm run typecheck`, `git diff --check`, `git diff --check 0795c51^ 0795c51`, and commit-diff secret-pattern scan with `NO_SECRET_PATTERN_MATCHES`. Residuals remain explicit: this proves local smoke-readiness only, not live retrieval-to-answer, remote `customer-intelligence` smoke, production Cesarin answer quality, full RAG quality, Product Search quality, metadata cleanup, DB/Supabase mutation, workflow/runtime verification, ingestion rerun, deploy, live smoke execution, or fixes for `metadata.embedding_dims` / retained inactive rows; the Edge HTTP no-write smoke path has not been live-executed, and the explicit narrow contract is not additionally environment-gated.
+- **Seed Runner Typecheck Strictness Truth**: The accepted commit `70ca5f2317476f6fc66fcab060c1915db85d32c2` (`test: repair seed runner typecheck strictness`) is canonized as a narrow local TypeScript strictness repair for `supabase/seeds/seed_runner.ts` and `src/__tests__/seed_runner.test.ts`. The implementation changed only those two files; no docs/canon, workflow, package, env, secret, or Supabase migration file changed in the implementation commit. Fake Supabase coverage snapshot access is now guarded, and `StoreKnowledgeInsert.embedding` cannot receive `undefined` from row construction because missing embeddings throw before insert. Seed-runner activation safety and failure semantics remain preserved: chunks/embeddings are prepared before insert/deactivation, replacement rows use `is_active=true`, insert happens before deactivation, previous rows are deactivated only after inserted row IDs exist, mismatched inserted IDs still fail without touching previous active rows, and non-zero failure semantics remain for embedding/doc/insert/coverage errors. Accepted validation passed: focused seed-runner tests (`1` file / `4` tests), targeted ESLint, project-wide `npm run typecheck`, `git diff --check`, `git diff --check 70ca5f2^ 70ca5f2`, and commit-diff secret-pattern scan with `NO_SECRET_PATTERN_MATCHES`. Residuals remain explicit: this proves local strictness repair only, not workflow/runtime verification, ingestion rerun, remote `store_knowledge` validation, metadata cleanup, DB/Supabase mutation, deploy, production Cesarin answer quality, full RAG quality, Product Search quality, semantic completeness, or fixes for `metadata.embedding_dims` / retained inactive rows.
+- **Cesarin Knowledge Main-Message Synthesis Truth**: The accepted commit `c65ba2386247e87d22067463fb3bac90d6684550` (`test: improve cesarin knowledge main message synthesis`) is canonized as a local no-mutation improvement to the `knowledge_rag_foundation` answer contract. Successful `evaluateKnowledgeRAGTree` results now build a substantive customer-visible `ui_render_hint` / main message from the top resolved chunk title/content while preserving `capsule_contract.resolved_chunks` for `AIConcierge`. The implementation changed only `src/lib/knowledge-rag-capsule.ts`, `src/lib/ai-capsule-schemas.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`; no docs/canon, workflow, package, Supabase migration/seed, env, or secret file changed in the implementation commit. Empty/no-match and degraded fallback behavior remain intact; `turn_analysis`, `catalog_gate`, `match_strategy`, `execution_status`, and capsule contract shape remain preserved; optional `source_id` is carried on knowledge chunks. Accepted validation passed: focused test command over the mapper/service/UI harnesses (`3` files / `30` tests), targeted ESLint with `0` errors and `1` existing warning, `git diff --check c65ba23^ c65ba23`, and a secret-pattern scan over the commit diff. `npm run typecheck` is not green and remains blocked by unrelated/pre-existing `seed_runner` strictness errors in `src/__tests__/seed_runner.test.ts` and `supabase/seeds/seed_runner.ts`. Residuals remain explicit: this proves local synthesis and rendering contract only, not live production Cesarin answer quality, live retrieval-to-answer, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, DB/Supabase/workflow/deploy mutation, or project-wide typecheck green status.
+- **Post-Gemini-Repair Ingest Knowledge Verification Truth**: Run `25969669995` of `Run Knowledge Ingestion` (`workflow_dispatch`) ran on `main` at `293b495` after GitHub Actions `GEMINI_API_KEY` repair/rotation and completed successfully. Job `ingest` passed in `38s`; `Run Knowledge Ingestor` passed; no failed steps were reported. Post-run authenticated read-only `store_knowledge` validation found `174` total rows, `41` active rows, `82` embedded rows, `41` active embedded rows, `41` inactive embedded rows, active vectors parsed as `768d` for all `41` active embedded rows, expected active source IDs missing `[]`, active required-field empty rows `0`, and `41` active embedded `768d` rows eligible for `match_knowledge`. Active category distribution remained seed-aligned: `faq: 6`, `onboarding: 4`, `payments: 8`, `policies: 3`, `shipping: 9`, `vape_basics: 11`; representative active samples were coherent. This canonizes that the post-Gemini-repair hardened ingestion workflow passed and the table-level active knowledge serving corpus remained healthy. Residuals remain explicit: retained inactive embedded rows remain; metadata mismatch cleanup is not claimed; this does not prove full RAG quality, Product Search quality, production Cesarin answer quality, semantic completeness, future provider/key stability, or inactive-row cleanup. No manual DB mutation, local ingestion, Supabase CLI, deploy, code/workflow edit, repair, or secret value exposure occurred.
+- **Ingest Knowledge Failure-Mode Safety Truth**: Post-hardening run `25947955038` of `Run Knowledge Ingestion` (`workflow_dispatch`) ran on `main` at `b52c12c` and failed in `Run Knowledge Ingestor`; this rejects full post-hardening runtime verification success for that run. Safe logs show Gemini embedding calls returned `403 PERMISSION_DENIED` with message `Your project has been denied access. Please contact support.` The bounded safety observation is accepted with residual risk: pre-run active coverage was `41/41`, embedding generation failed for all docs, activation was skipped for failed docs, previous active rows were reported untouched, final summary remained `Active rows: 41` / `Active rows with embeddings: 41`, and the runner failed non-zero with `Knowledge seed failed safety checks: docs_ok=0, docs_failed=10, active_with_embedding=41/41`. This does not claim independent post-failure remote `store_knowledge` validation, workflow rerun, ingestion rerun, metadata cleanup, production Cesarin answer quality, full RAG quality, Product Search quality, DB/Supabase mutation, or secret exposure for that failed observation. Later successful post-Gemini-repair run `25969669995` supersedes the runtime-verification NO-GO while this remains historical failure-mode safety evidence.
+- **Store Knowledge Ingestion Activation Safety Truth**: The accepted commit `05e3401c7d7bb2ac66786001fec24ce55409e233` (`test: harden store knowledge ingestion activation safety`) is canonized as local no-mutation hardening for `supabase/seeds/seed_runner.ts`. The implementation changed only `supabase/seeds/seed_runner.ts` and `src/__tests__/seed_runner.test.ts`; no workflow, package, migration, docs/canon, or secret file changed in the implementation commit. The runner now prepares chunks/embeddings before any deactivation, inserts replacements as `is_active: true`, deactivates previous active rows only after inserted row IDs are available, preserves `EMBEDDING_DIMS = 768`, and preserves workflow command compatibility with `npx tsx supabase/seeds/seed_runner.ts`. It now fails non-zero on embedding errors, insert errors, no processed docs, failed docs, docs OK mismatch, zero active rows, or incomplete active embedded coverage. The local Vitest harness uses fake Supabase and mocked embeddings to prove embedding failure and insert failure do not deactivate existing active rows, successful replacement inserts active chunks before deactivation, and incomplete coverage fails instead of finishing green. Accepted validation passed: `npm run test:run -- src/__tests__/seed_runner.test.ts` (`4` tests), targeted ESLint, targeted TypeScript check, and `git diff --check 05e3401^ 05e3401`. No ingestion, workflow run, Supabase CLI, DB command, remote function, remote call, REST/SQL write, deploy, secret usage, or secret exposure occurred. Residuals remain explicit: future `Run Knowledge Ingestion` still needs separately authorized runtime verification; remote `store_knowledge` state after this hardening has not been revalidated; actual workflow has not been rerun; `metadata.embedding_dims` mismatch remains; no metadata cleanup, production Cesarin answer-quality proof, full RAG quality, Product Search quality, DB/Supabase mutation, workflow/deploy execution, or future workflow success is claimed.
+- **Cesarin Knowledge Service Harness Truth**: The accepted commit `a5a50af06d70505503c6d84cec739d26e34f350f` (`test: add no-mutation cesarin knowledge service harness`) is canonized as a local no-mutation service-level proof that `conciergeService.chat` can return the `knowledge_rag_foundation` capsule contract shape expected by `useAIConcierge` and `AIConcierge`. The implementation added only `src/services/__tests__/concierge.service.knowledge-harness.test.ts` and did not change production service behavior, workflows, package files, Supabase files, docs, or secrets. The harness uses Vitest mocks for `supabase.functions.invoke`, `executeKnowledgeCapsule`, product/search/cart/other capsule executors, product services, attachment service, and pilot activation; telemetry is intercepted locally through `supabase.from`, with the mock throwing before any `ai_analytics` insert builder can exist. It proves a generic main message (`He recopilado esta informacion relacionada para ayudarte.`), `capsule_contract.capsule_name = knowledge_rag_foundation`, `execution_status = SUCCESS`, `match_strategy = MODERATE_CONFIDENCE_MULTI_SOURCE`, `resolved_chunks` with `source_id`, `title`, `category`, and `content`, plus `turn_analysis` and `catalog_gate`. It also verifies the main message does not contain the full DHL policy text while chunks carry substantive answer content. Representative topics covered: shipping, payments, onboarding, Xalapa/store policy, and vape basics. Validation accepted by Codex: `npm run test:run -- src/services/__tests__/concierge.service.knowledge-harness.test.ts` passed with `1` test file / `1` test; `npx eslint src/services/__tests__/concierge.service.knowledge-harness.test.ts` passed; `git diff --check a5a50af^ a5a50af` passed. No remote `customer-intelligence` invocation, real Supabase RPC, DB write, telemetry insert, memory/order/auth/store_knowledge mutation, workflow, deploy, ingestion, Gemini call, secret path, or secret exposure occurred. Residuals remain explicit: this proves mocked local service contract behavior only, not live production Cesarin answer quality, live retrieval-to-answer, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, inactive-corpus root-cause repair, future-ingestion safety, or remote runtime behavior; production-like live smoke remains blocked by mutation paths, the generic-main-message residual from this lane is superseded locally by accepted commit `c65ba23`, `metadata.embedding_dims` mismatch remains, and the prior inactive-corpus root cause remains unrepaired.
+- **Cesarin Knowledge Chunk Visibility Harness Truth**: The accepted commit `7fbd3f127c9bfea82da01384f231858ed7473e09` (`test: add no-mutation cesarin knowledge chunk visibility harness`) is canonized as a local no-mutation UI proof that mocked `knowledge_rag_foundation` `resolved_chunks` render as customer-visible content in `AIConcierge`. The implementation changed only `src/components/ui/ai/__tests__/AIConcierge.test.tsx` and did not change runtime service behavior, workflows, package files, Supabase files, docs, or secrets. The harness mocks `useAIConcierge`, renders `AIConcierge` locally, and injects a generic `ui_render_hint`-style main message plus `resolved_chunks` for shipping, payments, onboarding, Xalapa/store policy, and vape basics. Assertions prove the generic main message, `Manual y Guias`, chunk title `Politica de envio DHL`, category `shipping`, a meaningful DHL shipping snippet, and payment/onboarding/Xalapa/nicotine-guide chunk titles/content are visible. Validation passed via `npm run test:run -- src/components/ui/ai/__tests__/AIConcierge.test.tsx` with `1` test file and `27` tests passing. Existing stderr was local/test noise only (`Supabase no configurado`, mocked framer-motion prop warnings); no remote call, secret exposure, Supabase write, DB write, telemetry insert, memory/order/auth mutation, workflow, deploy, or ingestion occurred. Residuals remain explicit: this proves mocked UI chunk visibility only, not live production Cesarin answer quality, live retrieval-to-answer, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, inactive-corpus root-cause repair, or future-ingestion safety; production-like live answer smoke remains blocked by mutation paths, and the later local main-message synthesis improvement is canonized separately in `c65ba23`.
+- **Match Knowledge Retrieval Smoke Truth**: The accepted read-only direct `match_knowledge` retrieval smoke is canonized as direct RPC retrieval proof after the `store_knowledge` active-corpus repair, not as full RAG/Product Search/Cesarin answer-quality proof. Structural precheck confirmed `133` total rows, `41` active rows, `41` active embedded rows, `0` inactive embedded rows, active vectors parsing as `768d` for all `41` rows, and no expected source IDs missing. Runtime-like parameters were used: query embeddings via Gemini `embedContent`, REST RPC `match_knowledge`, `match_threshold: 0.5`, and `match_count: 3`. Five representative queries returned coherent runtime-threshold top matches: DHL shipping -> `politica-envios-detallada-v1` / `shipping` / `0.7278`; payment methods -> `politica-pagos-v2` / `payments` / `0.7289`; ordering -> `guia-onboarding-v1` / `onboarding` / `0.7349`; physical store / Xalapa delivery policy -> `info-ubicacion-xalapa-v1` / `policies` / `0.7728`; nicotine starter guidance -> `guia-dejar-fumar-v1` / `vape_basics` / `0.7906`. No low-threshold diagnostic was needed. The smoke used REST `GET`, direct Gemini query embeddings, and REST RPC only; no write endpoint, workflow run, deploy, ingestion rerun, `seed_runner`, `knowledge-ingestor`, Supabase mutation, DB mutation, file edit, commit/push, metadata cleanup, repair, or secret exposure occurred. Residuals remain explicit: `metadata.embedding_dims` mismatch remains; root cause of the prior inactive corpus is not repaired; future ingestion may reintroduce inactive state; no full RAG quality, Product Search quality, production Cesarin answer quality, semantic completeness, metadata cleanup, root-cause repair, or future-ingestion safety is claimed.
+- **Store Knowledge Active Corpus Repair Truth**: The accepted remote `store_knowledge` active-corpus repair is canonized as table-level semantic eligibility restoration, not full RAG quality proof. Pre-repair, `match_knowledge` runtime eligibility was blocked because it requires `is_active = true` and `embedding is not null`, while remote `store_knowledge` had `133` total rows, `0` active rows, `0` active embedded rows, and `41` inactive embedded rows. The repair used the old local `.env` only as an in-memory credential source and exposed no secret values. Read-only preflight found exactly `41` coherent inactive embedded candidates across the 10 expected source IDs; categories matched seed truth (`shipping`, `payments`, `vape_basics`, `faq`, `onboarding`, `policies`), and all candidate vectors parsed as `768d`. One narrow REST `PATCH` set `is_active = true` only on the 41 preflight-selected row IDs. Post-repair: `133` total rows, `41` active rows, `41` active embedded rows, `0` inactive embedded rows, all expected source IDs active, no active required-field empties, and `41` active `768d` rows eligible for `match_knowledge`. No insert/delete/upsert/truncate, metadata change, embedding change, content/category/source/title change, workflow run, ingestion rerun, Supabase CLI mutation command, file edit, commit/push, deploy, or secret exposure occurred during repair. Residuals remain explicit: `metadata.embedding_dims` still says `3072` on 40 active rows and is missing on 1 row while actual vectors parse as `768`; root cause is not repaired; future ingestion may reintroduce the inactive-corpus state; semantic ranking quality, Product Search quality, and production Cesarin answer quality are not proven.
+- **Ingest Knowledge Runtime Verification Truth**: GitHub Actions run `25927827351` (`Run Knowledge Ingestion`, `workflow_dispatch`) succeeded on `main` at `76179a4139743f07836f95e20b8dabece69200f6` after the missing `SUPABASE_SERVICE_ROLE_KEY` blocker was repaired and verified by secret metadata name only. Required secret names `SUPABASE_SERVICE_ROLE_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `GEMINI_API_KEY` were present; no secret values were exposed. The workflow preserved `workflow_dispatch`, `actions/checkout@v5`, `actions/setup-node@v6`, Node `22`, secret references by name only, `Check Secrets` output limited to missing secret names, and ingestion command `npx tsx supabase/seeds/seed_runner.ts`. Job `ingest` succeeded and passed `Set up job`, `Checkout repo`, `Setup Node.js`, `Check Secrets`, `Install dependencies`, `Run Knowledge Ingestor`, post steps, and `Complete job`; failed step: none. Check-run annotations returned `[]`. After verification, local HEAD and `origin/main` remained aligned at `76179a4`, with `origin/main...HEAD` at `0 0`; local artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` remained outside scope and untouched. This satisfies the `ingest-knowledge` runtime-verification residual after the Node 24 GitHub Actions migration. Residuals remain explicit: semantic correctness of remote Supabase data contents was not independently validated, and remote Supabase data contents were not manually inspected. Non-claims: no all-workflows rerun, deploy-pages/deploy-functions/graqle-sync rerun, source/workflow/package/Supabase file change, manual DB work, local Supabase CLI execution, local ingestion execution, secret change during runtime verification, or secret value exposure is claimed.
+- **GraQle Sync Runtime Verification Truth**: GitHub Actions run `25925139071` (`GraQle Cloud Sync`, `workflow_dispatch`) succeeded on `main` at `e7cee6216a481ac145a3948aa7c69ba8a2c87bcd` after the Node 24 GitHub Actions migration. The workflow preserved `workflow_dispatch`, `actions/checkout@v5`, `actions/setup-python@v6`, Python `3.12`, and its designed `graqle.json` commit/push step. Steps passed: `Set up job`, `Checkout Codebase`, `Setup Python Runtime`, `Install GraQle Ecosystem & Apply Local Patch`, `Execute GraQle Rebuild`, `Commit & Push Updated Graph`, and post steps / complete job. GitHub check-run annotation count was `0`. The workflow did not push a `graqle.json` commit; after `git fetch origin`, local HEAD and `origin/main` both remained `e7cee62` with no remote drift. This satisfies the selected `graqle-sync` runtime-verification residual. **Residuals**: `ingest-knowledge` is now runtime-verified by accepted run `25927827351`; semantic correctness of remote Supabase data remains unvalidated; raw logs were not exhaustively inspected beyond run metadata, step success, check-run annotations, and remote alignment checks; future `graqle-sync` runs may still push `graqle.json` if graph output changes; the Supabase CLI binary remains moving because `version: latest` is preserved in the deploy-functions workflow; the pinned action SHA will not automatically receive upstream action fixes. **Non-claims**: no all-workflows runtime proof, graph content change, DB/Supabase work, local GraQle execution, local Supabase CLI execution, source/workflow/package change, secret change, or secret value exposure is claimed.
+- **Deploy Functions Runtime Verification Truth**: GitHub Actions run `25924147087` (`Deploy Supabase Edge Functions`, `workflow_dispatch`) succeeded on `main` at `fe3b57c93d2b7105a8773522dd42d16f81f05064` after the Node 24 GitHub Actions migration and immutable `supabase/setup-cli` action pin. The workflow preserved `workflow_dispatch`, `supabase/setup-cli@df56b21da46c98abb12a9804e4fb1f657773e333`, `with: version: latest`, and deploy commands for `knowledge-ingestor`, `create-payment`, and `mercadopago-webhook`; all three deploy steps passed and GitHub check-run annotation count was `0`. This satisfies the selected `deploy-functions` runtime-verification residual. **Residuals**: `ingest-knowledge` is now runtime-verified by accepted run `25927827351`; semantic correctness of remote Supabase data remains unvalidated; the Supabase CLI binary remains moving because `version: latest` is preserved; the pinned action SHA will not automatically receive upstream action fixes; raw logs were not exhaustively inspected beyond run metadata, step success, and check-run annotations. **Non-claims**: no all-workflows runtime proof, Supabase CLI binary immutability, DB work, local Supabase CLI execution, source/workflow/package change, secret change, or secret value exposure is claimed.
+- **Supabase Setup CLI Action Pin Truth:** Commit `d02e3654132dea88ef312a14d79864296c6aa118` (`chore(ci): pin supabase setup-cli action`) was accepted with residual risk and closes the moving-major `supabase/setup-cli@v2` action-reference residual. The commit changed only `.github/workflows/deploy-functions.yml`, replacing the moving major action reference with immutable ref `df56b21da46c98abb12a9804e4fb1f657773e333`; that SHA matched `refs/heads/v2` and peeled `refs/tags/v2.0.0^{}` at audit time. Workflow triggers, deploy commands, `with: version: latest`, and secret references were preserved by name only, and no secret values were introduced. Later run `25924147087` satisfied the bounded `deploy-functions` runtime-verification residual. Residuals remain explicit: the Supabase CLI binary version remains moving because `version: latest` is intentionally preserved, and the pinned action SHA will not automatically receive upstream action fixes. Non-claims: no Supabase CLI binary immutability, DB/Supabase operation outside the workflow deploy, source/package change, or secret change is claimed.
+- **Node 24 GitHub Actions Migration Truth:** Commit `f7519f757582995256c43a53982e4042bc3cf0fd` (`chore(ci): migrate github actions to node 24 runtime`) was accepted with residual risk and canonizes closure of the prior Node.js 20 GitHub Actions runtime residual. The migration changed only `.github/workflows/deploy-pages.yml`, `.github/workflows/deploy-functions.yml`, `.github/workflows/graqle-sync.yml`, and `.github/workflows/ingest-knowledge.yml`; it moved `actions/checkout` to `@v5`, `actions/setup-node` to `@v6`, `actions/upload-artifact` to `@v6`, `actions/setup-python` to `@v6`, and initially `supabase/setup-cli` to `@v2`, later pinned by accepted commit `d02e365` to `df56b21da46c98abb12a9804e4fb1f657773e333`. GitHub Actions runtime is Node 24 through updated action versions, while app/build Node is Node 22 LTS where `setup-node` is configured. `deploy-pages.yml` remains manual-only via `workflow_dispatch` with no `push` trigger and preserves `timeout-minutes: 15`, `WRANGLER_SEND_METRICS: "false"`, and `npx --yes wrangler pages deploy`; Cloudflare and Vite Supabase secret references remain preserved by name only. Verification run `25920238570` (`Deploy Storefront to Cloudflare Pages`) succeeded on `f7519f7` with build, artifact upload, and Cloudflare Pages deploy passing, and GitHub check annotations empty. Later run `25924147087` (`Deploy Supabase Edge Functions`, `workflow_dispatch`) succeeded on `fe3b57c93d2b7105a8773522dd42d16f81f05064`: setup toolchain plus deploy steps for `knowledge-ingestor`, `create-payment`, and `mercadopago-webhook` passed, and check-run annotation count was `0`. Later run `25925139071` (`GraQle Cloud Sync`, `workflow_dispatch`) succeeded on `e7cee6216a481ac145a3948aa7c69ba8a2c87bcd`: setup, checkout, Python runtime, GraQle install/patch, GraQle rebuild, and commit/push step passed; check-run annotation count was `0`, and no `graqle.json` commit was pushed. Residuals remain explicit: `ingest-knowledge` was later runtime-verified by accepted run `25927827351`; semantic correctness of remote Supabase data remains unvalidated; raw logs were not exhaustively inspected; no Node 20 deprecation annotations were found through GitHub check annotations; local Supabase temp artifacts remain unrelated and untouched. Non-claims: no DB/Supabase work outside the workflow deploy, local Supabase CLI execution, secret change, Cloudflare custom domain alias proof, all-workflows runtime proof, or raw-log warning-free proof occurred during canonization.
+- **Cloudflare Pages Deploy Workflow Truth:** The GitHub Actions manual deploy workflow is now fully operational after a complete recovery. Commit `eaee15a` (`chore(ci): harden un-interactive wrangler pages deploy`) hardened the workflow with `timeout-minutes: 15`, `WRANGLER_SEND_METRICS: "false"`, and `npx --yes wrangler pages deploy`. The previously exposed Cloudflare API token was revoked; a new restricted token (`Account → Cloudflare Pages → Edit`) was securely rotated into `CLOUDFLARE_API_TOKEN` via `gh secret set` without value exposure. Successful manual deploy run `25918704188` completed on `2026-05-15`: build passed, artifact upload passed, Wrangler deploy passed, deployment URL `https://2e4d371a.vsm-store.pages.dev`. All four GitHub Actions secrets are active: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. Workflow remains manual-only via `workflow_dispatch` as a parallel controlled-release mechanism; Cloudflare Pages native Git integration remains the primary automatic deploy path for production. The deployment URL is a Cloudflare Pages preview deployment, not the production `vsm-store.pages.dev` custom domain binding. The former Node.js 20 action-runtime residual from this recovery is superseded by the accepted Node 24 GitHub Actions migration in `f7519f7`. Codex acceptance audit verdict remains `ACCEPT WITH RESIDUAL RISK` for both the recovery and the later migration. No DB/Supabase/RPC/migration/order mutation/admin UI work occurred during the deploy recovery.
+- **Admin RPC Switch Production Release Truth:** Production manifest `https://vsm-store.pages.dev/runtime-build.json` now reports `gitShortHash = 726222c` and `runtimeBuildFingerprint = v113-726222c`, so production appears to serve the final canonized admin RPC switch browser-smoke commit. Production admin route observation attempted `https://vsm-store.pages.dev/admin/orders`, but redirected to `/login`; no existing safe production admin session was available, so production admin orders, order drawer, and cancellation UI were not observed. No RPC call, final cancellation click, order mutation, deploy, workflow rerun, DB action, remote SQL, Supabase operation, file change, commit, or push occurred. GitHub Actions Pages workflow for `726222c` (`25901261310`) failed at `Verify Cloudflare credentials` before `npm ci`, build, artifact upload, or `wrangler pages deploy`; production likely updated through Cloudflare Pages native Git integration, but Cloudflare dashboard/API status was not checked. Residuals remain: production admin read-only smoke blocked by auth, remote sandbox RPC smoke unresolved/blocked, GitHub Actions credential failure separate, and production real-order smoke NO-GO.
+- **Admin RPC Switch Read-Only Browser Smoke Truth:** A bounded read-only admin browser smoke passed after `eec1d46` and `ed1be3e`. The smoke used local Vite `http://127.0.0.1:5174/admin/orders` with the local Supabase runtime and the existing sandbox admin session. The admin orders page loaded and showed 9 orders. Eligible unpaid local order `#A8D28D` / `6ea29f71-1c12-42f5-948e-5b4033a8d28d` opened coherently in the detail drawer; the cancellation confirmation UI, reason textarea, and final `Si, cancelar pedido` control rendered, but final confirmation was not clicked. Terminal cancelled order `#00B501` did not show the cancellation button. Network capture recorded `0` calls to `cancel_admin_unpaid_order_with_audit`, and local DB readback confirmed `#A8D28D` remained `processing` / `pending` with `order_admin_events` count `0`. Non-blocking local browser resource noise (`noise.svg` 404 and synthetic-session 403 resource errors) did not crash the UI. This is UI/read-only evidence only: no RPC call, no order mutation, no browser cancellation execution, no remote SQL, no DB push/reset, no deploy, and no production real-order smoke. Remote sandbox RPC smoke remains unresolved/blocked and must not be claimed as PASS; any future executable cancellation proof requires explicitly authorized disposable/sandbox data.
+- **Audited Unpaid Cancellation RPC Runtime Truth:** The accepted RPC substrate commit `489c006` (`feat(db): add audited unpaid cancellation rpc substrate`) adds `public.cancel_admin_unpaid_order_with_audit(p_order_id uuid, p_reason text)` through `supabase/migrations/20260513000002_cancel_admin_unpaid_order_with_audit_rpc.sql`; its canon commit remains `b237927` (`docs: canonize audited unpaid cancellation rpc substrate`). Local validation found the RPC `EXECUTE` ACL too broad (`anon`, `authenticated`, and `service_role`), so accepted pushed commit `c5e2da2` (`fix(db): restrict unpaid cancellation rpc grants`) adds `supabase/migrations/20260513000003_restrict_cancel_admin_unpaid_order_rpc_grants.sql`, leaving `EXECUTE` for `authenticated` only while `postgres` remains owner; canon for that correction is `4cc576a` (`docs: canonize unpaid cancellation rpc grant patch`). Post-patch local validation and local sandbox RPC smoke passed. Because remote/local migration histories diverge, normal CLI migration deploy remains NO-GO; the three accepted SQL files were instead applied remotely to `cvvlorbiwtuhkxolhfie` / `Tienda VSM` through a BOM-free temp bundle outside the repo using `npx supabase db query --linked --file <tempPath> --output json`, in order inside `BEGIN` / `COMMIT`: `20260513000001_order_admin_events.sql`, `20260513000002_cancel_admin_unpaid_order_with_audit_rpc.sql`, and `20260513000003_restrict_cancel_admin_unpaid_order_rpc_grants.sql`. Remote validation passed: `public.order_admin_events` exists, `public.cancel_admin_unpaid_order_with_audit(uuid,text)` exists, the function is `SECURITY DEFINER`, owner is `postgres`, RLS is enabled, admin SELECT/INSERT policies exist, no UPDATE/DELETE policies exist, required indexes exist including the unique partial idempotency index, and final ACL is `{postgres=X/postgres,authenticated=X/postgres}` with `anon_execute=false`, `authenticated_execute=true`, and `service_role_execute=false`. Migration history was intentionally not repaired or marked for these versions because divergence remains a separate lane. The RPC is designed to atomically validate an authenticated admin, lock an eligible unpaid order, preserve `payment_status`, append `tracking_notes` from latest DB truth, update status to `cancelled`, and insert one internal `order_admin_events` row in the same transaction. The active admin unpaid cancellation service path is now switched in pushed commit `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`): `cancelAdminOrder(orderId: string, reason: string)` calls `supabase.rpc('cancel_admin_unpaid_order_with_audit', { p_order_id: orderId, p_reason: trimmedReason })`, returns `Promise<{ id: string }>`, and no longer performs client-side order fetch/update or client-side `tracking_notes` mutation. `currentNotes` was removed from the service, hook, and drawer path. Local short-reason validation, existing error notification flow, and existing admin order/stats/recent-orders cache invalidations were preserved. Validation passed before commit: typecheck, focused service Vitest, and targeted ESLint. No RPC call, order mutation, browser cancellation smoke, remote SQL, `db push`, `db reset`, deploy, provider/refund call, or extra frontend surface occurred during implementation/push/canonization. Remote sandbox RPC smoke remains unresolved/blocked by the safety filter and must not be claimed as PASS; production real-order smoke remains NO-GO. No paid cancellation/refund/customer cancellation/provider/restock behavior exists, and migration history remains intentionally unrepaired/divergent.
+- **Order Admin Events Audit Substrate Truth:** The accepted Phase 1 order admin event substrate commit `b320150` (`feat(admin): add order admin event audit substrate`) adds `public.order_admin_events` via `supabase/migrations/20260513000001_order_admin_events.sql` and TypeScript contract `src/types/order-admin-events.ts`. This is an append-only internal admin audit trail substrate for future order lifecycle events, with order FK, actor fields, event/source/visibility, before/after status and payment snapshots, internal/customer note separation, nullable provider/refund marker fields, metadata, idempotency key, admin SELECT/INSERT RLS, and no UPDATE/DELETE policies. It is schema/types truth only: no cancellation behavior refactor, no admin timeline UI, no `tracking_notes` behavior change, no paid cancellation/manual refund workflow, no customer cancellation request UX, no provider/Mercado Pago call, no refund execution, no inventory restock, no partial refunds, no historical backfill, and no remote Supabase `db push` or deploy.
+- **Reverse Fulfillment Lifecycle Data Integrity Truth**: The accepted reverse fulfillment lifecycle integrity patch (`d66509a`) establishes a bounded database-level safeguard for CRM metrics and loyalty points upon order cancellation or refund. Customer stats are now strictly aggregated from `delivered` orders, and loyalty points are reversed via non-destructive "expired" ledger rows with idempotency guards. This is database truth only: no Admin UI elements, no Mercado Pago outbound calls, and no automated inventory restocking. The migration is committed and pushed to `main`, but remote Supabase `db push` is pending.
+- **Green Validation Recovery Truth:** The accepted recovery commit `e6d240fa51b97f2d75ba7611a794d3afc16cb0ff` (`fix: restore green validation after recovery cleanup`) is pushed to `origin/main` and `main` is aligned with `origin/main`. The accepted package restored the local validation baseline after Windows/Codex recovery: typecheck PASS, lint PASS with `0` errors and `352` warnings preserved, full unit suite PASS with `87` files / `620` tests, and focused React Query, loyalty, Product Search capsule, AI capsule orchestrator, and Concierge Stage4 tests passed. The change was bounded to recovery micro-fixes: Product Search dead-branch removal plus TOKEN_RECOVERY guard correction, Concierge duplicate-guidance suppression and redundant Boolean cleanup, React Query Spanish mojibake copy, OrderDetail dead JSX cleanup, loyalty test expectation alignment to existing source truth, and narrow test TypeScript/lint guards. This is not Docker/WSL/Supabase recovery, not browser smoke, not deploy, not migrations, not remote Supabase work, not `.env` work, not untracked helper cleanup, not full Product Search redesign, not broad Cesarin redesign, and not a loyalty business-logic source change.
+- **Local Stack Recovery Truth:** WSL/VMP admin workflow is enabled, Docker Desktop is running, `docker run --rm hello-world` passed, local Supabase core is up on `http://127.0.0.1:54321`, `http://127.0.0.1:54323`, and `http://127.0.0.1:54324`, local Vite storefront smoke passed against local Supabase, `admin@vsm.local` exists only in local auth with a local `public.admin_users` row, `/admin` and `/admin/cesarin` rendered locally, and remote Supabase hits stayed at `0`. The temp Edge env file `$env:TEMP\vsm-store-local-edge.env` was used without editing `.env`; commit `80abb1e` is `feat(edge): allow local Gemini model overrides with production-safe defaults in customer-intelligence`; local temp env can override Analyst/Sommelier to `gemini-2.5-flash` while production defaults stay `AUXILIARY_MODEL=gemini-2.5-flash`, `CONCIERGE_ANALYST_MODEL=gemini-2.5-pro`, and `CONCIERGE_SOMMELIER_MODEL=gemini-2.5-pro`.
+- **Cesarin OS Operator Surface Truth:** The accepted Cesarin OS admin/operator truth is bounded and not storefront runtime work. `Cesarin OS Operator Consolidation Phase 1` made the main Pilot path telemetry-centered around `PilotTelemetry`, routed main-shell review outcomes through `ReviewDrawer` and the existing signal-state path, and removed `TabLearning`, `TabInterventions`, `TabRepoGraph`, plus the former Pilot pending-orders/runtime-probe/parity/runbook/settings/feedback clutter from the main operator path. The accepted shell-truthfulness reduction at `debcb0a` hid `Simulador`, `Calidad / QA`, runtime parity, and `Sonda del runtime real` from normal `/admin/cesarin` operator navigation, and normal shell mount no longer attempts `ai_simulation_sessions` or `ai_simulation_reports`. The accepted navigation rationalization at `261089b77d68d217c10daac953c59ef00241d288` now groups normal `/admin/cesarin` as daily `Operacion / Mejoras / Conocimiento`, secondary `Historico / Casos`, and advanced/settings `Reglas / Conceptos / Persona`. Hidden/dormant `learning`, `interventions`, `simulator`, `quality`, `PilotParityDiagnostics`, and premium/simulation lab surfaces remain absent from normal navigation. A bounded local authenticated browser smoke opened `/admin/cesarin`, confirmed the accepted groups/tabs were visible, confirmed hidden/dormant surfaces were absent, clicked all visible tabs, observed no fatal JS errors, and observed no regression; one non-fatal `404` resource console error was recorded and is not claimed fixed. Existing behavior/data services remain preserved. This note does not claim storefront changes, Product Search changes, simulator/storefront parity, backend/schema repair, browser/E2E coverage beyond this smoke, backend workflow validation, DB mutation validation, remote Supabase work, or production readiness.
+- **Exposure Gate Truth:** Storefront exposure is now controlled truthfully by the global storefront flag. The old `global AND pilot` rule is no longer the storefront reality: ordinary users see Césarín when `is_ai_assistant_enabled === true`, while pilot authorization remains only as bounded preview/QA override when global exposure is off and as debug/access-path context when global exposure is already on.
+- **Local Storefront Browser Smoke Truth:** One bounded local storefront browser smoke now also exists as local-only operational evidence. After local app/server recovery, local auth recovery, local-only storefront exposure enablement, temp local Edge env regeneration, and local Edge Function restart against the temp env file, the real floating storefront assistant/chat UI rendered locally and accepted the prompt `qué me recomiendas barato`. The local response did not collapse to bare `¡Claro!`, asked a useful narrowing question, kept the catalog gate closed, and showed no product cards; no fatal/blocking JS/runtime error was observed. This note does not claim production/live proof, remote Supabase validation, broad Product Search quality validation, retrieval/ranking/embedding validation, checkout/provider validation, or that external image `404` noise is fixed.
+- **Local Timeout UX Truth:** The accepted storefront AI concierge frontend timeout fix in `e3b13c960a171c7f65bea27c2da464b214419339` is now also bounded pilot truth. The old frontend AI concierge hard timeout was `25,000ms`; the accepted concierge-only UX now shows a slow-response state around `20,000ms` (`Analizando...` -> `Sigo pensando...`) and keeps the final timeout at `60,000ms`. One bounded local browser pass then proved the repaired corridor under a real response that took `21,075ms`: the UI showed the slow-response copy, did not show premature `La respuesta tardo demasiado`, rendered a useful guidance/narrowing response, wrote telemetry, and did not recur to the thin `¡Claro!` symptom. This note does not claim production/live proof, broad Product Search quality validation, retrieval/ranking/embedding validation, backend/Gemini prompt changes, checkout/provider validation, Cesarin OS workflow validation, DB schema change, remote Supabase validation, or that local loyalty-intelligence `400` / external image `404` noise is fixed.
+- **Storefront Image Fallback Truth:** The accepted bounded image fallback commits `3f7e717cc31a796f5912f50cc94242144163603a` (`fix: localize storefront fallback images`) and `86e031da0da2f2702258bf342a9614e60e1b20ca` (`fix: localize neural hero images`) close the customer-visible Unsplash fallback/demo dependency in active hero/category/menu fallback source paths. `MegaHero`, `category-showcase`, `MegaMenu`, and `useNeuralHero` personalized slides now use local SVG fallback assets under `public/images/storefront-fallbacks/`; `Campeón` maps to `hero-extracts.svg`, `En Riesgo` maps to `hero-generic.svg`, and `Novo` / `Prospecto` maps to `hero-vape.svg`. The active bounded paths `src/components/home/MegaHero.tsx`, `src/hooks/useNeuralHero.ts`, `src/constants/category-showcase.ts`, and `src/components/layout/header/MegaMenu.tsx` are accepted clean of Unsplash references. `public/_headers` still allows Unsplash only as a non-active dependency allowance for possible externally supplied/admin-provided images, and migration/seed/product image placeholders were not changed. This does not claim global external-image removal, Product Search validation, retrieval/ranking/embedding validation, checkout/provider validation, loyalty changes, Supabase/Edge/backend changes, production proof, deploy, `db push`, `db reset`, remote Supabase validation, or broad storefront redesign.
+- **Home Featured Category Route Truth:** The accepted Home featured category route/content slice in `bf925f3a371798d6193e9b987caa7048c4958e95` (`fix home featured category routes`) is now bounded pilot storefront truth. The Product Discovery and Merchandising Coherence front selected this as its first implementation slice. The accepted Home mappings are `Líquidos` -> `/vape/liquidos`, `Pods & Mods` -> `/vape/mods`, `Cannabis Premium` -> `/420/concentrados`, and `Accesorios` -> `/vape/accesorios-vape`; visible `LÃ­quidos` mojibake is corrected to `Líquidos`; and a Home-only normalizer covers known stale saved featured-category values. Acceptance audit confirmed only `src/constants/category-showcase.ts` and `src/components/home/CategoryShowcase.tsx` changed, the old Home paths `/vape/pods`, `/420/cannabis`, and `/vape/accesorios` are no longer used, and the accepted routes load without `Producto no encontrado`. This does not claim broader merchandising completion, `/ofertas`, `/buscar`, PDP related products, hero clarity, Product Search, checkout, admin, DB/schema, remote Supabase, deploy, `db push`, or `db reset`; arbitrary future invalid admin-configured featured category slugs are not globally prevented.
+- **Offers/Deals Consistency Truth:** The accepted Offers/deals consistency slice in `25998e9c88c9f294f0f4ec825903cc5205a9f45e` (`fix offers discounted products query`) is now bounded pilot storefront truth. `/ofertas` could show `No hay ofertas activas` while `/vape` and `/420` showed discounted products/counts because the old `getDiscountedProducts` query attempted `filter('compare_at_price', 'gt', 'price')`; if that PostgREST basic query-builder column-vs-column filter errored, the catch path returned `[]`. The accepted path now fetches bounded active stocked comparison-price candidates, filters true discounts locally with `typeof compare_at_price === 'number' && compare_at_price > price`, slices to the requested limit, and includes variants/options for existing `ProductCard` behavior. Validation recorded `/ofertas` with no empty state, no `Producto no encontrado`, 25 rendered discount price pairs, and 0 invalid pairs; `/vape` still loaded with `12 en oferta`, and `/420` still loaded with `13 en oferta`. This does not claim coupons, flash deals, a promotions architecture, `/buscar`, hero clarity, PDP related products, Product Search retrieval/embeddings, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema, remote Supabase, deploy, `db push`, `db reset`, or full Product Discovery completion. Minor accepted residual: the bounded candidate fetch can miss older true discounts if many non-discount compare-price candidates appear first.
+- **Search Expectation Alignment Truth:** The accepted broad category search routing slice in `5310a043af8dbef2c59367c393fee8ceb81db411` (`fix broad category search routing`) is now bounded pilot storefront truth. `/buscar?q=vape` previously treated `vape` as literal product text search and could surface incidental 420 vaporizer matches instead of the expected `/vape` collection path. Exact broad terms after `trim().toLowerCase()` now route as follows: `vape`, `vapes`, and `vapeo` -> section `vape`, `Vape Collection`, CTA `/vape`; `420` -> section `420`, `420 Zone`, CTA `/420`. For those terms, the page bypasses normal literal text search and fetches section products through existing `getProducts({ section, limit: 20 })`; non-broad terms still use `useSearch(query)`. Validation recorded the broad vape terms and `420` showing the expected collection CTA with no empty state and no `Producto no encontrado`; `pod` kept normal search without the broad-section banner; `/vape` and `/420` still loaded normally. This does not claim semantic/vector search, Product Search retrieval/embeddings, Gemini, Césarín response quality, hero clarity/location, PDP related products, checkout/provider, admin/Cesarin OS, DB/schema, remote Supabase, deploy, `db push`, `db reset`, a search engine rewrite, a full synonym engine, every future broad search phrase, or full Product Discovery completion. Minor accepted residual: only exact `vape`, `vapes`, `vapeo`, and `420` broad terms are covered.
+- **Hero Clarity / Acapulco-DHL Truth:** The accepted hero clarity/location consistency slice in `41e8eee3b6d2096ff30651e6572344ba40d572b2` (`fix: align hero copy with DHL shipping truth`) is now bounded pilot storefront truth. The accepted business truth is: the project is operated/developed from Xalapa, the business owner/commercial base is Acapulco, products are mostly imported from China and the United States, there are no personal/local deliveries, and delivery is only through DHL. The Home hero fallback/normalized copy now says `Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.` The Home hero must not claim products are made/fabricated/hechos in Xalapa, free shipping in Xalapa, local delivery in Xalapa, or local/personal delivery in Acapulco; `sin entregas personales` is accepted as a negation. Stale-copy normalization prevents old city-specific/local-delivery/manufacturing claims from surfacing in the Home hero, Home SEO description / sr-only heading were aligned to this truth, and readability was improved only through bounded class adjustments to spacing, vertical positioning, font scale, line height, and text drop shadow. Accepted implementation changed only `src/components/home/MegaHero.tsx`, `src/pages/Home.tsx`, and `src/components/home/__tests__/MegaHero.test.tsx`. Validation recorded the focused MegaHero test file passing with 2 tests, `git diff --check` passing with only a CRLF warning, desktop/mobile browser QA passing for headline cropping/header/bottom-nav/readability/CTA checks, and regression smoke preserving Home featured categories, `/ofertas`, `/buscar?q=vape`, `/vape`, and `/420`. This does not claim PDP related products, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema, remote Supabase, deploy, `db push`, `db reset`, a service-area policy system, pickup/local-delivery support, production proof, or full Product Discovery completion. Minor accepted residual: `npm run test -- MegaHero` timed out from Vitest worker startup/tooling, focused `test:run` passed, browser QA used bundled Node v24 plus installed Chrome due the in-app browser Node mismatch, and tests do not explicitly assert every forbidden phrase while implementation normalization plus browser QA cover the visible Home hero path.
+- **Post-Hero / PDP Shipping Trust Copy Truth:** The accepted post-hero / PDP shipping trust copy slice in `3f2a766ca313219e5af5b293683a9464637a1894` (`fix: align post-hero shipping trust copy`) is now bounded pilot storefront truth. The accepted business truth remains DHL-only national shipping, Acapulco commercial base/owner, Xalapa project/store build location, mostly imported products from China and USA, no personal/local deliveries, no made/fabricated/hechos-in-Xalapa claim, no local delivery zones, no invented free-shipping threshold, and no unsupported delivery-speed promise. Accepted implementation changed only `src/components/home/PromoSection.tsx`, `src/components/home/TrustBadges.tsx`, and `src/components/products/ProductPriceSection.tsx`: post-hero promo copy now says `Envíos por DHL a todo México`, `Productos importados de China y USA`, and `Consultar envío DHL`; Home/PDP trust badges now say `Envío DHL / A todo México` and `Entrega Segura / Solo por DHL`; PDP price/shipping trust now says `Envío DHL Seguro / A todo México`. Accepted evidence is bounded to targeted eslint, touched-file diff check, and text-search verification. This does not claim browser visual QA, green repo-wide typecheck, deploy, remote Supabase validation, DB/schema/migration work, checkout/provider/payment changes, admin changes, AI/Césarín/Product Search changes, Hero/MegaHero changes, a full shipping policy system, pickup/local-delivery support, free-shipping thresholds, delivery-time promises, or full Product Discovery completion. Minor accepted residual: repo-wide typecheck remains red due unrelated/preexisting concierge execution-bridge fixture typing, no browser visual QA was run, and `Consultar envío DHL` routes to `/contact` as a contact CTA rather than a delivery-zone claim.
+- **Desktop Storefront Navigation Route Truth:** The accepted desktop navigation route coherence slice in `b92392c7b1132471a38babc18a7e01612c51ed0e` (`fix: align desktop storefront nav routes`) is now bounded pilot storefront truth. Desktop header navigation no longer exposes the nonexistent storefront `/cupones` path, and authenticated `Mis Compras` now routes to the real customer orders index at `/orders` instead of stale `/perfil/pedidos`. Accepted implementation changed only `src/components/layout/header/DesktopNav.tsx`: the desktop `Cupones` item and its extra divider were removed, `Mis Compras` was retargeted to `/orders`, and the unused `TicketPercent` import was removed. Valid desktop nav/dropdown routes remained preserved for `/nuevo`, `/mas-vendidos`, `/ofertas`, `/vape`, `/420`, and `/rastreo`. Validation recorded targeted eslint, repository-wide typecheck, touched-file diff check, and text search for removed bad paths passing. This does not claim browser visual QA, mobile navigation changes, coupons page/system creation, checkout/provider/payment changes, admin changes, AI/Césarín/Product Search changes, DB/schema/migration work, Supabase work, deploy, `App.tsx` route creation, or full Product Discovery completion. Low accepted residual: no browser visual QA was run, and the diff was limited to one desktop nav config file without structural redesign.
+- **Product Card Cover Image Fallback Truth:** The accepted product-card cover image fallback slice in `02d90c3e6c1d52435b0229408542f4dda6d48844` (`fix: use cover image fallback in product cards`) is now bounded pilot storefront truth. `ProductCard` now uses `product.cover_image` when `product.images?.[currentImage]` is unavailable, so recommendation/related-product paths that carry cover art but no image array can still render a product image. Accepted implementation changed only `src/components/products/ProductCard.tsx`, replacing `product.images?.[currentImage] || ''` with `product.images?.[currentImage] || product.cover_image || ''`. Image arrays remain first priority, existing hover/image-dot behavior remains unchanged, and true no-image fallback remains preserved through the final empty string. Validation recorded targeted eslint, repository-wide typecheck, touched-file diff check, and source check passing. This does not claim all product images are valid, image upload/storage/admin behavior changed, recommendation ranking/selection changed, new recommendations were added, empty recommendation headings were fixed, browser visual QA, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migration, Supabase, deploy, or full Product Discovery completion. Low accepted residual: no browser visual QA was run and no focused ProductCard test was added because no nearby focused harness existed.
+- **PDP Recommendation Section Visibility Truth:** The accepted PDP recommendation section visibility slice in `87ac99725cf4ab73a9226b641950c1604595d0ea` (`fix: gate empty PDP recommendation sections`) is now bounded pilot storefront truth. `ProductDetail` no longer owns unconditional orphan-prone recommendation wrappers/headings for `Comprados juntos habitualmente` or `También te gustará`. `FrequentlyBoughtTogether` now owns the `Comprados juntos habitualmente` heading/divider only after its loading/empty guard, and `RelatedProducts` now owns the `También te gustará` heading/divider only after its loading/empty guard. Empty/loading states stay non-visible, while existing headings and visual treatment remain when recommendation content exists. Accepted implementation changed only `src/pages/ProductDetail.tsx`, `src/components/products/RelatedProducts.tsx`, and `src/components/products/FrequentlyBoughtTogether.tsx`; recommendation ranking, selection, source data, service/query behavior, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migration, Supabase, and deploy were not changed. Validation recorded targeted eslint, repository-wide typecheck, touched-file diff check, and source/text check passing. This does not claim recommendation quality/ranking improved, new recommendations were added, empty recommendation data was fixed, root category chip filtering fixed, broad search accent copy fixed, browser visual QA, or full Product Discovery completion. Low accepted residual: no browser visual QA was run, no focused component test was added, and the change is presentation gating only.
+- **Broad Search Collection Copy Accent Truth:** The accepted broad search collection copy accent slice in `9709ea8c566b00af9971e2ff06565c1f970cd121` (`fix: add accents to broad search collection copy`) is now bounded pilot storefront truth. Broad search banner copy now uses accented Spanish: `Categoria completa` -> `Categoría completa`, `liquidos` -> `líquidos`, `coleccion correcta` -> `colección correcta`, and `Ver coleccion` -> `Ver colección`. Accepted implementation changed only `src/pages/SearchResults.tsx` and `src/pages/__tests__/SearchResults.test.tsx`; the focused test update was limited to CTA accessible text. Broad keys `vape`, `vapes`, `vapeo`, and `420` remain preserved, CTA routes `/vape` and `/420` remain preserved, and `getBroadSectionSearch` plus normal non-broad search behavior remain unchanged. Validation recorded targeted eslint, repository-wide typecheck, focused `SearchResults` vitest passing 3/3 tests, touched-file diff check passing with CRLF warnings only, and text/source check passing. This does not claim semantic search, Product Search changes, search routing behavior changes, product ranking/retrieval changes, full copy cleanup, full Product Discovery completion, browser visual QA, or reopening Slices 1-8. Low accepted residual: no browser visual QA was run, and the change is copy-only.
+- **PDP Duplicate Trust Badge Section Truth:** The accepted PDP duplicate trust badge section slice in `01df4acf1fb7aa616013701fbdbfe9faaedd0a95` (`fix: remove duplicate PDP trust badges`) is now bounded pilot storefront truth. `ProductDetail` no longer renders the nested/sticky-column `<TrustBadges />` block under `ProductImages`; the full-width `<TrustBadges />` section below the main PDP layout remains preserved. `ProductDetail.tsx` now renders `<TrustBadges />` exactly once, and the `TrustBadges` import remains correctly used by the preserved full-width section. Accepted implementation changed only `src/pages/ProductDetail.tsx`; `ProductImages`, `ProductInfo`, `SocialProof`, `FrequentlyBoughtTogether`, `RelatedProducts`, services, routes, search, copy, Product Search, AI/Césarín, admin, checkout/provider, DB, Supabase, deploy, and helper artifacts were not changed. Validation recorded targeted eslint, repository-wide typecheck, touched-file diff check with a CRLF warning only, and source count check passing. This does not claim TrustBadges copy/content rewrite, shipping/trust policy change, PDP redesign, full PDP conversion optimization, recommendation behavior change, full Product Discovery completion, or reopening Slices 1-9. Low accepted residual: no browser visual QA was run, and this is a one-file presentation cleanup.
+- **Section Root Category Chip Descendant Filtering Truth:** The accepted section root category chip descendant filtering slice in `526628562f265ddb1b9bba2d911b43a7f395929a` (`fix: include child categories in section filters`) is now bounded pilot storefront truth. Section root category chips on `/vape` and `/420` now filter product grids by the selected root category family: the active root category ID plus direct child category IDs from the already-loaded `categories` array. Accepted implementation changed only `src/pages/SectionPage.tsx`, adding memoized `activeCategoryIds` and filtering with `products.filter(p => activeCategoryIds.has(p.category_id))`; the old direct-only `p.category_id === activeCategory` filter is gone. `Todos`, sorting via `sortProducts(result, sort)`, ProductGrid, clear-filter, scroll behavior, category cards, and section routes remain preserved. No category service query, backend, route, schema, DB, Supabase, Product Search, AI/Césarín, admin, checkout/provider, deploy, or helper artifact behavior changed. Low accepted residual: direct children only, no recursive hierarchy system, no browser QA was run, and deterministic source-level filtering was accepted as sufficient.
+- **Quick View Cover Image Fallback Truth:** The accepted quick-view cover image fallback slice in `0beee20b7b3c6bfa5ecb5164b14d98757bd7c929` (`fix: use cover image fallback in quick view`) is now bounded pilot storefront truth. `QuickViewModal` main image rendering now uses `product.images?.[selectedImage] || product.cover_image || ''`: the selected image-array entry remains first priority, `product.cover_image` is used only when that selected image is unavailable, and the final empty string keeps the true no-image fallback path so the package placeholder remains reachable. Accepted implementation changed only `src/components/products/QuickViewModal.tsx`. Thumbnail behavior remains tied to actual `product.images` arrays, and modal layout, variant selection, pricing, cart behavior, wishlist behavior, and detail link behavior remain unchanged. No `ProductCard`, services, upload/storage/admin behavior, recommendations, Product Search, AI/Césarín, checkout/provider, DB, Supabase, deploy, or helper artifact behavior changed. Low accepted residual: no browser visual QA was run, the change affects only the main quick-view image source, and no thumbnail or upload/storage behavior changed.
+- **PDP / Quick View Urgency Truthfulness Truth:** The accepted urgency truthfulness slice in `126d01b36181ee5fcd3f0ed1189b9a59d0522479` (`fix: remove synthetic urgency claims`) is now bounded pilot storefront truth. `UrgencyIndicators` no longer renders unsupported synthetic urgency/social-proof claims for people viewing now, last purchase time, sold percentage/progress, or `Se vendieron...` flash-sale/toast behavior. Accepted implementation changed only `src/components/products/UrgencyIndicators.tsx`, removing fake urgency generators including `Math.random()`, `setInterval`, timer-driven fake sale toast logic, random viewing state, and fake sale state. The component API remains compatible with `stock`, optional `viewCount`, and `className`; `viewCount` remains in the prop interface but is not rendered without a truthful data source. Truthful stock states remain visible: `Agotado`, low-stock messaging, and in-stock messaging. Existing callers in `src/components/products/ProductInfo.tsx` and `src/components/products/QuickViewModal.tsx` remained unchanged. No services, analytics/order/inventory queries, backend truth/data, DB/schema/migrations, Supabase, Product Search, AI/Césarín, checkout/provider/payment, admin/upload/storage, deploy, or helper artifact behavior changed. Low accepted residual: no browser visual QA was run, and minor copy polish such as `Ultimas` without accent can remain for later without undermining the truthfulness slice.
+- **PDP / Quick View Purchase Option Copy Accent Truth:** The accepted purchase option copy accent slice in `de5dd1e822526fe514014e624d66f2e786f6edd7` (`fix: add accents to purchase option copy`) is now bounded pilot storefront truth. Accepted implementation changed only `src/lib/domain/products.ts`, `src/components/products/ProductActions.tsx`, and `src/components/products/QuickViewModal.tsx`, correcting customer-facing Spanish accent copy in PDP / Quick View purchase and variant-selection surfaces: `Anadir al carrito` -> `Añadir al carrito`, `catalogo actual` -> `catálogo actual`, `Elige una opcion` -> `Elige una opción`, `Selecciona una opcion` -> `Selecciona una opción`, `Opcion` -> `Opción`, `Opcion no disponible` -> `Opción no disponible`, `ya no esta disponible` -> `ya no está disponible`, `esta disponible` -> `está disponible`, and `Catalogo actual` -> `Catálogo actual`. Remaining `opciones` text is correct Spanish plural and not part of the defect. Focused domain tests passed for `src/lib/domain/__tests__/products.test.ts` with 5/5 tests. This was copy-only: no purchaseability state logic, selected-variant logic, quantity logic, cart behavior, wishlist behavior, pricing behavior, route behavior, recommendation behavior, service/query behavior, checkout behavior, Product Search, AI/Césarín, admin, DB/Supabase/deploy, or helper artifact behavior changed. Low accepted residual: no browser visual QA was run, other unrelated unaccented copy may still exist elsewhere, and this slice does not broaden into full copy cleanup.
+- **Category Filter Empty-State Clear Recovery Truth:** The accepted category filter empty-state clear recovery slice in `25816b4cc1e4fa57ff6811c95fe593a96ae95e18` (`fix: clear category filters from empty grid`) is now bounded pilot storefront truth. Accepted implementation changed only `src/pages/CategoryPage.tsx`. Category leaf pages now pass `onClearFilter` to `ProductGrid` only when active filters exist, the original category product list has products, and the filtered/sorted result is empty. The clear-filter handler resets `priceRange` to `[availableFilters.minPrice, availableFilters.maxPrice]` and `attributes` to `{}`, using existing product-derived available filters from `getAvailableFilters(products)`. `Limpiar filtro` now recovers the category product grid for active-filter zero-result states, while true no-product categories do not get a misleading clear-filter CTA. Existing sorting remains preserved through `sortProducts(filteredProducts, sort)`. `ProductGrid.tsx`, `FilterSidebar.tsx`, and `src/lib/product-filtering.ts` were inspected but not modified. Desktop/mobile filter sidebar behavior, child category cards, product fetching, route behavior, services, filtering utilities, Product Search, AI/Césarín, checkout/provider/payment, admin, DB/Supabase/deploy, and helper artifact behavior remain unchanged. Low accepted residual: no browser visual QA was run, acceptance is source-level plus lint/typecheck, and the logic uses existing filter reset semantics already present in `FilterSidebar`.
+- **Exposure Causality Note:** The observed `degraded-ux-timeout-01` standing-gate failure was acceptance-audited as unrelated runtime latency noise outside this exposure-gating front's causality.
+- **Base Build:** v113 (Wave 193 - Marketing AI Reality Repair)
+- **Model Stack (canonical for the audited storefront/customer-intelligence core path):**
+  - Analyst / Sommelier: `gemini-2.5-pro` via the shared Gemini helper on Gemini API `v1beta`
+  - Auxiliary/admin-style paths where still applicable: `gemini-2.5-flash`; this pilot note does not restate repo-wide API-version uniformity outside the audited core path
+  - Embeddings in the audited core path: `gemini-embedding-001` via Gemini API `v1beta` + `outputDimensionality: 768`
+  - Note: this `v1beta` convergence is the accepted truth for the audited `customer-intelligence` core path in this lane; it does not claim that every Gemini-consuming edge function in the repo is already converged.
+- **Retrieval Quality:** Live semantic retrieval is operational again after provider access recovery, embedding repopulation completion, and the accepted downstream search-quality micro-fixes. Current accepted residual truth remains explicit: broad-query purity is not perfect and some exploratory product turns remain commercially loose, but these are no longer operational blockers.
+- **Telemetry Ownership:** The storefront edge/client telemetry handshake now includes explicit `telemetry_contract` ownership signaling that reduces future drift between edge-owned and client-owned logging. Legacy signals still coexist for compatibility; this is not documented as total telemetry unification.
+- **Reliability Gate:** The accepted Phase 1 authenticated harness now remains the standing regression gate for the defined runtime-quality suite. The final accepted frozen baseline is `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0`. This is closure for the defined Phase 1 gate only, not a claim of permanent immunity from future drift.
+- **Sales Recovery Behavior:** Exact-product misses can recover through bounded token-based catalog matching when semantic expansion is not required. Token recovery remains useful, but it is now surfaced separately from embedding-based semantic suggestions in drafting, telemetry, and the storefront label surface.
+- **Current PRODUCT_SEARCH Truth:** The explicit operational hold is lifted. Live public query embeddings are aligned to `768d`, repopulation is complete, exact grounded hits no longer lose to ambiguity fallback, and weak/noisy product turns now degrade honestly to `NO_MATCH`. Residual broad-query looseness remains accepted as non-blocking follow-on tuning, not as an active hold condition.
+- **Product-Search Message Coherence Truth:** In the client `product_search_integrity` capsule branch, admin `response_text` still logs `capsuleContract.customer_response_draft`, admin `offered_products` remain aligned with storefront cards, and the storefront chat bubble now protects grounded capsule draft truth from later `finalMessage` / `humanizedMessage` / `conciseMessage` weakening when the same turn already has grounded product support. This is branch-local storefront/runtime coherence only: no retrieval change, no capsule execution change, no prompt/routing redesign, no schema/admin analytics redesign, no checkout/payment/provider work, and no claim of semantic-proof grounding or global message-shaping convergence.
+- **Response Compaction Truth:** The accepted client-side compaction fix in `3faaae0` (`fix: relax AI concierge response compaction to 8 sentences`) and regression lock in `99efa7a` (`test: add regression tests for AI concierge response compaction logic`) close the known corridor where admin could show richer `capsuleContract.customer_response_draft` text while the storefront bubble rendered a later 2/3-sentence compacted version. `compactCesarinCopy`, `mergeConversationalPrefix`, `getEffectiveConversationalPrefix`, and Product Search final-message compaction now use an 8-sentence ceiling, so richer customer-response drafts can survive storefront rendering when grounded. Duplicate removal, redundant closing removal, prefix distinctness checks, clarification/public-info/source-context prefix suppression, and product-anchor fallback protection remain preserved. Focused regression coverage passed with 25 tests in `src/lib/__tests__/cesarin-text-utils.test.ts`. This is a bounded storefront/client response-quality fix only: no retrieval/ranking/embedding validation, no backend prompt/persona rewrite, no Supabase Function change, no checkout/provider validation, no loyalty fix, no remote Supabase validation, no deploy, and no claim that every response-quality issue or every admin/front divergence is solved forever. Future poor responses should be diagnosed by comparing the storefront bubble, network payload, `ai_analytics.response_text`, and `ai_logic_debug`.
+- **Micro-Input Recovery Truth:** The accepted micro-input copy fix in `dff1a42e44ff8128e05bbde5747c0a02d761d8cb` (`fix: improve micro input recovery copy`) is now bounded storefront/customer-intelligence pilot truth. Known micro fragments `q`, `qu`, `que`, `?`, and `mmm` now produce `Parece que se te cortó el mensaje, ¿qué querías decirme?`; `tienes` asks `Sí, ¿qué producto o sabor estás buscando?`; `no sé` gets guided help; and `ayuda` / `hola` remain helpful rather than cut-message recovery. The guard applies only on clarification-first closed-catalog zero-tool / zero-product-surface turns and does not trigger for catalog-open, product-card, tool, or capsule-result turns. Focused tests passed with 13 tests in `src/lib/__tests__/customer-intelligence-response-shape.test.ts`, and normal storefront assistant browser/runtime validation passed for `q`, `qu`, `que`, `?`, `mmm`, `tienes`, `no sé`, `ayuda`, and `hola`: no cards, no timeout/Gemini/API blocker, and no Product Search/capsule compaction regression. Telemetry stayed closed-catalog and zero-card: micro fragments logged `UNKNOWN`, `tienes` and `no sé` logged `PRODUCT_SEARCH`, `ayuda` logged `SUPPORT`, and `hola` logged `GREETING`. Local helper artifacts (`check_analytics*.cjs`, `check_audit.cjs`, `check_auth.cjs`, `enable_ai.cjs`, `repair_auth.cjs`, `test_edge*.cjs`, `test_prompts*.cjs`, and `supabase/snippets/`) remain untracked/uncommitted and preserved. This is a bounded response-copy guard only: not broad persona work, not Product Search retrieval/ranking/embedding validation, not checkout/provider validation, not a loyalty fix, not DB/schema/migration work, not remote Supabase validation, not deploy, and not full unclear-intent matrix coverage. Local loyalty-intelligence `400` / `401` JWT console noise remains non-blocking and unfixed; greeting duplication in `hola` can be watched later if repeated.
+- **Clarification-to-Conversion Behavior:** For exploratory product-seeking turns, the storefront response now tries to narrow on one useful axis first and frame the shown options as a choice only when the comparative evidence is actually supported. When product differences are weak, the storefront stays neutral instead of inventing a start-here hierarchy. This does not change retrieval architecture or S94 honesty boundaries.
+- **Choice-to-Confidence Behavior:** Once the storefront already has a likely choice, the assistant may reinforce that option with short, modest confidence language only when the support is real. Weak-support cases must stay neutral, and multi-exact exact-match cases must not imply that one clear option already won unless there is truly only one exact in-stock match.
+- **Confidence-to-Cart Behavior:** Storefront handoff strength must now match branch support honestly. Weak-support fallback cases should stay at review/PDP level, while stronger exact or support-backed paths may progress naturally into review-then-cart wording. Cart-adjacent language must not appear just because only one fallback product survived.
+- **Variant-Level Precision / Disambiguation Behavior:** When a turn materially asks for a concrete variant-bearing attribute, the storefront now carries bounded `variant_truth` through retrieval and drafting so it can distinguish `available`, `missing`, `ambiguous`, and `unsupported` truth. This is catalog-grounded only: missing or ambiguous variant truth must downgrade confidence/readiness to PDP review or selector-needed posture, while confirmed in-stock variant truth may be surfaced more explicitly when grounded. This does not make the storefront a broad variant engine or stock oracle, and unusual phrasing still falls back to bounded catalog truth rather than invention.
+- **Promotion-Awareness / Incentive Yielding Behavior:** When real active promotion truth exists, the storefront may now surface one bounded `promotion_signal` through the existing product-search message path. The accepted states are `FLASH_DEAL` and `COUPON`; flash deals are product-matched and active, while coupons are structurally valid public coupons filtered by active flag, valid date window, positive discount, max-uses not exhausted, and prior customer use when customer identity is available. This is informational only, checkout remains the final eligibility truth, no discount is auto-applied, and missing or unavailable exact variant truth still suppresses promotion pressure rather than inventing urgency.
+- **Authenticated Routine Replenishment / Conversational Reorder Behavior:** When an authenticated customer expresses explicit reorder intent, the storefront may now resolve one bounded `replenishment_signal` from real authenticated order / order-item history and current catalog truth. Replenishment candidates are revalidated against current catalog reality before surfacing, `retrieval_source` may be `AUTHENTICATED_REORDER` on this path, inactive / discontinued / invalid-variant / unavailable historical items do not return as ready-to-repeat, and Stage 5 may surface `ADD_READY` only when current catalog truth still supports direct add with grounded quantity and variant intact; otherwise the path stays `REVIEW_ONE` through the existing storefront message / next-step / add-to-cart surfaces only. This remains bounded authenticated reorder help, not guest reorder memory, not a purchase-history browser, not subscriptions or predictive auto-reorder, not CRM expansion, and not checkout/payment redesign.
+- **Authenticated Order Tracking / Post-Purchase Resolution Behavior:** When an authenticated customer asks post-purchase questions such as payment confirmation, order status, shipping state, or persisted guide availability, the storefront may now resolve one bounded `authenticated_order_tracking` path with `order_tracking_signal` grounded only in authenticated persisted order data. Hydration stays bounded to recent relevant orders and may support explicit order-number lookup only inside that bounded set; payment/order/tracking summaries reuse canonical storefront order/payment truth; `ORDER_TRACKING` now prefers this authenticated capsule path instead of generic fallback/policy behavior; responses stay non-catalog and advisory by default, with route handoff added only for the separately accepted checkout-execution bridge when pending Mercado Pago continuation is eligible; and guest / no-order / no-tracking cases degrade honestly. This remains read-only storefront assistance only, not guest order access, not refunds/cancellations/order edits, not courier scraping, not a full order-history browser or CRM panel in chat, and not checkout/payment redesign.
+- **Checkout Execution Bridge Behavior:** When existing checkout-readiness or authenticated order-tracking truth makes continuation eligible, the storefront may now expose one bounded route handoff through the existing `message.action` CTA surface only. The accepted handoffs are exact: `Abrir checkout` -> `/checkout`, `Retomar orden abierta` -> `/orders/{id}`, and `Continuar pago pendiente` -> `/payment/pending?order_id={id}`. This remains orchestration-only and route-based: non-eligible states stay advisory-only, `next_step_view` is not expanded for this front, and no autonomous checkout/payment execution is introduced.
+- **Compatibility-to-Attachment Behavior:** When a single in-stock primary product already has strong support and the compatibility/concepts graph confirms an attachable relation, the storefront may surface one bounded compatible attachment through existing `next_step_view` / `secondaryAction` surfaces only. The attachment path is graph-backed, stays suppressed on compare / exploratory / approximate / direct factual turns, and improves basket-building without opening a second funnel. Products without graph grounding may produce no attachment offer.
+- **Compatibility / Fit Verification Behavior:** When a customer explicitly asks whether one product fits another device or accessory, the storefront may now resolve one bounded `storefront_compatibility_check` path through the existing compatibility/concepts truth and only safe unambiguous cart context. The accepted states are `COMPATIBLE`, `INCOMPATIBLE`, `NEEDS_MORE_CONTEXT`, `NO_GROUNDED_MATCH`, and `REVIEW_PRODUCT`. The lane stays read-only, message-only, and surface-limited; it does not invent fit, mutate the cart, or auto-act on the answer.
+- **Objection-to-Recovery Behavior:** Late-stage objections should now recover locally inside the already narrowed branch instead of resetting the funnel. `cheaper`, `worth_it`, hesitation, and nearby-alternative handling must stay grounded in current branch support, only one nearby alternative should appear when justified, and objection paths should stay persuasive but conservative on action strength.
+- **Recovery-to-Commitment Behavior:** After a grounded objection recovery already exists inside a narrowed branch, the storefront may now add a stronger commitment-ready close only when that recovery is support-backed. Weak-support recovery must remain conservative, and two-option recovery must stay focused on the current pair instead of reopening broader browsing.
+- **Commitment-to-Checkout-Readiness Behavior:** After commitment already exists, the storefront may now add a bounded checkout-readiness step only when the readiness check itself is explicitly support-backed. This is not checkout execution or payment flow; weak and multi-option paths must stay conservative, and ordinary selectorless single-product paths must not sound checkout-ready.
+- **Checkout-Readiness-to-Cart-Precision Behavior:** After checkout-readiness already exists, the storefront may now add a bounded selector-backed cart-precision step only when a materially purchase-defining selector is actually supported. This is not cart execution, checkout execution, or payment flow; selectorless strong paths must stay at readiness, and weak or multi-option paths must remain non-precise.
+- **Cart Dependency Audit Behavior:** In cart/checkout-readiness contexts, the storefront may now audit the active cart for one graph-backed missing dependency using the existing compatibility/concepts substrate. The guidance is advisory only, limited to strict dependency relations, filtered to active in-stock dependent products, suppressed when the cart already satisfies the dependency or is already blocked / in a stronger-correction state, and rendered through existing readiness surfaces only. This is not bundle mode, not multiple warnings, not variant-level or quantity-level reasoning, and not guaranteed for graphless products.
+- **Cesarin Stage 1 Behavior:** The storefront assistant now speaks in a shorter, more oral, more honest style under uncertainty, can admit when a product/query still catches him off guard, offers a visible approximate-recovery loop (`Esta se parece mas` / `Ninguna`) when nearby products are all that can be shown truthfully, and escalates honestly to the real WhatsApp path when rescue is clearly failing. This does not add deep customer memory, autonomous learning, or fake human-support promises.
+- **Cesarin Stage 2 Behavior:** Authenticated returning customers may now receive sharper recommendation continuity through lightweight taste memory over `flavor`, `budget`, `format`, `brand`, `intensity`, and `experience`. Memory use is compact and humble: current turn always overrides prior memory, weak signals stay soft, explicit rejection stays conservative, and guests still do not get fake durable memory. Historical interests no longer gain fake recency/hits just because they survived merge.
+- **Cesarin Stage 3 Behavior:** The storefront now converts that same bounded taste memory into real commercial judgment for authenticated returning customers. Relevant liked profiles can lift stronger options, rejected/disliked paths can move downward, budget posture can nudge ordering conservatively, and approximate recovery inherits better top suggestions because reranking happens before the existing recovery loop. Current turn still overrides prior memory, and this remains bounded storefront behavior rather than a giant ranking engine or CRM layer.
+- **Cesarin Core Refactor - Wave 1 (accepted):** The storefront/customer-intelligence core is now materially less rail-driven. Cesarin identity is slimmer and less seller-scripted, runtime separation is clearer between model reasoning, native capabilities, own functions, and UI affordances, the old main-path `UNKNOWN -> PRODUCT_SEARCH` coercion is gone, forced product-search injection is gone from the main path, and degraded Analyst fallback no longer coerces product search. This remains Wave 1 only: not Wave 2, not a catalog-gate redesign, not an anti-bloat rewrite, and not removal of all Stage 4 / Stage 5 infrastructure.
+- **Cesarin Core Refactor - Wave 3 (accepted):** The storefront/customer-intelligence core is now materially catalog-gated at runtime/storefront level. An explicit catalog gate now exists in the real path, products no longer appear by reflex, clarification-first and non-catalog turns stay product-suppressed, stale product/recovery/next-step product surfaces now suppress themselves when the gate closes, and legitimate search-leading turns still keep products plus approximate recovery when justified. This remains Wave 3 only: not Wave 4 anti-bloat, not live/voice, not a giant planner/orchestrator, and not a claim that the final small persona patch alone created the whole lane.
+- **Cesarin Core Refactor - Wave 4 (accepted):** The storefront/customer-intelligence core is now materially less bloated in runtime/storefront output. Explicit anti-bloat response discipline now exists in the real runtime/storefront path through `RESPONSE_SHAPE_RULES`, `compactCesarinResponseText(...)`, and `shapeCesarinResponseText(...)`; Stage 4 no longer appends an extra commercial tail when the useful move is already present; Stage 5 now keeps actionable guidance in `next_step_view` instead of reinjecting it into the main assistant text; and storefront/hook/UI now avoid redundant recovery and next-step duplication. Useful surfaces remain preserved when justified: approximate recovery, next-step help, honest WhatsApp fallback, and truthful business/action boundaries. This remains Wave 4 only: not Wave 5 tool-index work, not web-intelligence, not a planner/orchestrator redesign, not a new mode system, not a new funnel/CTA layer, and not live/voice.
+- **Cesarin Core Refactor - Wave 5 (accepted):** The storefront/customer-intelligence core now has a real explicit capability box and bounded runtime capability plan. The accepted Wave 5 implementation introduced an explicit split between `MODEL_KNOWLEDGE`, `NATIVE_PUBLIC`, and `OWN_FUNCTION`; runtime now builds and uses `capabilityPlan`; edge execution now uses `capabilityPlan.serverToolCalls`; and intent filtering is centralized through the capability index / capability-id mapping rather than a separate hidden guardrail routing table. `public_web_search` and `public_url_context` now exist as honest reserved slots only. This remains Wave 5 only: not active Wave 6 web intelligence, not a planner/orchestrator redesign, not a storefront UI redesign, and not admin / Cesarin OS work.
+- **Cesarin Core Refactor - Wave 6 Web Intelligence (Pass 1) (accepted):** The storefront/customer-intelligence core now has bounded active public-web intelligence inside the accepted capability box. `public_web_search` and `public_url_context` are now real active `NATIVE_PUBLIC` capabilities; `MODEL_KNOWLEDGE` remains the default when external lookup is unnecessary; `OWN_FUNCTION` still wins for private truth, internal state, and real action; `PUBLIC_INFO` is non-catalog; and public-web execution stays bounded through `capabilityPlan.serverToolCalls` rather than a new planner/orchestrator. Public-web use remains compact, policy-gated, and non-reflexive. This remains Wave 6 Pass 1 only: not full web-intelligence completion, not a storefront UI redesign, and not admin / Cesarin OS work.
+- **Cesarin Core Refactor - Wave 6 Web Intelligence (Pass 2) (accepted):** The storefront/customer-intelligence core now includes one accepted honesty/visibility micro-pass over Wave 6 Pass 1. Successful `public_web_search` / `public_url_context` executions may now surface compact `source_context` in bounded form: small public-context indicator, optional brief, and up to 2 normalized public sources. That provenance appears only when public web actually ran successfully, `PUBLIC_INFO` remains non-catalog, product/recovery/next-step product surfaces remain suppressed on the relevant storefront path, the storefront contract stays materially intact with only a narrow extension, and legacy public-web helpers remain deprecated compatibility-only rather than the active primary path. This is Pass 2 only: not a citation framework, not a storefront UI redesign, and not full Wave 6 completion.
+- **Cesarin Core Refactor - Wave 6 Web Intelligence (Final Micro-Pass) (accepted):** The storefront/customer-intelligence core now includes the final accepted Wave 6 hygiene closure. Explicit negative-path proof now exists that ordinary non-public-web turns do not surface `source_context`, dead legacy `public_web_search_legacy` / `public_url_context_legacy` plus their legacy-only shim path are removed, compact public-context provenance still appears only when public web actually ran successfully, `PUBLIC_INFO` remains non-catalog, and the active public-web path remains the bounded primary runtime path only. This is final Wave 6 hygiene only: not a new architecture lane, not a citation framework, not a storefront UI redesign, and not full Wave 6 expansion.
+- **Cesarin Core Refactor - Wave 7 Memoria y Contexto Blando (accepted):** The storefront/customer-intelligence core now has bounded soft continuity. Runtime can now reuse recent session context, authenticated `ia_context`, and lightweight existing memory context more usefully, but continuity remains soft, compact, humble, and optional; topic/lane shift suppresses stale continuity push; the current turn stays sovereign; continuity does not reopen catalog by itself; guests still do not get fake durable memory; and authenticated continuity remains lightweight rather than deep transcript memory or a CRM-style layer. This remains Wave 7 only: not a storefront UI redesign, not a planner/orchestrator redesign, and not deep memory infrastructure.
+- **Cesarin Core Refactor - Post-Refactor Convergence / Hardening Wave (accepted):** The storefront/customer-intelligence core now runs on a cleaner converged concierge baseline. Analyst / Sommelier are explicitly aligned to `gemini-2.5-pro`, auxiliary/admin-style paths may still stay on auxiliary Flash where applicable, the capability box is now the clearer primary routing authority in Analyst prompting, final-answer ownership is cleaner, and stale conversational prefix is explicitly suppressed through shared runtime logic on `ASK_CLARIFYING_QUESTION`, grounded `PUBLIC_INFO` turns with `source_context`, and duplicate prefix/text overlap. This remains convergence/hardening only: not a new architecture lane, not a storefront UI redesign, not a new commercial UX lane, not live/voice, and not admin / Cesarin OS work.
+- **CÃ©sarÃ­n Storefront - Commercial Visibility / UX Effectiveness Wave (accepted):** The storefront assistant now expresses customer-facing help more clearly without reopening core rails or redesigning the storefront from zero. Visible help differentiation is now active through only four compact truthful labels: `Contexto publico`, `Ayuda de producto`, `Paso accionable`, and `Guia directa`; `Siguiente paso` is clearer when support is real; Stage 5 copy is more customer-facing without becoming pushy; product help remains catalog-gated; public context remains bounded to real public-web support; actionable help remains distinct from product pressure; and suppressed/non-catalog turns do not get mislabeled as product help. This remains a bounded visible storefront pass only: not measured conversion uplift, not a storefront redesign, and not a funnel engine.
+- **CÃ©sarÃ­n Storefront - Commercial Outcome Hardening Wave (accepted):** The storefront assistant now also hardens commercial outcome choice itself rather than only making it more visible. Stage 5 now explicitly grades support as `weak`, `supported`, or `strong`; weak or approximate cases stay humbler and more exploratory/review-first; `ADD_READY` is tightly restricted to genuinely strong single-product support; two viable products stay compare-worthy more often; weak single-product support stays review-first instead of action-ready; and true add-ready help may now surface more clearly as `Paso accionable` while ordinary catalog-open product help still remains `Ayuda de producto`. This remains a bounded storefront/customer-facing improvement lane only: not measured conversion uplift, not a ranking engine, not a funnel engine, and not a storefront redesign from zero.
+- **CÃ©sarÃ­n Storefront - Trust & Transparency Hardening Wave (accepted):** The storefront assistant now also makes recommendation posture easier to read through compact visible trust signaling. Stage 5 guidance now uses clearer human trust-language, and the UI now helps users read the difference between weak exploratory help, compare-worthy help, prudent review-first help, and clearer add-ready help through subtle notes such as `Todavia estamos afinando`, `Las dos traen buen caso`, `Es la mejor pista por ahora`, `Es la ruta mas clara`, `Ya va bien encaminado`, and `Ya viene bien amarrado`. Public-context turns remain isolated from product-confidence language, catalog-closed lanes remain closed, and this remains a bounded trust/clarity pass only: not a confidence score system, not a confidence meter, not a badge zoo, not a debug taxonomy surface, and not measured trust/conversion uplift.
+- **CÃƒÂ©sarÃƒÂ­n Storefront - Decision Flow Naturalization Wave (accepted):** The storefront decision flow now follows upstream posture more naturally instead of leaning on older storefront forcing. `turnAnalysis` now materially informs storefront stage shaping, Stage 4 follows upstream model posture more closely, the storefront service no longer forces the old `EXPLORE_LIGHT` fallback through `modeHint`, regex/helper duplication between Stage 4 and Stage 5 is materially reduced, and the accepted weak-support semantic/approximate single-candidate regression is now closed so humble `KEEP_EXPLORING` is preserved when upstream posture still remains `GUIDED_COMPARE`. This remains a bounded storefront naturalization lane only: not full heuristic removal, not full model-pure family resolution, not a planner/orchestrator redesign, and not a storefront redesign from zero.
+- **CÃ©sarÃ­n Assistant Runtime â€” Technical Cleanup & Coherence Wave (accepted):** The storefront/runtime baseline now also includes a bounded coherence cleanup. Stage 4 no longer carries the dead `modeHint` contract, fallback `current_turn_decision` is now canonicalized through a shared resolver, service and hook are materially aligned on fallback decision truth, and legacy `conversation_mode_hint` no longer influences fallback decision posture. This remains a bounded runtime cleanup only: not a full runtime rewrite, not total fallback unification, not a planner/orchestrator lane, and not a new product behavior pass.
+- **AI Platform Integrity & Runtime Convergence (accepted with minor residual risk):** The audited storefront/customer-intelligence core path now has one bounded runtime integrity/convergence pass on top of the accepted baseline. Gemini calls inside that audited core path now converge through one shared `v1beta` helper policy instead of accidental internal `v1` / `v1beta` drift, and the storefront edge/client telemetry handshake now includes explicit `telemetry_contract` ownership signaling that materially reduces future ownership drift. This pilot note keeps the residual truth explicit: the Gemini convergence here is only for the audited core path, `telemetry_contract` still coexists with legacy signals for compatibility, and the broader `knowledge-ingestor` hardening from the same lane was accepted by code inspection rather than storefront end-to-end pilot proof.
+- **CÃ©sarÃ­n Storefront â€” Recovery & Friction Handling Wave (accepted):** The storefront baseline now also includes one bounded friction-reduction improvement. Weak `REVIEW_ONE` may now expose a subtle `Seguimos viendo` reentry affordance through `next_step_view.assistAction`, but only for weak-support review-first states; it stays inside the existing gated next-step surface, returns the user to the normal conversation flow through ordinary `sendMessage(...)`, and does not create a new route, parallel executor, or product-pressure lane. This remains a bounded recovery/friction pass only: not a funnel engine, not a planner/orchestrator path, not measured conversion uplift, and not full friction elimination.
+- **CÃ©sarÃ­n Storefront / Assistant â€” Shaping Spine Consolidation Wave (accepted):** The storefront/runtime baseline now also includes a more coherent shaping spine. Shared text-shaping utilities are centralized in `src/lib/cesarin-text-utils.ts`; service and hook rely more directly on shared/server truth and less on local reinterpretation; `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly; and `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`. The auditability micro-fix then added focused UI regressions to explicitly guard that contract, so the prior residual is understood as auditability-only rather than active product duplication. This remains a bounded spine-consolidation lane only: not a full assistant rewrite, not perfect centralization everywhere, and not a new commercial behavior pass.
+- **Current Embedding Coverage:** live embedding canon is now aligned to `768d`, and active `products` plus active `store_knowledge` are fully repopulated with no null embeddings remaining. This is current recovered runtime truth, not the earlier hold-era repopulation failure state.
+- **Cesarin Stage 4 Behavior:** The storefront still adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`, but storefront shaping no longer depends on edge `conversation_mode_hint` as a required runtime dependency. Strong-signal turns can still get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, and broad weak-memory turns stay exploratory. This remains bounded primarily to the main commercial/product-search lane, not all Cesarin behavior.
+- **Cesarin Stage 5 Behavior:** The storefront now also resolves one bounded next actionable storefront step after recommendation through `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`. Stage 5 runs after Stage 3 reranking and Stage 4 posture shaping, hydrates real product data before deciding the next move, attaches `next_step_view` to the capsule contract, and renders a real `Siguiente paso` block in the UI using existing `OPEN_PDP` and `ADD_TO_CART` storefront actions only when support is real. Compare/exploration remain honest when close is not justified, selector-needed stays grounded in real product/variant evidence, and current-turn intent can still block stale memory/posture from forcing action confidence.
+
+## Wave 2 Operating Truth
+- Cesarin is now materially turn-first at the runtime/storefront behavior level.
+- Runtime computes a bounded current-turn profile with `primary_intent`, `secondary_intents`, `turn_priority`, `current_turn_decision`, `turn_focus`, `primary_tool_calls`, and `queued_tool_calls`.
+- Runtime acts from `primary_intent` and filters tool calls to the primary lane.
+- Mixed-intent turns are handled in a bounded truthful way: one primary need is resolved first while secondaries remain queued context.
+- Current-turn needs can override stale prior-lane momentum.
+- Storefront search/product/recovery/next-step product surfaces suppress themselves when the current turn is no longer search-first.
+- Wave 1 gains remain preserved: lightweight memory, approximate recovery, honest WhatsApp fallback, truthful business/action boundaries, and honest guest non-persistence.
+- Non-claims remain explicit: no Wave 4 anti-bloat, no new mode system, no giant planner/orchestrator, and no live/voice work.
+
+## Wave 3 Operating Truth
+- Cesarin is now materially catalog-gated at the runtime/storefront behavior level.
+- `resolveCatalogGate(...)` exists in `supabase/functions/customer-intelligence/intent-guardrails.ts`, runtime consumes it in `supabase/functions/customer-intelligence/index.ts`, storefront normalizes/applies it in `src/services/concierge.service.ts`, the hook carries/respects it in `src/hooks/useAIConcierge.ts`, and the UI suppresses product surfaces from it in `src/components/ui/ai/AIConcierge.tsx`.
+- Clarification-first behavior is real: `ASK_CLARIFYING_QUESTION` and `UNKNOWN` close the gate, and search tools are stripped from the capability plan when the gate is closed.
+- When the gate is closed, products are cleared, `resolved_products` are cleared, `next_step_view` is nulled, and stale product/recovery/next-step product surfaces are suppressed.
+- Legitimate search-leading turns still surface products and approximate recovery when the current turn is clear enough and product help is materially justified.
+- Wave 1 and Wave 2 gains remain preserved underneath the gate.
+- Non-claims remain explicit: no Wave 4 anti-bloat, no live/voice, no giant planner/orchestrator, no admin / Cesarin OS drift, no total removal of all prior helper shaping, and no claim that the final tiny persona patch alone implemented the whole lane.
+
+## Wave 4 Operating Truth
+- Cesarin is now materially less bloated at the runtime/storefront behavior level.
+- Explicit anti-bloat structure now exists in the real path through `RESPONSE_SHAPE_RULES`, `compactCesarinResponseText(...)`, and `shapeCesarinResponseText(...)`.
+- CÃ©sarÃ­n now tends toward one useful move, less duplicated guidance, and fewer robotic commercial tails.
+- Stage 4 no longer appends an extra commercial tail when the useful move is already present.
+- Stage 5 keeps actionable guidance in `next_step_view` instead of duplicating the same move in main text.
+- Storefront rendering no longer re-bloats runtime output with redundant recovery and next-step echo.
+- Useful surfaces remain preserved when justified: approximate recovery, next-step help, honest WhatsApp fallback, and truthful business/action boundaries.
+- Non-claims remain explicit: no Wave 5 tool-index work, no web-intelligence, no planner/orchestrator redesign, no new mode system, no new funnel/CTA layer, no live/voice, and no admin / Cesarin OS drift.
+
+## Wave 5 Operating Truth
+- Cesarin now has a real explicit capability/tool index at the storefront/customer-intelligence core layer.
+- The accepted split is now explicit and real: `MODEL_KNOWLEDGE`, `NATIVE_PUBLIC`, and `OWN_FUNCTION`.
+- Runtime now builds and uses a bounded `capabilityPlan`.
+- Edge execution now uses `capabilityPlan.serverToolCalls`.
+- Intent filtering is now centralized through the capability index / capability-id mapping rather than a separate hidden guardrail routing table.
+- Wave 5 established `public_web_search` and `public_url_context` as explicit public capability slots; Wave 6 Pass 1 now activates those slots in bounded form.
+- Wave 2 turn-first behavior, Wave 3 catalog gate, and Wave 4 anti-bloat remain preserved under the new capability plan.
+- Storefront contract remained stable; no storefront UI redesign was required for Wave 5.
+- Non-claims remain explicit: no Wave 6 web intelligence completion, no planner/orchestrator redesign, no live/voice, no admin / Cesarin OS drift, and no storefront UI redesign.
+
+## Wave 6 Operating Truth
+- Cesarin now has bounded active public-web intelligence at the storefront/customer-intelligence core layer.
+- `public_web_search` and `public_url_context` are now real active `NATIVE_PUBLIC` capabilities inside the existing capability box.
+- Public web remains policy-gated and non-reflexive: `MODEL_KNOWLEDGE` stays the default when stable reasoning is enough, and `OWN_FUNCTION` still wins for private truth, internal state, and real action.
+- `public_url_context` is limited to explicit URL/page-context turns, and `public_web_search` is limited to genuine public/fresh/external-info turns.
+- Clarify-first turns suppress public web, and `PUBLIC_INFO` is explicitly non-catalog, so public web does not reopen product surfaces when the catalog gate is closed.
+- Runtime execution remains bounded through `capabilityPlan.serverToolCalls`, and public-web synthesis remains compact and explicitly external rather than impersonating private/internal truth.
+- Successful public-web turns may now surface compact truthful `source_context`: a small public-context indicator, optional brief, and up to 2 normalized public sources.
+- Explicit negative-path proof now exists that ordinary non-public-web turns do not show compact public-context provenance.
+- That provenance remains bounded and optional; it is not a citation wall or source dashboard.
+- Storefront contract remained materially intact; only a narrow contract extension was added for Pass 2.
+- Legacy `public_web_search_legacy` / `public_url_context_legacy` are removed.
+- The active public-web path is the bounded primary runtime path only.
+- Wave 2 turn-first behavior, Wave 3 catalog gate, Wave 4 anti-bloat, Wave 5 capability-box structure, and neutral degraded Analyst fallback remain preserved.
+- Storefront contract remained materially stable; no storefront UI redesign was required for Wave 6 Pass 1 or Pass 2.
+- Non-claims remain explicit: this is Wave 6 Pass 1 plus Pass 2 plus final hygiene only, not full web-intelligence completion, not a citation framework, not a planner/orchestrator redesign, not live/voice, and not admin / Cesarin OS drift.
+
+## Wave 7 Operating Truth
+- Cesarin now has bounded soft continuity at the runtime/storefront behavior level.
+- Runtime can reuse recent session context, authenticated `ia_context`, and lightweight existing memory context.
+- Continuity remains soft, compact, humble, and optional rather than rigid or transcript-like.
+- The current turn remains sovereign; continuity may inform, but it does not hijack the turn.
+- Topic/lane shift suppresses stale continuity push.
+- Continuity does not reopen catalog by itself.
+- Guest non-persistence remains honest.
+- Authenticated continuity remains lightweight rather than deep transcript memory or a CRM-style memory layer.
+- Wave 2 through Wave 6 foundations remain preserved.
+- Non-claims remain explicit: no deep memory platform, no storefront UI redesign, and no planner/orchestrator redesign.
+
+## Post-Refactor Convergence / Hardening Operating Truth
+- The storefront concierge baseline is now explicitly `gemini-2.5-pro` for Analyst and Sommelier.
+- Auxiliary/admin-style paths may still remain on auxiliary Flash where applicable.
+- The capability box is now the clearer primary routing authority in Analyst prompting.
+- Final-answer ownership is cleaner across bounded public web, soft continuity, and storefront shaping.
+- Shared runtime logic now suppresses stale conversational prefix on `ASK_CLARIFYING_QUESTION`, grounded `PUBLIC_INFO` turns with `source_context`, and duplicate prefix/text overlap.
+- Soft continuity no longer stacks on clarify-first or grounded public-web turns.
+- `PUBLIC_INFO` remains non-catalog.
+- Wave 2 turn-first behavior, Wave 3 catalog gate, Wave 4 anti-bloat, Wave 5 capability-box boundedness, Wave 6 bounded public web, Wave 7 soft continuity, own-function priority, and neutral degraded fallback remain preserved.
+- Non-claims remain explicit: no storefront UI redesign, no new commercial UX lane, no voice/live work, no admin / Cesarin OS drift, and no total rail removal claim everywhere.
+
+## Storefront Commercial Visibility / UX Effectiveness Operating Truth
+- Visible help differentiation is now active in the storefront assistant UI.
+- Customers can now more clearly tell what kind of help they are getting through only four compact labels: `Contexto publico`, `Ayuda de producto`, `Paso accionable`, and `Guia directa`.
+- Those labels remain bounded and subtle rather than becoming a badge zoo.
+- `Contexto publico` appears only when public web actually produced real `source_context`.
+- `Ayuda de producto` remains catalog-gated and only appears when catalog/product surfaces are truly open.
+- `Paso accionable` remains distinct from product pressure and only appears for real action-oriented help.
+- Suppressed/non-catalog turns do not get mislabeled as product help.
+- `Siguiente paso` is now more customer-clear when support is real, but remains truthfully gated rather than becoming a reflexive pressure block.
+- Stage 5 copy is clearer and more customer-facing without becoming pushy.
+- Wave 2 turn-first behavior, Wave 3 catalog gate, Wave 4 anti-bloat, Wave 6 bounded public web, Wave 7 soft continuity, and truthful private/action boundaries remain preserved.
+- Non-claims remain explicit: no measured conversion uplift, no storefront redesign from zero, no funnel-engine creation, and no broader storefront redesign claim.
+
+## Storefront Commercial Outcome Hardening Operating Truth
+- Commercial outcome selection is now stronger and more truthful in the live storefront path.
+- Explore / compare / review / add-ready states are now more clearly distinguished by real support strength instead of collapsing too early into action-ready framing.
+- Stage 5 now explicitly grades support as `weak`, `supported`, or `strong`.
+- Weak or approximate support remains humble and exploratory/review-first.
+- `ADD_READY` now appears only when support is genuinely strong, single-product, and materially action-ready.
+- Compare-worthy turns stay compare-worthy more often instead of being prematurely collapsed into action-ready help.
+- Weak single-product support remains review-first rather than sounding cart-ready.
+- True add-ready help may now surface more clearly as `Paso accionable`, while ordinary catalog-open product help still remains `Ayuda de producto`.
+- Product pressure is not reopened on closed lanes.
+- Non-claims remain explicit: no measured conversion uplift, no ranking engine, no funnel automation, and no storefront redesign from zero.
+
+## Storefront Trust & Transparency Hardening Operating Truth
+- Visible trust signaling is now active in the storefront assistant UI.
+- Users can now better read the posture behind compare / review / add-ready guidance.
+- Trust signals remain subtle and compact rather than becoming a debug or scoring surface.
+- Weak-support states now read more humbly rather than merely sounding uncertain.
+- Compare-worthy states now read more intentionally compare-worthy.
+- Review-first states now read more prudent and useful rather than timid.
+- Strong add-ready states now read clearer without becoming pushy.
+- Public-context turns remain isolated from product-confidence signaling.
+- Catalog-closed lanes remain closed.
+- Non-claims remain explicit: no measured trust uplift, no measured conversion uplift, no confidence score/dashboard claim, and no storefront redesign from zero.
+
+## Storefront Decision Flow Naturalization Operating Truth
+- Decision flow now feels materially more natural in the accepted storefront baseline.
+- `turnAnalysis` now materially informs storefront stage shaping.
+- Stage 4 follows upstream model posture more closely instead of leaning on older storefront forcing.
+- The storefront service no longer forces the old `EXPLORE_LIGHT` fallback through `modeHint`.
+- Weak-support semantic/approximate single-candidate paths now preserve humble `KEEP_EXPLORING` when upstream posture remains `GUIDED_COMPARE`.
+- Regex/helper duplication between Stage 4 and Stage 5 was materially reduced.
+- Catalog gate, anti-bloat, bounded public web, bounded soft continuity, visible help differentiation, commercial outcome hardening, trust signaling, and truthful private/action boundaries remain preserved.
+- Non-claims remain explicit: no full heuristic removal, no full model-pure family resolution, no planner/orchestrator redesign, and no storefront redesign from zero.
+
+## Storefront Technical Cleanup & Coherence Operating Truth
+- The storefront/runtime baseline now uses a cleaner canonical fallback decision path.
+- Stage 4 no longer depends on the old dead `modeHint` legacy contract.
+- Fallback `current_turn_decision` is now canonicalized through a shared resolver.
+- Service and hook are materially aligned on fallback decision truth.
+- Legacy `conversation_mode_hint` no longer influences fallback decision posture.
+- The pilot baseline remains preserved.
+- Non-claims remain explicit: no full runtime rewrite, no total fallback unification, no new commercial rails, and no planner/orchestrator lane.
+
+## AI Platform Integrity & Runtime Convergence Operating Truth
+- The audited `customer-intelligence` core path now uses one explicit shared Gemini API helper policy.
+- The truthful Gemini API version for that audited core path is now `v1beta` for generation and embeddings in this lane.
+- The storefront edge/client telemetry handshake now includes explicit `telemetry_contract` ownership signaling.
+- On the generic storefront service path, ownership now resolves from `telemetry_contract` first and keeps backward compatibility with older signals.
+- Legacy telemetry ownership signals still exist; this is drift reduction, not total telemetry unification.
+- The same accepted lane also hardened `knowledge-ingestor` in the broader IA platform, but this pilot note records that continuity of admin/service-role writes was validated by code inspection rather than storefront end-to-end pilot proof.
+- No storefront UX semantics, pilot gating behavior, or commercial-behavior lane changed in this pass.
+- Non-claims remain explicit: no repo-wide Gemini convergence claim and no legacy telemetry-replacement claim everywhere.
+
+## Storefront Recovery & Friction Handling Operating Truth
+- Weak review-first now has a subtle reentry path in the accepted storefront baseline.
+- That reentry appears through `next_step_view.assistAction` only when `family === 'REVIEW_ONE'` and support is weak.
+- The accepted visible affordance is `Seguimos viendo`.
+- The reentry remains voluntary and non-pushy.
+- It stays inside the existing gated next-step surface and returns to the normal conversation loop through ordinary `sendMessage(...)`.
+- It does not reopen product pressure or create a parallel decision path.
+- Non-claims remain explicit: no broader funnel automation, no planner/orchestrator path, no measured conversion uplift, and no claim of full friction elimination.
+
+## Storefront Shaping Spine Consolidation Operating Truth
+- Shared text-shaping utilities are now centralized in `src/lib/cesarin-text-utils.ts`.
+- Service and hook rely more directly on shared/server truth and less on local reinterpretation.
+- `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly.
+  - `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
+  - The prior UI residual was auditability-only, not active product duplication.
+  - The spine is more coherent, but no claim is made that every layer is perfectly centralized.
+
+> ## Storefront Visible Guidance Compression Operating Truth
+  - Visible guidance is less repetitive in the storefront baseline.
+  - Chips are now more categorical when `next_step_view` already exists.
+  - `Siguiente paso` is now the primary place for useful direction when present.
+  - Trust-note echoes are suppressed when equivalent guidance is already visible.
+  - Weak, compare, and add-ready visible surfaces feel less mechanically explanatory as a result.
+  - No global text-compression claim is made across every surface, and no product-behavior inflation comes from this UI-only cleanup.
+
+## Visibility Rules (Accepted Exposure Contract)
+- The old `global AND pilot` dual-gate requirement is no longer the storefront truth.
+- `global off + pilot off => hidden`
+- `global off + pilot on => visible via bounded pilot preview/QA override`
+- `global on + pilot off => visible to ordinary storefront users`
+- `global on + pilot on => visible to ordinary storefront users, with pilot retained only as debug/access-path context`
+
+## Pilot Override Methods
+Use these methods only for bounded preview/QA override when global storefront exposure is off, or for explicit debug/access-path checks when global exposure is already on:
+
+### A. URL Parameter (Browser-Only)
+1. Open the storefront URL.
+2. Append `?pilot=cesarin` to the path.
+3. Override access is persisted durably in the browser so the preview/QA state survives ordinary refresh reads until it is cleared.
+
+### B. Admin Launcher (PWA-Optimized)
+1. Login with an admin account.
+2. Open the **User Profile Menu** (Desktop) or **Mobile Sidebar Menu**.
+3. Select **"Ir a Admin (Cesarin OS)"**.
+4. Use Cesarin OS for telemetry-centered observation and review; the main Pilot operator path no longer contains the old manual checklist/session-control cockpit.
+5. For storefront preview override, prefer the URL parameter path above unless a separately preserved admin debug control is explicitly available in the current build.
+
+## Recommended Manual Preview / QA Override Flow
+1. **Activate:** Use the pilot override only when you need bounded preview/QA while global exposure is off, or when you want to confirm the debug/access path explicitly.
+2. **Interact:** Test commercial inquiries (vapes, extracts, stock, shipping).
+3. **Verify:** Check if the assistant follows the Sommelier persona rules, resolves the current turn first, handles one primary need before leaving secondary context queued naturally, only opens catalog/product surfacing when the current turn actually justifies it, and now keeps the final answer materially compact. Clarification-first turns should stay clarification-first instead of showing premature products; policy, logistics, compatibility, tracking, post-sale, greeting, and other non-search-primary turns should stay product-suppressed; explicit fit questions should now resolve through the bounded compatibility check path when the fit anchor is grounded enough; search-leading turns that are already clear enough may still show useful products and approximate recovery; and when the turn changes away from search-first, stale search/product/recovery/next-step product surfaces should suppress themselves instead of dragging the conversation back. Capability use should now also look explicit and bounded: small-talk/clarification/model-only turns should not activate unnecessary tools, private-truth lanes should stay explicit, explicit URL/page-context turns may use bounded `public_url_context`, genuine public/fresh/external-info turns may use bounded `public_web_search`, and public web must stay compact, non-reflexive, and non-catalog. When public web actually ran successfully, the storefront may now show compact public-context provenance, but it should remain small, bounded, and optional rather than turning into a source wall; ordinary non-public-web turns should not show that provenance at all. Soft continuity should now also feel useful but humble: recent session context or lightweight authenticated context may be reused to avoid repetition, but topic/lane shift should suppress stale continuity push, the current turn must stay sovereign, and continuity must not reopen catalog by itself or sound like deep CRM memory. Convergence hardening should also now be visible: Analyst / Sommelier should behave like the Gemini 2.5 Pro concierge baseline, the capability box should read as the primary routing authority rather than a hidden manual rail, and stale continuity prefix should not stack on clarify-first turns or grounded public-web turns that already carry `source_context`. This visible storefront pass should now also be easy to feel in the UI: customers should be able to tell, in a light-touch way, whether they are getting `Guia directa`, bounded `Contexto publico`, catalog-gated `Ayuda de producto`, or real `Paso accionable`; those labels must stay subtle and truthful rather than becoming a badge zoo; `Siguiente paso` should read more clearly when support is real; suppressed/non-catalog turns must not get mislabeled as product help; and none of this should imply measured conversion uplift or a storefront redesign. Main answer text should still avoid repeating the same move as response plus `Siguiente paso` plus closing tail; Stage 4 should not append an extra seller tail when the useful move is already there; Stage 5 guidance should stay primarily in `next_step_view`; weak fallback cases should stay at review/PDP level; stronger exact or support-backed cases may move naturally toward cart; multi-exact cases must not imply that one clear option already won; objection paths should stay grounded, narrow, and conservative on action strength; once a grounded objection recovery exists, only strong-support recovery may tighten into a more commitment-ready close, while weak-support and two-option recovery must stay conservative and non-browsing; checkout-readiness may appear only when the final readiness check is explicitly support-backed, and it must never imply checkout execution or payment flow; cart precision may appear only when a materially purchase-defining selector is actually supported, and it must never imply cart execution, checkout execution, or payment flow.
+   Commercial outcome hardening should now also be visible in the real flow: weak or approximate support should stay humble, review-first, or exploratory; two viable products should stay compare-worthy more often instead of collapsing prematurely into action-ready framing; weak single-product support should still read as review-first rather than cart-ready; and true add-ready help should appear only when support is genuinely strong and single-product.
+   Trust and transparency hardening should now also be visible in the real flow: users should be able to read why help still feels exploratory, why two options are worth comparing, why review-first is prudent, and why add-ready support feels steadier when it is real; those signals must stay compact, human-facing, and subtle, must not appear as a confidence score or debug taxonomy, and public-context turns must stay isolated from product-confidence language.
+   Decision-flow naturalization should now also be visible in the real flow: posture wiring should follow upstream turn truth more closely, the old forced storefront exploration fallback should no longer appear by reflex, and weak-support semantic/approximate single-candidate paths should stay humbly in `KEEP_EXPLORING` when the accepted upstream posture is still compare-leaning rather than collapsing prematurely into review confidence.
+   Technical cleanup and coherence should now also be visible in the real baseline: Stage 4 should no longer depend on the old `modeHint` contract, fallback turn decision should stay canonical instead of leaking legacy hint strings, and `conversation_mode_hint` should no longer influence fallback decision posture when upstream turn analysis is missing.
+   Recovery and friction handling should now also be visible in the real baseline: weak review-first should expose a subtle voluntary reentry path through `Seguimos viendo`, that reentry should stay inside the existing gated next-step surface, and it should return the user to the ordinary conversation loop without creating product pressure or a parallel decision path.
+   Shaping spine consolidation should now also be visible in the real baseline: shared text-shaping utilities should stay centralized in `cesarin-text-utils.ts`, service/hook should rely on shared/server truth more directly, `buildConciergeCatalogGate(...)` should stay thinner, and the UI shared-util contract should remain guarded by tests rather than silently re-duplicated.
+4. **Audit:** Go to Admin > Cesarin OS > Operacion diaria, inspect `PilotTelemetry`, and open `ReviewDrawer` for rows that need human evaluation or promotion into the improvement queue.
+5. **Monitor:** Review `ai_analytics` for `capsule_match_strategy`, `capsule_retrieval_source`, `semantic_match_success`, `fallback_used`, and `product_card_count` so token recovery, semantic recovery, and fallback behavior are not conflated.
+6. **Troubleshoot:** Keep runtime-probe, parity, and simulator-style checks out of the normal operator path. Normal `/admin/cesarin` navigation should not expose those surfaces as ordinary tools. Use the URL override path for storefront preview; any future simulator/diagnostic access must be treated as separately preserved developer diagnostics, not as normal operator truth, unless an explicitly authorized debug control is present in the current build.
+
+## Known Constraints
+- **Quota/Latency:** Free tier Gemini API may experience `429` errors or latency spikes.
+- **Local QA Judge Stability Toggle:** Commit `d0812a4` added `DISABLE_QA_JUDGE` as an optional local/dev env toggle in `customer-intelligence`. When `true`, the async background QA Judge / `evaluate_turn` call is skipped, preventing Gemini 429-induced isolate wall-clock timeouts during local development. QA Judge remains enabled by default when the env var is absent. Production behavior is unchanged.
+- **Exposure-Gating Causality:** The observed `degraded-ux-timeout-01` standing-gate failure was acceptance-audited as unrelated runtime latency noise outside this exposure front's causality. This note does not treat that failure as evidence against the accepted exposure contract.
+- **Memory:** Conversation history is still session-scoped, but the storefront/customer-intelligence core now also has bounded soft continuity over recent session context plus lightweight authenticated context. Authenticated storefront customers still have compact persistent taste memory/preference context that can influence continuity and recommendation order in a bounded way. Guests still reset fully with session loss and do not have durable cross-session memory.
+- **Deployment Drift (Resolved):** Previous appearances of regression (`404` errors) during the Wave 191 cycle were purely deployment drift caused by testing slim Edge Functions with the deprecated `gemini-1.5-flash` model. Resolved at Wave 191 closure. The current accepted concierge baseline is now `gemini-2.5-pro` for Analyst / Sommelier, while auxiliary/admin-style paths may still remain on auxiliary Flash where applicable.
+- **Analyst Refinement Success (Wave 189/191):** Abstract queries (price+flavor combos) now show significantly improved direct classification by the Analyst. `PASS_WITH_WARNING` events are non-blocking and represent minor intent edge cases (for example inventory phrasing `queda stock` overlapping with `COMPATIBILITY_CHECK`), not functional failures. Intent precedence may need later tuning.
+- **Cart Completion / Execution Constraint:** Concierge can now hand off eligible customers into existing checkout, open-order, and pending-payment continuation routes through the existing CTA behavior, but this remains route-based orchestration rather than in-chat autonomous checkout/payment execution.
+
+## Non-Negotiable Rules
+- **DO NOT** describe storefront exposure truth as `global AND pilot`; that dual-gate rule is retired for storefront visibility.
+- **DO NOT** reintroduce pilot authorization as a requirement for global-on storefront exposure without a separately authorized front.
+- **DO NOT** hardcode an unconditional storefront bypass in `App.tsx`.
+- **DO NOT** leak raw technical error messages to the customer.
+- **Brain-First Capsule Rule (v106 canon, Stage 1 adjusted):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. Weak storefront turns should still be rescued when real product, inventory, policy, or greeting signals exist, but `UNKNOWN` may remain honestly unresolved when no real rescue signal is present.
+
+## Brain-First Guardrail State (Wave 3 reconciled - 29 mar 2026)
+The deterministic storefront edge layer is still allowed to preserve truthful boundary behavior, but product-search coercion is no longer the fallback spine of the system:
+- Main-path weak-intent `UNKNOWN -> PRODUCT_SEARCH` coercion is removed.
+- Forced product-search injection is removed from the main path.
+- Real edge rescue remains allowed for truthful boundary lanes such as policy, inventory, and greeting signals.
+- Real product guidance can still happen when the model actually asks for capability help or when truthful storefront evidence materially supports it.
+- If no real rescue signal exists, the turn may remain honestly unresolved instead of being pushed into catalog guidance by reflex.
+- If the Analyst degrades, the accepted neutral fallback now returns `intent: 'UNKNOWN'`, `turn_decision: 'ASK_CLARIFYING_QUESTION'`, `tool_calls: []`, and `fallback_reason: 'ANALYST_DEGRADED'`.
+
+### Wave 2 Guardrail Addendum
+- Runtime/storefront behavior is now materially turn-first.
+- Runtime computes a bounded current-turn profile and acts from `primary_intent`.
+- Secondary intents remain bounded queued context; they are not deep parallel execution.
+- Tool calls are filtered to the primary lane.
+- Current-turn needs can override stale prior-lane momentum.
+
+### Wave 3 Guardrail Addendum
+- Runtime/storefront behavior is now materially catalog-gated.
+- `ASK_CLARIFYING_QUESTION` and `UNKNOWN` close the catalog gate.
+- When the gate is closed, search tools are stripped from the capability plan.
+- When the gate is closed, products are cleared, `resolved_products` are cleared, `next_step_view` is nulled, and stale product/recovery/next-step product surfaces are suppressed.
+- Legitimate search-leading turns may still surface products and approximate recovery when the current turn materially justifies that help.
+
+### Wave 4 Guardrail Addendum
+- Runtime/storefront behavior is now materially less bloated.
+- Explicit anti-bloat shaping now exists through `RESPONSE_SHAPE_RULES`, `compactCesarinResponseText(...)`, and `shapeCesarinResponseText(...)`.
+- The same move should no longer be duplicated across main text, next-step guidance, and closing tails.
+- Stage 4 no longer adds an extra commercial tail when the useful move is already present.
+- Stage 5 keeps the actionable move in `next_step_view` instead of repeating it in the main assistant text.
+- Useful help remains preserved when justified: approximate recovery, next-step help, and honest WhatsApp fallback.
+
+### Wave 5 Guardrail Addendum
+- Runtime/storefront behavior now includes an explicit consultable capability box.
+- Intent filtering now routes through the capability index / capability-id mapping instead of a separate hidden guardrail routing table.
+- Guardrails remain border policy and do not reintroduce product-search coercion.
+- Wave 5 made the public-web slots explicit; Wave 6 Pass 1 activates them in bounded form through the existing capability path.
+- Storefront contract remained stable; no user-visible UI redesign was required for this lane.
+
+### Wave 6 Guardrail Addendum
+- Runtime/storefront behavior now includes bounded active public-web intelligence.
+- Public web remains policy-gated and non-reflexive; guardrails do not force it for greeting, ambiguity, or clarify-first turns.
+- `OWN_FUNCTION` still wins for private truth, internal state, and real action.
+- `PUBLIC_INFO` is non-catalog, so public web does not reopen product surfaces when the catalog gate is closed.
+- Public-web execution stays bounded through `capabilityPlan.serverToolCalls`; this is not a planner/orchestrator layer.
+- Successful public-web turns may surface compact truthful `source_context`, but only when public web actually ran successfully.
+- Ordinary non-public-web turns do not surface `source_context`.
+- That provenance remains bounded and optional rather than a citation framework or source wall.
+- Legacy public-web helpers are removed; the active public-web path is the bounded primary runtime path only.
+
+### Wave 7 Guardrail Addendum
+- Runtime/storefront behavior now includes bounded soft continuity.
+- Soft continuity may reuse recent session context, authenticated `ia_context`, and lightweight existing memory context.
+- The current turn remains sovereign; continuity may inform, but it does not hijack the turn.
+- Topic/lane shift suppresses stale continuity push.
+- Continuity does not reopen catalog by itself and does not override own-function priority or bounded public-web policy.
+- Guests still do not get fake durable memory.
+- Authenticated continuity remains lightweight rather than deep transcript memory or a CRM-style layer.
+
+### Post-Refactor Convergence / Hardening Guardrail Addendum
+- The storefront concierge baseline is now explicitly Gemini 2.5 Pro for Analyst and Sommelier.
+- The capability box is now the clearer primary routing authority in Analyst prompting; this did not create a new planner or hidden routing tree.
+- Shared runtime suppression now blocks stale conversational prefix on clarify-first turns, grounded `PUBLIC_INFO` turns with `source_context`, and duplicate prefix/text overlap.
+- Soft continuity therefore remains helpful without stacking on top of the current turn.
+- `PUBLIC_INFO` remains non-catalog, bounded public web remains non-reflexive, and own-function priority still wins for private truth or real action.
+
+### Storefront Commercial Visibility / UX Effectiveness Guardrail Addendum
+- Visible help differentiation is now part of the accepted storefront truth, but it remains bounded to four subtle labels only: `Contexto publico`, `Ayuda de producto`, `Paso accionable`, and `Guia directa`.
+- `Contexto publico` appears only when real bounded public-web support produced `source_context`.
+- `Ayuda de producto` remains catalog-gated; suppressed/non-catalog turns do not get mislabeled as product help.
+- `Paso accionable` remains distinct from product pressure and only appears for real action-oriented support.
+- `Siguiente paso` is clearer when support is real, but it remains truthfully gated rather than becoming a reflexive pressure block.
+- This storefront pass does not claim measured uplift, does not create a funnel engine, and does not redesign the storefront from zero.
+
+### Storefront Commercial Outcome Hardening Guardrail Addendum
+- Commercial outcome selection is now stricter and more truthful in the storefront path.
+- Weak or approximate support must stay humble rather than sounding action-ready.
+- Two viable products should remain compare-worthy more often instead of collapsing prematurely into one winner.
+- `ADD_READY` only appears when support is genuinely strong, single-product, and materially action-ready.
+- Weak single-product support stays review-first rather than cart-ready.
+- `Paso accionable` therefore remains action-ready help, not generic product pressure.
+- Product pressure is not reopened on closed lanes.
+- This storefront wave does not claim measured conversion uplift, does not create a ranking engine, and does not create funnel automation.
+
+### Storefront Trust & Transparency Hardening Guardrail Addendum
+- Visible trust signaling is now part of accepted storefront truth, but it remains subtle and customer-facing.
+- Stage 5 guidance now communicates posture more clearly in human trust-language rather than internal jargon.
+- Trust/posture notes must not become a confidence score, confidence meter, citation wall, debug panel, or badge zoo.
+- Weak exploratory states should feel humble rather than confused.
+- Compare-worthy states should feel intentionally compare-worthy rather than accidentally indecisive.
+- Review-first states should feel prudent and useful rather than timid.
+- Public-context turns must stay isolated from product-confidence signaling.
+- Catalog-closed lanes remain closed.
+
+### Storefront Decision Flow Naturalization Guardrail Addendum
+- `turnAnalysis` now materially informs storefront stage shaping.
+- Stage 4 should preserve upstream posture more faithfully instead of forcing older storefront exploration behavior by reflex.
+- The old storefront `EXPLORE_LIGHT` fallback through `modeHint` is no longer part of the accepted live baseline.
+- Weak-support semantic/approximate single-candidate paths must stay humble in `KEEP_EXPLORING` when upstream posture still remains `GUIDED_COMPARE`.
+- Regex/helper duplication should stay reduced rather than drifting back upward between Stage 4 and Stage 5.
+- Catalog gate, anti-bloat, bounded public web, bounded soft continuity, visible help differentiation, commercial outcome hardening, trust signaling, and truthful private/action boundaries remain preserved.
+- This lane does not claim full heuristic removal or full model-pure family resolution.
+
+### Storefront Technical Cleanup & Coherence Guardrail Addendum
+- Stage 4 no longer carries the dead `modeHint` contract.
+- Fallback `current_turn_decision` now stays canonical through a shared resolver rather than leaking legacy hint strings.
+- Legacy `conversation_mode_hint` no longer influences fallback decision posture.
+- Service and hook should stay aligned on fallback decision truth under the accepted pilot baseline.
+- This lane does not claim total fallback unification or a full runtime rewrite.
+
+### Storefront Recovery & Friction Handling Guardrail Addendum
+- Weak `REVIEW_ONE` may now expose a subtle `Seguimos viendo` reentry affordance.
+- That affordance remains voluntary, non-pushy, and bounded to weak-support review-first states only.
+- It stays inside the existing gated next-step surface and returns through ordinary `sendMessage(...)`.
+- It does not create a new route, planner/orchestrator path, or product-pressure lane.
+- This lane does not claim broader funnel automation or full friction elimination.
+
+### Storefront Shaping Spine Consolidation Guardrail Addendum
+- Shared text-shaping utilities are now centralized in `src/lib/cesarin-text-utils.ts`.
+- Service and hook should rely more directly on shared/server truth and less on local reinterpretation.
+- `buildConciergeCatalogGate(...)` should stay thinner and trust server truth more cleanly.
+- `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
+- The prior UI residual was auditability-only, not active product duplication.
+- This lane does not claim perfect centralization everywhere or a full assistant rewrite.
+
+## Storefront Sales / Persona Hardening Operating Truth
+- Cesarin's visible commercial voice is now materially warmer, sharper, and more commercially natural.
+- The assistant feels more like a confident helpful seller and less like a disciplined system that is only organizing states.
+- The change came from voice/prompting/bounded wording hardening, not from new rails or a new behavior tree.
+- Existing safeguards remain intact: current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, weak-support humility, compare-first honesty, add-ready truthfulness, and public-info non-catalog behavior.
+- The visible commercial feel still depends partly on deterministic Stage 4/5 scaffolding, so this is not a claim of fully free-form sales personality.
+- No measured conversion uplift is claimed.
+
+### Storefront Sales / Persona Hardening Guardrail Addendum
+- `supabase/functions/customer-intelligence/persona.ts` now frames Cesarin as a trusted seller with calm confidence, warmth, and light natural wit when it fits.
+- `supabase/functions/customer-intelligence/index.ts` now carries a compact presence-commercial block in the Sommelier prompt so runtime answers can sound more human, sharper, and less like a disciplined state machine.
+- `src/lib/cesarin-stage4.ts` and `src/lib/cesarin-stage5.ts` now sound less mechanical while preserving support thresholds and gate behavior.
+- The accepted tests lock the new voice and wording, but they also preserve the residual truth that deterministic scaffolding still shapes part of the visible commercial feel.
+- This remains a bounded storefront/customer-intelligence lane, not an architecture wave, not a planner, and not a funnel engine.
+### Storefront Stage 4 / Stage 5 De-Scaffolding Operating Truth
+- The accepted storefront response path now feels less stage-assembled and more like one integrated conversational/commercial move.
+- `next_step_view` remains only when it adds distinct guidance or real action value.
+- Redundant `KEEP_EXPLORING` scaffolding no longer needs to survive when the main response already carries the same move.
+- Trust-note visibility is narrower and stays limited to the exploratory edge where it still helps.
+- The remaining Stage 4 / Stage 5 structure is still real and load-bearing; this lane did not remove it or claim it was removed.
+- No measured conversion uplift or global text-compression claim is made.
+
+### Storefront Stage 4 / Stage 5 De-Scaffolding Guardrail Addendum
+- Visible storefront guidance is less repetitive when the main answer already communicates the move.
+- Chips and trust notes remain bounded; they do not become a new copy engine or a new pressure surface.
+- The accepted baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, and truthful support thresholds.
+- This lane is a bounded storefront de-scaffolding improvement, not a redesign or a planner/orchestrator layer.
+### Storefront Turn-Level Commercial Judgment Tightening Operating Truth
+- A compact bounded `commercial_move` now carries turn-level commercial truth for the product-search storefront path.
+- Upstream `commercial_move` is primary truth when present; Stage 4 and Stage 5 only recompute through the shared resolver as fallback when it is absent.
+- The accepted move vocabulary remains bounded to `KEEP_EXPLORING`, `COMPARE_TWO`, `REVIEW_ONE`, and `ADD_READY`.
+- Stage 4 remains bounded and coherent.
+- Stage 5 follows the turn-level commercial judgment more directly while preserving selector-needed behavior, weak/support/strong honesty, compare-worthiness, review-first truth, and strict add-ready gating.
+- This lane improves turn-level commercial judgment propagation; it does not claim total commercial interpretation centralization everywhere or a planner/orchestrator redesign.
+
+### Storefront Turn-Level Commercial Judgment Tightening Guardrail Addendum
+- Upstream `commercial_move` is primary truth when present.
+- Fallback recomputation only happens when upstream `commercial_move` is absent.
+- Stage 4 and Stage 5 remain real and load-bearing realization layers.
+- The accepted move vocabulary stays bounded and does not expand into a mode system or planner layer.
+- This lane does not claim total downstream deterministic shaping removal.
+### Storefront Selector-Needed Trigger Tightening / De-Scripted Surface Operating Truth
+- `SELECTOR_NEEDED` remains a local Stage 5 family by design; it is not promoted upstream into `commercial_move`.
+- The selector-needed trigger is now tighter and no longer wins early just because a variant selector exists.
+- Selector-needed is bounded to stronger single-product, non-approximate, non-compare cases where the missing selector is materially purchase-defining.
+- Compare-worthy turns and weaker review-first turns are no longer stolen by selector-needed.
+- The generic selector-needed family chip and trust-note scaffolding were removed from the storefront UI.
+- Minimal missing-selector guidance remains only where it still adds value.
+- The storefront baseline is now less scripted on this edge without expanding upstream judgment or reopening closed lanes.
+
+### Storefront Selector-Needed Trigger Tightening / De-Scripted Surface Guardrail Addendum
+- Selector-needed now behaves more like a bounded commercial ask and less like a scripted edge.
+- The accepted storefront baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+- This lane does not claim selector-needed removal, upstream move expansion, a planner layer, or full natural-language freedom.
+
+### Storefront Tool-Selection / Intent-Guardrails De-Scripting Operating Truth
+- The storefront runtime now gives resolved turn-profile truth more primacy before local regex/fallback guardrails can override it.
+- Regex-inferred intents are now subordinated more often instead of overtaking non-`UNKNOWN` analyst intent by default.
+- Fallback capability injection now survives only when the resolved turn profile still requires capability use and the primary intent still matches.
+- Public-web admission is now boundary-gated behind resolved `PUBLIC_INFO` instead of behaving like regex-led semantic self-routing.
+- The early compatibility force-correction is no longer part of the accepted runtime path.
+- Legitimate deterministic boundary controls remain intact: catalog closure, clarify-first suppression, own-function fallback for true private/action lanes, and public-web restraint.
+
+### Storefront Tool-Selection / Intent-Guardrails De-Scripting Guardrail Addendum
+- This remains a bounded storefront/customer-intelligence lane, not a planner/orchestrator, not `commercial_move` expansion, and not a Stage 4 / Stage 5 redesign.
+- This lane does not claim regex elimination, full model-pure behavior, or measured conversion uplift.
+- The accepted residual is auditability-only and non-blocking: there is still no single focused regression pinning the removed compatibility pre-correction in `index.ts`.
+
+### Storefront Stage 5 Family-Resolution Thinning / Upstream Truth Obedience Operating Truth
+- Stage 5 now follows upstream `commercial_move` more directly on the accepted storefront product-search path.
+- The visible next-step family now depends less on local Stage 5 arbitration once upstream truth already exists.
+- Upstream `REVIEW_ONE` is no longer re-promoted into compare mode by local fallback heuristics.
+- Upstream `ADD_READY` now degrades only through real Stage 5 selector-safety guardrails when a materially purchase-defining selector is still missing.
+- `SELECTOR_NEEDED` remains preserved as a real local Stage 5 safety family.
+- The final auditability closure was test-only and came from a focused service/runtime regression, not from a second production behavior change.
+
+### Storefront Stage 5 Family-Resolution Thinning / Upstream Truth Obedience Guardrail Addendum
+- This remains a bounded storefront-only Stage 5 thinning lane.
+- This lane does not claim full Stage 5 removal, full model-pure rendering, widened `commercial_move`, Stage 4 rewrite, planner/orchestrator work, admin / Cesarin OS work, or measured business uplift.
+- The accepted baseline keeps current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, compare/review/add-ready honesty, and real selector-needed safety intact.
+
+### Storefront Availability Truth Alignment Operating Truth
+- Availability and outlook turns now state current availability first.
+- Outlook/projection is explicitly secondary and separated from the present stock truth.
+- Unsupported future-return implication was removed from active OOS wording.
+- Inventory truth output was tightened without reopening routing architecture.
+- Final runtime/storefront proof now exists through the accepted `conciergeService.chat(...)` regression for `INVENTORY_OUTLOOK`.
+
+### Storefront Availability Truth Alignment Guardrail Addendum
+- This remains a bounded storefront-only availability micro-lane.
+- Accepted implementation chain: `d0726ddf6c7ef3c4d89656600292403bbe6e323a` and `732e5ac46fb657acdf183f32ad72ce0e6329282d`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront UI redesign, planner/orchestrator work, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
+### Storefront Text-Only Chat + Copy De-Robotization Operating Truth
+- The active storefront assistant path no longer uses opaque `amarrada`-style phrasing.
+- Uncertainty / weak-match wording is now clearer and more direct.
+- Storefront chat now behaves as text-only because the active assistant hook path no longer auto-triggers `speak(...)` for assistant replies.
+- This lane changed the active storefront chat behavior without reopening routing, stage architecture, or storefront UI structure.
+- Broader speech infrastructure still exists outside the active storefront hook path by design.
+
+### Storefront Text-Only Chat + Copy De-Robotization Guardrail Addendum
+- This remains a bounded storefront-only micro-pass.
+- Accepted implementation commit: `6bc159d01e92bbb23e219c88595cf9dd11aeea0b`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront redesign, planner/orchestrator work, voice/live platform redesign, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+### Storefront Direct-Answer Preservation / Stage 5 Restraint Operating Truth
+- Resolved concrete single-product fact turns now answer directly and stop.
+- Secondary Stage 5/storefront help is suppressed only for the narrow intended case after the main answer is already sufficient.
+- Compare, selector-needed, weak review-first, and genuine follow-through cases remain preserved.
+- This lane changed the active storefront post-answer behavior without reopening routing, tool-selection, or stage philosophy.
+
+### Storefront Direct-Answer Preservation / Stage 5 Restraint Guardrail Addendum
+- This remains a bounded storefront-only micro-lane.
+- Accepted implementation commit: `74014a18813e6484bea05b3c2d88eb20cfcaa3db`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+
+### Storefront Attribute Precision / Fact Consistency Operating Truth
+- Concrete product fact answers are now materially more precise and more consistent across supported factual families in the active storefront path.
+- Supported factual families now include stronger direct-answer handling for `puffs / caladas`, `nicotina`, `sabor`, `modelo / versiÃ³n`, and compatibility-style facts already present in the current data shape.
+- Missing supported facts now stay explicit and honest instead of falling through to generic exact-match reinforcement or fabricated claims.
+- Final runtime/storefront proof now exists beyond `caladas`, including flavor, compatibility-style facts, and compatibility-missing honesty.
+
+### Storefront Attribute Precision / Fact Consistency Guardrail Addendum
+- Accepted implementation chain: `ffb4a389cc1d5d2bff435363e7a3ccb92bebf8de` and `814bb3e247752ab6adfab1e1751f23a05c9041ed`.
+- The compatibility inclusion in the direct-fact suppression detector remained narrow and did not reopen broader Stage philosophy.
+- This lane does not claim routing redesign, prompt-heavy redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
+- The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+### Storefront Truth Spine Consolidation Wave Operating Truth
+- Capsule/truth-layer outputs now carry more of the active storefront truth/help contract directly.
+- `truth_signals` and `help_contract` now exist as explicit upstream capsule outputs on dominant storefront paths.
+- Stage 5 now depends less on local detectors/suppressions and more on capsule truth/help when resolving next-step posture.
+- Service now behaves more like a literal composer of upstream turn truth, capsule truth/help, and Stage 5 render intent.
+- UI now consumes a more explicit upstream help/render contract with bounded backward compatibility instead of deriving as much business meaning locally.
+- Dominant factual/help/compare storefront behavior remained preserved under the consolidated truth spine.
+
+### Storefront Truth Spine Consolidation Wave Guardrail Addendum
+- This remains a bounded storefront-only consolidation wave.
+- Upstream turn analysis and catalog gate stayed primary throughout the accepted wave.
+- This wave does not claim routing redesign, planner/orchestrator work, storefront redesign, Stage philosophy rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
+- Residual non-blocking structural limits remain accepted: Stage 5 is still a bounded realization layer, `help_contract` is intentionally narrow, and UI retains bounded backward-compatibility fallback where explicit render truth is absent.
+### Storefront Runtime Telemetry Truth Hardening (MVL) Operating Truth
+- The active storefront/customer-intelligence telemetry path now persists a more useful bounded runtime-truth set into `ai_analytics`.
+- That runtime-truth set now includes compact fields such as `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- These fields are derived from already-existing runtime truth and improve pilot operability for reading real storefront behavior without opening a new behavior lane.
+- The accepted lane does not change recommendation posture, catalog gate semantics, Stage 5 family semantics, routing behavior, or public-web selection behavior.
+
+### Storefront Runtime Telemetry Truth Hardening (MVL) Guardrail Addendum
+- This remains a bounded storefront-only observability lane.
+- Accepted implementation commit: `f7f0a5b86731d09d5ecafb4d6a54dc7fd940b9a3`.
+- This lane does not claim a dashboard build, analytics platform build, planner/orchestrator work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
+- The accepted truth is structurally implemented and acceptance-audited; this pilot note does not over-claim exhaustive live production proof for every telemetry field combination.
+
+### Storefront AI_Analytics Telemetry Readiness Micro-Fix Operating Truth
+- The accepted MVL telemetry model is now structurally aligned with the real `ai_analytics` schema and real read/write paths.
+- The real edge and storefront service write paths now persist the bounded top-level telemetry fields `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- The existing admin inspection path now prefers those top-level columns and falls back to historical `ai_logic_debug` rows when needed.
+- This improves pilot operability and telemetry inspection readiness only; it does not open a new behavior lane or change storefront behavior semantics.
+
+### Storefront AI_Analytics Telemetry Readiness Micro-Fix Guardrail Addendum
+- This remains a bounded readiness micro-fix, not dashboard/platform/planner work.
+- Accepted implementation commit: `39732a405230107a1294b489eb24a2203db4256e`.
+- Security/RLS was not loosened in this pass.
+- This note does not over-claim direct live verification that the migration is already applied or that live production rows were directly verified in this pass.
+
+### Storefront Search-Leading Product Grounding & Recovery Hardening Operating Truth
+- The active storefront search-leading path now grounds and recovers more usefully before falling into generic no-match behavior.
+- Broad entity-led product search, attribute-led narrowing, near-exact missing-product recovery, and mixed-need product recovery now depend less on dead-end fallback when the real active catalog still offers grounded help.
+- The accepted lane materially reduces the repeated dead-zone pattern where useful search-leading turns were collapsing into `NO_MATCH`, `KEEP_EXPLORING`, `retrieval_source = NONE`, and `product_card_count = 0`.
+- Honesty remains intact: the storefront may recover with useful alternatives, but it still does not invent fake exact matches or force catalog pressure when useful grounding is absent.
+- The final acceptance-clean status includes later runtime/service evidence for the exact fresh failure-family turns `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`.
+- The lane is now live-proven on a strict non-degraded window.
+- The strict clean live window was `2026-04-03T03:14:33Z` to `2026-04-03T03:14:53Z`.
+- The old dead-end signature stayed absent in that clean window: `retrieval_source = NONE`, `capsule_match_strategy = NO_MATCH`, `product_card_count = 0`, and `next_step_family = KEEP_EXPLORING` did not reappear as the zero-card dead-end combination.
+- Five audited prompts recovered via `TOKEN_RECOVERY` with cards present and `next_step_family = COMPARE_TWO`; `busco un waka pero no se cual` recovered via `TOKEN_RECOVERY` with `product_card_count = 1` and `next_step_family = KEEP_EXPLORING`, but no longer as a zero-card dead-end.
+
+### Storefront Search-Leading Product Grounding & Recovery Hardening Guardrail Addendum
+- This remains a bounded retrieval/recovery lane inside the existing search-leading capsule bridge.
+- Accepted implementation chain: `f79b222b857d73946e952efb2bf7162677a8c557` and `d2bce5fdd51faa8bb45eeefd047684d1a77ca36f`.
+- This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff redesign, standalone mixed-intent expansion, broad catalog rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
+- The later test-only patch closed an auditability residual; it did not create a new behavior lane.
+- Live-proof scope was exactly the same 6 prompts listed in the accepted lane entry.
+- The proof window was explicitly non-degraded, with no `GEMINI_DEGRADED` and no `429`.
+- Ambient `429` remains a separate watchpoint and is not a blocker for this lane's closure.
+- Preserve the existing non-claims about no planner/orchestrator redesign, no Stage 5 redesign, no broad retrieval rewrite, no admin / Cesarin OS expansion, and no measured uplift.
+
+### Storefront Store-Hours Misrouting Micro-Fix Operating Truth
+- Store-hours/opening-hours style informational turns now stay on the non-catalog informational/policy family instead of misrouting into `PRODUCT_SEARCH`.
+- The catalog gate stays closed for those turns and the active storefront path no longer opens product recovery for them.
+- Product capsule recovery and product-card behavior are no longer part of the accepted store-hours path.
+- The already-correct non-catalog behavior for shipping/policy turns such as `hacen envios a todo mexico?` remains intact.
+
+### Storefront Store-Hours Misrouting Micro-Fix Guardrail Addendum
+- This remains a bounded storefront micro-fix, not a broad informational-routing rewrite.
+- Accepted implementation commit: `363cecf78e02129b70fb388f6028a86807716af0`.
+- This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff change, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
+- This note records structural fix plus acceptance audit; it does not separately claim fresh live telemetry re-verification for this micro-fix in this pass.
+
+### Storefront Degraded Policy Fallback Micro-Fix Operating Truth
+- Under degraded `429 / GEMINI_DEGRADED` conditions, non-catalog `POLICY_INQUIRY` turns for store-hours, shipping, and payment no longer fall back to the old generic degraded line.
+- The active storefront path keeps those turns non-catalog with a closed catalog gate and no product capsule.
+- Live verified bounded degraded replies now include:
+  - `Ahorita no traigo el horario exacto confirmado en sistema.`
+  - `Manejamos envios por DHL Express a sucursal.`
+  - `Por ahora manejamos solo transferencia o deposito bancario.`
+- Store-hours remains intentionally honest and non-inventive under degradation.
+
+### Storefront Degraded Policy Fallback Micro-Fix Guardrail Addendum
+- This remains a bounded degraded-fallback-quality micro-fix, not a broad resilience framework or generic 429 platform fix.
+- Accepted implementation commit: `ea3ca63755914f3a7f9d2330de8e2b4c5ce8a5c5`.
+- This lane is acceptance-audited and live-verified on the authenticated storefront path.
+- This lane does not claim planner/orchestrator redesign, search-recovery redesign, a new policy lane, admin / Cesarin OS expansion, or measured uplift.
+- Residual truth stays explicit: upstream `429` rate limiting still exists live; this micro-fix improved degraded fallback quality, not 429 frequency.
+
+### Storefront Authenticated Routine Replenishment / Conversational Reorder Operating Truth
+- The active authenticated storefront path can now resolve one bounded `replenishment_signal` from explicit reorder intent plus real reorderable order / order-item history.
+- Replenishment truth is revalidated against current catalog truth before surfacing.
+- `retrieval_source` may now be `AUTHENTICATED_REORDER` on this path.
+- Historical items that are inactive, discontinued, invalid-variant, or otherwise unavailable do not surface as ready-to-repeat.
+- Stage 5 may surface `ADD_READY` only when current catalog truth still supports direct add with grounded quantity and variant intact.
+- When direct add is not currently supported but a grounded historical target still exists, the storefront stays at `REVIEW_ONE` and uses the existing message / next-step / add-to-cart surfaces only.
+- This lane stays bounded to explicit authenticated reorder intent and existing storefront surfaces only.
+
+### Storefront Authenticated Routine Replenishment / Conversational Reorder Guardrail Addendum
+- This remains a bounded authenticated storefront replenishment lane, not a history-browser, subscription, or CRM lane.
+- Accepted implementation commit: `ba544bc82346ab856a97de0124bb9872f00adb54`.
+- This lane consumes real authenticated order history plus current catalog truth; it does not reopen the accepted `Storefront Authenticated Reorder & Catalog Drift Hardening` lane.
+- This lane does not claim guest reorder memory, a full purchase-history browser, subscription logic, auto-billing, predictive reorder, CRM expansion, checkout/payment redesign, or guaranteed reorder for historical items that no longer validate.
+
+### Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution Operating Truth
+- The active authenticated storefront path can now resolve one bounded `authenticated_order_tracking` path with `order_tracking_signal`.
+- Order-tracking truth is grounded only in authenticated persisted order data.
+- Hydration is bounded to recent relevant orders and may support explicit order-number lookup only inside that bounded set.
+- Payment, order-status, and tracking summaries reuse canonical storefront order/payment truth rather than inventing a parallel lifecycle model.
+- `ORDER_TRACKING` storefront routing now prefers the authenticated capsule path instead of generic fallback/policy behavior.
+- Post-purchase assistant responses on this lane remain non-catalog and advisory by default; only eligible pending Mercado Pago continuation may now expose one bounded `message.action` route handoff to `/payment/pending?order_id={id}` through the existing CTA behavior.
+- Guest, no-order, and no-tracking cases degrade honestly.
+
+### Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution Guardrail Addendum
+- This remains a bounded authenticated read-only storefront assistance lane, not an order-management or CRM lane.
+- Accepted implementation commit: `24b1afd027ae96d04cf6ca579b19795fbc83a123`.
+- Accepted checkout-execution bridge add-on commit: `ca9b100de9d17c97184320f6b8ae3627fbac585f`.
+- This lane does not claim guest access to order truth, refunds, cancellations, order edits, external courier scraping, admin / Cesarin OS expansion, checkout/payment redesign, payment/provider architecture work, or a full order-history browser / CRM panel in chat.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) Operating Truth
+- The active authenticated storefront path can now resolve one bounded `authenticated_warranty_triage` path for defect/warranty-style support turns.
+- `WARRANTY_SUPPORT` now exists as a bounded non-catalog storefront support intent.
+- Warranty-triage truth is grounded only in authenticated persisted recent fulfilled-order and order-item data.
+- Explicit order-number lookup is bounded to that same authenticated recent-order set.
+- The resolver classifies this lane into bounded states such as `LIKELY_ELIGIBLE`, `OUT_OF_POLICY`, `CANNOT_IDENTIFY_PRODUCT`, `NO_RELEVANT_ORDER`, and `AUTH_REQUIRED`.
+- The lane remains strict read-only and message-only.
+- Generic warranty-policy questions may still remain `POLICY_INQUIRY` when contextual authenticated triage is not the right lane.
+- Catalog/product sales surfaces stay suppressed on these support turns.
+
+### Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) Guardrail Addendum
+- This remains a bounded authenticated storefront support-triage lane, not a full RMA or support-desk platform.
+- Accepted implementation commit: `0d3b0725967022803ab2b42d08ef21d5dbbc487c`.
+- This lane does not claim guest warranty access, RMA ticket creation, refunds, cancellations, order edits, admin / Cesarin OS expansion, checkout/payment redesign, or a full CRM / ticketing platform.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Authenticated Loyalty & VIP Yielding Operating Truth
+- The active authenticated storefront path can now resolve one bounded `authenticated_loyalty_status` path for loyalty / VIP questions.
+- `LOYALTY_SUPPORT` now exists as a bounded non-catalog storefront intent.
+- Loyalty truth is grounded only in existing authenticated storefront loyalty/customer sources already present in the system.
+- Points balance, tier/status, monetary equivalent, and next-tier distance are surfaced only when grounded by existing store rules/configuration.
+- The lane remains strict read-only and message-only.
+- Guest/unauthenticated users do not get fake loyalty access.
+- Zero-point and no-loyalty-data states degrade honestly.
+- Catalog/product sales surfaces stay suppressed on loyalty turns.
+
+### Storefront Authenticated Loyalty & VIP Yielding Guardrail Addendum
+- This remains a bounded authenticated storefront loyalty/status assistance lane, not a rewards dashboard or loyalty-admin platform.
+- Accepted implementation commit: `e495a9d0c8a59ceeb832f6545e81d144e1af2c20`.
+- This lane does not claim point redemption, point mutation, automatic discount application, admin / Cesarin OS expansion, checkout/payment redesign, a rewards dashboard, a gamification engine, or CRM expansion.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Contextual Out-of-Stock Pivot & Alternative Yielding Operating Truth
+- The active authenticated storefront path can now recover one bounded out-of-stock pivot path through the existing product-search capsule and Stage 5 storefront flow.
+- Pivoting only occurs when the requested item or requested variant is genuinely unavailable or out of stock.
+- Suggested substitutes are grounded in existing catalog truth and currently purchasable in stock.
+- Ranking stays bounded to close sibling signals already grounded in current metadata such as brand, flavor, model, type, section, and token overlap.
+- Missing-variant cases may route into `OUT_OF_STOCK_ALTERNATIVE` when grounded substitutes exist.
+- If no sufficiently grounded substitute exists, the lane degrades honestly to `NO_MATCH`.
+- Existing in-stock paths and variant-truth discipline remain preserved.
+- Stage 5 surfaces the pivot through existing storefront message / next-step structures only.
+
+### Storefront Contextual Out-of-Stock Pivot & Alternative Yielding Guardrail Addendum
+- This remains a bounded authenticated storefront recovery lane, not a waitlist, notify-me, or recommendation-platform lane.
+- Accepted implementation commit: `537856a144854604c0b2170f99bc08cd37a47d12`.
+- This lane does not claim waitlist capture, notify-me flow, admin / Cesarin OS expansion, checkout/payment redesign, a broad recommendation-engine rewrite, guaranteed substitute availability beyond current in-stock catalog truth, or semantic equivalence when only approximate similarity exists.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Conversational Basket Kitting & Hardware Upgrades Operating Truth
+- The active authenticated storefront path can now resolve one bounded `storefront_kitting_basket` path for explicit kit, setup, switch-from-disposables, and hardware-upgrade turns.
+- `KIT_ASSEMBLY` now exists as a bounded storefront intent.
+- Kitting truth is grounded only in active in-stock catalog truth plus existing compatibility/attachment truth already present in the system.
+- The resolver classifies this lane into bounded states such as `FULL_KIT`, `PARTIAL_KIT`, and `NO_GROUNDED_KIT`.
+- Hardware, consumable, and liquid compatibility stay grounded rather than semantic-only.
+- The lane degrades honestly when one component cannot be grounded or stocked.
+- The visible storefront outcome stays inside existing assistant message, next-step, and resolved-product surfaces only.
+
+### Storefront Conversational Basket Kitting & Hardware Upgrades Guardrail Addendum
+- This remains a bounded authenticated storefront kitting lane, not a bundle platform or generic setup-builder lane.
+- Accepted implementation commit: `a8e097118a1f97d95458840edec935255972dc7c`.
+- This lane does not claim a new bundle/cart entity, bundle UI, admin / Cesarin OS expansion, schema migrations, checkout/payment redesign, CRM/profile expansion, broad "build anything" orchestration, or guaranteed full-kit availability when catalog truth cannot support it.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Conversational Checkout Readiness & Friction Resolution Operating Truth
+- The active storefront path can now resolve one bounded `storefront_checkout_readiness` path for checkout-readiness, close-now friction, payment-method truth, and bounded shipping-readiness turns.
+- `CHECKOUT_READINESS` now exists as a bounded non-catalog storefront intent.
+- The resolver is strict read-only and reuses existing storefront truth only:
+  - cart truth
+  - checkout draft truth
+  - payment settings truth
+  - address truth
+  - coupon validation truth
+  - authenticated open-order recovery truth
+- The lane classifies into bounded states such as `READY_TO_CHECKOUT`, `MISSING_REQUIRED_INFO`, `CART_BLOCKER`, `PAYMENT_METHOD_INFO`, `SHIPPING_INFO_AVAILABLE`, `SHIPPING_INFO_PARTIAL`, and `AUTH_REQUIRED`.
+- Responses stay non-catalog and advisory by default. The accepted execution bridge may now attach one bounded `message.action` route handoff only for eligible `/checkout` or `/orders/{id}` continuation; non-eligible states remain advisory-only.
+- Shipping-cost guidance remains bounded: the storefront may confirm requirements or partial readiness truth, but it does not invent an exact quote where current storefront truth does not expose one.
+
+### Storefront Conversational Checkout Readiness & Friction Resolution Guardrail Addendum
+- This remains a bounded storefront readiness/clarity lane plus one bounded route-handoff bridge through existing CTA behavior, not checkout redesign or autonomous payment execution.
+- Accepted implementation commit: `f1b9bb0ec08fa7cae189dfd058b1e685348cf878`.
+- Accepted checkout-execution bridge add-on commit: `ca9b100de9d17c97184320f6b8ae3627fbac585f`.
+- This lane does not claim order creation, payment mutation, checkout redesign, payment/provider architecture work, autonomous payment execution, `next_step_view` expansion, invented exact shipping quotes, admin / Cesarin OS expansion, or architecture reopening.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Contextual Budget Rescue & Trade-Down Yielding Operating Truth
+- The active storefront path can now resolve one bounded `storefront_budget_rescue` path for explicit price-friction and cheaper-alternative turns.
+- `BUDGET_RESCUE` now exists as a bounded storefront intent.
+- Trade-down truth is grounded only in current catalog truth, stock truth, promo truth, and optional safe single-cart-item context.
+- The resolver classifies this lane into bounded states such as `CHEAPER_ALTERNATIVE_FOUND`, `PROMO_ALREADY_BEST_VALUE`, `NO_GOOD_TRADE_DOWN`, and `REVIEW_CURRENT_OPTION`.
+- The lane remains strict read-only.
+- Responses remain message-only and use existing assistant message, product-card, and next-step surfaces only.
+- The lane does not invent discounts, price mutation, or savings claims.
+
+### Storefront Contextual Budget Rescue & Trade-Down Yielding Guardrail Addendum
+- This remains a bounded storefront trade-down lane, not a pricing-engine platform or recommender rewrite.
+- Accepted implementation commit: `ae2f5f7`.
+- This lane does not claim fake discounting, price mutation, invented savings, admin / Cesarin OS expansion, checkout/payment redesign, dynamic discounting, or a broad recommender rewrite.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
+### Storefront Clarification-First Response Quality Pilot Truth
+- The accepted clarification-first response-quality fix is `d4984421370491c206dded37991e2aeece58a9c9` (`Fix clarification-first fallback response`).
+- It closes the pilot-visible thin-response issue where the skipped Sommelier `ANALYST_CLARIFICATION` path could persist a thin Analyst prefix such as `¡Claro!` as customer-visible `response_text`.
+- The repair applies only to `PRODUCT_SEARCH` turns with `ASK_CLARIFYING_QUESTION`, `catalog_gate_reason = clarification_first`, zero tools, no product surfaces, and thin text.
+- Accepted behavior is one useful narrowing question for broad product/budget recommendation turns while keeping the catalog closed.
+- The path still returns `products: []` and `routed_capsule: null`; gate-closed cleanup still clears product arrays and `next_step_view`.
+- Focused validation passed with `3` files and `51` tests.
+- Bounded local runtime validation later exercised the scoped broad budget/product recommendation theme through authenticated local `customer-intelligence` against `http://127.0.0.1:54321` and created a new `ai_analytics` row.
+- The observed local telemetry path was `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `catalog_gate_open=false`, `catalog_gate_reason=clarification_first`, `fallback_used=true`, `semantic_match_success=false`, `product_card_count=0`, and `sommelier_fallback_reason=ANALYST_CLARIFICATION`.
+- The persisted local response length was `93`, asked a useful narrowing question about disposable vs rechargeable, did not collapse to `¡Claro!`, and exposed no product cards.
+- A later controlled local sample exposed one remaining edge-owned clarification-first row persisting exactly `¡Claro!`; final guard commit `3ad7113020cc96005978666cf34f581b8df8e1f4` (`Fix final clarification-first thin response guard`) now runs `guardClarificationFirstFinalText(...)` after text guarantee/compaction and before `analyticsPayload.response_text` is built.
+- Final controlled local runtime validation after that guard sent `5` authenticated prompts, created `4` edge-owned `ai_analytics` rows, and all `4/4` persisted edge-owned rows were `PRODUCT_SEARCH` + `ASK_CLARIFYING_QUESTION` + `clarification_first`, catalog closed, `product_card_count=0`, useful narrowing questions present, `thin_rows=0`, and `closed_gate_with_cards=0`.
+- The grape/flavor prompt routed to the client-side Product Search capsule and did not create an edge-owned row in the direct runtime call.
+
+### Storefront Clarification-First Response Quality Guardrail Addendum
+- This is a bounded storefront/customer-intelligence response-quality micro-fix only.
+- This does not claim live production traffic proof, broad Product Search quality validation, retrieval/ranking changes, embeddings/vector changes, product-search capsule logic changes, browser/client Product Search capsule validation, storefront UI redesign, Cesarin OS/admin changes, checkout/provider changes, telemetry schema changes, remote Supabase changes, deploy, `db push`, `db reset`, production readiness, or global clarification completion.
+- Residual risk remains explicit: final runtime proof covers edge-owned local clarification-first rows only, not full browser/client Product Search capsule telemetry or a broad live clarification matrix.
+
+### Bulk Operational Data Hydration & Telemetry Triage Pilot Truth
+- A non-coding operational data hydration pass was accepted with minor residual on 6 de abril de 2026.
+- This pass materially affects pilot data reality, not pilot application behavior.
+- Live `product_variants` increased by `+37`, bringing active product variant coverage to `44/44`.
+- Live compatibility graph data improved narrowly with `+2` `product_concepts`, `+4` `concept_aliases`, and `+2` `compatibility_relations`.
+- The two new compatibility relations are bounded `has_connector` relations to the existing `510 Connector`, grounded only in explicit `products.specs.conector` values.
+- Live `cesarin_improvement_items` increased by `+3` from high-signal telemetry triage: store-hours knowledge gap, shipping-policy retrieval gap, and payment-method policy retrieval gap.
+- No `store_knowledge` facts were inserted in this pass because no new authoritative facts were found in inspected sources.
+- Compatibility coverage remains sparse, so compatibility/kitting-style pilot behavior must still expect honest degradation where graph truth is missing.
+- Historical note: at the time of this hydration pass, `PRODUCT_SEARCH` still remained on operational hold because embeddings were empty and Gemini provider quota was still blocking repopulation. Current canon supersedes that hold-era state: the hold is lifted after provider recovery, full repopulation, and downstream search-quality fixes.
+
+### Compatibility Graph Hydration Batch 2 Pilot Truth
+- A second non-coding compatibility graph hydration pass was accepted with minor residual on 8 de abril de 2026.
+- This pass was telemetry-prioritized and materially affects pilot data reality, not pilot application behavior.
+- Live compatibility graph data increased by `+3` `product_concepts`, `+6` `concept_aliases`, and `+9` `compatibility_relations`.
+- The inserted relation families were bounded to `uses_battery = 5`, `uses_pod = 3`, and `has_connector = 1`.
+- The added truth is grounded only in explicit live product evidence for seeded items such as `batería 18650`, `batería integrada`, `cartuchos`, `pods propietarios`, and `conexión 510 híbrida`.
+- Visible storefront pilot reality is therefore somewhat stronger on those seeded compatibility / kitting items, but the graph still remains sparse overall.
+- Compatibility / fit / kitting pilot behavior must still expect honest degradation on unseeded items, including many exact coil and third-party fit questions.
+- Historical note: at the time of this hydration pass, `PRODUCT_SEARCH` still remained on operational hold because embeddings were empty and Gemini provider quota was still blocking repopulation. Current canon supersedes that hold-era state: the hold is lifted after provider recovery, full repopulation, and downstream search-quality fixes.
+
+### Compatibility Graph Hydration Batch 3 Pilot Truth
+- A third non-coding compatibility graph hydration pass was accepted with minor residual on 8 de abril de 2026.
+- This pass was telemetry-prioritized and materially affects pilot data reality, not pilot application behavior.
+- Live compatibility graph data increased by `+4` `product_concepts`, `+8` `concept_aliases`, and `+4` `compatibility_relations`.
+- The inserted relation family was bounded to `recommended_for_liquid = 4`.
+- The added truth is grounded only in explicit live device/liquid evidence: the source device already had confirmed `Nic Salts` or `Freebase` compatibility, and the target liquid product explicitly declared that same liquid type in tags and/or description.
+- Visible storefront pilot reality is therefore somewhat stronger on seeded device-to-liquid compatibility / kitting cases, especially where a device can now point to concrete nic-salt or freebase products.
+- Compatibility / fit / kitting pilot behavior must still expect honest degradation on unseeded items, including many exact coil and third-party fit questions.
+- Historical note: at the time of this hydration pass, `PRODUCT_SEARCH` still remained on operational hold because embeddings were empty and Gemini provider quota was still blocking repopulation. Current canon supersedes that hold-era state: the hold is lifted after provider recovery, full repopulation, and downstream search-quality fixes.
+
+### Phase Completion / Quota Waiting Pilot Truth
+- Historical note: this section records the accepted 8 de abril waiting-state truth only. It is no longer the current live project state.
+- Compatibility hydration fronts Batch 1-3 materially improved live graph truth and are now paused due signal exhaustion, not neglect.
+- Policy / `store_knowledge` textual coverage was already effectively saturated at that point, but semantic retrieval was still frozen because embeddings were empty.
+- That waiting-state truth has now been superseded by later provider recovery, embedding repopulation completion, PRODUCT_SEARCH hold-lift, and the accepted Phase 1 reliability closure under the frozen harness.
+- Current live pilot truth is the one recorded at the top of this file: operational storefront, lifted PRODUCT_SEARCH hold, and accepted Phase 1 reliability gate.
+
+### Bulk Operational Data Hydration & Telemetry Triage Guardrail Addendum
+- This was data hydration only, not a new storefront lane.
+- This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
+- This pass does not claim full compatibility completion, full kitting readiness, semantic retrieval quality, `PRODUCT_SEARCH` readiness, Cesarin OS/admin implementation expansion, or architecture reopening.
+
+### Compatibility Graph Hydration Batch 2 Guardrail Addendum
+- This was data hydration only, not a new storefront lane.
+- This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
+- This pass does not claim full compatibility completion, exact coil truth where the catalog still lacks safe grounding, third-party fit completion, semantic retrieval quality, `PRODUCT_SEARCH` readiness, Cesarin OS/admin implementation expansion, or architecture reopening.
+
+### Compatibility Graph Hydration Batch 3 Guardrail Addendum
+- This was data hydration only, not a new storefront lane.
+- This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
+- This pass does not claim full compatibility completion, exact coil truth where the catalog still lacks safe grounding, third-party fit completion, broad liquid-family completion beyond the seeded items, semantic retrieval quality, `PRODUCT_SEARCH` readiness, Cesarin OS/admin implementation expansion, or architecture reopening.
+
+## Capability Capsules (All Materialized)
+- **Product Search Integrity Capsule** - Read-Only Blueprint
+- **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
+- **Cart Operator Capsule** - Safe Mutator Blueprint
+All three are fully materialized and E2E validated. The Edge Function returns `requires_client_capsule: true` for product/knowledge queries - actual DB retrieval and product card rendering happens client-side.
+
+## Next Steps After Pilot Launch
+1. Monitor `ai_analytics` weekly: `semantic_match_success`, `fallback_used`, `product_card_count`, plus the bounded runtime-truth fields `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source` once the accepted readiness migration is applied in the real environment
+2. Enrich `store_knowledge` with any unanswered queries observed in telemetry
+3. Keep operator understanding aligned with the accepted exposure truth: `is_ai_assistant_enabled` controls ordinary storefront exposure, while pilot authorization remains only as bounded preview/QA override when global exposure is off
+4. Future only if separately authorized: assess whether the accepted route-handoff bridge is sufficient, but do not treat this pilot note as authorization for autonomous checkout/payment execution or a new provider/checkout architecture front
+
+
+
+*Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Frictionless Routine Replenishment (1-Click Conversational Reorder) - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*
+
+*Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
+*Actualizado: 14 de abril de 2026 (Storefront Conversational Checkout Execution Bridge - ACCEPT).*
+*Actualizado: 15 de abril de 2026 (Storefront AI Pilot Gate Graduation & Controlled All-User Exposure - ACCEPT).*
+*Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*
+*Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*
+*Actualizado: 5 de abril de 2026 (PRODUCT_SEARCH - HOLD LIFTED after completed 768d migration, recovered Gemini account access, and downstream fallback micro-patch).*
+*Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*
+*Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
+*Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 3 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
+*Actualizado: 8 de abril de 2026 (Phase Completion & Quota Escalation Waiting State - RECONCILED).*
+*Actualizado: 13 de abril de 2026 (AI Reliability / Evals / Operational Excellence — Phase 1 - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
+*Actualizado: 23 de abril de 2026 (Cesarin OS Operator Consolidation Phase 1 - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 23 de abril de 2026 (Cesarin OS Operator UX Truthfulness Reduction - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
+*Actualizado: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
+*Actualizado: 29 de abril de 2026 (Home Featured Category Route/Content Integrity - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 29 de abril de 2026 (Offers/Deals Consistency - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 29 de abril de 2026 (Search Expectation Alignment - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 1 de mayo de 2026 (Hero Clarity / Acapulco-DHL Location Consistency - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 1 de mayo de 2026 (Post-Hero / PDP Shipping Trust Copy Coherence - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Actualizado: 1 de mayo de 2026 (Desktop Storefront Navigation Route Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (Product Card Cover Image Fallback Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (PDP Recommendation Section Visibility Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (Broad Search Collection Copy Accent Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (PDP Duplicate Trust Badge Section Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (Section Root Category Chip Descendant Filtering Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (Quick View Cover Image Fallback Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (PDP / Quick View Urgency Truthfulness Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (PDP / Quick View Purchase Option Copy Accent Coherence - ACCEPT).*
+*Actualizado: 2 de mayo de 2026 (Category Filter Empty-State Clear Recovery Coherence - ACCEPT).*
+*Actualizado: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
+*Actualizado: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
+*Actualizado: 2 de mayo de 2026 (Slice 16 - Quick View Shipping Trust & Urgency Coherence - ACCEPT).*
+  - Implementation commit: `af76f897aa70fd4464df82fbfeda3e6c850e6624` (pushed).
+  - Scope: only `src/components/products/QuickViewModal.tsx` was modified.
+  - DHL trust cue: Built `Envío DHL Seguro` & `A todo México` replicating the accepted `ProductPriceSection.tsx` pattern exactly.
+  - Non-Claims/Blocked Claims: No free shipping, local delivery, pickup, delivery-speed promises, zones, or personal delivery introduced. No component changes to `ProductPriceSection.tsx`, `ProductInfo.tsx`, or `UrgencyIndicators.tsx`. No backend, UI, DB, or AI overclaims.
+  - Stock Oracle parity: Attached `useInventoryOracle` and `StockOracleBadge` wired strictly via `product.id` and `product.stock`, prepended directly above untouched `UrgencyIndicators`.
+  - Preserved State: Slices 12, 13, and 14 conventions untouched. Modal image bounds, cart flows, pricing render, and wishlist behaviors structurally pristine.
+  - Residual Risk: Low and accepted. No browser visual QA run; vertical addition may increase viewport scroll; expected small `useInventoryOracle` load state triggers safely upon Quick View activation without regression.
+*Actualizado: 3 de mayo de 2026 (Slice 17 - Storefront Grid Discovery Context Coherence Pass - ACCEPT).*
+  - Implementation commit: `e33aa5645862d086236cc81acf664e32213377ad` (pushed).
+  - Scope: `src/components/products/ProductGrid.tsx`, `src/components/products/ProductCard.tsx`, `src/pages/SearchResults.tsx`, `src/pages/CategoryPage.tsx`, `src/pages/SectionPage.tsx`.
+  - Contextual empty-state: Optional `emptyStateTitle` and `emptyStateSubtext` props added to `ProductGrid`; `SearchResults`, `CategoryPage`, and `SectionPage` now inject context-aware recovery copy.
+  - Out-of-stock CTA icon: bare `"X"` text node replaced with `PackageX` from `lucide-react`; matches established icon language in `QuickViewModal.tsx`.
+  - Preserved State: Slice 15 clear-filter logic (`onClearFilter` gating) and Slice 11 section-filter descendant logic remain strictly untouched. No service, route, backend, DB/Supabase, AI/Césarín, checkout, admin, or Product Search behavior changed.
+  - Validation: ESLint passed, TypeScript typecheck passed, Playwright browser QA confirmed contextual empty-state messaging on `/buscar`, `/vape`, `/420` routes; DOM inspection confirmed `ProductGrid` empty-state and out-of-stock badge render.
+  - Residual Risk: Low and accepted. `PackageX` icon confirmed statically and via DOM; live browser screenshot of an OOS card was not captured due to absence of an OOS product in the local dataset.
+
+*Actualizado: 3 de mayo de 2026 (Slice 18 - Storefront Merchandising Routes & Variant Label Coherence Pass - ACCEPT).*
+  - Process Deviation: Implementation initially pushed with encoding corruption (`4704c5d8cc`); fixed by local corrective patch (`cef8ad253d`) under containment mandate prior to canon.
+  - Scope: `src/components/products/ProductActions.tsx`, `src/pages/BestsellersPage.tsx`, `src/pages/OffersPage.tsx`, `src/pages/NewArrivals.tsx`.
+  - Scope preserved: `ProductGrid.tsx`, `QuickViewModal.tsx`, sorting library, hooks, API, Product Search, DB.
+  - Logic Update: Unified `ProductActions` variant strings to `getVariantDisplayName()`; expanded merchandising discovery routes to use existing `ProductGrid` rendering and existing `SORT_OPTIONS`/`sortProducts` sorting behavior.
+  - Visual Update (Patch): Removed visible UTF-8 replacement-character artifacts; validated `Más Vendidos`, `Top 50 Histórico`, `Sección Ofertas`, `Últimas 2 Semanas`, and canonical `OffersPage` SEO description via static/browser QA.
+
+- **Storefront Merchandising Routes & Variant Label Coherence Pass (DONE, ACCEPTED WITH PROCESS DEVIATION AND LOW RESIDUAL RISK)**: Slice 18 is accepted and pushed in implementation commit `4704c5d8cc672753ec1eec1a3602644f485d59a4` and corrective patch commit `cef8ad253d93f71a58cb9aeb501ac0d763cdf2f3`. Scope strictly bound to `src/components/products/ProductActions.tsx`, `src/pages/BestsellersPage.tsx`, `src/pages/OffersPage.tsx`, and `src/pages/NewArrivals.tsx`. `ProductActions` variant selector aligns with `getVariantDisplayName(variant)`, unifying attribute labels and rendering eyebrow attribute labels only when available, without mutating cart or purchaseability logic. The three routes `/mas-vendidos`, `/ofertas`, `/nuevo` use existing `ProductGrid` rendering and existing `SORT_OPTIONS`/`sortProducts` sorting behavior and render product counts while strictly preserving existing data components, queries, and behaviors. Process deviation recorded: Slice 18 implementation pushed prior to Codex acceptance; post-push audit flagged visible UTF-8 corruption on discovery routes (`Más Vendidos`); containment audit mandated a corrective patch. The corrective patch was limited to visible string and `OffersPage` SEO description repairs in the three merchandising pages, removed visible UTF-8 replacement-character artifacts, and restored the full `OffersPage` SEO description without changing logic outside the accepted string and SEO description repairs. Validation: ESLint and typecheck passed. Browser QA verified clean rendering of Spanish characters over `/mas-vendidos`, `/ofertas`, and `/nuevo` strictly via string updates (no logic changed). Commit `4704c5d` and patch `cef8ad2` are on `origin/main`. Claims boundary: no Product Search changes, no AI/Césarín changes, no checkout/payment/provider changes, no admin/Cesarin OS changes, no DB/Supabase changes, no migrations, no backend/service changes, no deploy, no full Product Discovery completion claim, no new ranking logic, no promotions/coupons/flash-deals architecture, no new arrivals data system, no data source/query changes, no `ProductGrid` changes, no `QuickViewModal` changes, no domain helper changes, no sorting library changes, no browser QA beyond `/mas-vendidos`, `/ofertas`, `/nuevo`, and any explicitly reported PDP variant evidence. Residual risk is low and accepted: Browser QA for variant PDP depends on presence of populated semantic data.
+
+- **Storefront Product Discovery and Merchandising Coherence Closeout (GO, CLOSED)**: Codex readiness audit returned GO for formal closeout after Slices 1–18; no high-ROI customer-visible blocker remains on the audited discovery/merchandising surfaces. Closeout baseline synchronized on `origin/main` at commit `cc13265674751a95c8e565dab99f6c30f118f8f5`. This front is closed and should not be reopened unless Carlos explicitly authorizes a new storefront discovery lane. Closeout coverage includes: Home featured category routes/content, Offers/deals consistency, broad search expectation alignment, Hero Acapulco/DHL truth, post-hero/PDP shipping trust copy, desktop navigation route coherence, ProductCard image fallback, PDP recommendation section gating, broad search accent copy, PDP duplicate trust badges, section root category descendant filtering, Quick View image fallback, PDP/Quick View urgency truthfulness, PDP/Quick View purchase option accent copy, category filter empty-state recovery, Quick View shipping/trust cue, storefront grid discovery context, and merchandising routes plus PDP variant label coherence. Accepted residual (non-blocking): Footer “Nuevos Drops” links to `/vape` instead of `/nuevo`; this is not fixed in closeout and may be handled later as an optional standalone micro-fix. Non-claims: no Product Search completion, no semantic/vector search completion, no embeddings/retrieval/ranking validation, no Césarín runtime/persona changes, no checkout/payment/provider changes, no admin/Cesarin OS changes, no DB/Supabase/schema/migration changes, no backend/API architecture changes, no production deployment, no remote Supabase mutation, no full ecommerce/business completion, no coupons/promotions architecture, no claim that every copy issue is fixed, no claim that every merchandising edge case is solved, no Footer “Nuevos Drops” fix, no browser QA for every closed slice beyond recorded evidence, no future-proof completeness.
+
+### AUTHENTICATED TRANSFER CHECKOUT SMOKE (May 5, 2026) - GO
+- **Validation**: Strict browser smoke on https://vsm-store.pages.dev/.
+- **Result**: Authenticated Transferencia/Depósito checkout is functional (checkout-submit returns 200).
+- **Evidence**: Order UUID 8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a, Shortcode VSM-0038, state PENDIENTE successfully rendered in /orders.
+- **System State**:
+  - Sub-schema divergence (orders.tracking_number, checkout columns, order_items table) causing blockers on /checkout and /orders was repaired via production migration prior to this validation.
+  - Cart, Auth, and Transfer checkout flow are browser-validated for this smoke path.
+  - Guest validation limits accepted: Guest checkout remains WhatsApp hand-off by design (no DB record).
+- **Non-Claims**:
+  - Mercado Pago integration, actual payment settlements, and provider webhooks NOT tested/NOT claimed.
+  - No new code, DB mutations, admin interfaces, nor domain-level alignments claimed during this sprint operation. This applies strictly to the Authenticated Transfer browser path.
+
+### MERCADO PAGO SANDBOX HANDOFF SMOKE (May 5, 2026) - GO/PARTIAL
+- **Validation**: Authenticated checkout provider handoff and return route smoke on https://vsm-store.pages.dev/.
+- **Result**: GO for Mercado Pago handoff, sandbox detection, order pre-creation, return/failure path, and order ledger visibility. PARTIAL for approved payment/webhook settlement because sandbox payment was not completed due to headless test limits.
+- **Evidence**: Order UUID b360b90e-e117-4841-9cbe-0299c5b60574, Shortcode VSM-0039, Preference ID 3287776681-8934139c-24d0-4d1d-ba2e-afce3bc04f92, state Pendiente successfully rendered in /orders without schema crash. App displayed appropriate pending/fallback logic ("Pago iniciado, pendiente de confirmacion").
+- **System State**:
+  - Did not supersede the already accepted Authenticated Transferencia/Depósito checkout GO.
+  - Guest validation limits accepted: Guest checkout remains WhatsApp hand-off by design.
+- **Non-Claims**:
+  - Mercado Pago approved payment, webhook approved-payment delivery, payment settlement, and production payment provider readiness NOT tested/NOT claimed.
+  - Final commercial domain NOT connected. Real payments NOT run.
+  - No new code, DB mutations, admin interfaces, nor domain-level alignments claimed.
+
+### ADMIN ORDERS READ-ONLY VISIBILITY SMOKE (May 5, 2026) - GO
+- **Validation**: Dedicated admin test account authentication and `/admin/orders` route read-only smoke on https://vsm-store.pages.dev/.
+- **Result**: GO for ledger visibility, routing stability, and detail drawer rendering.
+- **Evidence**: `test-admin-vsm@example.com` provisioned successfully. Auth succeeded on `cvvlorbiwtuhkxolhfie.supabase.co`. `/admin/orders` loaded without fatal runtime or schema crashes. Orders `VSM-0038` and `VSM-0039` were visually verified in the list. Order detail drawer opened and rendered read-only correctly.
+- **System State**:
+  - Admin surface routing correctly protected by AdminGuard and checking `admin_users` table.
+  - No fulfillment/order/payment/tracking/refund/cancel mutation was performed or validated.
+- **Non-Claims**:
+  - Does NOT claim order status, payment status, tracking number, cancellation flow, or refund flow mutation works.
+  - Does NOT claim Mercado Pago refund API works or admin fulfillment is fully validated.
+  - Does NOT claim all admin routes/roles/permissions are validated.
+  - Does NOT claim production payment readiness is complete or final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened or Product Search, Césarín, Checkout, or DB schema changed.
+  - Does NOT claim any credentials were printed or committed.
+
+### ADMIN TRACKING MUTATION SMOKE (May 5, 2026) - GO
+- **Validation**: Admin browser smoke on https://vsm-store.pages.dev/ limited to one tracking/guide mutation only.
+- **Result**: GO. First admin fulfillment mutation validated was tracking/guide only on `VSM-0039` (`#B60574`).
+- **Evidence**: In `/admin/orders` detail drawer for `VSM-0039`, tracking field under `Rastreo / Guía` accepted exact value `TEST-TRACKING-SMOKE-123`, saved through tracking-only control, rendered in UI, and remained present after full page refresh and reopen.
+- **State Integrity**:
+  - `order_status` unchanged: `pending` -> `pending`.
+  - `payment_status` unchanged: `Mercadopago (Pendiente)` -> `Mercadopago (Pendiente)`.
+- **Baseline Note**: Tracking value `TEST-TRACKING-SMOKE-123` remains intentionally as baseline proof unless Carlos authorizes a later cleanup lane.
+- **Non-Claims**:
+  - Does NOT claim order status mutation works.
+  - Does NOT claim payment status mutation works.
+  - Does NOT claim cancellation flow works.
+  - Does NOT claim refund flow works.
+  - Does NOT claim Mercado Pago refund API works.
+  - Does NOT claim Mercado Pago webhook approved-payment works.
+  - Does NOT claim payment settlement works.
+  - Does NOT claim admin fulfillment is fully validated.
+  - Does NOT claim all admin mutations are validated.
+  - Does NOT claim all admin routes/roles/permissions are validated.
+  - Does NOT claim production payment readiness is complete.
+  - Does NOT claim final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened.
+  - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+  - Does NOT claim tracking was reverted or cleaned up.
+
+### ADMIN ORDER STATUS MUTATION SMOKE (May 5, 2026) - GO
+- **Validation**: Admin browser smoke on https://vsm-store.pages.dev/ limited to one safe order_status mutation only.
+- **Result**: GO. Validated status transition was `VSM-0038` (`#0C2C6A`) `pending` / `Pendiente` -> `confirmed` / `Confirmado`.
+- **Evidence**: In `/admin/orders` detail drawer for `VSM-0038`, the order status control changed to `Confirmado`, UI showed the status update toast, row label changed accordingly, and after refresh/reopen the order remained `confirmed`.
+- **State Integrity**:
+  - `payment_status` before mutation: `Transferencia (Pendiente)`.
+  - `payment_status` after mutation: `Transferencia (Pendiente)`.
+  - Payment status did NOT become `paid` / `Pagado`.
+  - `VSM-0039` (`#B60574`) remained untouched and pending.
+- **Scope Note**: This validates only the safe first transition `pending -> confirmed` and does not extend to later order status paths.
+- **Non-Claims**:
+  - Does NOT claim `processing`, `shipped`, or `delivered` transitions work.
+  - Does NOT claim payment_status mutation works.
+  - Does NOT claim payment automation is safe for later statuses.
+  - Does NOT claim cancellation flow works.
+  - Does NOT claim refund flow works.
+  - Does NOT claim Mercado Pago refund API works.
+  - Does NOT claim Mercado Pago webhook approved-payment works.
+  - Does NOT claim payment settlement works.
+  - Does NOT claim full admin fulfillment is validated.
+  - Does NOT claim all admin mutations are validated.
+  - Does NOT claim all order status transitions are validated.
+  - Does NOT claim all admin routes are validated.
+  - Does NOT claim all roles/permissions are validated.
+  - Does NOT claim production payment readiness is complete.
+  - Does NOT claim final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened.
+  - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+  - Does NOT claim `VSM-0038` was reverted to pending.
+
+### ADMIN PAYMENT STATUS MUTATION READINESS (May 6, 2026) - NOT_READY_LEDGER_CONTAMINATION_RISK
+- **Validation**: Documentation/source/canon readiness reconciliation only. No admin browser action, order mutation, payment mutation, tracking mutation, checkout, Mercado Pago call, webhook test, refund/cancel action, DB change, or code change was executed.
+- **Result**: NOT_READY_LEDGER_CONTAMINATION_RISK. Admin payment_status mutation is deferred because the current source path is not proven payment-status-only.
+- **Source Findings**:
+  - Admin order detail drawer exposes `[Confirmar Pago]` when `payment_status` is not `paid`.
+  - The UI path calls `onPaymentStatusChange(order.id, 'paid')`.
+  - `useAdminOrders.ts` routes that action to `updateOrderPaymentStatus(id, status)`.
+  - `admin-orders.service.ts` updates Supabase directly with `orders.payment_status = paymentStatus` and `updated_at`.
+  - This admin payment mutation does NOT call an Edge Function and does NOT call Mercado Pago.
+  - Mercado Pago webhook remains the separate provider-event truth path for `mp_payment_id`, `mp_payment_data`, `payment_status`, and order status changes.
+- **Ledger Risk**:
+  - Source/canon inspection found DB trigger `tr_order_paid_referral` in `supabase/migrations/20260308000100_loyalty_referrals.sql`.
+  - That trigger can fire when `NEW.payment_status = 'paid'` and old payment_status was not paid.
+  - The trigger can call `process_referral_reward(...)` and insert loyalty/referral ledger rows.
+  - Therefore an admin `[Confirmar Pago]` smoke is not guaranteed to be payment-status-only.
+- **Current Test Order Integrity**:
+  - `VSM-0038` (`#0C2C6A`) remains the only plausible future manual Transferencia candidate, but remains `confirmed` / `Transferencia (Pendiente)` in canon; it was NOT marked paid.
+  - `VSM-0039` (`#B60574`) remains untouched and reserved for Mercado Pago webhook/payment validation; it remains `pending` / `Mercadopago (Pendiente)` with tracking baseline `TEST-TRACKING-SMOKE-123`.
+- **Future Authorization Requirement**: Any future manual Transferencia payment_status smoke requires explicit Carlos authorization accepting the irreversible admin UI state and possible ledger/referral/loyalty side effects, or a safer isolated test path must exist first.
+- **Non-Claims**:
+  - Does NOT claim payment_status mutation works.
+  - Does NOT claim payment_status mutation is safe.
+  - Does NOT claim `[Confirmar Pago]` is side-effect-free.
+  - Does NOT claim Mercado Pago approved payment works.
+  - Does NOT claim Mercado Pago webhook approved-payment works.
+  - Does NOT claim payment settlement works.
+  - Does NOT claim Mercado Pago refund API works.
+  - Does NOT claim referral/loyalty side effects were tested.
+  - Does NOT claim `VSM-0038` was marked paid.
+  - Does NOT claim `VSM-0039` was touched.
+  - Does NOT claim refund/cancel flow works.
+  - Does NOT claim full admin fulfillment is validated.
+  - Does NOT claim production payment readiness is complete.
+  - Does NOT claim final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened.
+  - Does NOT claim Product Search, Cesarin, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+
+### MERCADO PAGO HISTORICAL APPROVED-PAYMENT EVIDENCE (May 6, 2026) - ACCEPTED
+- **Validation**: Codex read-only historical DB evidence verification.
+- **Result**: ACCEPT_HISTORICAL_MP_APPROVED_PAYMENT_PROVIDER_PAYLOAD_EVIDENCE.
+- **Evidence**: Historical production DB evidence exists for Mercado Pago approved-payment/provider-payload persistence. 16 historically marked paid MP orders found. The strongest pristine read-only evidence order is UUID: `0bd9fff8-59a1-404f-aee4-bf36a70b45b5` (created_at: 2026-03-24T09:23:36.966929+00:00, updated_at: 2026-03-26T02:56:05.864824+00:00, payment_method: mercadopago, payment_status: paid, status: delivered).
+- **Payload Shape**: `mp_payment_id` is present (masked 151...784), `mp_preference_id` present. `mp_payment_data` contains a provider-shaped payment object with top-level keys including id, status, date_approved, external_reference, payment_method, transaction_details, authorization_code, money_release_status, api_response, etc.
+- **Source Inference**: Admin manual payment mutation only patches payment_status/updated_at. The webhook path writes mp_payment_id and mp_payment_data. Thus, the durable provider-shaped payload cannot be explained by admin Confirmar Pago alone. March edge logs are purged, so origin is inferred from durable DB shape.
+- **Test Order Preservation**: `VSM-0039` (`#B60574`) remains pending/pending, mp_payment_id null, tracking `TEST-TRACKING-SMOKE-123`, and is preserved. `VSM-0038` (`#0C2C6A`) remains confirmed / Transferencia Pendiente.
+- **Scope Note**: May 2026 `VSM-0039` handoff smoke remains GO/PARTIAL. `VSM-0039` did not validate approved payment or webhook delivery. Historical March evidence closes the narrower question of whether MP provider-approved payment persistence has ever worked. Fresh sandbox payment is not required merely to prove historical persistence exists.
+- **Explicit Non-claims**:
+  - Does NOT claim `VSM-0039` approved-payment success.
+  - Does NOT claim current/fresh webhook delivery was just tested.
+  - Does NOT claim current Mercado Pago configuration is live-ready today.
+  - Does NOT claim settlement/refund/cancellation validation.
+  - Does NOT claim conversion events were inserted for the historical order.
+  - Does NOT claim referral/loyalty side effects are fully validated.
+  - Does NOT claim edge logs prove March webhook delivery.
+  - Does NOT claim production commercial readiness.
+  - Does NOT claim final commercial domain readiness.
+  - Does NOT claim all Mercado Pago edge cases are solved.
+
+### ADMIN PAYMENT STATUS MUTATION - DB/SERVICE BOUNDARY (May 6, 2026) - PASS
+- **Validation**: Codex authorized DB/Service boundary mutation test on VSM-0038.
+- **Result**: ACCEPT_DB_SERVICE_BOUNDARY_PAYMENT_STATUS_MUTATION_PASS.
+- **Execution**: The authorized browser click smoke deviated into a service/DB-boundary simulation script (`simulate_admin_confirm_pago.cjs`). The executed patch matched the admin service boundary: `{ payment_status: 'paid', updated_at: <now> }`.
+- **Target Order**: VSM-0038 / #0C2C6A (UUID: 8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a).
+- **Pre-state**: status: confirmed, payment_method: transfer, payment_status: pending, mp_payment_id: null, mp_payment_data: null, tracking: null.
+- **Post-state**: status: confirmed (unchanged), payment_method: transfer (unchanged), payment_status: paid / Pagado, mp_payment_id: null, mp_payment_data: null, tracking: null (unchanged).
+- **Side Effects**: `conversation_conversion_events` total stayed 29 (VSM-0038 linked rows stayed 0). `loyalty_points` linked rows stayed 0. `referrals` table absent from production schema cache.
+- **Test Order Preservation**: VSM-0039 / #B60574 remained pending/pending, mp_payment_id null, tracking TEST-TRACKING-SMOKE-123. Completely untouched.
+- **Conclusion**: Admin payment-status-only DB/service boundary passed on VSM-0038. No conversion/loyalty/referral side effects were created. No Mercado Pago fields were injected. No order_status or tracking mutation occurred. No further payment-status mutation should be run on VSM-0038.
+- **Explicit Non-claims**:
+  - Does NOT claim the actual React admin drawer click was browser-validated.
+  - Does NOT claim Mercado Pago webhook/current sandbox works.
+  - Does NOT claim refund/cancellation works.
+  - Does NOT claim order_status transitions are safe.
+  - Does NOT claim future schema/migrations cannot add side effects.
+  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim all admin routes/roles are validated.
+  - Does NOT claim VSM-0039 paid or touched.
+
+### ADMIN ORDER STATUS TRANSITION - DB/SERVICE BOUNDARY PROCESSING (May 6, 2026) - PASS
+- **Validation**: Codex authorized DB/Service boundary mutation test on VSM-0038 for confirmed -> processing transition.
+- **Result**: ACCEPT_DB_SERVICE_BOUNDARY_ORDER_STATUS_PROCESSING_PASS.
+- **Execution**: The authorized browser drawer smoke deviated into a strictly bounded service/DB-boundary simulation script (`simulate_admin_order_status.cjs`). Source/service boundary verified: `admin-orders.service.ts -> updateOrderStatus`. The executed patch was: `{ status: 'processing', payment_status: 'paid', updated_at: <now> }`.
+- **Target Order**: VSM-0038 / #0C2C6A (UUID: 8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a).
+- **Pre-state**: status/order_status: confirmed, payment_method: transfer, payment_status: paid, mp_payment_id: null, mp_payment_data: null, tracking: null.
+- **Post-state**: status/order_status: processing, payment_method: transfer (unchanged), payment_status: paid, mp_payment_id: null, mp_payment_data: null, tracking: null (unchanged).
+- **Side Effects**: `conversation_conversion_events` total stayed 29 (VSM-0038 linked rows stayed 0). `loyalty_points` linked rows stayed 0. `referrals` table absent from production schema cache.
+- **Test Order Preservation**: VSM-0039 / #B60574 remained pending/pending, mp_payment_id null, tracking TEST-TRACKING-SMOKE-123. Completely untouched.
+- **Conclusion**: Admin order-status DB/service boundary passed for VSM-0038 confirmed -> processing. No conversion/loyalty/referral side effects were observed. No Mercado Pago fields were injected. No tracking mutation occurred. No further confirmed -> processing mutation should be run on VSM-0038.
+- **Explicit Non-claims**:
+  - Does NOT claim the actual React admin drawer status selector was browser-validated.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline mutation is safe.
+  - Does NOT claim shipped/delivered transitions are safe.
+  - Does NOT claim refund/cancellation works.
+  - Does NOT claim Mercado Pago current webhook works.
+  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim future schema/migrations cannot add side effects.
+  - Does NOT claim VSM-0039 paid or touched.
+
+### ADMIN ACCESS RECOVERY & UI READ-ONLY VERIFICATION (May 6, 2026) - PASS
+- **Validation**: Codex authorized a bounded admin access recovery followed by a read-only Admin UI verification for VSM-0038.
+- **Result**: ACCEPT_ADMIN_ACCESS_AND_UI_READ_ONLY_DISPLAY_PASS.
+- **Execution**: Dedicated test admin access was restored for `test-admin-vsm@example.com`. Recovery required a password reset (via service role) and admin role restoration via DB upsert into `admin_users`. No secrets were exposed. Helper scripts `recover_admin.cjs` and `grant_admin.cjs` remained local and untracked.
+- **Verification URL**: https://vsm-store.pages.dev/admin/orders
+- **Read-only surfaces inspected**: list/card, table, kanban, and order drawer.
+- **VSM-0038 UI state observed**: status/order_status: Preparando / processing; payment_status: Pagado / paid; payment_method: Transferencia / transfer; MP fields absent; tracking: Sin guía asignada; Confirmar Pago hidden.
+- **VSM-0039 preservation observed**: status/order_status: Pendiente / pending; payment_status: Pendiente / pending; payment_method: Mercadopago; mp_payment_id none displayed; tracking TEST-TRACKING-SMOKE-123; untouched.
+- **UI control risks observed**: status selector visible/enabled, tracking Agregar button visible, Confirmar Pago visible on VSM-0039, bulk checkboxes visible, kanban drag/drop exposed, refund/cancel controls not observed in primary drawer.
+- **Explicit Non-claims**:
+  - Does NOT claim React drawer mutation path was validated.
+  - Does NOT claim status dropdown mutation works.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline actions are safe.
+  - Does NOT claim shipped/delivered transitions are safe.
+  - Does NOT claim refund/cancel works.
+  - Does NOT claim current Mercado Pago webhook works.
+  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim final commercial readiness.
+
+### ADMIN VISIBLE CONTROL SURFACE MAP - NO MUTATION RECOMMENDED (May 6, 2026)
+- **Verdict**: CONTROL_SURFACE_MAP_COMPLETE_NO_MUTATION_RECOMMENDED.
+- **Current Baseline**:
+  - VSM-0038 is processing / paid / transfer, MP fields null, tracking null.
+  - VSM-0039 is pending / pending / mercadopago, mp_payment_id null, tracking TEST-TRACKING-SMOKE-123, and must remain untouched.
+- **Control Surface Map**:
+  - Drawer status selector uses `updateOrderStatus`.
+  - Drawer tracking save uses `updateOrderTracking`.
+  - Drawer Confirmar Pago uses `updateOrderPaymentStatus`.
+  - List/table/board status selectors use `updateOrderStatus`.
+  - List tracking save uses `updateOrderTracking`.
+  - Table checkboxes plus bulk toolbar can mutate multiple selected orders.
+  - Kanban drag/drop can mutate order status.
+  - Filters/view toggles/open drawer are read-only.
+  - No explicit Mercado Pago refund API/admin refund control was found in the inspected admin order surfaces.
+  - Cancellation exists as order_status transition, not validated refund/cancel workflow.
+- **Risks**:
+  - `updateOrderStatus` forces payment_status = paid for processing/shipped/delivered.
+  - delivered may trigger referral/loyalty migration logic if active.
+  - bulk actions can mutate multiple orders.
+  - VSM-0039 can be contaminated by Confirmar Pago, status selectors, bulk, or kanban.
+  - VSM-0038 should not be casually reused.
+- **Conclusion**: No further mutation is recommended from this control-surface audit. Future smokes require explicit Carlos authorization with exact target/control/transition. VSM-0039 remains excluded unless a future MP-current-webhook lane is explicitly opened.
+- **Explicit Non-claims**:
+  - Does NOT claim status dropdown mutation works.
+  - Does NOT claim tracking mutation UI works in this pass.
+  - Does NOT claim Confirmar Pago UI mutation works.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline mutations are safe.
+  - Does NOT claim shipped/delivered transitions are safe.
+  - Does NOT claim refund/cancel works.
+  - Does NOT claim current Mercado Pago webhook works.
+  - Does NOT claim full admin fulfillment readiness.
+
+### REFUND / CANCELLATION READINESS - NO MUTATION RECOMMENDED (May 6, 2026)
+- **Verdict**: NO_REFUND_PATH_FOUND_CANCEL_STATUS_ONLY.
+- **Facts**:
+  - No implemented Mercado Pago refund API path was found.
+  - No admin UI control triggering a real refund was found.
+  - `payment_status = refunded` exists as a status/type and webhook-mapped provider state, but no admin/provider refund execution path was found.
+  - Mercado Pago webhook can react to provider-reported refunded status, but does not initiate refunds.
+  - Cancellation exists as `order_status/status = cancelled` transition only.
+  - `updateOrderStatus(..., 'cancelled')` does not set `payment_status = refunded`.
+  - Cancellation does not restore inventory, reverse loyalty/referral/conversion rows, notify customer, or affect Mercado Pago provider state in inspected code.
+  - VSM-0038 should not be cancelled because it is processing / paid / transfer and cancellation would be commercially ambiguous.
+  - VSM-0039 must remain untouched because it is preserved pending MP evidence.
+  - Any future cancellation smoke requires a fresh controlled non-MP test order and explicit Carlos authorization.
+- **Explicit Non-claims**:
+  - Does NOT claim refund works.
+  - Does NOT claim Mercado Pago refund API exists.
+  - Does NOT claim cancellation performs a refund.
+  - Does NOT claim cancellation reverses inventory, loyalty, referral, conversion, or ledger effects.
+  - Does NOT claim cancellation notifies customer.
+  - Does NOT claim MP provider state is cancelled.
+  - Does NOT claim VSM-0038 or VSM-0039 was touched.
+  - Does NOT claim current MP webhook readiness.
+  - Does NOT claim full admin fulfillment readiness.
+
+### SHIPPING / DELIVERY READINESS - REQUIRE FRESH CONTROLLED ORDER FIRST (May 6, 2026)
+- **Verdict**: REQUIRE_FRESH_CONTROLLED_ORDER_FIRST.
+- **Current Baseline**:
+  - VSM-0038 is processing / paid / transfer, MP fields null, tracking null. It has already absorbed payment-status and order-status service-boundary mutations and must not be casually reused.
+  - VSM-0039 is pending / pending / mercadopago, mp fields null, tracking TEST-TRACKING-SMOKE-123, and remains excluded/untouched.
+- **Processing -> Shipped Map**:
+  - Service path: `updateOrderStatus` via admin status controls.
+  - DB patch: `status = shipped`, `updated_at`, and forced `payment_status = paid`.
+  - Payment status coupling exists because shipped is in the paid-status set.
+  - Tracking coupling: none found.
+  - Side effects: no app/service-level notification, inventory, ledger, or provider side effect was found for this transition in inspected source.
+  - Reachable UI surfaces: drawer selector, list/table/board selectors, kanban drag/drop, and bulk toolbar paths.
+- **Shipped -> Delivered Map**:
+  - Service path: same `updateOrderStatus`.
+  - DB patch: `status = delivered`, `updated_at`, and forced `payment_status = paid`.
+  - Payment status coupling exists.
+  - Tracking coupling: none found.
+  - Side effects: no app-level notification, inventory, or provider side effect was found.
+  - Delivered/referral trigger risk exists because migration logic `tr_order_paid_referral` can fire when status becomes delivered if active, calling referral/loyalty processing.
+  - Delivered is higher risk than shipped.
+- **Tracking Readiness/Risk**:
+  - Tracking is not source-enforced before shipped or delivered.
+  - If tracking is null, the system can represent shipped/delivered with no guide assigned. Null-tracking fulfillment is operationally misleading.
+  - Tracking readiness should be audited before any real shipping smoke.
+- **Order Risk Assessment**:
+  - VSM-0038 is not ideal for further fulfillment mutation.
+  - VSM-0039 remains excluded.
+  - Future fulfillment smoke requires a fresh controlled non-MP transfer order.
+  - The safest future candidate is a fresh controlled transfer order, paid/processing by explicit authorization, ideally with tracking readiness handled first.
+- **Safe/Unsafe Actions**:
+  - Safe now: source/canon reconciliation, read-only UI visibility check for shipping controls, tracking readiness audit.
+  - Unsafe without Carlos authorization: processing -> shipped, shipped -> delivered, bulk, kanban, table/list inline mutation, touching VSM-0039.
+  - Excluded: delivered smoke until trigger risk is bounded, refund/cancel execution, Mercado Pago/webhook work.
+- **Conclusion**: No shipping or delivery mutation was executed. No mutation is recommended now. Future shipping smoke requires fresh controlled non-MP test order and explicit Carlos authorization. Delivered transition is not recommended until trigger risk is bounded. Next recommended lane: tracking readiness audit before any shipping smoke.
+- **Explicit Non-claims**:
+  - Does NOT claim processing -> shipped works.
+  - Does NOT claim shipped -> delivered works.
+  - Does NOT claim tracking UI works.
+  - Does NOT claim delivered trigger side effects are safe.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline actions are safe.
+  - Does NOT claim notifications or inventory behavior are validated.
+  - Does NOT claim current Mercado Pago webhook delivery.
+  - Does NOT claim refund/cancel works.
+  - Does NOT claim full admin fulfillment readiness.
+
+### TRACKING CANONICALIZATION IMPLEMENTED WITH TEST DEBT (May 8, 2026)
+- **Verdict**: TRACKING_CANONICALIZATION_IMPLEMENTED_WITH_TEST_DEBT.
+- **Facts**:
+  - Tracking canonicalization was committed in `608a6907db2c45d91cb4c5dac26c95c4723dd3b5` ("fix: canonicalize admin tracking number").
+  - `orders.tracking_number` is now the canonical guide/tracking number field in implemented admin and storefront code.
+  - `orders.tracking_notes` remains as supplemental free text / link / operational note.
+  - `updateOrderTracking` (admin service) now writes to `tracking_number` and `updated_at`, not `tracking_notes`.
+  - Admin orders, dashboard recent orders, and admin customer order history queries now select/use `tracking_number`.
+  - Admin drawer and order list tracking inputs now read from and write to `tracking_number`.
+  - Admin WhatsApp helper now labels `tracking_number` as "Guía" and `tracking_notes` separately as "Nota".
+  - Customer `OrderDetail` (`/orders/:id`) now displays `tracking_number` as the primary "Número de Guía" and `tracking_notes` as supplemental "Notas de Envío".
+  - No DB backfill was performed; existing orders without `tracking_number` were not mutated.
+  - VSM-0038 and VSM-0039 were not touched.
+  - No admin browser mutation smoke test was performed in this pass.
+  - No carrier/DHL behavior or automatic shipping/delivery status reconciliation was added.
+  - **Test Debt**: No focused admin service unit/integration test currently proves `updateOrderTracking` writes `tracking_number` instead of `tracking_notes`. Storefront resolution tests passed.
+- **Explicit Non-claims**:
+  - Does NOT claim DHL tracking readiness.
+  - Does NOT claim `/track` provider integration readiness.
+  - Does NOT claim admin browser mutation path was validated.
+  - Does NOT claim existing historical orders were backfilled.
+  - Does NOT claim shipping/delivery readiness.
+  - Does NOT claim VSM-0038 or VSM-0039 was touched.
+  - Does NOT claim full tracking/commercial fulfillment readiness.
+  - Does NOT claim admin service integration tests exist.
+
+### VSM-0040 CONTROLLED FULFILLMENT SMOKE PASS (May 8, 2026)
+- **Verdict**: VSM0040_FULFILLMENT_SMOKE_PASS.
+- **Order Identity**:
+  - Order number: VSM-0040. UUID: `5be6729d-bd43-4a8e-af85-8433047d6e2b`.
+  - Customer marker: `CONTROLLED FULFILLMENT SMOKE - DO NOT SHIP`.
+  - Payment method: `transfer`. Product: Gomitas CBD 25mg x10 Frutas. Total: 350.00.
+  - DB-seeded (not storefront checkout). `conversion_source: manual`. No Césarín session.
+- **Smoke Phases Passed**:
+  - Phase 1: `payment_status` pending → paid. ✅
+  - Phase 2: `status` pending → processing. ✅
+  - Phase 3: `tracking_number` null → TEST-DHL-TRACKING-001 (canonical field, `tracking_notes` remained null). ✅
+  - Phase 4: Mid-smoke side-effect verification — all baselines unchanged. ✅
+  - Phase 5: `status` processing → shipped. Stopped before delivered. ✅
+- **Final VSM-0040 State**: `shipped / paid / transfer`. `tracking_number: TEST-DHL-TRACKING-001`. `tracking_notes: null`. All MP fields null.
+- **Side Effects Unchanged**: Product stock 45. Conversion events 29. Loyalty points 0. Customer stats 0/0.00/bronze. Referrals table absent.
+- **Preservation**: VSM-0038 unchanged (`processing/paid`, updated_at `2026-05-07`). VSM-0039 unchanged (`pending/pending`, tracking_notes `TEST-TRACKING-SMOKE-123`, updated_at `2026-05-06`).
+- **Scope**: No source/docs/commit/push changes during smoke. No checkout, MP, webhook, refund/cancel, delivered, bulk/kanban mutations. Direct DB boundary only.
+- **Explicit Non-claims**:
+  - Does NOT claim delivered readiness.
+  - Does NOT claim DHL/provider tracking readiness.
+  - Does NOT claim refund/cancel readiness.
+  - Does NOT claim Mercado Pago current webhook readiness.
+  - Does NOT claim bulk/kanban/table-inline mutation safety.
+  - Does NOT claim checkout readiness.
+  - Does NOT claim admin browser UI mutation path was validated.
+  - Does NOT claim full commercial fulfillment readiness.
