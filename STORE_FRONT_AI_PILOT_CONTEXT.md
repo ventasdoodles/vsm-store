@@ -20,6 +20,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Scope mismatch is rejected instead of silently broadening suppression.
 - Normal non-smoke behavior remains preserved when the contract is absent.
 - Existing non-smoke `knowledge_rag_foundation` telemetry remains intact.
+- Post-deploy live smoke: after `626a730` added `customer-intelligence` to `deploy-functions` and workflow_dispatch run `25980183647` succeeded, exactly one authenticated deployed app-triggered no-write smoke returned `metadata: present`, contract `customer_intelligence_no_write_v1`, suppressed writes `ai_customer_memory` and `ai_analytics`, suppressed call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- That smoke proves the bounded policy/shipping/payment retrieval-to-answer path only; it does not prove production answer quality, full RAG quality, Product Search quality, or all customer-intelligence routes.
 - Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
 
 ## Current Knowledge RAG Local Harness Truth
@@ -38,12 +40,13 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` and `docs/audits/2026-05/seed-runner-typecheck-strictness.md`.
 
 ## Tactical Non-Claims
-- No live retrieval-to-answer proof.
-- No remote `customer-intelligence` smoke.
-- No Edge HTTP no-write smoke execution.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke.
+- Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
+- Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.
 - No Product Search quality proof.
+- No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.
 - No retained inactive embedded row cleanup.

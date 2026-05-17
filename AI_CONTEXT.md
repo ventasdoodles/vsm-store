@@ -24,6 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
+- Latest post-split accepted runtime/canon lane: post-deploy live no-write customer-intelligence smoke, accepted with residual risk after `626a730` and workflow run `25980183647`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -35,7 +36,18 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: No-Write Customer-Intelligence Smoke Readiness
+## Latest Accepted Lane: Post-Deploy No-Write Customer-Intelligence Smoke
+- Workflow patch commit: `626a730` (`ci: include customer-intelligence in function deploy workflow`) added `customer-intelligence` to `.github/workflows/deploy-functions.yml`.
+- Authorized workflow_dispatch run `25980183647` succeeded on `main` at `626a730d9363ca3dec01c82116ab85947c56209a`.
+- Successful deploy steps in run `25980183647`: `knowledge-ingestor`, `customer-intelligence`, `create-payment`, and `mercadopago-webhook`.
+- Exactly one authenticated deployed app-triggered no-write customer-intelligence smoke ran after that deploy via `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1`.
+- Smoke question: `¿Cuáles son las opciones de envío o pago?`.
+- Sanitized audit metadata showed `metadata: present`, contract `customer_intelligence_no_write_v1`, suppressed writes `ai_customer_memory` and `ai_analytics`, suppressed call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- Supporting chunks: `Guía de Inicio para Nuevos Compradores (3/4)`, `Envíos Detallados y Costos (1/4)`, and `Política de Envíos (4/5)`.
+- Verdict: ACCEPT WITH RESIDUAL RISK. This is a bounded live retrieval-to-answer/no-write smoke for one authenticated policy/shipping/payment-style question, not broad production answer-quality or full RAG/Product Search proof.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: No-Write Customer-Intelligence Smoke Readiness
 - Implementation commit: `0795c51de54842df4dbf496855f785cd83ba45ba` (`test: add no-write customer intelligence smoke readiness`).
 - Canon commit: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -63,16 +75,18 @@
 - Cloudflare Pages manual deploy recovery was proven at run `25918704188` and canonized.
 - GitHub Actions Node 20 -> Node 24 migration was accepted and canonized at commit `f7519f7`; app/build Node remains Node 22 LTS.
 - `supabase/setup-cli` is pinned by SHA in `deploy-functions`; the binary version remains intentionally mobile because `with: version: latest` was preserved.
+- `626a730` added `customer-intelligence` to the `deploy-functions` workflow, and workflow_dispatch run `25980183647` successfully deployed `customer-intelligence` plus the existing function deploy steps.
 - Runtime verifications are accepted for `deploy-functions` run `25924147087`, `graqle-sync` run `25925139071`, and `ingest-knowledge` run `25927827351`.
 - Detailed workflow history is indexed in `AUDIT_LOG.md` and preserved in `docs/audits/2026-05/github-actions-runtime-verification.md` plus the full archive snapshot.
 
 ## Active Residuals / Non-Claims
-- No live retrieval-to-answer proof is claimed.
-- No remote `customer-intelligence` smoke is claimed.
-- No Edge HTTP no-write smoke execution is claimed.
+- Bounded live retrieval-to-answer proof is claimed only for the post-deploy authenticated no-write `customer-intelligence` policy/shipping/payment smoke described above.
+- Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
+- Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
 - No production Cesarin answer-quality proof is claimed.
 - No full RAG quality proof is claimed.
 - No Product Search quality proof is claimed.
+- No broad production readiness or all-routes `customer-intelligence` safety proof is claimed.
 - No semantic completeness proof is claimed.
 - No metadata cleanup is claimed.
 - `metadata.embedding_dims` mismatch remains open: active vectors parse as `768d`, but metadata still records `3072` on many rows and is missing on one row unless separately repaired.
@@ -93,6 +107,7 @@
 - Local no-mutation Cesarin knowledge main-message synthesis improvement.
 - Seed-runner local typecheck strictness repair.
 - No-write customer-intelligence smoke readiness.
+- Post-deploy live no-write customer-intelligence smoke.
 
 ## Canon Update Rules
 - Keep this file current-state-first.

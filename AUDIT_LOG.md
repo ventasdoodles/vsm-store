@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-17 | Post-deploy no-write customer-intelligence smoke | ACCEPT WITH RESIDUAL RISK | `626a730`, run `25980183647`, one deployed smoke | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-16 | No-write customer-intelligence smoke readiness | ACCEPT WITH RESIDUAL RISK | `0795c51` | `8e0dab7` | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-16 | Seed-runner typecheck strictness repair | ACCEPT WITH RESIDUAL RISK | `70ca5f2` | canonized before `8e0dab7` | `docs/audits/2026-05/seed-runner-typecheck-strictness.md` |
 | 2026-05-16 | Cesarin knowledge main-message synthesis | ACCEPT WITH RESIDUAL RISK | `c65ba23` | canonized before `70ca5f2` | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
@@ -45,12 +46,13 @@
 | <= 2026-05-16 | Earlier storefront, checkout, admin, Cesarin OS, and product discovery lanes | historical canon | many | historical | `docs/archive/AUDIT_LOG_ARCHIVE_2026-05-16.md` |
 
 ## Active Non-Claims Carried Forward
-- No live retrieval-to-answer proof.
-- No remote `customer-intelligence` smoke.
-- No Edge HTTP no-write smoke execution.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write `customer-intelligence` policy/shipping/payment smoke.
+- Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
+- Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.
 - No Product Search quality proof.
+- No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.
 - No fix for `metadata.embedding_dims`.
