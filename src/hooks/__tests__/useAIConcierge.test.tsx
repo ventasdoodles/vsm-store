@@ -95,6 +95,27 @@ function createDeferred<T>() {
     return { promise, resolve, reject };
 }
 
+function createNoWriteSmokeResponse(message: string, chunks = 1) {
+    return {
+        message,
+        intent: 'info',
+        suggestedProducts: [],
+        capsule_contract: {
+            capsule_name: 'knowledge_rag_foundation',
+            ui_render_hint: message,
+            match_strategy: 'HIGH_CONFIDENCE_POLICY_MATCH',
+            resolved_chunks: Array.from({ length: chunks }, (_, index) => ({ id: `chunk-${index + 1}` })),
+            no_write_smoke: {
+                active: true,
+                contract: 'customer_intelligence_no_write_v1',
+                scope: 'concierge_chat_knowledge_path',
+                suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+                suppressed_calls: ['cesarin-qa-judge'],
+            },
+        },
+    };
+}
+
 describe('useAIConcierge Stage 1 recovery loop', () => {
     beforeEach(() => {
         chatMock.mockReset();
@@ -227,6 +248,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             expect(result.current.messages.at(-1)?.content).toContain('tarjeta');
         });
         expect((result.current.messages.at(-1) as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            prompt_category: 'combined_payment_shipping',
             metadata_present: true,
             contract: 'customer_intelligence_no_write_v1',
             capsule_name: 'knowledge_rag_foundation',
@@ -235,6 +257,99 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             match_strategy: 'HIGH_CONFIDENCE_POLICY_MATCH',
             resolved_chunk_count: 1,
         });
+    });
+
+    it('auto-triggers the multi-prompt RAG quality smoke only with the exact contract and mode flag', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true',
+        );
+        const expectedPrompts = [
+            '¿Aceptan tarjeta o cómo puedo pagar?',
+            '¿Hacen envíos a todo México y es a domicilio?',
+            '¿Cuánto cuesta el envío por DHL?',
+            '¿Cuáles son las opciones de envío o pago?',
+            '¿A qué hora abren hoy?',
+            '¿Me garantizas entrega mañana a domicilio?',
+        ];
+        expectedPrompts.forEach((prompt) => {
+            chatMock.mockResolvedValueOnce(createNoWriteSmokeResponse(`Respuesta para ${prompt}`, 2));
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => expect(chatMock).toHaveBeenCalledTimes(6));
+
+        expectedPrompts.forEach((prompt, index) => {
+            expect(chatMock.mock.calls[index]).toEqual([
+                prompt,
+                expect.any(Array),
+                expect.any(Object),
+                undefined,
+                undefined,
+                'session-hook-1',
+                { noWriteSmoke: true },
+            ]);
+        });
+        const auditMessages = result.current.messages.filter((message) =>
+            Boolean((message as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit),
+        );
+        expect(auditMessages).toHaveLength(6);
+        expect((auditMessages[0] as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            prompt_category: 'payment_method',
+            prompt_label: expectedPrompts[0],
+            status: 'ok',
+            metadata_present: true,
+            contract: 'customer_intelligence_no_write_v1',
+            resolved_chunk_count: 2,
+        });
+    });
+
+    it('does not activate the multi-prompt RAG quality smoke for missing or incorrect mode params', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=random',
+        );
+
+        renderHook(() => useAIConcierge());
+
+        await Promise.resolve();
+
+        expect(chatMock).not.toHaveBeenCalled();
+    });
+
+    it('represents a multi-prompt smoke failure as sanitized audit status', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true',
+        );
+        chatMock
+            .mockRejectedValueOnce(new Error('network unavailable'))
+            .mockResolvedValue(createNoWriteSmokeResponse('Respuesta segura.', 1));
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => expect(chatMock).toHaveBeenCalledTimes(6));
+
+        const firstAudit = result.current.messages.find((message) =>
+            (message as { capsule_contract?: { no_write_smoke_audit?: { status?: string } } }).capsule_contract?.no_write_smoke_audit?.status === 'error',
+        ) as { capsule_contract?: { no_write_smoke_audit?: Record<string, unknown> } } | undefined;
+        expect(firstAudit?.capsule_contract?.no_write_smoke_audit).toMatchObject({
+            prompt_category: 'payment_method',
+            status: 'error',
+            error_type: 'request_failed',
+            metadata_present: false,
+            contract: 'customer_intelligence_no_write_v1',
+        });
+        const serializedAudit = JSON.stringify(firstAudit?.capsule_contract?.no_write_smoke_audit);
+        expect(serializedAudit).not.toContain('access_token');
+        expect(serializedAudit).not.toContain('refresh_token');
+        expect(serializedAudit).not.toContain('Authorization');
+        expect(serializedAudit).not.toContain('cookie');
+        expect(serializedAudit).not.toContain('apikey');
     });
 
     it('blocks the explicit no-write smoke trigger without an authenticated app user', async () => {

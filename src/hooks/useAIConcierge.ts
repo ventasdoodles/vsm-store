@@ -120,14 +120,40 @@ const AI_CONCIERGE_SLOW_RESPONSE_MS = 20_000;
 const AI_CONCIERGE_REQUEST_TIMEOUT_MS = 60_000;
 const NO_WRITE_SMOKE_QUERY_PARAM = 'ci_no_write_smoke';
 const NO_WRITE_SMOKE_CONTRACT_PARAM = 'smoke_contract';
+const NO_WRITE_SMOKE_RAG_QUALITY_PARAM = 'ci_rag_quality_smoke';
 const NO_WRITE_SMOKE_QUESTION = '¿Cuáles son las opciones de envío o pago?';
+const NO_WRITE_RAG_QUALITY_PROMPTS = [
+    { category: 'payment_method', prompt: '¿Aceptan tarjeta o cómo puedo pagar?' },
+    { category: 'shipping_scope', prompt: '¿Hacen envíos a todo México y es a domicilio?' },
+    { category: 'shipping_cost', prompt: '¿Cuánto cuesta el envío por DHL?' },
+    { category: 'combined_payment_shipping', prompt: NO_WRITE_SMOKE_QUESTION },
+    { category: 'store_hours_limitation', prompt: '¿A qué hora abren hoy?' },
+    { category: 'unsupported_delivery_guarantee', prompt: '¿Me garantizas entrega mañana a domicilio?' },
+] as const;
+
+type NoWriteSmokeAuditContext = {
+    prompt_category?: string;
+    prompt_label?: string;
+    status?: 'ok' | 'blocked' | 'error';
+    error_type?: string;
+};
 
 function shouldAutoRunNoWriteSmoke(): boolean {
     if (typeof window === 'undefined') return false;
 
     const params = new URLSearchParams(window.location.search);
     return params.get(NO_WRITE_SMOKE_QUERY_PARAM) === 'true'
-        && params.get(NO_WRITE_SMOKE_CONTRACT_PARAM) === CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT;
+        && params.get(NO_WRITE_SMOKE_CONTRACT_PARAM) === CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT
+        && !params.has(NO_WRITE_SMOKE_RAG_QUALITY_PARAM);
+}
+
+function shouldAutoRunNoWriteRagQualitySmoke(): boolean {
+    if (typeof window === 'undefined') return false;
+
+    const params = new URLSearchParams(window.location.search);
+    return params.get(NO_WRITE_SMOKE_QUERY_PARAM) === 'true'
+        && params.get(NO_WRITE_SMOKE_CONTRACT_PARAM) === CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT
+        && params.get(NO_WRITE_SMOKE_RAG_QUALITY_PARAM) === 'true';
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -137,11 +163,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function buildNoWriteSmokeAuditSummary(response: {
     message?: string | null;
     capsule_contract?: Record<string, unknown>;
-}): Record<string, unknown> {
+}, context: NoWriteSmokeAuditContext = {}): Record<string, unknown> {
     const contract = response.capsule_contract ?? {};
     const metadata = isRecord(contract.no_write_smoke) ? contract.no_write_smoke : {};
 
     return {
+        prompt_category: context.prompt_category ?? null,
+        prompt_label: context.prompt_label ?? null,
+        status: context.status ?? 'ok',
+        error_type: context.error_type ?? null,
         metadata_present: Boolean(metadata.active),
         contract: typeof metadata.contract === 'string' ? metadata.contract : null,
         suppressed_writes: Array.isArray(metadata.suppressed_writes) ? metadata.suppressed_writes : [],
@@ -272,6 +302,7 @@ export function useAIConcierge() {
             recoverySeed,
             noWriteSmoke,
             smokeAudit,
+            smokeAuditContext,
         }: {
             displayContent: string;
             requestContent: string;
@@ -279,6 +310,7 @@ export function useAIConcierge() {
             recoverySeed?: RecoverySeed;
             noWriteSmoke?: boolean;
             smokeAudit?: boolean;
+            smokeAuditContext?: NoWriteSmokeAuditContext;
         }) => {
             if (!requestContent.trim() && !audio) return;
 
@@ -362,7 +394,7 @@ export function useAIConcierge() {
                 if (smokeAudit) {
                     assistantMsg.capsule_contract = {
                         ...(assistantMsg.capsule_contract ?? {}),
-                        no_write_smoke_audit: buildNoWriteSmokeAuditSummary(responseWithContracts),
+                        no_write_smoke_audit: buildNoWriteSmokeAuditSummary(responseWithContracts, smokeAuditContext),
                     };
                 }
                 const turnAnalysis = assistantMsg.turn_analysis ?? assistantMsg.capsule_contract?.turn_analysis ?? null;
@@ -456,6 +488,32 @@ export function useAIConcierge() {
                 } else {
                     setError({ type: 'generic', message: 'Hubo un problema al responder. Intenta nuevamente.' });
                 }
+
+                if (smokeAudit) {
+                    const assistantMsg: ConciergeAssistantMessage = {
+                        id: (Date.now() + 1).toString(),
+                        role: 'assistant',
+                        content: 'No-write RAG quality smoke prompt failed with sanitized status.',
+                        timestamp: new Date(),
+                        capsule_contract: {
+                            no_write_smoke_audit: {
+                                ...(smokeAuditContext ?? {}),
+                                status: 'error',
+                                error_type: isTimeout ? 'timeout' : isQuota ? 'quota' : 'request_failed',
+                                metadata_present: false,
+                                contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+                                suppressed_writes: [],
+                                suppressed_calls: [],
+                                capsule_name: null,
+                                knowledge_answer_present: false,
+                                main_message_present: false,
+                                match_strategy: null,
+                                resolved_chunk_count: 0,
+                            },
+                        },
+                    };
+                    setMessages((prev) => [...prev, assistantMsg]);
+                }
             } finally {
                 clearRequestTimers();
                 setIsSlowResponse(false);
@@ -487,16 +545,63 @@ export function useAIConcierge() {
             requestContent: NO_WRITE_SMOKE_QUESTION,
             noWriteSmoke: true,
             smokeAudit: true,
+            smokeAuditContext: {
+                prompt_category: 'combined_payment_shipping',
+                prompt_label: NO_WRITE_SMOKE_QUESTION,
+            },
         });
     }, [addMessage, authLoading, runAssistantTurn, user]);
 
-    useEffect(() => {
-        if (authLoading || noWriteSmokeAutoRunRef.current || !shouldAutoRunNoWriteSmoke()) return;
+    const runNoWriteRagQualitySmoke = useCallback(async () => {
+        if (authLoading) return;
 
-        noWriteSmokeAutoRunRef.current = true;
-        setIsOpen(true);
-        void runNoWriteSmoke();
-    }, [authLoading, runNoWriteSmoke]);
+        if (!user) {
+            addMessage({
+                content: 'No-write RAG quality smoke blocked: authenticated session required.',
+                capsule_contract: {
+                    no_write_smoke_audit: {
+                        prompt_category: 'rag_quality_smoke',
+                        prompt_label: null,
+                        status: 'blocked',
+                        metadata_present: false,
+                        contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+                        blocked_reason: 'authenticated_session_required',
+                    },
+                },
+            } as Partial<ConciergeMessage>);
+            return;
+        }
+
+        for (const { category, prompt } of NO_WRITE_RAG_QUALITY_PROMPTS) {
+            await runAssistantTurn({
+                displayContent: prompt,
+                requestContent: prompt,
+                noWriteSmoke: true,
+                smokeAudit: true,
+                smokeAuditContext: {
+                    prompt_category: category,
+                    prompt_label: prompt,
+                },
+            });
+        }
+    }, [addMessage, authLoading, runAssistantTurn, user]);
+
+    useEffect(() => {
+        if (authLoading || noWriteSmokeAutoRunRef.current) return;
+
+        if (shouldAutoRunNoWriteRagQualitySmoke()) {
+            noWriteSmokeAutoRunRef.current = true;
+            setIsOpen(true);
+            void runNoWriteRagQualitySmoke();
+            return;
+        }
+
+        if (shouldAutoRunNoWriteSmoke()) {
+            noWriteSmokeAutoRunRef.current = true;
+            setIsOpen(true);
+            void runNoWriteSmoke();
+        }
+    }, [authLoading, runNoWriteRagQualitySmoke, runNoWriteSmoke]);
 
     const sendMessage = useCallback(
         async (content: string, _isNeural: boolean = false, audio?: string) => {

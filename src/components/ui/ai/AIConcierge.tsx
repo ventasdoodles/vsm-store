@@ -704,6 +704,8 @@ export const AIConcierge: React.FC = () => {
                                                     No-write smoke audit
                                                 </div>
                                                 <div className="mt-1 grid grid-cols-1 gap-1">
+                                                    <span>prompt: {String(noWriteSmokeAudit.prompt_category ?? 'none')}</span>
+                                                    <span>status: {String(noWriteSmokeAudit.status ?? 'none')}</span>
                                                     <span>metadata: {noWriteSmokeAudit.metadata_present ? 'present' : 'missing'}</span>
                                                     <span>contract: {String(noWriteSmokeAudit.contract ?? 'none')}</span>
                                                     <span>writes: {formatSmokeAuditList(noWriteSmokeAudit.suppressed_writes)}</span>

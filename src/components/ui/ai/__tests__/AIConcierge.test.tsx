@@ -255,6 +255,9 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                     capsule_contract: {
                         capsule_name: 'knowledge_rag_foundation',
                         no_write_smoke_audit: {
+                            prompt_category: 'payment_method',
+                            prompt_label: '¿Aceptan tarjeta o cómo puedo pagar?',
+                            status: 'ok',
                             metadata_present: true,
                             contract: 'customer_intelligence_no_write_v1',
                             suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
@@ -282,6 +285,8 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         const audit = screen.getByTestId('ci-no-write-smoke-audit');
         expect(audit).toHaveTextContent('No-write smoke audit');
+        expect(audit).toHaveTextContent('prompt: payment_method');
+        expect(audit).toHaveTextContent('status: ok');
         expect(audit).toHaveTextContent('contract: customer_intelligence_no_write_v1');
         expect(audit).toHaveTextContent('writes: ai_customer_memory, ai_analytics');
         expect(audit).toHaveTextContent('calls: cesarin-qa-judge');
