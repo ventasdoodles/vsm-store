@@ -11,6 +11,8 @@
 - Multi-prompt trigger commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
 - No-write error metadata preservation verdict: ACCEPT WITH RESIDUAL RISK.
 - No-write error metadata preservation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
+- Payment/shipping-cost no-write RAG smoke path hardening verdict: ACCEPT WITH RESIDUAL RISK.
+- Payment/shipping-cost no-write RAG smoke path hardening commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -113,13 +115,34 @@
   - `git diff --check 7905b60^ 7905b60`: PASS.
   - Commit-diff secret scan found no raw secret values.
 
+## Payment / Shipping-Cost No-Write RAG Smoke Path Hardening
+- Commit `cb6311e` added local/source hardening for the `payment_method` and `shipping_cost` no-write RAG smoke paths.
+- Changed files:
+  - `src/hooks/useAIConcierge.ts`.
+  - `src/hooks/__tests__/useAIConcierge.test.tsx`.
+  - `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`.
+  - `src/lib/__tests__/customer-intelligence-turn-first.test.ts`.
+  - `supabase/functions/customer-intelligence/index.ts`.
+  - `supabase/functions/customer-intelligence/intent-guardrails.ts`.
+- Under recognized `customer_intelligence_no_write_v1` no-write smoke, the exact prompts `¿Aceptan tarjeta o cómo puedo pagar?` and `¿Cuánto cuesta el envío por DHL?` are forced to `POLICY_INQUIRY` / `knowledge_rag_foundation` instead of `storefront_checkout_readiness`.
+- Normal checkout-readiness behavior remains intact for real checkout phrases such as `ya puedo pagar?`.
+- The six-prompt allowlist and normal `sendMessage` behavior remain unchanged.
+- Sanitized audit rows now distinguish `edge_metadata_present` from `request_contract_present`.
+- Unsupported delivery-guarantee successful-path shaping was not included.
+- Validation for `cb6311e`:
+  - `npm run test:run -- src/lib/__tests__/customer-intelligence-turn-first.test.ts src/lib/__tests__/customer-intelligence-tool-selection.test.ts src/hooks/__tests__/useAIConcierge.test.tsx src/services/__tests__/concierge.service.knowledge-harness.test.ts`: PASS, 4 files / 70 tests.
+  - Targeted ESLint over changed files: PASS with 0 errors and existing warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check cb6311e^ cb6311e`: PASS.
+  - Commit-diff secret scan found no secret-like values.
+
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke.
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
 - No deployed trigger availability or live multi-prompt smoke execution is claimed for `3f61e13`.
-- No deployed availability or live smoke rerun is claimed for `7905b60`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
 - No no-write suppression proof is claimed for the previous failed runtime prompts.
 - No unsupported delivery-guarantee quality hardening is claimed.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.

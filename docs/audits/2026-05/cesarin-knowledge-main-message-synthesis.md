@@ -11,6 +11,8 @@
 - No-write error metadata preservation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
 - Unsupported delivery guarantee answer-shaping verdict: ACCEPT WITH RESIDUAL RISK.
 - Unsupported delivery guarantee answer-shaping commit: `9637596` (`test: harden unsupported delivery guarantee policy answer`).
+- Payment/shipping-cost no-write RAG smoke path hardening verdict: ACCEPT WITH RESIDUAL RISK.
+- Payment/shipping-cost no-write RAG smoke path hardening commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -65,6 +67,14 @@
 - Existing payment, shipping scope, shipping cost, combined payment/shipping, and store-hours harness behavior remains covered.
 - This patch did not change no-write trigger behavior, no-write metadata preservation, workflow, deploy, DB, ingestion, or live paths.
 
+## Payment / Shipping-Cost No-Write RAG Smoke Path Hardening
+- Commit `cb6311e` added local/source hardening for the `payment_method` and `shipping_cost` no-write RAG smoke paths.
+- Under recognized `customer_intelligence_no_write_v1` no-write smoke, the exact prompts `¿Aceptan tarjeta o cómo puedo pagar?` and `¿Cuánto cuesta el envío por DHL?` are forced to `POLICY_INQUIRY` / `knowledge_rag_foundation` instead of `storefront_checkout_readiness`.
+- Normal checkout-readiness behavior remains intact for real checkout phrases such as `ya puedo pagar?`.
+- The six-prompt allowlist and normal `sendMessage` behavior remain unchanged.
+- Sanitized audit rows now distinguish `edge_metadata_present` from `request_contract_present`.
+- Unsupported delivery-guarantee successful-path shaping was not included.
+
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
 - Targeted ESLint: PASS with 0 errors and 1 existing warning.
@@ -95,6 +105,12 @@
   - `npm run typecheck`: PASS.
   - `git diff --check 9637596^ 9637596`: PASS.
   - Commit-diff secret scan found no secret-like values.
+- Payment/shipping-cost no-write RAG smoke path hardening validation for `cb6311e`:
+  - `npm run test:run -- src/lib/__tests__/customer-intelligence-turn-first.test.ts src/lib/__tests__/customer-intelligence-tool-selection.test.ts src/hooks/__tests__/useAIConcierge.test.tsx src/services/__tests__/concierge.service.knowledge-harness.test.ts`: PASS, 4 files / 70 tests.
+  - Targeted ESLint over changed files: PASS with 0 errors and existing warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check cb6311e^ cb6311e`: PASS.
+  - Commit-diff secret scan found no secret-like values.
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
@@ -104,8 +120,8 @@
 - No Product Search quality proof.
 - No deployed/runtime RAG answer-quality proof from the local harness.
 - No deployed availability or live execution of the multi-prompt no-write RAG quality trigger.
-- No deployed availability or live smoke rerun is claimed for `7905b60`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
 - Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; successful deployed LLM/Sommelier behavior remains unproven.
 - Future live six-prompt proof still requires deployed availability verification and explicit authorization.
 - The original `payment_method` and `shipping_cost` runtime failure causes remain unknown.

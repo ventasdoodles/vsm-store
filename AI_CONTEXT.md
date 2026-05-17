@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: unsupported delivery guarantee answer-shaping, accepted with residual risk at `9637596`.
+- Latest post-split accepted canon lane: payment/shipping-cost no-write RAG smoke path hardening, accepted with residual risk at `cb6311e`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,19 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Unsupported Delivery Guarantee Answer-Shaping
+## Latest Accepted Lane: Payment / Shipping-Cost No-Write RAG Smoke Path Hardening
+- Implementation commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
+- Changed files: `src/hooks/useAIConcierge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`, `src/lib/__tests__/customer-intelligence-turn-first.test.ts`, `supabase/functions/customer-intelligence/index.ts`, and `supabase/functions/customer-intelligence/intent-guardrails.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- Under recognized `customer_intelligence_no_write_v1` no-write smoke, the exact prompts `¿Aceptan tarjeta o cómo puedo pagar?` and `¿Cuánto cuesta el envío por DHL?` are forced to `POLICY_INQUIRY` / `knowledge_rag_foundation` instead of `storefront_checkout_readiness`.
+- Normal checkout-readiness behavior remains intact for real checkout phrases such as `ya puedo pagar?`.
+- The six-prompt allowlist and normal `sendMessage` behavior remain unchanged.
+- Sanitized audit rows now distinguish `edge_metadata_present` from `request_contract_present`.
+- Unsupported delivery-guarantee successful-path shaping was not included.
+- Validation accepted: targeted Vitest PASS with 4 files / 70 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check cb6311e^ cb6311e` PASS; commit-diff secret scan found no secret-like values.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: Unsupported Delivery Guarantee Answer-Shaping
 - Implementation commit: `9637596` (`test: harden unsupported delivery guarantee policy answer`).
 - Changed files: `supabase/functions/customer-intelligence/policy-degraded-fallback.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, and `src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -128,8 +140,8 @@
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
 - No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
-- No deployed availability is claimed for `7905b60`, and no live multi-prompt smoke rerun is claimed after that patch.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No deployed availability is claimed for `7905b60` or `cb6311e`, and no live multi-prompt smoke rerun is claimed after those patches.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
 - No no-write suppression proof is claimed for the previous failed runtime prompts.
 - Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed LLM/Sommelier behavior or live six-prompt runtime success is claimed.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
@@ -163,6 +175,7 @@
 - Multi-prompt no-write RAG quality trigger.
 - No-write error metadata preservation.
 - Unsupported delivery-guarantee answer-shaping.
+- Payment/shipping-cost no-write RAG smoke path hardening.
 
 ## Canon Update Rules
 - Keep this file current-state-first.

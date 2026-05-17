@@ -35,12 +35,13 @@
 - Multi-prompt no-write RAG quality trigger `3f61e13`: targeted Vitest PASS for `src/hooks/__tests__/useAIConcierge.test.tsx` and `src/components/ui/ai/__tests__/AIConcierge.test.tsx` with 2 files / 46 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check 3f61e13^ 3f61e13` PASS; commit-diff secret-pattern scan found no secret values, only negative test assertions.
 - No-write error metadata preservation `7905b60`: targeted Vitest PASS for `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `src/hooks/__tests__/useAIConcierge.test.tsx` with 3 files / 25 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check 7905b60^ 7905b60` PASS; commit-diff secret scan found no raw secret values.
 - Unsupported delivery guarantee answer-shaping `9637596`: targeted Vitest PASS for `src/lib/__tests__/knowledge-rag-capsule.test.ts` and `src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts` with 2 files / 13 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 9637596^ 9637596` PASS; commit-diff secret scan found no secret-like values.
+- Payment/shipping-cost no-write RAG smoke path hardening `cb6311e`: targeted Vitest PASS for `src/lib/__tests__/customer-intelligence-turn-first.test.ts`, `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, and `src/services/__tests__/concierge.service.knowledge-harness.test.ts` with 4 files / 70 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check cb6311e^ cb6311e` PASS; commit-diff secret scan found no secret-like values.
 
 ## Non-Claims / Residuals
 - No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
 - No deployed/runtime RAG quality proof from `3f61e13`; it is trigger readiness only.
-- No deployed availability or live smoke rerun is claimed for `7905b60`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
 - Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed/runtime LLM/Sommelier behavior or live six-prompt success is claimed.
 - The original `payment_method` and `shipping_cost` runtime failure causes remain unknown.
 - No Product Search quality proof.

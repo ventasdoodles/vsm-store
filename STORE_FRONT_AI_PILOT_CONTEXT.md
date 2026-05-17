@@ -34,6 +34,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Its sanitized audit output includes prompt/category, status, contract, suppression metadata, capsule, answer/main-message presence, match strategy, and resolved chunk count.
 - `7905b60` adds local/tested no-write error metadata preservation for recognized `customer_intelligence_no_write_v1` paths: Edge error responses include sanitized `no_write_smoke` metadata, service preserves that metadata from error response bodies, client telemetry is suppressed for no-write error paths, and the hook renders metadata-present audit rows when available.
 - `9637596` adds local deterministic unsupported delivery-guarantee answer-shaping through the narrow `unsupported_shipping_promise_limit` degraded policy fallback when shipping policy context exists. It says next-day guaranteed home delivery cannot be confirmed, grounds shipping to DHL OCURRE / sucursal, and says timing/cost must be confirmed before closing the order.
+- `cb6311e` adds local/source hardening for the `payment_method` and `shipping_cost` no-write RAG smoke paths: under recognized `customer_intelligence_no_write_v1`, the exact prompts `¿Aceptan tarjeta o cómo puedo pagar?` and `¿Cuánto cuesta el envío por DHL?` are forced to `POLICY_INQUIRY` / `knowledge_rag_foundation` instead of `storefront_checkout_readiness`; normal checkout-readiness behavior remains intact for real checkout phrases such as `ya puedo pagar?`.
+- `cb6311e` also updates sanitized no-write failure audit rows to distinguish `edge_metadata_present` from `request_contract_present`.
 - These are local/no-mutation proofs only.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` and `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
@@ -50,8 +52,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
 - No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
-- No deployed availability or live smoke rerun is claimed for `7905b60`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
 - Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed LLM/Sommelier behavior or live six-prompt runtime success is claimed.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof; scoped local policy/RAG harness coverage is not deployed/runtime quality proof.
