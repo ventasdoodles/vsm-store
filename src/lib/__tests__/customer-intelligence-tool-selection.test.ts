@@ -318,6 +318,35 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.primaryCapability.name).toBe('knowledge_rag_foundation');
   });
 
+  it('forces knowledge RAG for no-write smoke policy prompts that also look like checkout readiness', () => {
+    for (const query of [
+      '¿Aceptan tarjeta o cómo puedo pagar?',
+      '¿Cuánto cuesta el envío por DHL?',
+    ]) {
+      const plan = buildRuntimeCapabilityPlan({
+        intent: 'POLICY_INQUIRY',
+        query,
+        toolCalls: [],
+        hasAudio: false,
+        hasMemorySummary: false,
+        turnProfile: makeTurnProfile({
+          primary_intent: 'POLICY_INQUIRY',
+          turn_priority: ['POLICY_INQUIRY', 'CHECKOUT_READINESS'],
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'policy',
+        }),
+        catalogGate: makeCatalogGate({
+          reason: 'non_catalog_lane',
+        }),
+      });
+
+      expect(plan.forcedCapability).toBe('knowledge_rag_foundation');
+      expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['knowledge_rag_foundation']);
+      expect(plan.primaryCapability.kind).toBe('client_capsule');
+      expect(plan.primaryCapability.name).toBe('knowledge_rag_foundation');
+    }
+  });
+
   it('still forces bounded policy truth when the analyst degraded into clarify-first', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'POLICY_INQUIRY',

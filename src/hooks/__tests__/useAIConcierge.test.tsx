@@ -342,6 +342,8 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             status: 'error',
             error_type: 'request_failed',
             metadata_present: false,
+            edge_metadata_present: false,
+            request_contract_present: true,
             contract: 'customer_intelligence_no_write_v1',
         });
         const serializedAudit = JSON.stringify(firstAudit?.capsule_contract?.no_write_smoke_audit);
@@ -393,6 +395,8 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             status: 'error',
             error_type: 'request_failed',
             metadata_present: true,
+            edge_metadata_present: true,
+            request_contract_present: true,
             contract: 'customer_intelligence_no_write_v1',
             suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
             suppressed_calls: ['cesarin-qa-judge'],

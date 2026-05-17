@@ -121,6 +121,30 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('non_catalog_lane');
   });
 
+  it('keeps exact no-write RAG payment and shipping cost smoke prompts in the policy lane', () => {
+    for (const query of [
+      '¿Aceptan tarjeta o cómo puedo pagar?',
+      '¿Cuánto cuesta el envío por DHL?',
+    ]) {
+      const profile = resolveTurnFirstIntent({
+        analystIntent: 'CHECKOUT_READINESS',
+        analystDecision: 'USE_CAPABILITY',
+        query,
+        toolCalls: [
+          { name: 'storefront_checkout_readiness', args: { query } },
+          { name: 'knowledge_rag_foundation', args: { query, is_ambiguous: false } },
+        ],
+        preferPolicyForNoWriteSmoke: true,
+      });
+
+      expect(profile.primary_intent).toBe('POLICY_INQUIRY');
+      expect(profile.turn_focus).toBe('policy');
+      expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+      expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toEqual(['knowledge_rag_foundation']);
+      expect(profile.queued_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_checkout_readiness');
+    }
+  });
+
   it('routes bounded stock questions to INVENTORY_OUTLOOK and opens only the explicit product-review surface', () => {
     const turnProfile = resolveTurnFirstIntent({
       analystIntent: 'UNKNOWN',

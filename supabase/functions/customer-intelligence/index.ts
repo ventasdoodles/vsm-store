@@ -815,6 +815,7 @@ serve(async (req) => {
                 analystDecision: analystReport.turn_decision ?? analystReport.current_turn_decision ?? null,
                 query: turnSignals.normalizedQuery || (query || ''),
                 toolCalls: analystToolCalls,
+                preferPolicyForNoWriteSmoke: Boolean(noWriteSmoke),
             });
             const catalogGate = resolveCatalogGate({
                 turnProfile,

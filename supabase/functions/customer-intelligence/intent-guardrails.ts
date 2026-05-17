@@ -144,6 +144,11 @@ function detectCheckoutReadinessMatch(normalizedQuery: string): boolean {
     return readinessMatch || paymentMethodMatch || shippingReadinessMatch;
 }
 
+function isNoWriteRagSmokePolicyPrompt(normalizedQuery: string): boolean {
+    return normalizedQuery === 'aceptan tarjeta o como puedo pagar'
+        || normalizedQuery === 'cuanto cuesta el envio por dhl';
+}
+
 function detectKittingMatch(normalizedQuery: string): boolean {
     return /\b(kit|kitting|starter kit|setup|set up|armame|arme|armar|equipo completo|equipo entero|quiero cambiar de desechables|cambiar a pods|pasarme a pods|pasar a pods|de desechables a pods|upgrade de hardware|upgrade a pods|arma me un kit|armame un equipo|armame un setup|equipo con liquido|equipo con líquido)\b/.test(normalizedQuery);
 }
@@ -260,8 +265,11 @@ export function resolveTurnFirstIntent(input: {
     analystDecision?: TurnDecision | null;
     query: string;
     toolCalls: ToolCall[];
+    preferPolicyForNoWriteSmoke?: boolean;
 }): TurnFirstIntentProfile {
     const signals = detectStorefrontTurnSignals(input.query);
+    const forceNoWritePolicyLane = input.preferPolicyForNoWriteSmoke === true
+        && isNoWriteRagSmokePolicyPrompt(signals.normalizedQuery);
     const candidateIntents: StorefrontResolvedIntent[] = [];
 
     if (signals.isCompatibilityMatch && !signals.isTimeContext && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'COMPATIBILITY_CHECK' })) {
@@ -273,7 +281,7 @@ export function resolveTurnFirstIntent(input: {
     if (signals.isTrackingMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'ORDER_TRACKING' })) {
         pushCandidate(candidateIntents, 'ORDER_TRACKING');
     }
-    if (signals.isCheckoutReadinessMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'CHECKOUT_READINESS' })) {
+    if (!forceNoWritePolicyLane && signals.isCheckoutReadinessMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'CHECKOUT_READINESS' })) {
         pushCandidate(candidateIntents, 'CHECKOUT_READINESS');
     }
     if (signals.isLoyaltyMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'LOYALTY_SUPPORT' })) {
@@ -305,7 +313,7 @@ export function resolveTurnFirstIntent(input: {
     }
 
     if (input.analystIntent !== 'UNKNOWN' || candidateIntents.length === 0) {
-        pushCandidate(candidateIntents, input.analystIntent);
+        pushCandidate(candidateIntents, forceNoWritePolicyLane ? 'POLICY_INQUIRY' : input.analystIntent);
     }
 
     const turn_priority = [...candidateIntents].sort(compareIntentPriority);
