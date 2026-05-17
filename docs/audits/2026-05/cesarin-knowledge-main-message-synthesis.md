@@ -14,6 +14,8 @@
 - Payment/shipping-cost no-write RAG smoke path hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Payment/shipping-cost no-write RAG smoke path hardening commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
 - Partial six-prompt live no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
+- Unsupported delivery guarantee successful RAG-path hardening verdict: ACCEPT WITH RESIDUAL RISK.
+- Unsupported delivery guarantee successful RAG-path hardening commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -84,6 +86,21 @@
 - Accepted with residual: `payment_method` was grounded in visible payment chunks but exposed a MercadoPago/cards versus transfer/deposit-only policy inconsistency; `shipping_cost` was grounded in a visible `$150-$180 MXN` chunk but may conflict with confirmation/estimate expectations; `store_hours_limitation` avoided inventing hours but did not clearly answer the hours question from visible evidence.
 - Needs fix: `unsupported_delivery_guarantee` did not clearly refuse or qualify guaranteed next-day home delivery in the successful live RAG/Sommelier path.
 - This confirms that the `9637596` `unsupported_shipping_promise_limit` degraded fallback hardening does not cover the successful live RAG/Sommelier path.
+- Follow-up `826927f` locally hardens the successful client-capsule RAG path for that unsupported guarantee case, but it is not deployed/runtime proof.
+
+## Unsupported Delivery Guarantee Successful RAG-Path Hardening
+- Commit `826927f` added local/source hardening for successful `knowledge_rag_foundation` / client-capsule RAG answer shaping.
+- Changed files: `src/lib/knowledge-rag-capsule.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, and `src/services/ai-capsule-orchestrator.service.ts`.
+- No docs/canon, workflows, package/env files, Supabase migrations/seeds, DB scripts, no-write trigger code, or no-write metadata code changed in `826927f`.
+- `evaluateKnowledgeRAGTree` now accepts optional query context.
+- `executeKnowledgeCapsule` now passes `toolArgs.query` into the mapper so the successful `knowledge_rag_foundation` client-capsule RAG path can apply the guard.
+- The successful RAG-path guard detects unsupported shipping-promise questions and requires shipping / DHL OCURRE / sucursal policy evidence in resolved chunks.
+- When active, it returns a bounded customer-facing answer saying next-day guaranteed home delivery is not confirmed, grounds shipping to DHL ocurre / sucursal, and says timing and costs are confirmed before closing the order.
+- Local tests cover `Â¿Me garantizas entrega maÃ±ana a domicilio?`, `Â¿Garantizan entrega maÃ±ana?`, and `Â¿Me llega maÃ±ana seguro a mi casa?`.
+- Tests assert the answer does not overclaim guaranteed next-day home delivery.
+- Tests also cover that the guard does not run without unsupported-promise query context or without shipping/OCURRE policy evidence.
+- Existing tests remained green for payment method, shipping scope, shipping cost, combined payment/shipping, store-hours degraded fallback, degraded unsupported-guarantee fallback from `9637596`, and the no-write metadata preservation harness.
+- No no-write trigger or metadata behavior was broadened.
 
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
@@ -121,6 +138,12 @@
   - `npm run typecheck`: PASS.
   - `git diff --check cb6311e^ cb6311e`: PASS.
   - Commit-diff secret scan found no secret-like values.
+- Unsupported delivery guarantee successful RAG-path hardening validation for `826927f`:
+  - `npm run test:run -- src/lib/__tests__/knowledge-rag-capsule.test.ts src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts src/services/__tests__/concierge.service.knowledge-harness.test.ts`: PASS, 3 files / 19 tests.
+  - Targeted ESLint over changed source/test files: PASS.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 826927f^ 826927f`: PASS.
+  - Commit-diff secret scan: `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
@@ -130,7 +153,8 @@
 - No Product Search quality proof.
 - The partial six-prompt smoke does not prove production answer quality for all six prompts.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; successful deployed RAG/Sommelier behavior still needs targeted fixing.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is locally accepted at `826927f`, but deployed/runtime proof remains unaccepted.
+- Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.
 - No semantic completeness proof.

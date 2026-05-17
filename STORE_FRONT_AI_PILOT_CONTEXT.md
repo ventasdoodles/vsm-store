@@ -39,7 +39,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - `9637596` adds local deterministic unsupported delivery-guarantee answer-shaping through the narrow `unsupported_shipping_promise_limit` degraded policy fallback when shipping policy context exists. It says next-day guaranteed home delivery cannot be confirmed, grounds shipping to DHL OCURRE / sucursal, and says timing/cost must be confirmed before closing the order.
 - `cb6311e` adds local/source hardening for the `payment_method` and `shipping_cost` no-write RAG smoke paths: under recognized `customer_intelligence_no_write_v1`, the exact prompts `¿Aceptan tarjeta o cómo puedo pagar?` and `¿Cuánto cuesta el envío por DHL?` are forced to `POLICY_INQUIRY` / `knowledge_rag_foundation` instead of `storefront_checkout_readiness`; normal checkout-readiness behavior remains intact for real checkout phrases such as `ya puedo pagar?`.
 - `cb6311e` also updates sanitized no-write failure audit rows to distinguish `edge_metadata_present` from `request_contract_present`.
-- `cb6311e`, `7905b60`, and `9637596` were present in deployed source for the partial six-prompt smoke, but answer-quality residuals remain.
+- `826927f` adds local/source successful-path answer shaping for unsupported delivery guarantees in `knowledge_rag_foundation`: the guard uses query context plus shipping / DHL OCURRE / sucursal policy chunks to refuse or qualify next-day home-delivery guarantees and require timing/cost confirmation before closing the order.
+- `cb6311e`, `7905b60`, and `9637596` were present in deployed source for the partial six-prompt smoke; `826927f` is not yet deployed or runtime-proven.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` and `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
 ## Current Retrieval / Ingestion Truth
@@ -56,7 +57,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not all-routes safety or full answer quality.
 - DB transaction-log mutation absence is not proven.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee successful live RAG/Sommelier behavior still needs targeted fixing; `9637596` covered only deterministic degraded fallback.
+- Unsupported delivery-guarantee successful client-capsule RAG-path behavior has a local/source fix at `826927f`, but deployed/runtime proof remains unaccepted.
+- Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - Store-hours behavior remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.

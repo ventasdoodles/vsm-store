@@ -15,6 +15,8 @@
 - Payment/shipping-cost no-write RAG smoke path hardening commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
 - Partial six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
 - Partial six-prompt no-write RAG smoke baseline: storefront runtime `d50379e`, `runtimeBuildFingerprint` `v113-d50379e`, deploy-functions run `26000841773` success, and `Deploy customer-intelligence` success.
+- Unsupported delivery guarantee successful RAG-path hardening verdict: ACCEPT WITH RESIDUAL RISK.
+- Unsupported delivery guarantee successful RAG-path hardening commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -177,6 +179,7 @@
 - `combined_payment_shipping`: ACCEPT. The answer was a strong bounded policy answer combining transfer/deposit plus DHL OCURRE / no domicilio.
 - `store_hours_limitation`: ACCEPT WITH RESIDUAL. The answer did not invent unsupported hours, but did not clearly answer the hours question from visible evidence.
 - `unsupported_delivery_guarantee`: NEEDS FIX. The answer did not clearly refuse or qualify guaranteed next-day home delivery, confirming that `9637596` degraded fallback hardening does not cover the successful live RAG/Sommelier path.
+- Follow-up local/source fix: `826927f` is accepted with residual risk for successful client-capsule RAG-path answer shaping of unsupported delivery guarantee prompts. It has not yet been deployed, freshness-verified, or live-smoke tested.
 
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
@@ -185,7 +188,8 @@
 - No DB transaction-log mutation absence proof is claimed.
 - No production answer-quality proof is accepted for all six prompts.
 - No claim is made that payment/shipping policy corpus evidence is internally consistent.
-- `unsupported_delivery_guarantee` needs targeted successful-path answer shaping.
+- `unsupported_delivery_guarantee` successful client-capsule RAG-path answer shaping has a local/source fix at `826927f`, but deployed/runtime proof remains unaccepted.
+- Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` needs clearer bounded not-found / ask-WhatsApp behavior.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
 - No production Cesarin answer-quality proof.

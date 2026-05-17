@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: partial deployed six-prompt no-write RAG smoke evidence, verdict PARTIAL / NEEDS TARGETED FIX after current `d50379e` runtime and `customer-intelligence` deploy freshness.
+- Latest post-split accepted canon lane: unsupported delivery-guarantee successful RAG-path hardening, accepted with residual risk at `826927f`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,22 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Partial Six-Prompt No-Write RAG Smoke Evidence
+## Latest Accepted Lane: Unsupported Delivery Guarantee Successful RAG-Path Hardening
+- Implementation commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
+- Changed files: `src/lib/knowledge-rag-capsule.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, and `src/services/ai-capsule-orchestrator.service.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- This is a narrow local/source patch for `unsupported_delivery_guarantee` successful `knowledge_rag_foundation` / client-capsule RAG answer shaping.
+- `evaluateKnowledgeRAGTree` now accepts optional query context, and `executeKnowledgeCapsule` passes `toolArgs.query` into that mapper.
+- The successful RAG-path guard detects unsupported shipping-promise questions, requires shipping / DHL OCURRE / sucursal policy evidence in resolved chunks, and returns a bounded customer-facing answer saying next-day guaranteed home delivery is not confirmed, shipping is DHL ocurre / sucursal, and timing/cost are confirmed before closing the order.
+- Local tests cover `Â¿Me garantizas entrega maÃ±ana a domicilio?`, `Â¿Garantizan entrega maÃ±ana?`, and `Â¿Me llega maÃ±ana seguro a mi casa?`.
+- Tests assert the answer does not overclaim guaranteed next-day home delivery, and that the guard does not run without unsupported-promise query context or without shipping/OCURRE policy evidence.
+- Existing tests remained green for payment method, shipping scope, shipping cost, combined payment/shipping, store-hours degraded fallback, degraded unsupported-guarantee fallback from `9637596`, and the no-write metadata preservation harness.
+- No no-write trigger or metadata behavior was broadened.
+- Validation accepted: targeted Vitest PASS with 3 files / 19 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 826927f^ 826927f` PASS; commit-diff secret scan `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
+- This is local/source proof only until deployed, freshness-verified, and separately smoke-tested.
+- Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md`.
+
+## Accepted Lane: Partial Six-Prompt No-Write RAG Smoke Evidence
 - Baseline before this canon pass: `d50379e` (`docs: canonize payment shipping no-write RAG path hardening`).
 - Deployed freshness before the smoke: storefront runtime `gitShortHash` `d50379e`, `runtimeBuildFingerprint` `v113-d50379e`, deploy-functions run `26000841773` success, and `Deploy customer-intelligence` success.
 - The deployed source contained `cb6311e`, `7905b60`, and `9637596`.
@@ -46,7 +61,7 @@
 - For all six prompts, visible sanitized audit evidence showed `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes `ai_customer_memory` and `ai_analytics`, call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
 - `edge_metadata_present` / `request_contract_present` were not visibly rendered as separate fields.
 - Verdict: PARTIAL / NEEDS TARGETED FIX. Deployed no-write contract execution and visible suppression metadata are accepted for all six prompts, but full answer-quality proof is not accepted.
-- Per-prompt quality classification: `shipping_scope` ACCEPT; `combined_payment_shipping` ACCEPT; `payment_method` ACCEPT WITH RESIDUAL due payment corpus/policy inconsistency; `shipping_cost` ACCEPT WITH RESIDUAL due fixed `$150-$180 MXN` range versus confirmation/estimate expectation; `store_hours_limitation` ACCEPT WITH RESIDUAL due weak answer to the hours question; `unsupported_delivery_guarantee` NEEDS FIX because successful live RAG/Sommelier output did not clearly refuse or qualify guaranteed next-day home delivery.
+- Per-prompt quality classification at smoke time: `shipping_scope` ACCEPT; `combined_payment_shipping` ACCEPT; `payment_method` ACCEPT WITH RESIDUAL due payment corpus/policy inconsistency; `shipping_cost` ACCEPT WITH RESIDUAL due fixed `$150-$180 MXN` range versus confirmation/estimate expectation; `store_hours_limitation` ACCEPT WITH RESIDUAL due weak answer to the hours question; `unsupported_delivery_guarantee` NEEDS FIX because successful live RAG/Sommelier output did not clearly refuse or qualify guaranteed next-day home delivery. Follow-up local/source hardening for the client-capsule RAG path is accepted at `826927f`, without deployed/runtime proof.
 - No DB transaction-log mutation absence proof is claimed.
 - No tokens, cookies, localStorage, auth headers, passwords, keys, env values, service-role bearer misuse, user creation, password reset, DB mutation command, Supabase CLI, ingestion, workflow run, deploy, or code/test/doc edits occurred during the smoke execution.
 - Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
@@ -159,7 +174,8 @@
 - Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke, but payment/shipping corpus consistency remains unresolved.
 - No claim is made that the payment corpus is internally consistent: visible evidence still has a MercadoPago/cards versus transfer/deposit-only tension.
 - No claim is made that shipping cost policy is internally settled: visible evidence used a `$150-$180 MXN` range while confirmation/estimate handling remains a residual.
-- Unsupported delivery-guarantee hardening is still incomplete for the successful live RAG/Sommelier path; `9637596` covered deterministic degraded fallback only.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is locally accepted at `826927f`, but deployed/runtime proof remains unaccepted.
+- Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
 - Existing raw console diagnostics remain outside the no-write lanes.
 - No production Cesarin answer-quality proof is claimed.
@@ -193,6 +209,7 @@
 - Unsupported delivery-guarantee answer-shaping.
 - Payment/shipping-cost no-write RAG smoke path hardening.
 - Partial six-prompt no-write RAG smoke evidence.
+- Unsupported delivery-guarantee successful RAG-path hardening.
 
 ## Canon Update Rules
 - Keep this file current-state-first.
