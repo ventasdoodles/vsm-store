@@ -17,6 +17,8 @@
 - Partial six-prompt no-write RAG smoke baseline: storefront runtime `d50379e`, `runtimeBuildFingerprint` `v113-d50379e`, deploy-functions run `26000841773` success, and `Deploy customer-intelligence` success.
 - Unsupported delivery guarantee successful RAG-path hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Unsupported delivery guarantee successful RAG-path hardening commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
+- fa305b2 live six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
+- fa305b2 smoke baseline: storefront runtime `fa305b2`, `runtimeBuildFingerprint` `v113-fa305b2`, deployed assets containing `826927f` markers plus no-write trigger/audit markers.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -181,6 +183,49 @@
 - `unsupported_delivery_guarantee`: NEEDS FIX. The answer did not clearly refuse or qualify guaranteed next-day home delivery, confirming that `9637596` degraded fallback hardening does not cover the successful live RAG/Sommelier path.
 - Follow-up local/source fix: `826927f` is accepted with residual risk for successful client-capsule RAG-path answer shaping of unsupported delivery guarantee prompts. It has not yet been deployed, freshness-verified, or live-smoke tested.
 
+## fa305b2 Live Six-Prompt No-Write RAG Smoke Partial Evidence
+- Freshness for `fa305b2` / `826927f` was proven before the smoke:
+  - Storefront runtime `gitShortHash`: `fa305b2`.
+  - Runtime fingerprint: `v113-fa305b2`.
+  - Deployed assets contained `826927f` successful RAG-path hardening markers and no-write trigger/audit markers.
+- Exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke rerun executed through `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
+- The trigger did not redirect to login and authenticated storefront execution state was available.
+- No tokens, cookies, localStorage, auth headers, passwords, keys, env values, service-role bearer misuse, user creation, password reset, DB mutation command, Supabase CLI, ingestion, workflow run, deploy, code/test/doc edits, extra prompt, or individual retry occurred.
+- Exactly six categories executed once:
+  - `payment_method`.
+  - `shipping_scope`.
+  - `shipping_cost`.
+  - `combined_payment_shipping`.
+  - `store_hours_limitation`.
+  - `unsupported_delivery_guarantee`.
+- For all six prompts, visible sanitized audit evidence showed:
+  - `status: ok`.
+  - `metadata: present`.
+  - `contract: customer_intelligence_no_write_v1`.
+  - `writes: ai_customer_memory, ai_analytics`.
+  - `calls: cesarin-qa-judge`.
+  - `capsule: knowledge_rag_foundation`.
+  - `answer: present`.
+  - `main message: present`.
+  - `match: MODERATE_CONFIDENCE_MULTI_SOURCE`.
+  - `chunks: 3`.
+- `edge_metadata_present` and `request_contract_present` were not visibly rendered as separate fields.
+- Visible/proven for all six: deployed no-write contract execution, visible no-write audit metadata, and suppressed writes/calls metadata.
+- Not proven: DB transaction-log mutation absence.
+
+### fa305b2 Per-Prompt Answer-Quality Classification
+- `payment_method`: ACCEPT WITH RESIDUAL. Runtime/no-write passed and the answer was grounded in visible payment chunks, but MercadoPago/cards versus transfer/deposit-only corpus inconsistency remains.
+- `shipping_scope`: ACCEPT. The answer correctly says DHL OCURRE / sucursal and no domicilio.
+- `shipping_cost`: ACCEPT WITH RESIDUAL. The answer was grounded in the visible `$150-$180 MXN` chunk, but a residual remains if canonical policy expects confirmation/estimate handling rather than a fixed range.
+- `combined_payment_shipping`: ACCEPT. The answer was a strong bounded answer combining transfer/deposit with DHL OCURRE / no domicilio.
+- `store_hours_limitation`: ACCEPT WITH RESIDUAL. The answer improved versus the prior weak result: it returned WhatsApp/support/order-confirmation hours Monday-Saturday 10:00 AM-7:00 PM without inventing broad store-opening proof. Residual remains because this is support/order-confirmation hours, not general store-opening proof.
+- `unsupported_delivery_guarantee`: NEEDS FIX. The customer-facing main answer still did not clearly refuse or qualify guaranteed next-day home delivery. It cited same-day shipping cutoff and 1-3 business-day estimates, but did not clearly say the guarantee/home-delivery premise is unsupported.
+
+### fa305b2 Root-Cause Hypothesis
+- `826927f` likely did not activate in live runtime because the guard requires unsupported-promise query context plus shipping / DHL OCURRE / sucursal policy evidence in resolved chunks.
+- The live `unsupported_delivery_guarantee` result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of OCURRE/no-domicilio evidence.
+- The remaining issue is a retrieval/guard-gating plus answer-shaping interaction, not a no-write audit failure.
+
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
@@ -188,9 +233,9 @@
 - No DB transaction-log mutation absence proof is claimed.
 - No production answer-quality proof is accepted for all six prompts.
 - No claim is made that payment/shipping policy corpus evidence is internally consistent.
-- `unsupported_delivery_guarantee` successful client-capsule RAG-path answer shaping has a local/source fix at `826927f`, but deployed/runtime proof remains unaccepted.
+- `unsupported_delivery_guarantee` successful client-capsule RAG-path answer shaping is deployed/fresh at `fa305b2`, but the live rerun remains NEEDS FIX under a retrieved timing-estimate chunk set without OCURRE/no-domicilio evidence.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
-- `store_hours_limitation` needs clearer bounded not-found / ask-WhatsApp behavior.
+- `store_hours_limitation` is accepted with residual only: support/order-confirmation hours were returned, not broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.

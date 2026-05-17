@@ -16,6 +16,7 @@
 - Partial six-prompt live no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
 - Unsupported delivery guarantee successful RAG-path hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Unsupported delivery guarantee successful RAG-path hardening commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
+- fa305b2 live six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -87,6 +88,7 @@
 - Needs fix: `unsupported_delivery_guarantee` did not clearly refuse or qualify guaranteed next-day home delivery in the successful live RAG/Sommelier path.
 - This confirms that the `9637596` `unsupported_shipping_promise_limit` degraded fallback hardening does not cover the successful live RAG/Sommelier path.
 - Follow-up `826927f` locally hardens the successful client-capsule RAG path for that unsupported guarantee case, but it is not deployed/runtime proof.
+- Follow-up live rerun at `fa305b2` proved the deployed no-write audit path again, but `unsupported_delivery_guarantee` still needs a targeted fix because the customer-facing main answer cited timing estimates without clearly refusing or qualifying guaranteed next-day home delivery.
 
 ## Unsupported Delivery Guarantee Successful RAG-Path Hardening
 - Commit `826927f` added local/source hardening for successful `knowledge_rag_foundation` / client-capsule RAG answer shaping.
@@ -101,6 +103,14 @@
 - Tests also cover that the guard does not run without unsupported-promise query context or without shipping/OCURRE policy evidence.
 - Existing tests remained green for payment method, shipping scope, shipping cost, combined payment/shipping, store-hours degraded fallback, degraded unsupported-guarantee fallback from `9637596`, and the no-write metadata preservation harness.
 - No no-write trigger or metadata behavior was broadened.
+
+## fa305b2 Live Unsupported Guarantee Outcome
+- Before the rerun, storefront freshness for `fa305b2` / `826927f` was proven by runtime metadata and deployed bundle markers.
+- Exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke rerun executed.
+- All six prompts showed visible no-write metadata: `status: ok`, contract `customer_intelligence_no_write_v1`, suppressed writes `ai_customer_memory` / `ai_analytics`, suppressed call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- `unsupported_delivery_guarantee` still did not clearly refuse or qualify the guaranteed next-day home-delivery premise. The visible answer cited same-day cutoff and 1-3 business-day estimates.
+- Root-cause hypothesis: the `826927f` guard likely did not activate because the live result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of the shipping / DHL OCURRE / sucursal / no-domicilio evidence required by the guard.
+- This points to a retrieval/guard-gating plus answer-shaping interaction, not a no-write audit failure.
 
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
@@ -153,9 +163,9 @@
 - No Product Search quality proof.
 - The partial six-prompt smoke does not prove production answer quality for all six prompts.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is locally accepted at `826927f`, but deployed/runtime proof remains unaccepted.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but live answer quality remains unaccepted because the rerun still did not clearly refuse or qualify guaranteed next-day home delivery.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
-- `store_hours_limitation` remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
+- `store_hours_limitation` improved in the fa305b2 rerun and is accepted with residual only: it returned WhatsApp/support/order-confirmation hours, not broad store-opening proof.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.
 - No semantic completeness proof.
 - No metadata cleanup.

@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-17 | fa305b2 live six-prompt no-write RAG smoke partial evidence | PARTIAL / NEEDS TARGETED FIX | `fa305b2`, one authenticated deployed six-prompt smoke after `826927f` freshness | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Unsupported delivery-guarantee successful RAG-path hardening | ACCEPT WITH RESIDUAL RISK | `826927f` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | Partial six-prompt no-write RAG smoke evidence | PARTIAL / NEEDS TARGETED FIX | `d50379e`, run `26000841773`, one authenticated deployed six-prompt smoke | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Payment/shipping-cost no-write RAG smoke path hardening | ACCEPT WITH RESIDUAL RISK | `cb6311e` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
@@ -59,7 +60,8 @@
 - DB transaction-log mutation absence is not proven.
 - The partial six-prompt smoke does not prove production answer quality for all six prompts.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is locally accepted at `826927f`, but deployed/runtime proof remains unaccepted.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` as NEEDS FIX under a retrieved timing-estimate chunk set.
+- The likely remaining issue is retrieval/guard-gating plus answer shaping: the live unsupported-guarantee result did not retrieve OCURRE/no-domicilio evidence needed by the `826927f` guard.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.

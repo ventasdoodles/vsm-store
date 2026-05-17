@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: unsupported delivery-guarantee successful RAG-path hardening, accepted with residual risk at `826927f`.
+- Latest post-split accepted canon lane: `fa305b2` live six-prompt no-write RAG smoke partial evidence, verdict PARTIAL / NEEDS TARGETED FIX after deployed storefront freshness for `826927f`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,20 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Unsupported Delivery Guarantee Successful RAG-Path Hardening
+## Latest Accepted Lane: fa305b2 Live Six-Prompt No-Write RAG Smoke Partial Evidence
+- Freshness before the smoke: storefront runtime `gitShortHash` `fa305b2`, `runtimeBuildFingerprint` `v113-fa305b2`, and deployed assets containing `826927f` successful RAG-path hardening markers plus no-write trigger/audit markers.
+- Exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke rerun executed after that freshness check through `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
+- The trigger did not redirect to login, authenticated storefront execution state was available, and no tokens, cookies, localStorage, auth headers, passwords, keys, env values, service-role bearer misuse, user creation, password reset, DB mutation command, Supabase CLI, ingestion, workflow run, deploy, code/test/doc edits, extra prompt, or individual retry occurred.
+- The trigger executed exactly six allowlisted categories once: `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, and `unsupported_delivery_guarantee`.
+- For all six prompts, visible sanitized audit evidence showed `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes `ai_customer_memory` and `ai_analytics`, call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- `edge_metadata_present` and `request_contract_present` were not visibly rendered as separate fields.
+- Verdict: PARTIAL / NEEDS TARGETED FIX. Deployed no-write contract execution and visible suppression metadata are accepted for all six prompts, but full answer-quality proof is not accepted.
+- Per-prompt quality classification: `shipping_scope` ACCEPT; `combined_payment_shipping` ACCEPT; `payment_method` ACCEPT WITH RESIDUAL due MercadoPago/cards versus transfer/deposit-only corpus inconsistency; `shipping_cost` ACCEPT WITH RESIDUAL due fixed `$150-$180 MXN` range versus confirmation/estimate expectation; `store_hours_limitation` ACCEPT WITH RESIDUAL because it returned WhatsApp/support/order-confirmation hours Monday-Saturday 10:00 AM-7:00 PM without inventing broad store-opening proof, but that is not general store-opening proof; `unsupported_delivery_guarantee` NEEDS FIX because it still did not clearly refuse or qualify guaranteed next-day home delivery in the customer-facing main answer.
+- Root-cause hypothesis: `826927f` likely did not activate in live runtime because its guard requires unsupported-promise query context plus shipping / DHL OCURRE / sucursal policy evidence in resolved chunks; the live `unsupported_delivery_guarantee` result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of OCURRE/no-domicilio evidence. The remaining issue is a retrieval/guard-gating plus answer-shaping interaction, not a no-write audit failure.
+- No DB transaction-log mutation absence proof is claimed.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: Unsupported Delivery Guarantee Successful RAG-Path Hardening
 - Implementation commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
 - Changed files: `src/lib/knowledge-rag-capsule.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, and `src/services/ai-capsule-orchestrator.service.ts`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -48,7 +61,7 @@
 - Existing tests remained green for payment method, shipping scope, shipping cost, combined payment/shipping, store-hours degraded fallback, degraded unsupported-guarantee fallback from `9637596`, and the no-write metadata preservation harness.
 - No no-write trigger or metadata behavior was broadened.
 - Validation accepted: targeted Vitest PASS with 3 files / 19 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 826927f^ 826927f` PASS; commit-diff secret scan `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
-- This is local/source proof only until deployed, freshness-verified, and separately smoke-tested.
+- This was local/source proof until deployed freshness was verified at `fa305b2`; the later live six-prompt smoke still left `unsupported_delivery_guarantee` as NEEDS FIX because the live retrieved chunks did not include the OCURRE/no-domicilio policy evidence needed for the guard.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md`.
 
 ## Accepted Lane: Partial Six-Prompt No-Write RAG Smoke Evidence
@@ -174,9 +187,9 @@
 - Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke, but payment/shipping corpus consistency remains unresolved.
 - No claim is made that the payment corpus is internally consistent: visible evidence still has a MercadoPago/cards versus transfer/deposit-only tension.
 - No claim is made that shipping cost policy is internally settled: visible evidence used a `$150-$180 MXN` range while confirmation/estimate handling remains a residual.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is locally accepted at `826927f`, but deployed/runtime proof remains unaccepted.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` unresolved under a retrieved timing-estimate chunk set.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
-- `store_hours_limitation` remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
+- `store_hours_limitation` is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write lanes.
 - No production Cesarin answer-quality proof is claimed.
 - No full RAG quality proof is claimed.
@@ -210,6 +223,7 @@
 - Payment/shipping-cost no-write RAG smoke path hardening.
 - Partial six-prompt no-write RAG smoke evidence.
 - Unsupported delivery-guarantee successful RAG-path hardening.
+- fa305b2 live six-prompt no-write RAG smoke partial evidence.
 
 ## Canon Update Rules
 - Keep this file current-state-first.

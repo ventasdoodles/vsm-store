@@ -7,7 +7,7 @@
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
 - Fecha: 2026-05-17
-- Bloque vigente: post accepted unsupported delivery-guarantee successful RAG-path hardening `826927f`, sobre partial deployed six-prompt no-write RAG smoke evidence, payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, unsupported delivery guarantee degraded fallback answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
+- Bloque vigente: post fa305b2 live six-prompt no-write RAG smoke partial evidence, con unsupported delivery-guarantee successful RAG-path hardening `826927f` desplegado/fresh pero aun insuficiente en runtime, sobre payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, unsupported delivery guarantee degraded fallback answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
 - Baseline esperado: `main` alineado con `origin/main` tras el commit doc-only correspondiente.
 
 ## 2. Estado autoritativo actual
@@ -20,6 +20,7 @@
 
 ## 3. Ultimos hitos cerrados
 - Unsupported delivery-guarantee successful RAG-path hardening: aceptado con riesgo residual. Commit `826927f`; patch local/source estrecho en `src/lib/knowledge-rag-capsule.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, y `src/services/ai-capsule-orchestrator.service.ts`. `evaluateKnowledgeRAGTree` acepta query context opcional y `executeKnowledgeCapsule` pasa `toolArgs.query`; el guard detecta unsupported shipping-promise questions, exige evidencia de shipping / DHL OCURRE / sucursal en chunks resueltos, y responde que no se confirma entrega garantizada al dia siguiente a domicilio, aterriza a DHL ocurre / sucursal, y pide confirmar tiempos/costos antes de cerrar la orden. Validado localmente con 3 files / 19 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
+- fa305b2 live six-prompt no-write RAG smoke partial evidence: veredicto PARTIAL / NEEDS TARGETED FIX. Freshness previa: runtime storefront `fa305b2`, fingerprint `v113-fa305b2`, assets con marcadores `826927f` y marcadores no-write trigger/audit. Se ejecuto exactamente un smoke autenticado via trigger `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; corrio solo `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, y `unsupported_delivery_guarantee`. Los seis mostraron `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes suprimidos `ai_customer_memory` / `ai_analytics`, call suprimida `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, y `3` chunks. La prueba sigue parcial: `unsupported_delivery_guarantee` no rechazo/califico claramente la garantia de entrega manana a domicilio; hipotesis: el guard `826927f` no activo porque retrieval devolvio chunks de estimado/corte/local delivery en vez de evidencia OCURRE/no-domicilio.
 - Partial six-prompt no-write RAG smoke evidence: veredicto PARTIAL / NEEDS TARGETED FIX. Runtime storefront `d50379e`, fingerprint `v113-d50379e`, run deploy-functions `26000841773` success, `Deploy customer-intelligence` success, y source desplegado conteniendo `cb6311e`, `7905b60`, y `9637596`. Se ejecuto exactamente un smoke autenticado via trigger `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; corrio solo `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, y `unsupported_delivery_guarantee`. Los seis mostraron `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes suprimidos `ai_customer_memory` / `ai_analytics`, call suprimida `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, y `3` chunks. La prueba de calidad queda parcial: `unsupported_delivery_guarantee` necesitaba fix al momento del smoke y queda cubierto solo local/source en `826927f`; `store_hours_limitation`, `payment_method`, y `shipping_cost` conservan residuales.
 - Payment/shipping-cost no-write RAG smoke path hardening: aceptado con riesgo residual. Commit `cb6311e`; bajo `customer_intelligence_no_write_v1`, los prompts exactos `¿Aceptan tarjeta o cómo puedo pagar?` y `¿Cuánto cuesta el envío por DHL?` se fuerzan a `POLICY_INQUIRY` / `knowledge_rag_foundation` en vez de `storefront_checkout_readiness`; checkout-readiness normal sigue intacto para frases como `ya puedo pagar?`; el audit sanitizado distingue `edge_metadata_present` de `request_contract_present`; validado localmente con 4 files / 70 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
 - No-write error metadata preservation: aceptado con riesgo residual. Commit `7905b60`; errores Edge reconocidos como `customer_intelligence_no_write_v1` incluyen metadata sanitizada `no_write_smoke`; el servicio conserva metadata de error responses; se suprime client telemetry para no-write error paths; el hook renderiza audit rows con metadata presente cuando existe; validado localmente con 3 files / 25 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
@@ -40,9 +41,9 @@
 - El partial six-prompt smoke prueba ejecucion del trigger desplegado y metadata visible de supresion no-write para ese run, no full answer quality ni all-routes safety.
 - No DB transaction-log mutation absence proof.
 - No claim de consistencia interna completa del corpus/politica de pago/envio.
-- `unsupported_delivery_guarantee` tiene fix local/source para successful client-capsule RAG path en `826927f`, pero falta deploy, freshness verification, y live smoke separado para ampliar claims runtime.
+- `unsupported_delivery_guarantee` tiene fix desplegado/fresh para successful client-capsule RAG path en `826927f`, pero el live rerun `fa305b2` sigue parcial porque el set recuperado no incluyo evidencia OCURRE/no-domicilio requerida por el guard.
 - Cualquier server-side Sommelier path distinto que evite el client-capsule mapper sigue sin prueba.
-- `store_hours_limitation` necesita comportamiento mas claro de bounded not-found / ask-WhatsApp.
+- `store_hours_limitation` queda ACCEPT WITH RESIDUAL: devolvio horarios de WhatsApp/soporte/confirmacion de pedidos, no prueba de horario general de tienda.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.
 - No Product Search quality proof.
@@ -73,6 +74,7 @@
 - Payment/shipping-cost no-write RAG smoke path hardening.
 - Partial six-prompt no-write RAG smoke evidence.
 - Unsupported delivery-guarantee successful RAG-path hardening.
+- fa305b2 live six-prompt no-write RAG smoke partial evidence.
 
 ## 6. Proximo paso correcto
 - Despues de esta canonizacion, Codex debe hacer acceptance audit del commit doc-only antes de seleccionar el siguiente hito tecnico/productivo.
