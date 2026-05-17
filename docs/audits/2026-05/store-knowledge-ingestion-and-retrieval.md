@@ -9,6 +9,7 @@
 - Local/tested multi-prompt no-write RAG quality trigger.
 - Local/tested no-write error metadata preservation.
 - Local deterministic unsupported delivery-guarantee answer-shaping.
+- Partial deployed six-prompt no-write RAG smoke evidence.
 - Store knowledge ingestion activation safety hardening.
 - Ingest failure-mode safety observation.
 - Post-Gemini-repair ingest verification.
@@ -22,6 +23,7 @@
 - `3f61e13` added a local/tested authenticated app trigger for a future multi-prompt no-write RAG quality smoke over the same six allowlisted prompts, gated by `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, and `ci_rag_quality_smoke=true`.
 - `7905b60` added local/tested no-write error metadata preservation for recognized `customer_intelligence_no_write_v1` paths; this improves auditability for error responses but does not prove the original runtime failure cause is fixed.
 - `9637596` added local deterministic unsupported delivery-guarantee answer-shaping through the narrow `unsupported_shipping_promise_limit` degraded policy fallback; it applies when shipping policy context exists, says next-day guaranteed home delivery cannot be confirmed, grounds shipping to DHL OCURRE / sucursal, and says timing/cost must be confirmed before closing the order.
+- A later authenticated deployed six-prompt no-write RAG smoke ran once at current runtime `d50379e` / `v113-d50379e` after deploy-functions run `26000841773` succeeded. All six allowlisted categories returned `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks. The smoke is PARTIAL / NEEDS TARGETED FIX for answer quality.
 - `05e3401` locally hardened `seed_runner.ts` so chunks/embeddings are prepared before deactivation and previous active rows are only deactivated after inserted row IDs exist.
 - Failed run `25947955038` is accepted only as failure-mode safety evidence: Gemini `403 PERMISSION_DENIED` blocked embedding generation, the run failed non-zero, and logs reported previous active rows untouched.
 - Post-Gemini-repair run `25969669995` passed and post-run read-only validation found `41` active embedded `768d` rows eligible for `match_knowledge`.
@@ -36,17 +38,17 @@
 - No-write error metadata preservation `7905b60`: targeted Vitest PASS for `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `src/hooks/__tests__/useAIConcierge.test.tsx` with 3 files / 25 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check 7905b60^ 7905b60` PASS; commit-diff secret scan found no raw secret values.
 - Unsupported delivery guarantee answer-shaping `9637596`: targeted Vitest PASS for `src/lib/__tests__/knowledge-rag-capsule.test.ts` and `src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts` with 2 files / 13 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 9637596^ 9637596` PASS; commit-diff secret scan found no secret-like values.
 - Payment/shipping-cost no-write RAG smoke path hardening `cb6311e`: targeted Vitest PASS for `src/lib/__tests__/customer-intelligence-turn-first.test.ts`, `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, and `src/services/__tests__/concierge.service.knowledge-harness.test.ts` with 4 files / 70 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check cb6311e^ cb6311e` PASS; commit-diff secret scan found no secret-like values.
+- Partial deployed six-prompt no-write RAG smoke evidence: all six prompts showed visible no-write audit metadata and `3` resolved chunks, but answer-quality classification remained partial because `unsupported_delivery_guarantee` needs successful-path fixing, `store_hours_limitation` was weak, and payment/shipping policy consistency residuals remain.
 
 ## Non-Claims / Residuals
-- No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
-- No deployed/runtime RAG quality proof from `3f61e13`; it is trigger readiness only.
-- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
-- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed/runtime LLM/Sommelier behavior or live six-prompt success is claimed.
-- The original `payment_method` and `shipping_cost` runtime failure causes remain unknown.
+- No full RAG quality proof.
+- The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not all-routes customer-intelligence safety.
+- No DB transaction-log mutation absence proof.
+- No claim is made that the payment/shipping policy corpus is internally consistent.
+- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; successful deployed RAG/Sommelier behavior still needs targeted fixing.
+- `store_hours_limitation` remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
 - No Product Search quality proof.
 - No production Cesarin answer-quality proof.
-- No deployed/runtime RAG answer-quality proof from the local harness.
 - No semantic completeness proof.
 - No metadata cleanup.
 - `metadata.embedding_dims` mismatch remains open.

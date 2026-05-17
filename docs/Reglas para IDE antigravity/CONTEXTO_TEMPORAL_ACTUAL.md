@@ -7,7 +7,7 @@
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
 - Fecha: 2026-05-17
-- Bloque vigente: post accepted payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, sobre canon previo de unsupported delivery guarantee answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
+- Bloque vigente: post partial deployed six-prompt no-write RAG smoke evidence over current runtime `d50379e`, con payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, unsupported delivery guarantee answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
 - Baseline esperado: `main` alineado con `origin/main` tras el commit doc-only correspondiente.
 
 ## 2. Estado autoritativo actual
@@ -19,6 +19,7 @@
 - No se permite crear `AI_CONTEXT2.md` ni `AUDIT_LOG2.md` como continuacion lineal.
 
 ## 3. Ultimos hitos cerrados
+- Partial six-prompt no-write RAG smoke evidence: veredicto PARTIAL / NEEDS TARGETED FIX. Runtime storefront `d50379e`, fingerprint `v113-d50379e`, run deploy-functions `26000841773` success, `Deploy customer-intelligence` success, y source desplegado conteniendo `cb6311e`, `7905b60`, y `9637596`. Se ejecuto exactamente un smoke autenticado via trigger `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; corrio solo `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, y `unsupported_delivery_guarantee`. Los seis mostraron `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes suprimidos `ai_customer_memory` / `ai_analytics`, call suprimida `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, y `3` chunks. La prueba de calidad queda parcial: `unsupported_delivery_guarantee` necesita fix; `store_hours_limitation`, `payment_method`, y `shipping_cost` conservan residuales.
 - Payment/shipping-cost no-write RAG smoke path hardening: aceptado con riesgo residual. Commit `cb6311e`; bajo `customer_intelligence_no_write_v1`, los prompts exactos `¿Aceptan tarjeta o cómo puedo pagar?` y `¿Cuánto cuesta el envío por DHL?` se fuerzan a `POLICY_INQUIRY` / `knowledge_rag_foundation` en vez de `storefront_checkout_readiness`; checkout-readiness normal sigue intacto para frases como `ya puedo pagar?`; el audit sanitizado distingue `edge_metadata_present` de `request_contract_present`; validado localmente con 4 files / 70 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
 - No-write error metadata preservation: aceptado con riesgo residual. Commit `7905b60`; errores Edge reconocidos como `customer_intelligence_no_write_v1` incluyen metadata sanitizada `no_write_smoke`; el servicio conserva metadata de error responses; se suprime client telemetry para no-write error paths; el hook renderiza audit rows con metadata presente cuando existe; validado localmente con 3 files / 25 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
 - Unsupported delivery guarantee answer-shaping: aceptado con riesgo residual. Commit `9637596`; agrega fallback local deterministico `unsupported_shipping_promise_limit` para promesas no soportadas de envio/garantia cuando hay contexto de politica de envio; indica que no se puede confirmar entrega garantizada al dia siguiente a domicilio; aterriza envio a DHL OCURRE / sucursal; exige confirmar tiempo/costo antes de cerrar la orden; validado localmente con 2 files / 13 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
@@ -33,17 +34,16 @@
 - Ingest failure-mode safety observation: aceptada como evidencia historica con riesgo residual. Run `25947955038` failed por Gemini `403 PERMISSION_DENIED`, pero mostro safety behavior.
 
 ## 4. Residuos explicitos
-- Live retrieval-to-answer proof queda limitado al single post-deploy no-write `customer-intelligence` smoke de politica/envio/pago.
-- Remote `customer-intelligence` smoke queda limitado a ese single deployed app-triggered no-write smoke.
-- Edge HTTP no-write metadata evidence queda limitado al audit block sanitizado de ese smoke.
-- No deployed availability ni live execution del multi-prompt no-write RAG quality trigger.
-- No deployed availability ni live smoke rerun de `7905b60` o `cb6311e`.
-- No prueba de que los fallos runtime originales `payment_method` / `shipping_cost` queden corregidos en produccion.
-- Unsupported delivery-guarantee hardening queda limitado al fallback local deterministico de `9637596`; no prueba deployed LLM/Sommelier behavior ni live six-prompt runtime success.
+- Live retrieval-to-answer proof queda limitado al single post-deploy no-write `customer-intelligence` smoke de politica/envio/pago y al partial six-prompt no-write RAG smoke descrito arriba.
+- Remote `customer-intelligence` smoke queda limitado a esos smokes deployed app-triggered explicitamente descritos.
+- El partial six-prompt smoke prueba ejecucion del trigger desplegado y metadata visible de supresion no-write para ese run, no full answer quality ni all-routes safety.
+- No DB transaction-log mutation absence proof.
+- No claim de consistencia interna completa del corpus/politica de pago/envio.
+- `unsupported_delivery_guarantee` necesita fix para successful live RAG/Sommelier path; `9637596` solo cubre fallback degradado deterministico.
+- `store_hours_limitation` necesita comportamiento mas claro de bounded not-found / ask-WhatsApp.
 - No production Cesarin answer-quality proof.
-- No full RAG quality proof; `3f7bb4b` solo es harness local deterministico scoped.
+- No full RAG quality proof.
 - No Product Search quality proof.
-- No deployed/runtime RAG answer-quality proof desde el harness local.
 - No broad production readiness ni all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - `metadata.embedding_dims` mismatch sigue abierto salvo reparacion futura.
@@ -69,6 +69,7 @@
 - No-write error metadata preservation.
 - Unsupported delivery guarantee answer-shaping.
 - Payment/shipping-cost no-write RAG smoke path hardening.
+- Partial six-prompt no-write RAG smoke evidence.
 
 ## 6. Proximo paso correcto
 - Despues de esta canonizacion, Codex debe hacer acceptance audit del commit doc-only antes de seleccionar el siguiente hito tecnico/productivo.

@@ -13,6 +13,8 @@
 - No-write error metadata preservation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
 - Payment/shipping-cost no-write RAG smoke path hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Payment/shipping-cost no-write RAG smoke path hardening commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
+- Partial six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
+- Partial six-prompt no-write RAG smoke baseline: storefront runtime `d50379e`, `runtimeBuildFingerprint` `v113-d50379e`, deploy-functions run `26000841773` success, and `Deploy customer-intelligence` success.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -136,17 +138,56 @@
   - `git diff --check cb6311e^ cb6311e`: PASS.
   - Commit-diff secret scan found no secret-like values.
 
+## Partial Six-Prompt No-Write RAG Smoke Evidence
+- Baseline before the smoke canon pass: `d50379e` (`docs: canonize payment shipping no-write RAG path hardening`).
+- Deployed freshness was established before the smoke:
+  - Storefront runtime `gitShortHash`: `d50379e`.
+  - Runtime fingerprint: `v113-d50379e`.
+  - `deploy-functions` run `26000841773`: success.
+  - `Deploy customer-intelligence`: success.
+  - Deployed source contained `cb6311e`, `7905b60`, and `9637596`.
+- Exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke rerun executed through `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
+- The app was already authenticated at `/profile`.
+- The storefront trigger did not redirect to login, and authenticated execution state was confirmed.
+- The trigger executed exactly six allowlisted categories once:
+  - `payment_method`.
+  - `shipping_scope`.
+  - `shipping_cost`.
+  - `combined_payment_shipping`.
+  - `store_hours_limitation`.
+  - `unsupported_delivery_guarantee`.
+- For all six prompts, visible sanitized audit evidence showed:
+  - `status: ok`.
+  - `metadata: present`.
+  - `contract: customer_intelligence_no_write_v1`.
+  - `writes: ai_customer_memory, ai_analytics`.
+  - `calls: cesarin-qa-judge`.
+  - `capsule: knowledge_rag_foundation`.
+  - `match: MODERATE_CONFIDENCE_MULTI_SOURCE`.
+  - `chunks: 3`.
+- `edge_metadata_present` / `request_contract_present` were not visibly rendered as separate fields.
+- Visible/proven for all six: suppressed writes `ai_customer_memory` and `ai_analytics`, suppressed call `cesarin-qa-judge`, and preserved contract `customer_intelligence_no_write_v1`.
+- Not proven: DB transaction-log mutation absence.
+- No tokens, cookies, localStorage, auth headers, passwords, keys, env values, service-role bearer misuse, user creation, password reset, DB mutation command, Supabase CLI, ingestion, workflow run, deploy, or code/test/doc edits occurred during the smoke execution.
+
+### Per-Prompt Answer-Quality Classification
+- `payment_method`: ACCEPT WITH RESIDUAL. Runtime routing/no-write passed and the answer was grounded in visible payment chunks, but a policy inconsistency remains because visible evidence mentions MercadoPago/cards while combined policy text says transfer/deposit only.
+- `shipping_scope`: ACCEPT. The answer directly matched DHL OCURRE / sucursal and no domicilio.
+- `shipping_cost`: ACCEPT WITH RESIDUAL. Runtime routing/no-write passed and the answer was grounded in the visible `$150-$180 MXN` chunk, but a residual remains if canonical policy expects confirmation/estimate handling instead of a fixed range.
+- `combined_payment_shipping`: ACCEPT. The answer was a strong bounded policy answer combining transfer/deposit plus DHL OCURRE / no domicilio.
+- `store_hours_limitation`: ACCEPT WITH RESIDUAL. The answer did not invent unsupported hours, but did not clearly answer the hours question from visible evidence.
+- `unsupported_delivery_guarantee`: NEEDS FIX. The answer did not clearly refuse or qualify guaranteed next-day home delivery, confirming that `9637596` degraded fallback hardening does not cover the successful live RAG/Sommelier path.
+
 ## Non-Claims / Residuals
-- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke.
-- Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
-- Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
-- No deployed trigger availability or live multi-prompt smoke execution is claimed for `3f61e13`.
-- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
-- No no-write suppression proof is claimed for the previous failed runtime prompts.
-- No unsupported delivery-guarantee quality hardening is claimed.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
+- Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
+- The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run.
+- No DB transaction-log mutation absence proof is claimed.
+- No production answer-quality proof is accepted for all six prompts.
+- No claim is made that payment/shipping policy corpus evidence is internally consistent.
+- `unsupported_delivery_guarantee` needs targeted successful-path answer shaping.
+- `store_hours_limitation` needs clearer bounded not-found / ask-WhatsApp behavior.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
-- No deployed/runtime RAG answer-quality proof is claimed from the multi-prompt trigger.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.
 - No Product Search quality proof.

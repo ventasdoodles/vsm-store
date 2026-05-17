@@ -13,6 +13,7 @@
 - Unsupported delivery guarantee answer-shaping commit: `9637596` (`test: harden unsupported delivery guarantee policy answer`).
 - Payment/shipping-cost no-write RAG smoke path hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Payment/shipping-cost no-write RAG smoke path hardening commit: `cb6311e` (`test: harden payment and shipping cost no-write smoke paths`).
+- Partial six-prompt live no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -75,6 +76,15 @@
 - Sanitized audit rows now distinguish `edge_metadata_present` from `request_contract_present`.
 - Unsupported delivery-guarantee successful-path shaping was not included.
 
+## Partial Live Six-Prompt Answer-Quality Evidence
+- After storefront runtime `d50379e` / `v113-d50379e` and deploy-functions run `26000841773` confirmed current `customer-intelligence` freshness, exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke ran through the existing trigger.
+- For all six categories, visible sanitized audit evidence showed `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- Answer-quality verdict: PARTIAL / NEEDS TARGETED FIX.
+- Accepted live quality: `shipping_scope` directly matched DHL OCURRE / sucursal and no domicilio; `combined_payment_shipping` combined transfer/deposit plus DHL OCURRE / no domicilio.
+- Accepted with residual: `payment_method` was grounded in visible payment chunks but exposed a MercadoPago/cards versus transfer/deposit-only policy inconsistency; `shipping_cost` was grounded in a visible `$150-$180 MXN` chunk but may conflict with confirmation/estimate expectations; `store_hours_limitation` avoided inventing hours but did not clearly answer the hours question from visible evidence.
+- Needs fix: `unsupported_delivery_guarantee` did not clearly refuse or qualify guaranteed next-day home delivery in the successful live RAG/Sommelier path.
+- This confirms that the `9637596` `unsupported_shipping_promise_limit` degraded fallback hardening does not cover the successful live RAG/Sommelier path.
+
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
 - Targeted ESLint: PASS with 0 errors and 1 existing warning.
@@ -114,17 +124,14 @@
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
-- Live retrieval-to-answer proof is limited to the separately canonized single post-deploy no-write customer-intelligence smoke.
-- Remote `customer-intelligence` smoke evidence is limited to the separately canonized single deployed app-triggered no-write smoke.
-- No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
+- Live retrieval-to-answer proof is limited to the separately canonized single post-deploy no-write customer-intelligence smoke and the partial six-prompt no-write RAG smoke.
+- Remote `customer-intelligence` smoke evidence is limited to those separately canonized deployed app-triggered no-write smokes.
+- No full RAG quality proof.
 - No Product Search quality proof.
-- No deployed/runtime RAG answer-quality proof from the local harness.
-- No deployed availability or live execution of the multi-prompt no-write RAG quality trigger.
-- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
-- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; successful deployed LLM/Sommelier behavior remains unproven.
-- Future live six-prompt proof still requires deployed availability verification and explicit authorization.
-- The original `payment_method` and `shipping_cost` runtime failure causes remain unknown.
+- The partial six-prompt smoke does not prove production answer quality for all six prompts.
+- No claim is made that the payment/shipping policy corpus is internally consistent.
+- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; successful deployed RAG/Sommelier behavior still needs targeted fixing.
+- `store_hours_limitation` remains weak and needs clearer bounded not-found / ask-WhatsApp behavior.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.
 - No semantic completeness proof.
 - No metadata cleanup.

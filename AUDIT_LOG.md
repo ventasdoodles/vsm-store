@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-17 | Partial six-prompt no-write RAG smoke evidence | PARTIAL / NEEDS TARGETED FIX | `d50379e`, run `26000841773`, one authenticated deployed six-prompt smoke | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Payment/shipping-cost no-write RAG smoke path hardening | ACCEPT WITH RESIDUAL RISK | `cb6311e` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Unsupported delivery-guarantee answer-shaping | ACCEPT WITH RESIDUAL RISK | `9637596` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | No-write error metadata preservation | ACCEPT WITH RESIDUAL RISK | `7905b60` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
@@ -51,17 +52,16 @@
 | <= 2026-05-16 | Earlier storefront, checkout, admin, Cesarin OS, and product discovery lanes | historical canon | many | historical | `docs/archive/AUDIT_LOG_ARCHIVE_2026-05-16.md` |
 
 ## Active Non-Claims Carried Forward
-- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write `customer-intelligence` policy/shipping/payment smoke.
-- Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
-- Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
-- No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
-- No deployed availability or live smoke rerun is claimed for `7905b60` or `cb6311e`.
-- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed in production.
-- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed LLM/Sommelier behavior or live six-prompt runtime success is claimed.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
+- Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
+- The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not broad customer-intelligence safety.
+- DB transaction-log mutation absence is not proven.
+- The partial six-prompt smoke does not prove production answer quality for all six prompts.
+- No claim is made that the payment/shipping policy corpus is internally consistent.
+- Unsupported delivery guarantees are not safely handled in the successful live RAG/Sommelier path; `unsupported_delivery_guarantee` needs a targeted fix.
 - No production Cesarin answer-quality proof.
-- No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
+- No full RAG quality proof.
 - No Product Search quality proof.
-- No deployed/runtime RAG answer-quality proof from the local harness.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.
