@@ -974,7 +974,7 @@ export async function executeKnowledgeCapsule(
     }
 
     // 3. CAPSULE EVALUATION
-    const contract = evaluateKnowledgeRAGTree(matches || [], toolArgs.is_ambiguous, Date.now() - startMs);
+    const contract = evaluateKnowledgeRAGTree(matches || [], toolArgs.is_ambiguous, Date.now() - startMs, toolArgs.query);
     
     // 4. STRUCTURED RESULT RETURN
     return contract;

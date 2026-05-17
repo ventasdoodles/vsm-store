@@ -50,10 +50,54 @@ function getGenericKnowledgeHint(strategy: InternalKnowledgeContractType['match_
     return "He recopilado esta informacion relacionada de nuestros tutoriales y manuales operativos:";
 }
 
+function normalizePolicySignal(value: unknown): string {
+    return normalizeKnowledgeText(value)
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function isUnsupportedShippingPromiseQuery(query?: string): boolean {
+    const normalizedQuery = normalizePolicySignal(query);
+
+    return /(garantiz|garantia|seguro|asegura|promete|promesa|llega)/.test(normalizedQuery)
+        && /(manana|24 horas|dia siguiente|next day|domicilio|casa|entrega)/.test(normalizedQuery);
+}
+
+function hasShippingPolicyEvidence(chunks: InternalKnowledgeChunkType[]): boolean {
+    const policyText = normalizePolicySignal(chunks
+        .map(chunk => [chunk.category, chunk.title, chunk.content].filter(Boolean).join(' '))
+        .join(' '));
+
+    const hasShippingContext = /(shipping|envio|envios|dhl|paqueteria)/.test(policyText);
+    const hasOcurreContext = /(ocurre|sucursal|no a domicilio)/.test(policyText);
+
+    return hasShippingContext && hasOcurreContext;
+}
+
+function buildUnsupportedShippingPromiseHint(chunks: InternalKnowledgeChunkType[]): string | null {
+    if (!hasShippingPolicyEvidence(chunks)) {
+        return null;
+    }
+
+    return 'No puedo confirmar una entrega manana garantizada ni entrega a domicilio. Lo que si marca la politica es envio por DHL ocurre a sucursal; tiempos y costos se confirman antes de cerrar el pedido.';
+}
+
 function buildKnowledgeAnswerHint(
     strategy: InternalKnowledgeContractType['match_strategy'],
-    chunks: InternalKnowledgeChunkType[]
+    chunks: InternalKnowledgeChunkType[],
+    query?: string
 ): string {
+    if (isUnsupportedShippingPromiseQuery(query)) {
+        const boundedShippingHint = buildUnsupportedShippingPromiseHint(chunks);
+        if (boundedShippingHint) {
+            return boundedShippingHint;
+        }
+    }
+
     const topChunk = chunks[0];
     const title = normalizeKnowledgeText(topChunk?.title);
     const content = trimKnowledgePreview(topChunk?.content);
@@ -108,7 +152,8 @@ export function buildEmptyKnowledgeContract(
 export function evaluateKnowledgeRAGTree(
     rawChunks: RawKnowledgeChunk[],
     is_ambiguous: boolean,
-    latency_ms: number
+    latency_ms: number,
+    query?: string
 ): InternalKnowledgeContractType {
     if (!rawChunks || rawChunks.length === 0) {
         return buildEmptyKnowledgeContract(latency_ms);
@@ -148,7 +193,7 @@ export function evaluateKnowledgeRAGTree(
         return buildEmptyKnowledgeContract(latency_ms);
     }
 
-    hint = buildKnowledgeAnswerHint(strategy, mappedChunks);
+    hint = buildKnowledgeAnswerHint(strategy, mappedChunks, query);
 
     return {
         capsule_name: 'knowledge_rag_foundation',

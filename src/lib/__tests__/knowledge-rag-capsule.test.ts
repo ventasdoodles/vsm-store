@@ -96,6 +96,17 @@ describe('scoped RAG answer-quality harness', () => {
     similarity: 0.83,
   };
 
+  const unsupportedDeliveryGuaranteeChunks = [
+    {
+      ...shippingScopeChunk,
+      similarity: 0.78,
+    },
+    {
+      ...shippingCostChunk,
+      similarity: 0.77,
+    },
+  ];
+
   const assertNoHallucinatedPaymentOrShippingClaim = (text: string) => {
     expect(text).not.toMatch(/aceptamos tarjeta/i);
     expect(text).not.toMatch(/pago con tarjeta disponible/i);
@@ -166,6 +177,33 @@ describe('scoped RAG answer-quality harness', () => {
     expect(contract.resolved_chunks).toHaveLength(3);
     expect(contract.resolved_chunks?.map((chunk) => chunk.category)).toEqual(['payments', 'shipping', 'shipping']);
     assertNoHallucinatedPaymentOrShippingClaim(contract.ui_render_hint);
+  });
+
+  it.each([
+    '¿Me garantizas entrega mañana a domicilio?',
+    '¿Garantizan entrega mañana?',
+    '¿Me llega mañana seguro a mi casa?',
+  ])('qualifies unsupported delivery guarantees in the successful RAG path: %s', (query) => {
+    const contract = evaluateKnowledgeRAGTree(
+      unsupportedDeliveryGuaranteeChunks,
+      false,
+      14,
+      query,
+    );
+
+    expect(contract.execution_status).toBe('SUCCESS');
+    expect(contract.match_strategy).toBe('MODERATE_CONFIDENCE_MULTI_SOURCE');
+    expect(contract.ui_render_hint).toContain('No puedo confirmar');
+    expect(contract.ui_render_hint).toContain('entrega manana garantizada');
+    expect(contract.ui_render_hint).toContain('entrega a domicilio');
+    expect(contract.ui_render_hint).toContain('DHL ocurre');
+    expect(contract.ui_render_hint).toContain('sucursal');
+    expect(contract.ui_render_hint).toContain('tiempos y costos se confirman');
+    expect(contract.resolved_chunks).toHaveLength(2);
+    expect(contract.resolved_chunks?.map((chunk) => chunk.category)).toEqual(['shipping', 'shipping']);
+    expect(contract.ui_render_hint).not.toMatch(/si\s+.*domicilio/i);
+    expect(contract.ui_render_hint).not.toMatch(/garantizamos/i);
+    expect(contract.ui_render_hint).not.toMatch(/entrega ma[ñn]ana a domicilio confirmada/i);
   });
 
   it('uses a bounded store-hours limitation when policy support is absent', () => {
