@@ -7,6 +7,28 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### No-Write Customer-Intelligence Smoke Readiness - 16 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `0795c51de54842df4dbf496855f785cd83ba45ba` (`test: add no-write customer intelligence smoke readiness`). This records the local/tested no-write smoke-readiness contract for the authenticated `customer-intelligence` `concierge_chat` knowledge handoff only.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Implementation Evidence:**
+1. **Commit scope:** the implementation commit changed exactly `src/lib/customer-intelligence-no-write-smoke.ts`, `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`, `src/services/concierge.service.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, `supabase/functions/customer-intelligence/index.ts`, and `supabase/functions/customer-intelligence/no-write-smoke.ts`; no docs/canon, workflow, package, env, secret, Supabase migration, or Supabase seed file changed in that implementation commit.
+2. **Explicit contract identity:** the no-write smoke contract is explicitly identified as `customer_intelligence_no_write_v1`.
+3. **Write/call suppression:** for authenticated `concierge_chat` knowledge handoff, the smoke contract suppresses `ai_customer_memory` persistence, Edge `ai_analytics` insert, QA Judge invocation, and client/service capsule telemetry.
+4. **Audit metadata:** responses in the accepted smoke-readiness path expose auditable `no_write_smoke` metadata.
+5. **Scope safety:** scope mismatch is rejected instead of silently broadening suppression.
+6. **Normal behavior preservation:** normal production behavior remains unchanged when the smoke flag/contract is absent, and existing non-smoke `knowledge_rag_foundation` telemetry remains intact.
+7. **Validation:** `npm run test:run -- src/services/__tests__/concierge.service.knowledge-harness.test.ts src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts` passed with `2` test files and `5` tests; targeted ESLint passed with `0` errors and existing warnings only; `npm run typecheck` passed; `git diff --check` and `git diff --check 0795c51^ 0795c51` passed; secret-pattern scan over the commit diff returned `NO_SECRET_PATTERN_MATCHES`.
+8. **Actions not performed:** no live smoke, live retrieval-to-answer proof, remote `customer-intelligence` smoke, workflow run, deploy, DB work, Supabase work, Supabase CLI, remote DB mutation, local ingestion, knowledge ingestion rerun, secret access, secret exposure, or unrelated change occurred during the accepted audit/canon lane.
+**Claims Accepted:**
+- A local/tested no-write smoke-readiness contract now exists for the authenticated `customer-intelligence` knowledge handoff path.
+- The smoke contract can suppress memory, Edge analytics, QA Judge, and client capsule telemetry surfaces for that path.
+- Non-smoke `knowledge_rag_foundation` telemetry behavior remains preserved.
+**Residual Risks / Bounded Non-Claims:**
+- This does not claim live retrieval-to-answer proof, remote `customer-intelligence` smoke, production Cesarin answer quality, full RAG quality, Product Search quality, metadata cleanup, DB/Supabase mutation, workflow/runtime verification, ingestion rerun, deploy, live smoke execution, or fixes for `metadata.embedding_dims` / retained inactive rows.
+- The Edge HTTP no-write smoke path has not been live-executed.
+- The smoke contract is explicit and narrow but not additionally environment-gated.
+**Outcome:** LOCAL NO-WRITE CUSTOMER-INTELLIGENCE SMOKE READINESS IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Seed Runner Typecheck Strictness Repair - 16 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted commit `70ca5f2317476f6fc66fcab060c1915db85d32c2` (`test: repair seed runner typecheck strictness`). This records the narrow local TypeScript strictness repair for `seed_runner.ts` and its fake Supabase safety harness only.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
