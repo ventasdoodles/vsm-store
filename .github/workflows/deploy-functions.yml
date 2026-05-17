@@ -28,6 +28,9 @@ jobs:
       - name: Deploy knowledge-ingestor
         run: supabase functions deploy knowledge-ingestor --project-ref $PROJECT_ID
 
+      - name: Deploy customer-intelligence
+        run: supabase functions deploy customer-intelligence --project-ref $PROJECT_ID
+
       - name: Deploy create-payment
         run: supabase functions deploy create-payment --project-ref $PROJECT_ID
 
