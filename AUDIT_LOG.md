@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-17 | Multi-prompt no-write RAG quality trigger | ACCEPT WITH RESIDUAL RISK | `3f61e13` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Scoped local RAG answer-quality harness | ACCEPT WITH RESIDUAL RISK | `3f7bb4b` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | Post-deploy no-write customer-intelligence smoke | ACCEPT WITH RESIDUAL RISK | `626a730`, run `25980183647`, one deployed smoke | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-16 | No-write customer-intelligence smoke readiness | ACCEPT WITH RESIDUAL RISK | `0795c51` | `8e0dab7` | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
@@ -50,6 +51,7 @@
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write `customer-intelligence` policy/shipping/payment smoke.
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
+- No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
 - No Product Search quality proof.

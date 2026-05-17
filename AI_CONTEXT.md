@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: scoped local RAG answer-quality harness, accepted with residual risk at `3f7bb4b`.
+- Latest post-split accepted canon lane: multi-prompt no-write RAG quality trigger, accepted with residual risk at `3f61e13`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,18 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Scoped Local RAG Answer-Quality Harness
+## Latest Accepted Lane: Multi-Prompt No-Write RAG Quality Trigger
+- Implementation commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
+- Changed files: `src/hooks/useAIConcierge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, `src/components/ui/ai/AIConcierge.tsx`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- The trigger is local/tested readiness for a future authenticated deployed multi-prompt no-write RAG quality smoke. It requires all three gates: `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, and `ci_rag_quality_smoke=true`.
+- It runs only the six allowlisted prompts from the scoped RAG answer-quality harness and calls `conciergeService.chat` with `{ noWriteSmoke: true }` for each request.
+- Sanitized audit output includes prompt/category, status, contract, suppression metadata, capsule, answer/main-message presence, match strategy, and resolved chunk count.
+- Normal `sendMessage` remains unchanged, the existing single no-write smoke trigger remains valid, and no broad debug panel or normal customer-visible control was added.
+- Validation accepted: targeted Vitest for `useAIConcierge.test.tsx` and `AIConcierge.test.tsx` PASS with 2 files / 46 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check 3f61e13^ 3f61e13` PASS; commit-diff secret-pattern scan found no secret values, only negative assertions.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: Scoped Local RAG Answer-Quality Harness
 - Implementation commit: `3f7bb4b` (`test: add scoped RAG answer-quality harness`).
 - Changed file: `src/lib/__tests__/knowledge-rag-capsule.test.ts`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -93,6 +104,7 @@
 - Bounded live retrieval-to-answer proof is claimed only for the post-deploy authenticated no-write `customer-intelligence` policy/shipping/payment smoke described above.
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
+- No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
 - No production Cesarin answer-quality proof is claimed.
 - No full RAG quality proof is claimed; `3f7bb4b` is a scoped local deterministic policy/RAG harness only.
 - No Product Search quality proof is claimed.
@@ -119,6 +131,8 @@
 - Seed-runner local typecheck strictness repair.
 - No-write customer-intelligence smoke readiness.
 - Post-deploy live no-write customer-intelligence smoke.
+- Scoped local RAG answer-quality harness.
+- Multi-prompt no-write RAG quality trigger.
 
 ## Canon Update Rules
 - Keep this file current-state-first.

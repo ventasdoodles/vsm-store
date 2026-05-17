@@ -7,6 +7,8 @@
 - Post-deploy smoke verdict: ACCEPT WITH RESIDUAL RISK.
 - Workflow patch commit: `626a730` (`ci: include customer-intelligence in function deploy workflow`).
 - Refresh workflow run: `25980183647` (`workflow_dispatch`, `main`, commit `626a730d9363ca3dec01c82116ab85947c56209a`) concluded success.
+- Multi-prompt trigger verdict: ACCEPT WITH RESIDUAL RISK.
+- Multi-prompt trigger commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -62,10 +64,36 @@
 - No secrets were printed/exported.
 - No Supabase CLI, local ingestion, knowledge ingestion rerun, code/test changes, DB work, or manual DB mutation command occurred during the smoke.
 
+## Multi-Prompt No-Write RAG Quality Trigger
+- Commit `3f61e13` added a local/tested authenticated app trigger for a future deployed multi-prompt no-write RAG quality smoke.
+- Changed files:
+  - `src/hooks/useAIConcierge.ts`.
+  - `src/hooks/__tests__/useAIConcierge.test.tsx`.
+  - `src/components/ui/ai/AIConcierge.tsx`.
+  - `src/components/ui/ai/__tests__/AIConcierge.test.tsx`.
+- The trigger requires all three gates:
+  - `ci_no_write_smoke=true`.
+  - `smoke_contract=customer_intelligence_no_write_v1`.
+  - `ci_rag_quality_smoke=true`.
+- It runs only the six allowlisted prompts from the scoped RAG answer-quality harness.
+- Each request calls `conciergeService.chat` with `{ noWriteSmoke: true }`.
+- Sanitized audit output includes prompt/category, status, contract, suppression metadata, capsule, answer/main-message presence, match strategy, and resolved chunk count.
+- Normal `sendMessage` remains unchanged.
+- Existing single no-write smoke trigger remains valid.
+- No broad debug panel or normal customer-visible control was added.
+- Validation for `3f61e13`:
+  - `npm run test:run -- src/hooks/__tests__/useAIConcierge.test.tsx src/components/ui/ai/__tests__/AIConcierge.test.tsx`: PASS, 2 files / 46 tests.
+  - Targeted ESLint over changed hook/UI files: PASS with 0 errors and existing warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 3f61e13^ 3f61e13`: PASS.
+  - Commit-diff secret-pattern scan found no secret values; hits were only negative test assertions.
+
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke.
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
+- No deployed trigger availability or live multi-prompt smoke execution is claimed for `3f61e13`.
+- No deployed/runtime RAG answer-quality proof is claimed from the multi-prompt trigger.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.
 - No Product Search quality proof.

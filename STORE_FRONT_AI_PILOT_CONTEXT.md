@@ -30,6 +30,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Local main-message synthesis improvement proves successful `knowledge_rag_foundation` results can synthesize a substantive customer-visible main message from the top resolved chunk while preserving chunks.
 - `3f7bb4b` adds a scoped local deterministic RAG answer-quality harness for six policy/RAG categories: payment method, shipping scope, DHL shipping cost, combined payment/shipping, store-hours limitation, and unsupported delivery guarantee.
 - The harness asserts grounded fixture text, correct policy recall, useful main message, resolved chunk support, bounded fallback/uncertainty, and absence of hallucinated payment/shipping claims.
+- `3f61e13` adds a local/tested authenticated app trigger for a future multi-prompt no-write RAG quality smoke. It requires `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, and `ci_rag_quality_smoke=true`, runs only the six allowlisted RAG quality prompts, and calls `conciergeService.chat` with `{ noWriteSmoke: true }` for each request.
+- Its sanitized audit output includes prompt/category, status, contract, suppression metadata, capsule, answer/main-message presence, match strategy, and resolved chunk count.
 - These are local/no-mutation proofs only.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` and `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
@@ -45,6 +47,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke.
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
+- No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof; scoped local policy/RAG harness coverage is not deployed/runtime quality proof.
 - No Product Search quality proof.

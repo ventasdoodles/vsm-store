@@ -5,6 +5,8 @@
 - Implementation commit: `c65ba2386247e87d22067463fb3bac90d6684550` (`test: improve cesarin knowledge main message synthesis`).
 - Scoped RAG answer-quality harness verdict: ACCEPT WITH RESIDUAL RISK.
 - Scoped RAG answer-quality harness commit: `3f7bb4b` (`test: add scoped RAG answer-quality harness`).
+- Multi-prompt no-write RAG quality trigger verdict: ACCEPT WITH RESIDUAL RISK.
+- Multi-prompt no-write RAG quality trigger commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -36,6 +38,14 @@
 - It asserts grounded fixture text, correct policy recall, useful customer-visible main message, resolved chunk support, bounded fallback/uncertainty, and absence of hallucinated payment/shipping claims.
 - It does not call Edge, Supabase, DB, network, provider, live app, workflow, deploy, ingestion, or smoke paths.
 
+## Multi-Prompt No-Write RAG Quality Trigger
+- Commit `3f61e13` added local/tested readiness for a future authenticated deployed multi-prompt no-write RAG quality smoke.
+- The trigger requires `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, and `ci_rag_quality_smoke=true`.
+- It runs only the same six allowlisted RAG quality prompts covered by the scoped local harness.
+- Each request calls `conciergeService.chat` with `{ noWriteSmoke: true }`.
+- Sanitized audit output includes prompt/category, status, contract, suppression metadata, capsule, answer/main-message presence, match strategy, and resolved chunk count.
+- Normal `sendMessage` remains unchanged, the existing single no-write smoke trigger remains valid, and no broad debug panel or normal customer-visible control was added.
+
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
 - Targeted ESLint: PASS with 0 errors and 1 existing warning.
@@ -48,6 +58,12 @@
   - `npm run typecheck`: PASS.
   - `git diff --check 3f7bb4b^ 3f7bb4b`: PASS.
   - Commit-diff secret-pattern scan: `NO_SECRET_PATTERN_MATCHES`.
+- Multi-prompt no-write RAG quality trigger validation for `3f61e13`:
+  - `npm run test:run -- src/hooks/__tests__/useAIConcierge.test.tsx src/components/ui/ai/__tests__/AIConcierge.test.tsx`: PASS, 2 files / 46 tests.
+  - Targeted ESLint over changed hook/UI files: PASS with 0 errors and existing warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 3f61e13^ 3f61e13`: PASS.
+  - Commit-diff secret-pattern scan found no secret values; hits were only negative test assertions.
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
@@ -56,6 +72,8 @@
 - No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
 - No Product Search quality proof.
 - No deployed/runtime RAG answer-quality proof from the local harness.
+- No deployed availability or live execution of the multi-prompt no-write RAG quality trigger.
+- Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.
 - No semantic completeness proof.
 - No metadata cleanup.
 - No DB/Supabase/workflow/deploy mutation.
