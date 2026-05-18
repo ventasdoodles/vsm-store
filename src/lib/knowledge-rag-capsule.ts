@@ -67,23 +67,40 @@ function isUnsupportedShippingPromiseQuery(query?: string): boolean {
         && /(manana|24 horas|dia siguiente|next day|domicilio|casa|entrega)/.test(normalizedQuery);
 }
 
-function hasShippingPolicyEvidence(chunks: InternalKnowledgeChunkType[]): boolean {
+type UnsupportedShippingPromiseEvidence = 'ocurre_policy' | 'shipping_timing_policy' | null;
+
+function getUnsupportedShippingPromiseEvidence(chunks: InternalKnowledgeChunkType[]): UnsupportedShippingPromiseEvidence {
     const policyText = normalizePolicySignal(chunks
         .map(chunk => [chunk.category, chunk.title, chunk.content].filter(Boolean).join(' '))
         .join(' '));
 
     const hasShippingContext = /(shipping|envio|envios|dhl|paqueteria)/.test(policyText);
     const hasOcurreContext = /(ocurre|sucursal|no a domicilio)/.test(policyText);
+    const hasTimingContext = /(mismo dia|corte|horario|tiempo|tiempos|estimad|dias habiles|confirmar|confirmacion|cobertura|costo|costos)/.test(policyText);
 
-    return hasShippingContext && hasOcurreContext;
+    if (hasShippingContext && hasOcurreContext) {
+        return 'ocurre_policy';
+    }
+
+    if (hasShippingContext && hasTimingContext) {
+        return 'shipping_timing_policy';
+    }
+
+    return null;
 }
 
 function buildUnsupportedShippingPromiseHint(chunks: InternalKnowledgeChunkType[]): string | null {
-    if (!hasShippingPolicyEvidence(chunks)) {
+    const evidence = getUnsupportedShippingPromiseEvidence(chunks);
+
+    if (!evidence) {
         return null;
     }
 
-    return 'No puedo confirmar una entrega manana garantizada ni entrega a domicilio. Lo que si marca la politica es envio por DHL ocurre a sucursal; tiempos y costos se confirman antes de cerrar el pedido.';
+    if (evidence === 'ocurre_policy') {
+        return 'No puedo confirmar una garantia de entrega manana ni una entrega a domicilio. Lo que si marca la politica es envio por DHL ocurre a sucursal; tiempos y costos se confirman antes de cerrar el pedido.';
+    }
+
+    return 'No puedo confirmar una garantia de entrega manana ni una entrega a domicilio con la informacion recuperada. Lo que aparece es envio por DHL con tiempos estimados sujetos a pago, cobertura y operacion; tiempos y costos se confirman antes de cerrar el pedido.';
 }
 
 function buildKnowledgeAnswerHint(

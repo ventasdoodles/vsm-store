@@ -107,6 +107,33 @@ describe('scoped RAG answer-quality harness', () => {
     },
   ];
 
+  const unsupportedDeliveryTimingOnlyChunks = [
+    {
+      id: 'chunk-shipping-cutoff-1',
+      source_id: 'politica-envios-corte-v1',
+      title: 'Corte de envios DHL',
+      category: 'shipping',
+      content: 'Pedidos pagados antes de las 5:00 PM salen el mismo dia habil por DHL. La entrega se estima en 1-3 dias habiles segun cobertura y operacion.',
+      similarity: 0.78,
+    },
+    {
+      id: 'chunk-shipping-estimate-1',
+      source_id: 'politica-envios-estimados-v1',
+      title: 'Tiempos estimados de envio',
+      category: 'shipping',
+      content: 'Los tiempos de entrega son estimados y dependen de confirmacion de pago, destino, cobertura y operacion de paqueteria.',
+      similarity: 0.77,
+    },
+    {
+      id: 'chunk-local-delivery-1',
+      source_id: 'politica-entrega-local-v1',
+      title: 'Entrega local y costos',
+      category: 'shipping',
+      content: 'En Xalapa puede existir entrega local con costo y horario por confirmar antes de cerrar el pedido.',
+      similarity: 0.76,
+    },
+  ];
+
   const assertNoHallucinatedPaymentOrShippingClaim = (text: string) => {
     expect(text).not.toMatch(/aceptamos tarjeta/i);
     expect(text).not.toMatch(/pago con tarjeta disponible/i);
@@ -194,7 +221,7 @@ describe('scoped RAG answer-quality harness', () => {
     expect(contract.execution_status).toBe('SUCCESS');
     expect(contract.match_strategy).toBe('MODERATE_CONFIDENCE_MULTI_SOURCE');
     expect(contract.ui_render_hint).toContain('No puedo confirmar');
-    expect(contract.ui_render_hint).toContain('entrega manana garantizada');
+    expect(contract.ui_render_hint).toContain('garantia de entrega manana');
     expect(contract.ui_render_hint).toContain('entrega a domicilio');
     expect(contract.ui_render_hint).toContain('DHL ocurre');
     expect(contract.ui_render_hint).toContain('sucursal');
@@ -204,6 +231,33 @@ describe('scoped RAG answer-quality harness', () => {
     expect(contract.ui_render_hint).not.toMatch(/si\s+.*domicilio/i);
     expect(contract.ui_render_hint).not.toMatch(/garantizamos/i);
     expect(contract.ui_render_hint).not.toMatch(/entrega ma[ñn]ana a domicilio confirmada/i);
+  });
+
+  it('qualifies unsupported delivery guarantees when retrieval only has timing estimates', () => {
+    const contract = evaluateKnowledgeRAGTree(
+      unsupportedDeliveryTimingOnlyChunks,
+      false,
+      14,
+      'me garantizas entrega manana a domicilio?',
+    );
+
+    expect(contract.execution_status).toBe('SUCCESS');
+    expect(contract.match_strategy).toBe('MODERATE_CONFIDENCE_MULTI_SOURCE');
+    expect(contract.ui_render_hint).toContain('No puedo confirmar');
+    expect(contract.ui_render_hint).toContain('garantia de entrega manana');
+    expect(contract.ui_render_hint).toContain('entrega a domicilio');
+    expect(contract.ui_render_hint).toContain('DHL');
+    expect(contract.ui_render_hint).toContain('tiempos estimados');
+    expect(contract.ui_render_hint).toContain('sujetos a pago');
+    expect(contract.ui_render_hint).toContain('cobertura');
+    expect(contract.ui_render_hint).toContain('tiempos y costos se confirman');
+    expect(contract.ui_render_hint).not.toContain('DHL ocurre');
+    expect(contract.ui_render_hint).not.toContain('sucursal');
+    expect(contract.resolved_chunks).toHaveLength(3);
+    expect(contract.resolved_chunks?.map((chunk) => chunk.category)).toEqual(['shipping', 'shipping', 'shipping']);
+    expect(contract.ui_render_hint).not.toMatch(/si\s+.*domicilio/i);
+    expect(contract.ui_render_hint).not.toMatch(/garantizamos/i);
+    expect(contract.ui_render_hint).not.toMatch(/entrega ma[Ã±n]ana a domicilio confirmada/i);
   });
 
   it('uses a bounded store-hours limitation when policy support is absent', () => {
