@@ -44,6 +44,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - `826927f` adds local/source successful-path answer shaping for unsupported delivery guarantees in `knowledge_rag_foundation`: the guard uses query context plus shipping / DHL OCURRE / sucursal policy chunks to refuse or qualify next-day home-delivery guarantees and require timing/cost confirmation before closing the order.
 - `826927f` is deployed/fresh in the `fa305b2` storefront bundle, but the latest live rerun shows the guard is still insufficient when retrieval returns timing-estimate chunks without OCURRE/no-domicilio evidence.
 - `2443caa` adds local/source retrieval/guard-gating hardening for that timing-estimate gap: unsupported next-day/home-delivery guarantee premises can now be refused or qualified when retrieved chunks contain DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence even without OCURRE/no-domicilio chunks. It preserves stronger DHL OCURRE / sucursal grounding when that evidence is present and does not change no-write trigger or metadata behavior.
+- `cff68c1` adds stable non-secret public bundle markers for future no-write smoke freshness checks: `ci_no_write_smoke`, `ci_rag_quality_smoke`, `smoke_contract`, `customer_intelligence_no_write_v1`, `no_write_smoke`, `no_write_smoke_audit`, `edge_metadata_present`, and `request_contract_present`. Existing smoke trigger/audit code references these markers; the patch does not enable smoke, change trigger conditions, alter no-write metadata semantics, change the six-prompt allowlist, or affect normal customer-visible UI.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` and `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
 ## Current Retrieval / Ingestion Truth
@@ -61,6 +62,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - DB transaction-log mutation absence is not proven.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
 - Unsupported delivery-guarantee successful client-capsule RAG-path behavior has a deployed/fresh fix at `826927f`; follow-up `2443caa` locally hardens the latest timing-estimate retrieval set, but it has no deployed availability or live smoke proof yet.
+- `cff68c1` is local/source proof only until deployed and read-only freshness-verified; marker visibility will prove bundle observability, not live smoke success or answer quality.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - Store-hours behavior is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without proving general store-opening hours.
 - No production Cesarin answer-quality proof.

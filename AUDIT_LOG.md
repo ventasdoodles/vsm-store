@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-18 | Stable no-write smoke public bundle markers | ACCEPT WITH RESIDUAL RISK | `cff68c1` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Unsupported delivery-guarantee retrieval guard hardening | ACCEPT WITH RESIDUAL RISK | `2443caa` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | fa305b2 live six-prompt no-write RAG smoke partial evidence | PARTIAL / NEEDS TARGETED FIX | `fa305b2`, one authenticated deployed six-prompt smoke after `826927f` freshness | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Unsupported delivery-guarantee successful RAG-path hardening | ACCEPT WITH RESIDUAL RISK | `826927f` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
@@ -64,6 +65,7 @@
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` as NEEDS FIX under a retrieved timing-estimate chunk set.
 - The likely remaining issue is retrieval/guard-gating plus answer shaping: the live unsupported-guarantee result did not retrieve OCURRE/no-domicilio evidence needed by the `826927f` guard.
 - Follow-up `2443caa` locally hardens that retrieval/guard-gating gap for DHL/shipping timing or cutoff evidence without OCURRE/no-domicilio chunks, but remains local/source-only until deployed, freshness-verified, and smoke-tested.
+- `cff68c1` adds stable public no-write smoke marker observability for future bundle freshness checks, but remains local/source-only until deployed and freshness-verified.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.

@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: `2443caa` unsupported delivery guarantee retrieval guard hardening, verdict ACCEPT WITH RESIDUAL RISK, local/source-only until deployed, freshness-verified, and smoke-tested.
+- Latest post-split accepted canon lane: `cff68c1` stable no-write smoke public bundle markers, verdict ACCEPT WITH RESIDUAL RISK, local/source-only until deployed and freshness-verified.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,19 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Unsupported Delivery Guarantee Retrieval Guard Hardening
+## Latest Accepted Lane: Stable No-Write Smoke Public Bundle Markers
+- Implementation commit: `cff68c1` (`test: add stable no-write smoke public bundle markers`).
+- Changed files: `src/lib/customer-intelligence-no-write-smoke.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- This is a narrow local/source patch for stable non-secret public bundle marker observability after a read-only deployed marker check returned `NO_GO_NEEDS_STABLE_MARKER_PATCH`.
+- It adds `CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS` with exact public strings: `ci_no_write_smoke`, `ci_rag_quality_smoke`, `smoke_contract`, `customer_intelligence_no_write_v1`, `no_write_smoke`, `no_write_smoke_audit`, `edge_metadata_present`, and `request_contract_present`.
+- Existing smoke trigger/audit code references these constants so future public bundle freshness checks can verify marker presence after deployment.
+- The patch does not enable smoke by itself; trigger conditions, request payload semantics, no-write metadata semantics, six-prompt allowlist, normal `sendMessage`, normal customer-visible UI, and `2443caa` unsupported guarantee guard behavior remain unchanged.
+- Validation accepted: targeted Vitest PASS with 3 files / 26 tests; targeted ESLint PASS with 0 errors and existing `AIConcierge.tsx` warnings only; `npm run typecheck` PASS; `git diff --check cff68c1^ cff68c1` PASS; commit-diff secret-value scan `COMMIT_DIFF_NO_SECRET_VALUE_PATTERN_MATCHES`.
+- This is local/source proof only until deployed and read-only freshness-verified. Marker visibility proves bundle observability, not runtime smoke success or answer quality.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: Unsupported Delivery Guarantee Retrieval Guard Hardening
 - Implementation commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
 - Changed files: `src/lib/knowledge-rag-capsule.ts` and `src/lib/__tests__/knowledge-rag-capsule.test.ts`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -203,6 +215,7 @@
 - No claim is made that the payment corpus is internally consistent: visible evidence still has a MercadoPago/cards versus transfer/deposit-only tension.
 - No claim is made that shipping cost policy is internally settled: visible evidence used a `$150-$180 MXN` range while confirmation/estimate handling remains a residual.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` unresolved under a retrieved timing-estimate chunk set. Follow-up `2443caa` locally hardens that retrieval/guard-gating gap, but has no deployed availability or live smoke proof yet.
+- `cff68c1` adds stable public no-write smoke marker observability for future freshness checks, but no deployed marker availability or live smoke success is claimed yet.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write lanes.

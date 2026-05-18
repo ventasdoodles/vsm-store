@@ -21,6 +21,8 @@
 - fa305b2 smoke baseline: storefront runtime `fa305b2`, `runtimeBuildFingerprint` `v113-fa305b2`, deployed assets containing `826927f` markers plus no-write trigger/audit markers.
 - Unsupported delivery guarantee retrieval guard hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Unsupported delivery guarantee retrieval guard hardening commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
+- Stable no-write smoke public bundle markers verdict: ACCEPT WITH RESIDUAL RISK.
+- Stable no-write smoke public bundle markers commit: `cff68c1` (`test: add stable no-write smoke public bundle markers`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -230,6 +232,42 @@
 - Follow-up `2443caa` is accepted with residual risk as a local/source patch for this exact retrieval/guard-gating gap. It lets the successful RAG-path guard activate on DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence even when OCURRE/no-domicilio chunks are absent, while preserving OCURRE/sucursal grounding when present.
 - `2443caa` is not deployed, freshness-verified, or live-smoke tested in this canon entry.
 
+## Stable No-Write Smoke Public Bundle Markers
+- Commit `cff68c1` is accepted with residual risk as a narrow local/source patch for stable non-secret public bundle marker observability.
+- The patch followed a read-only deployed marker check that returned `NO_GO_NEEDS_STABLE_MARKER_PATCH`: runtime freshness and `2443caa` guard markers were visible, but public deployed assets did not expose exact readiness markers for `ci_no_write_smoke`, `ci_rag_quality_smoke`, `no_write_smoke_audit`, `edge_metadata_present`, and `request_contract_present`.
+- Changed files:
+  - `src/lib/customer-intelligence-no-write-smoke.ts`.
+  - `src/hooks/useAIConcierge.ts`.
+  - `src/components/ui/ai/AIConcierge.tsx`.
+  - `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`.
+- It adds `CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS` with exact public non-secret strings:
+  - `ci_no_write_smoke`.
+  - `ci_rag_quality_smoke`.
+  - `smoke_contract`.
+  - `customer_intelligence_no_write_v1`.
+  - `no_write_smoke`.
+  - `no_write_smoke_audit`.
+  - `edge_metadata_present`.
+  - `request_contract_present`.
+- Existing smoke trigger/audit code now references these marker constants so future public bundle freshness checks can verify marker presence after deployment.
+- The patch does not enable smoke by itself.
+- Trigger conditions remain unchanged.
+- Request payload semantics remain unchanged.
+- No-write metadata semantics remain unchanged.
+- Six-prompt allowlist remains unchanged.
+- Normal `sendMessage` remains unchanged.
+- Normal customer-visible UI remains unchanged.
+- `2443caa` unsupported delivery guarantee guard behavior remains unchanged.
+- Validation for `cff68c1`:
+  - `npm run test:run -- src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts src/hooks/__tests__/useAIConcierge.test.tsx src/services/__tests__/concierge.service.knowledge-harness.test.ts`: PASS, 3 files / 26 tests.
+  - Targeted ESLint over changed files: PASS with 0 errors and existing `AIConcierge.tsx` warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check cff68c1^ cff68c1`: PASS.
+  - Commit diff secret-value scan: `COMMIT_DIFF_NO_SECRET_VALUE_PATTERN_MATCHES`.
+- No workflow, deploy, Supabase CLI, DB work, ingestion, live smoke, auth flow, browser login, or secret inspection occurred.
+- This is local/source proof only until deployed and read-only freshness-verified.
+- Marker visibility proves bundle observability, not runtime smoke success or answer quality.
+
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
@@ -239,6 +277,7 @@
 - No claim is made that payment/shipping policy corpus evidence is internally consistent.
 - `unsupported_delivery_guarantee` successful client-capsule RAG-path answer shaping is deployed/fresh at `fa305b2`, but the live rerun remains NEEDS FIX under a retrieved timing-estimate chunk set without OCURRE/no-domicilio evidence.
 - `2443caa` locally hardens the timing-estimate retrieval set gap, but no deployed availability, live smoke success, or production answer-quality proof is claimed.
+- `cff68c1` locally adds stable public marker observability for future freshness checks, but no deployed marker availability, live smoke success, or answer-quality proof is claimed.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual only: support/order-confirmation hours were returned, not broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
