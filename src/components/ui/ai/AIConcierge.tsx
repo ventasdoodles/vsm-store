@@ -18,6 +18,7 @@ import {
     type CesarinCartAssemblyEligibility,
 } from '@/lib/cesarin-cart-assembly';
 import { emitConversationConversionEvent } from '@/lib/conversion-measurement';
+import { CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS } from '@/lib/customer-intelligence-no-write-smoke';
 
 function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
@@ -672,7 +673,7 @@ export const AIConcierge: React.FC = () => {
                                     const cartFeedback = cartAssemblyFeedback[message.id];
                                     const noWriteSmokeAudit = (message as ConciergeMessage & {
                                         capsule_contract?: { no_write_smoke_audit?: Record<string, unknown> };
-                                    }).capsule_contract?.no_write_smoke_audit ?? null;
+                                    }).capsule_contract?.[CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.auditField] ?? null;
 
                                     return (
                                     <motion.div

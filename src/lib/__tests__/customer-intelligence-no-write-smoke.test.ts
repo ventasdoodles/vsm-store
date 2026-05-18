@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCustomerIntelligenceNoWriteSmokeRequestFields,
   CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+  CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS,
   isCustomerIntelligenceNoWriteSmokeActive,
 } from '../customer-intelligence-no-write-smoke';
 import {
@@ -14,6 +15,19 @@ import {
 } from '../../../supabase/functions/customer-intelligence/no-write-smoke';
 
 describe('customer-intelligence no-write smoke contract', () => {
+  it('exposes stable non-secret public bundle markers for readiness checks', () => {
+    expect(Object.values(CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS)).toEqual([
+      'ci_no_write_smoke',
+      'ci_rag_quality_smoke',
+      'smoke_contract',
+      'customer_intelligence_no_write_v1',
+      'no_write_smoke',
+      'no_write_smoke_audit',
+      'edge_metadata_present',
+      'request_contract_present',
+    ]);
+  });
+
   it('requires the explicit concierge_chat smoke contract before activating', () => {
     expect(isCustomerIntelligenceNoWriteSmokeRequest({
       no_write_smoke: true,

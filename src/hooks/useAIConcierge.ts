@@ -7,6 +7,7 @@ import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
 import {
     CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+    CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS,
     isCustomerIntelligenceNoWriteSmokeActive,
 } from '@/lib/customer-intelligence-no-write-smoke';
 import {
@@ -121,9 +122,13 @@ function uniqueStringList(values: string[]): string[] {
 
 const AI_CONCIERGE_SLOW_RESPONSE_MS = 20_000;
 const AI_CONCIERGE_REQUEST_TIMEOUT_MS = 60_000;
-const NO_WRITE_SMOKE_QUERY_PARAM = 'ci_no_write_smoke';
-const NO_WRITE_SMOKE_CONTRACT_PARAM = 'smoke_contract';
-const NO_WRITE_SMOKE_RAG_QUALITY_PARAM = 'ci_rag_quality_smoke';
+const NO_WRITE_SMOKE_QUERY_PARAM = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.triggerQueryParam;
+const NO_WRITE_SMOKE_CONTRACT_PARAM = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.contractQueryParam;
+const NO_WRITE_SMOKE_RAG_QUALITY_PARAM = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.ragQualityQueryParam;
+const NO_WRITE_SMOKE_REQUEST_FIELD = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.requestField;
+const NO_WRITE_SMOKE_AUDIT_FIELD = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.auditField;
+const NO_WRITE_SMOKE_EDGE_METADATA_PRESENT_FIELD = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.edgeMetadataPresentField;
+const NO_WRITE_SMOKE_REQUEST_CONTRACT_PRESENT_FIELD = CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.requestContractPresentField;
 const NO_WRITE_SMOKE_QUESTION = '¿Cuáles son las opciones de envío o pago?';
 const NO_WRITE_RAG_QUALITY_PROMPTS = [
     { category: 'payment_method', prompt: '¿Aceptan tarjeta o cómo puedo pagar?' },
@@ -166,12 +171,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function extractNoWriteSmokeMetadata(value: unknown): Record<string, unknown> | null {
     if (!isRecord(value)) return null;
 
-    const direct = value.no_write_smoke;
+    const direct = value[NO_WRITE_SMOKE_REQUEST_FIELD];
     if (isCustomerIntelligenceNoWriteSmokeActive(direct)) return direct as Record<string, unknown>;
 
     const capsuleContract = value.capsule_contract;
-    if (isRecord(capsuleContract) && isCustomerIntelligenceNoWriteSmokeActive(capsuleContract.no_write_smoke)) {
-        return capsuleContract.no_write_smoke as Record<string, unknown>;
+    if (isRecord(capsuleContract) && isCustomerIntelligenceNoWriteSmokeActive(capsuleContract[NO_WRITE_SMOKE_REQUEST_FIELD])) {
+        return capsuleContract[NO_WRITE_SMOKE_REQUEST_FIELD] as Record<string, unknown>;
     }
 
     return null;
@@ -182,7 +187,7 @@ function buildNoWriteSmokeAuditSummary(response: {
     capsule_contract?: Record<string, unknown>;
 }, context: NoWriteSmokeAuditContext = {}): Record<string, unknown> {
     const contract = response.capsule_contract ?? {};
-    const metadata = isRecord(contract.no_write_smoke) ? contract.no_write_smoke : {};
+    const metadata = isRecord(contract[NO_WRITE_SMOKE_REQUEST_FIELD]) ? contract[NO_WRITE_SMOKE_REQUEST_FIELD] : {};
 
     return {
         prompt_category: context.prompt_category ?? null,
@@ -190,8 +195,8 @@ function buildNoWriteSmokeAuditSummary(response: {
         status: context.status ?? 'ok',
         error_type: context.error_type ?? null,
         metadata_present: Boolean(metadata.active),
-        edge_metadata_present: Boolean(metadata.active),
-        request_contract_present: Boolean(metadata.active),
+        [NO_WRITE_SMOKE_EDGE_METADATA_PRESENT_FIELD]: Boolean(metadata.active),
+        [NO_WRITE_SMOKE_REQUEST_CONTRACT_PRESENT_FIELD]: Boolean(metadata.active),
         contract: typeof metadata.contract === 'string' ? metadata.contract : null,
         suppressed_writes: Array.isArray(metadata.suppressed_writes) ? metadata.suppressed_writes : [],
         suppressed_calls: Array.isArray(metadata.suppressed_calls) ? metadata.suppressed_calls : [],
@@ -413,7 +418,7 @@ export function useAIConcierge() {
                 if (smokeAudit) {
                     assistantMsg.capsule_contract = {
                         ...(assistantMsg.capsule_contract ?? {}),
-                        no_write_smoke_audit: buildNoWriteSmokeAuditSummary(responseWithContracts, smokeAuditContext),
+                        [NO_WRITE_SMOKE_AUDIT_FIELD]: buildNoWriteSmokeAuditSummary(responseWithContracts, smokeAuditContext),
                     };
                 }
                 const turnAnalysis = assistantMsg.turn_analysis ?? assistantMsg.capsule_contract?.turn_analysis ?? null;
@@ -516,9 +521,9 @@ export function useAIConcierge() {
                         content: 'No-write RAG quality smoke prompt failed with sanitized status.',
                         timestamp: new Date(),
                         capsule_contract: {
-                            no_write_smoke_audit: noWriteSmokeMetadata
+                            [NO_WRITE_SMOKE_AUDIT_FIELD]: noWriteSmokeMetadata
                                 ? buildNoWriteSmokeAuditSummary(
-                                    { message: null, capsule_contract: { no_write_smoke: noWriteSmokeMetadata } },
+                                    { message: null, capsule_contract: { [NO_WRITE_SMOKE_REQUEST_FIELD]: noWriteSmokeMetadata } },
                                     {
                                         ...(smokeAuditContext ?? {}),
                                         status: 'error',
@@ -530,8 +535,8 @@ export function useAIConcierge() {
                                     status: 'error',
                                     error_type: isTimeout ? 'timeout' : isQuota ? 'quota' : 'request_failed',
                                     metadata_present: false,
-                                    edge_metadata_present: false,
-                                    request_contract_present: true,
+                                    [NO_WRITE_SMOKE_EDGE_METADATA_PRESENT_FIELD]: false,
+                                    [NO_WRITE_SMOKE_REQUEST_CONTRACT_PRESENT_FIELD]: true,
                                     contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
                                     suppressed_writes: [],
                                     suppressed_calls: [],
@@ -561,7 +566,7 @@ export function useAIConcierge() {
             addMessage({
                 content: 'No-write smoke blocked: authenticated session required.',
                 capsule_contract: {
-                    no_write_smoke_audit: {
+                    [NO_WRITE_SMOKE_AUDIT_FIELD]: {
                         metadata_present: false,
                         contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
                         blocked_reason: 'authenticated_session_required',
@@ -590,7 +595,7 @@ export function useAIConcierge() {
             addMessage({
                 content: 'No-write RAG quality smoke blocked: authenticated session required.',
                 capsule_contract: {
-                    no_write_smoke_audit: {
+                    [NO_WRITE_SMOKE_AUDIT_FIELD]: {
                         prompt_category: 'rag_quality_smoke',
                         prompt_label: null,
                         status: 'blocked',

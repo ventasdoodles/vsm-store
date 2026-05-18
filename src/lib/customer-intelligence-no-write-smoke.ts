@@ -1,5 +1,16 @@
 export const CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT = 'customer_intelligence_no_write_v1' as const;
 
+export const CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS = Object.freeze({
+  triggerQueryParam: 'ci_no_write_smoke',
+  ragQualityQueryParam: 'ci_rag_quality_smoke',
+  contractQueryParam: 'smoke_contract',
+  contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+  requestField: 'no_write_smoke',
+  auditField: 'no_write_smoke_audit',
+  edgeMetadataPresentField: 'edge_metadata_present',
+  requestContractPresentField: 'request_contract_present',
+} as const);
+
 export interface CustomerIntelligenceNoWriteSmokeMetadata {
   active?: boolean;
   contract?: string;
@@ -17,8 +28,8 @@ export function buildCustomerIntelligenceNoWriteSmokeRequestFields(): {
   smoke_contract: typeof CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT;
 } {
   return {
-    no_write_smoke: true,
-    smoke_contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+    [CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.requestField]: true,
+    [CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.contractQueryParam]: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
   };
 }
 
