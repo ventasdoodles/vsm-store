@@ -27,6 +27,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Verdict for that smoke: PARTIAL / NEEDS TARGETED FIX. It proves deployed no-write audit coverage for the six-prompt set, but not production answer quality for all six prompts.
 - fa305b2 live rerun: after storefront freshness for `fa305b2` / `826927f` was proven, exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke rerun executed through the same trigger. All six again showed `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, suppressed writes `ai_customer_memory` and `ai_analytics`, suppressed call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
 - Verdict for the fa305b2 rerun: PARTIAL / NEEDS TARGETED FIX. No-write coverage passed, but `unsupported_delivery_guarantee` still did not clearly refuse or qualify guaranteed next-day home delivery because the live result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of OCURRE/no-domicilio evidence.
+- Controlled 56e8ef4 valid-trigger run: after deployed freshness proved `gitShortHash` `56e8ef4`, runtime fingerprint `v113-56e8ef4`, and deployed pending/preflight markers, exactly one valid trigger open rendered normally, did not reproduce the prior blank page, and showed one pending/preflight audit row plus six `ok` category rows.
+- Existing-tab answer capture for that run is ACCEPT WITH RESIDUAL RISK: `unsupported_delivery_guarantee` and `shipping_scope` are accepted; `payment_method`, `shipping_cost`, `combined_payment_shipping`, and `store_hours_limitation` remain accepted with residuals for payment corpus consistency, fixed-cost versus confirmation/estimate policy, and support-hours versus broad store-hours scope.
 - Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
 
 ## Current Knowledge RAG Local Harness Truth
@@ -45,6 +47,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - `826927f` is deployed/fresh in the `fa305b2` storefront bundle, but the latest live rerun shows the guard is still insufficient when retrieval returns timing-estimate chunks without OCURRE/no-domicilio evidence.
 - `2443caa` adds local/source retrieval/guard-gating hardening for that timing-estimate gap: unsupported next-day/home-delivery guarantee premises can now be refused or qualified when retrieved chunks contain DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence even without OCURRE/no-domicilio chunks. It preserves stronger DHL OCURRE / sucursal grounding when that evidence is present and does not change no-write trigger or metadata behavior.
 - `cff68c1` adds stable non-secret public bundle markers for future no-write smoke freshness checks: `ci_no_write_smoke`, `ci_rag_quality_smoke`, `smoke_contract`, `customer_intelligence_no_write_v1`, `no_write_smoke`, `no_write_smoke_audit`, `edge_metadata_present`, and `request_contract_present`. Existing smoke trigger/audit code references these markers; the patch does not enable smoke, change trigger conditions, alter no-write metadata semantics, change the six-prompt allowlist, or affect normal customer-visible UI.
+- `56e8ef4` adds deployed/fresh pending/preflight observability for the valid six-prompt trigger before first chat execution. The controlled valid-trigger run proved that pending row appears and that `unsupported_delivery_guarantee` now refuses/qualifies guaranteed next-day home delivery using estimated/conditional timing and before-close confirmation language for that one run.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` and `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
 ## Current Retrieval / Ingestion Truth
@@ -56,16 +59,16 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` and `docs/audits/2026-05/seed-runner-typecheck-strictness.md`.
 
 ## Tactical Non-Claims
-- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
-- The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not all-routes safety or full answer quality.
+- The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run, not all-routes safety.
 - DB transaction-log mutation absence is not proven.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee successful client-capsule RAG-path behavior has a deployed/fresh fix at `826927f`; follow-up `2443caa` locally hardens the latest timing-estimate retrieval set, but it has no deployed availability or live smoke proof yet.
-- `cff68c1` is local/source proof only until deployed and read-only freshness-verified; marker visibility will prove bundle observability, not live smoke success or answer quality.
+- Unsupported delivery-guarantee successful client-capsule RAG-path behavior has accepted targeted deployed evidence in the controlled `56e8ef4` run; older `fa305b2` evidence remains historical partial evidence.
+- `cff68c1` marker visibility and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - Store-hours behavior is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without proving general store-opening hours.
-- No production Cesarin answer-quality proof.
+- No broad production Cesarin answer-quality proof beyond the bounded controlled `56e8ef4` six-prompt run.
 - No full RAG quality proof.
 - No Product Search quality proof.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.

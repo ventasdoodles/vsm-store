@@ -23,6 +23,8 @@
 - Unsupported delivery guarantee retrieval guard hardening commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
 - Stable no-write smoke public bundle markers verdict: ACCEPT WITH RESIDUAL RISK.
 - Stable no-write smoke public bundle markers commit: `cff68c1` (`test: add stable no-write smoke public bundle markers`).
+- Controlled 56e8ef4 valid-trigger no-write RAG evidence verdict: ACCEPT WITH RESIDUAL RISK.
+- Controlled 56e8ef4 baseline: deployed storefront runtime `gitShortHash` `56e8ef4`, `runtimeBuildFingerprint` `v113-56e8ef4`, and deployed AIConcierge lazy chunk containing pending/preflight markers.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -268,20 +270,48 @@
 - This is local/source proof only until deployed and read-only freshness-verified.
 - Marker visibility proves bundle observability, not runtime smoke success or answer quality.
 
+## Controlled 56e8ef4 Valid-Trigger No-Write RAG Evidence
+- Deployed freshness for `56e8ef4` was proven before the controlled trigger check:
+  - `runtime-build.json`: `gitShortHash` `56e8ef4`.
+  - Runtime fingerprint: `v113-56e8ef4`.
+  - Root HTML served the expected app shell entry assets.
+  - Deployed AIConcierge lazy chunk contained `No-write RAG quality smoke pending`, `six-prompt audit armed`, `status:"pending"`, `rag_quality_smoke`, and `authenticated_session_required`.
+- Exactly one valid deployed trigger open was authorized and performed through `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
+- No reload, retry, second trigger open, manual prompt, auth flow, browser login, storage/cookie/localStorage/token/auth-header/password/key/env inspection, cache clear, service-worker unregister, workflow run, deploy, Supabase CLI, DB work, ingestion, implementation, test change, or secret exposure occurred.
+- The page rendered normally, stayed on the valid trigger URL, populated `#root`, and did not reproduce the prior blank-render symptom.
+- Sanitized console/runtime warnings/errors: `0`.
+- Visible audit rows:
+  - One pending/preflight row for `rag_quality_smoke`: `No-write RAG quality smoke pending: six-prompt audit armed before execution.`
+  - Six `ok` rows for `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, and `unsupported_delivery_guarantee`.
+  - Each `ok` row showed metadata present, contract `customer_intelligence_no_write_v1`, writes `ai_customer_memory, ai_analytics`, call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- Existing-tab answer capture was performed without navigation, reload, retry, or second trigger open.
+
+### 56e8ef4 Per-Prompt Answer-Quality Classification
+- `payment_method`: ACCEPT WITH RESIDUAL. The captured answer says cards are processed securely via MercadoPago. Residual remains because `combined_payment_shipping` says transfer/deposit only.
+- `shipping_scope`: ACCEPT. The captured answer says shipments are only to sucursal OCURRE and no home delivery.
+- `shipping_cost`: ACCEPT WITH RESIDUAL. The captured answer gives national shipping cost as fixed between `$150` and `$180 MXN`. Residual remains because confirmation/estimate policy handling is not emphasized in this row.
+- `combined_payment_shipping`: ACCEPT WITH RESIDUAL. The captured answer says payment is transfer/deposit only. Residual remains because that conflicts with the MercadoPago/cards answer in `payment_method`.
+- `store_hours_limitation`: ACCEPT WITH RESIDUAL. The captured answer gives WhatsApp/support/order-confirmation hours Monday-Saturday 10:00 AM-7:00 PM. Residual remains because this is not broad store-opening proof.
+- `unsupported_delivery_guarantee`: ACCEPT. The captured answer refuses or qualifies guaranteed delivery tomorrow and home delivery, frames DHL timing as estimated/conditional, and says timing/costs are confirmed before closing the order.
+
+### 56e8ef4 Verdict
+- Final verdict: ACCEPT WITH RESIDUAL RISK.
+- Accepted: deployed trigger observability, pending/preflight render, bounded six-prompt no-write audit execution, visible no-write audit metadata, no blank-render reproduction, no console warnings/errors, and targeted `unsupported_delivery_guarantee` answer-quality behavior for this one run.
+- Not accepted: DB mutation absence, Product Search proof, all-routes customer-intelligence safety, original blank-render root cause, broad production readiness, broad production Cesarin answer quality, and internal payment/shipping corpus consistency.
+
 ## Non-Claims / Residuals
-- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
-- The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run.
+- The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run.
 - No DB transaction-log mutation absence proof is claimed.
-- No production answer-quality proof is accepted for all six prompts.
+- Bounded answer-quality evidence is accepted for the six prompt categories in the controlled `56e8ef4` run only; broad production answer-quality proof is not accepted.
 - No claim is made that payment/shipping policy corpus evidence is internally consistent.
-- `unsupported_delivery_guarantee` successful client-capsule RAG-path answer shaping is deployed/fresh at `fa305b2`, but the live rerun remains NEEDS FIX under a retrieved timing-estimate chunk set without OCURRE/no-domicilio evidence.
-- `2443caa` locally hardens the timing-estimate retrieval set gap, but no deployed availability, live smoke success, or production answer-quality proof is claimed.
-- `cff68c1` locally adds stable public marker observability for future freshness checks, but no deployed marker availability, live smoke success, or answer-quality proof is claimed.
+- The older `fa305b2` live rerun remains historical partial evidence where `unsupported_delivery_guarantee` was NEEDS FIX; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` behavior for one run.
+- `2443caa` retrieval/guard-gating hardening and `cff68c1` marker observability have deployed/runtime evidence only through the bounded `56e8ef4` lane described above.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual only: support/order-confirmation hours were returned, not broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
-- No production Cesarin answer-quality proof.
+- No broad production Cesarin answer-quality proof beyond the bounded `56e8ef4` six-prompt run.
 - No full RAG quality proof.
 - No Product Search quality proof.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.

@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: `cff68c1` stable no-write smoke public bundle markers, verdict ACCEPT WITH RESIDUAL RISK, local/source-only until deployed and freshness-verified.
+- Latest post-split accepted canon lane: controlled deployed `56e8ef4` valid-trigger no-write RAG evidence, verdict ACCEPT WITH RESIDUAL RISK.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,19 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Stable No-Write Smoke Public Bundle Markers
+## Latest Accepted Lane: Controlled 56e8ef4 Valid-Trigger No-Write RAG Evidence
+- Deployed baseline: `56e8ef4` (`test: add no-write smoke preflight audit state`).
+- Freshness before validation: public `runtime-build.json` returned `gitShortHash` `56e8ef4` and `runtimeBuildFingerprint` `v113-56e8ef4`; deployed AIConcierge lazy chunk contained pending/preflight markers including `No-write RAG quality smoke pending`, `six-prompt audit armed`, `status:"pending"`, `rag_quality_smoke`, and `authenticated_session_required`.
+- Exactly one deployed app-triggered valid no-write RAG trigger was opened: `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
+- The page rendered normally, stayed on the valid trigger URL, did not reproduce the prior blank-render symptom, and produced no sanitized console warnings/errors.
+- Seven visible audit rows were observed: one pending/preflight row for `rag_quality_smoke`, plus six `ok` rows for `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, and `unsupported_delivery_guarantee`.
+- Existing-tab answer capture accepted answer text for the same six rows without reload, retry, second trigger open, auth flow, browser login, storage/cookie/localStorage/token/auth-header/password/key/env inspection, cache clear, service-worker unregister, workflow, deploy, Supabase CLI, DB work, ingestion, implementation, test change, or secret exposure.
+- Per-prompt quality classification for this bounded run: `unsupported_delivery_guarantee` ACCEPT; `shipping_scope` ACCEPT; `payment_method` ACCEPT WITH RESIDUAL due MercadoPago/cards versus transfer/deposit-only corpus inconsistency; `shipping_cost` ACCEPT WITH RESIDUAL due fixed `$150-$180 MXN` range versus confirmation/estimate expectation; `combined_payment_shipping` ACCEPT WITH RESIDUAL due payment corpus inconsistency; `store_hours_limitation` ACCEPT WITH RESIDUAL because it returned WhatsApp/support/order-confirmation hours Monday-Saturday 10:00 AM-7:00 PM, not broad store-opening proof.
+- `unsupported_delivery_guarantee` now passes the targeted deployed runtime expectation after `2443caa`: it refuses or qualifies guaranteed next-day/home delivery, frames DHL timing as estimated/conditional, and says timing/costs are confirmed before closing the order.
+- Verdict: ACCEPT WITH RESIDUAL RISK. This accepts deployed trigger observability, visible preflight/pending state, bounded six-prompt no-write audit execution, and captured answer evidence for this one controlled run; it does not prove DB mutation absence, Product Search, all-routes customer-intelligence safety, original blank-render root cause, or broad production readiness.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: Stable No-Write Smoke Public Bundle Markers
 - Implementation commit: `cff68c1` (`test: add stable no-write smoke public bundle markers`).
 - Changed files: `src/lib/customer-intelligence-no-write-smoke.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -207,19 +219,19 @@
 - Detailed workflow history is indexed in `AUDIT_LOG.md` and preserved in `docs/audits/2026-05/github-actions-runtime-verification.md` plus the full archive snapshot.
 
 ## Active Residuals / Non-Claims
-- Bounded live retrieval-to-answer proof is claimed only for the single post-deploy no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke described above.
+- Bounded live retrieval-to-answer proof is claimed only for the single post-deploy no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run described above.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
-- Visible no-write audit evidence is accepted for all six prompts in the partial six-prompt smoke, but DB transaction-log mutation absence is not proven.
-- The six-prompt smoke proves deployed trigger execution and no-write audit visibility for that one run; it does not prove full RAG quality or all customer-intelligence routes.
+- Visible no-write audit evidence is accepted for all six prompts in the controlled `56e8ef4` run, but DB transaction-log mutation absence is not proven.
+- The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, no-write audit visibility, and bounded answer evidence for that one run; it does not prove full RAG quality or all customer-intelligence routes.
 - Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke, but payment/shipping corpus consistency remains unresolved.
 - No claim is made that the payment corpus is internally consistent: visible evidence still has a MercadoPago/cards versus transfer/deposit-only tension.
 - No claim is made that shipping cost policy is internally settled: visible evidence used a `$150-$180 MXN` range while confirmation/estimate handling remains a residual.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` unresolved under a retrieved timing-estimate chunk set. Follow-up `2443caa` locally hardens that retrieval/guard-gating gap, but has no deployed availability or live smoke proof yet.
-- `cff68c1` adds stable public no-write smoke marker observability for future freshness checks, but no deployed marker availability or live smoke success is claimed yet.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` was insufficient in the older `fa305b2` live rerun. Follow-up `2443caa` plus the deployed `56e8ef4` controlled run now has targeted runtime answer evidence for `unsupported_delivery_guarantee`, limited to that one run.
+- `cff68c1` stable public no-write smoke markers and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write lanes.
-- No production Cesarin answer-quality proof is claimed.
+- No broad production Cesarin answer-quality proof is claimed beyond the bounded controlled `56e8ef4` six-prompt run.
 - No full RAG quality proof is claimed.
 - No Product Search quality proof is claimed.
 - No broad production readiness or all-routes `customer-intelligence` safety proof is claimed.

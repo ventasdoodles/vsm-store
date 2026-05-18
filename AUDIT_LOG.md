@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-18 | Controlled 56e8ef4 valid-trigger no-write RAG evidence | ACCEPT WITH RESIDUAL RISK | `56e8ef4`, one deployed valid-trigger open with existing-tab answer capture | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-18 | Stable no-write smoke public bundle markers | ACCEPT WITH RESIDUAL RISK | `cff68c1` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Unsupported delivery-guarantee retrieval guard hardening | ACCEPT WITH RESIDUAL RISK | `2443caa` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | fa305b2 live six-prompt no-write RAG smoke partial evidence | PARTIAL / NEEDS TARGETED FIX | `fa305b2`, one authenticated deployed six-prompt smoke after `826927f` freshness | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
@@ -56,18 +57,16 @@
 | <= 2026-05-16 | Earlier storefront, checkout, admin, Cesarin OS, and product discovery lanes | historical canon | many | historical | `docs/archive/AUDIT_LOG_ARCHIVE_2026-05-16.md` |
 
 ## Active Non-Claims Carried Forward
-- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
-- The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not broad customer-intelligence safety.
+- The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run, not broad customer-intelligence safety.
 - DB transaction-log mutation absence is not proven.
-- The partial six-prompt smoke does not prove production answer quality for all six prompts.
+- The controlled `56e8ef4` run accepts answer evidence for the six prompt categories in that one run; it does not prove broad production answer quality.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` as NEEDS FIX under a retrieved timing-estimate chunk set.
-- The likely remaining issue is retrieval/guard-gating plus answer shaping: the live unsupported-guarantee result did not retrieve OCURRE/no-domicilio evidence needed by the `826927f` guard.
-- Follow-up `2443caa` locally hardens that retrieval/guard-gating gap for DHL/shipping timing or cutoff evidence without OCURRE/no-domicilio chunks, but remains local/source-only until deployed, freshness-verified, and smoke-tested.
-- `cff68c1` adds stable public no-write smoke marker observability for future bundle freshness checks, but remains local/source-only until deployed and freshness-verified.
+- The older `fa305b2` rerun left `unsupported_delivery_guarantee` as NEEDS FIX under a retrieved timing-estimate chunk set; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` answer evidence for one run.
+- `2443caa` retrieval/guard-gating hardening and `cff68c1` public no-write markers have deployed freshness/runtime evidence only through the bounded `56e8ef4` lane described above.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
-- No production Cesarin answer-quality proof.
+- No broad production Cesarin answer-quality proof beyond the bounded `56e8ef4` six-prompt run.
 - No full RAG quality proof.
 - No Product Search quality proof.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.
