@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: `fa305b2` live six-prompt no-write RAG smoke partial evidence, verdict PARTIAL / NEEDS TARGETED FIX after deployed storefront freshness for `826927f`.
+- Latest post-split accepted canon lane: `2443caa` unsupported delivery guarantee retrieval guard hardening, verdict ACCEPT WITH RESIDUAL RISK, local/source-only until deployed, freshness-verified, and smoke-tested.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,22 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: fa305b2 Live Six-Prompt No-Write RAG Smoke Partial Evidence
+## Latest Accepted Lane: Unsupported Delivery Guarantee Retrieval Guard Hardening
+- Implementation commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
+- Changed files: `src/lib/knowledge-rag-capsule.ts` and `src/lib/__tests__/knowledge-rag-capsule.test.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- This is a narrow local/source patch for `unsupported_delivery_guarantee` successful `knowledge_rag_foundation` / client-capsule RAG retrieval/guard-gating behavior.
+- It hardens timing/cutoff-only retrieval sets by replacing the prior OCURRE-only evidence gate with a two-tier evidence classifier: `ocurre_policy` preserves stronger DHL OCURRE / sucursal grounding when present, while `shipping_timing_policy` activates on DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence.
+- For unsupported next-day/home-delivery guarantee premises, the guard can now activate even when retrieved chunks contain DHL/shipping timing or cutoff evidence but lack OCURRE/no-domicilio chunks.
+- Timing-only evidence is framed as estimated/conditional, and guaranteed next-day/home delivery is not confirmed.
+- Ordinary prompts are not broadly rewritten because the guard still requires the unsupported guarantee query premise.
+- No no-write trigger or metadata behavior changed.
+- No docs/canon, workflow, env, package, Supabase migration/seed, no-write trigger, or no-write metadata code changed in `2443caa`.
+- Validation accepted: targeted Vitest PASS with 3 files / 20 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 2443caa^ 2443caa` PASS; commit-diff secret scan `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`. The stderr from the harness was the expected mocked Edge error-path log; tests passed.
+- This is local/source proof only until deployed, freshness-verified, and smoke-tested. Any distinct server-side Sommelier path that bypasses this mapper remains unproven.
+- Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md`.
+
+## Accepted Lane: fa305b2 Live Six-Prompt No-Write RAG Smoke Partial Evidence
 - Freshness before the smoke: storefront runtime `gitShortHash` `fa305b2`, `runtimeBuildFingerprint` `v113-fa305b2`, and deployed assets containing `826927f` successful RAG-path hardening markers plus no-write trigger/audit markers.
 - Exactly one authenticated deployed app-triggered six-prompt no-write RAG smoke rerun executed after that freshness check through `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
 - The trigger did not redirect to login, authenticated storefront execution state was available, and no tokens, cookies, localStorage, auth headers, passwords, keys, env values, service-role bearer misuse, user creation, password reset, DB mutation command, Supabase CLI, ingestion, workflow run, deploy, code/test/doc edits, extra prompt, or individual retry occurred.
@@ -187,7 +202,7 @@
 - Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke, but payment/shipping corpus consistency remains unresolved.
 - No claim is made that the payment corpus is internally consistent: visible evidence still has a MercadoPago/cards versus transfer/deposit-only tension.
 - No claim is made that shipping cost policy is internally settled: visible evidence used a `$150-$180 MXN` range while confirmation/estimate handling remains a residual.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` unresolved under a retrieved timing-estimate chunk set.
+- Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` is deployed/fresh at `fa305b2`, but the live rerun still left `unsupported_delivery_guarantee` unresolved under a retrieved timing-estimate chunk set. Follow-up `2443caa` locally hardens that retrieval/guard-gating gap, but has no deployed availability or live smoke proof yet.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write lanes.
@@ -224,6 +239,7 @@
 - Partial six-prompt no-write RAG smoke evidence.
 - Unsupported delivery-guarantee successful RAG-path hardening.
 - fa305b2 live six-prompt no-write RAG smoke partial evidence.
+- Unsupported delivery-guarantee retrieval guard hardening.
 
 ## Canon Update Rules
 - Keep this file current-state-first.

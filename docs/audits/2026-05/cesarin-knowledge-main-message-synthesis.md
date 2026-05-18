@@ -17,6 +17,8 @@
 - Unsupported delivery guarantee successful RAG-path hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Unsupported delivery guarantee successful RAG-path hardening commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
 - fa305b2 live six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
+- Unsupported delivery guarantee retrieval guard hardening verdict: ACCEPT WITH RESIDUAL RISK.
+- Unsupported delivery guarantee retrieval guard hardening commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -112,6 +114,18 @@
 - Root-cause hypothesis: the `826927f` guard likely did not activate because the live result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of the shipping / DHL OCURRE / sucursal / no-domicilio evidence required by the guard.
 - This points to a retrieval/guard-gating plus answer-shaping interaction, not a no-write audit failure.
 
+## Unsupported Delivery Guarantee Retrieval Guard Hardening
+- Commit `2443caa` is accepted with residual risk as a narrow local/source patch for the successful `knowledge_rag_foundation` / client-capsule RAG retrieval/guard-gating gap found after the `fa305b2` smoke.
+- Changed files: `src/lib/knowledge-rag-capsule.ts` and `src/lib/__tests__/knowledge-rag-capsule.test.ts`.
+- The patch replaces the prior OCURRE-only evidence gate with a two-tier evidence classifier:
+  - `ocurre_policy` preserves stronger DHL OCURRE / sucursal grounding when that evidence is present.
+  - `shipping_timing_policy` activates on DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence.
+- For unsupported next-day/home-delivery guarantee premises, the guard can now activate when retrieved chunks contain DHL/shipping timing or cutoff evidence even without OCURRE/no-domicilio chunks.
+- Timing-only evidence is framed as estimated/conditional, and guaranteed next-day/home delivery is not confirmed.
+- Ordinary prompts are not broadly rewritten because the guard still requires the unsupported guarantee query premise.
+- No no-write trigger or metadata behavior changed.
+- No docs/canon, workflow, env, package, Supabase migration/seed, no-write trigger, or no-write metadata code changed in `2443caa`.
+
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
 - Targeted ESLint: PASS with 0 errors and 1 existing warning.
@@ -154,6 +168,13 @@
   - `npm run typecheck`: PASS.
   - `git diff --check 826927f^ 826927f`: PASS.
   - Commit-diff secret scan: `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
+- Unsupported delivery guarantee retrieval guard hardening validation for `2443caa`:
+  - `npm run test:run -- src/lib/__tests__/knowledge-rag-capsule.test.ts src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts src/services/__tests__/concierge.service.knowledge-harness.test.ts`: PASS, 3 files / 20 tests.
+  - Targeted ESLint over `src/lib/knowledge-rag-capsule.ts` and `src/lib/__tests__/knowledge-rag-capsule.test.ts`: PASS.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 2443caa^ 2443caa`: PASS.
+  - Commit-diff secret scan: `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
+  - The stderr from the harness was the expected mocked Edge error-path log; tests passed.
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
@@ -164,6 +185,7 @@
 - The partial six-prompt smoke does not prove production answer quality for all six prompts.
 - No claim is made that the payment/shipping policy corpus is internally consistent.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but live answer quality remains unaccepted because the rerun still did not clearly refuse or qualify guaranteed next-day home delivery.
+- `2443caa` locally hardens the timing/cutoff retrieval guard gap, but it has no deployed availability proof, live smoke success, production answer-quality proof, or all-routes safety proof.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` improved in the fa305b2 rerun and is accepted with residual only: it returned WhatsApp/support/order-confirmation hours, not broad store-opening proof.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.

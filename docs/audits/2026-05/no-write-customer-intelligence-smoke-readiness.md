@@ -19,6 +19,8 @@
 - Unsupported delivery guarantee successful RAG-path hardening commit: `826927f` (`test: harden unsupported delivery guarantee successful RAG path`).
 - fa305b2 live six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
 - fa305b2 smoke baseline: storefront runtime `fa305b2`, `runtimeBuildFingerprint` `v113-fa305b2`, deployed assets containing `826927f` markers plus no-write trigger/audit markers.
+- Unsupported delivery guarantee retrieval guard hardening verdict: ACCEPT WITH RESIDUAL RISK.
+- Unsupported delivery guarantee retrieval guard hardening commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -225,6 +227,8 @@
 - `826927f` likely did not activate in live runtime because the guard requires unsupported-promise query context plus shipping / DHL OCURRE / sucursal policy evidence in resolved chunks.
 - The live `unsupported_delivery_guarantee` result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of OCURRE/no-domicilio evidence.
 - The remaining issue is a retrieval/guard-gating plus answer-shaping interaction, not a no-write audit failure.
+- Follow-up `2443caa` is accepted with residual risk as a local/source patch for this exact retrieval/guard-gating gap. It lets the successful RAG-path guard activate on DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence even when OCURRE/no-domicilio chunks are absent, while preserving OCURRE/sucursal grounding when present.
+- `2443caa` is not deployed, freshness-verified, or live-smoke tested in this canon entry.
 
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke and the later partial six-prompt no-write RAG smoke.
@@ -234,6 +238,7 @@
 - No production answer-quality proof is accepted for all six prompts.
 - No claim is made that payment/shipping policy corpus evidence is internally consistent.
 - `unsupported_delivery_guarantee` successful client-capsule RAG-path answer shaping is deployed/fresh at `fa305b2`, but the live rerun remains NEEDS FIX under a retrieved timing-estimate chunk set without OCURRE/no-domicilio evidence.
+- `2443caa` locally hardens the timing-estimate retrieval set gap, but no deployed availability, live smoke success, or production answer-quality proof is claimed.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual only: support/order-confirmation hours were returned, not broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
