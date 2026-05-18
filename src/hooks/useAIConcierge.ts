@@ -142,7 +142,7 @@ const NO_WRITE_RAG_QUALITY_PROMPTS = [
 type NoWriteSmokeAuditContext = {
     prompt_category?: string;
     prompt_label?: string;
-    status?: 'ok' | 'blocked' | 'error';
+    status?: 'ok' | 'blocked' | 'error' | 'pending';
     error_type?: string;
 };
 
@@ -206,6 +206,32 @@ function buildNoWriteSmokeAuditSummary(response: {
         match_strategy: typeof contract.match_strategy === 'string' ? contract.match_strategy : null,
         resolved_chunk_count: Array.isArray(contract.resolved_chunks) ? contract.resolved_chunks.length : 0,
     };
+}
+
+function buildNoWriteSmokePendingAuditSummary(): Record<string, unknown> {
+    return {
+        prompt_category: 'rag_quality_smoke',
+        prompt_label: null,
+        status: 'pending',
+        error_type: null,
+        metadata_present: false,
+        [NO_WRITE_SMOKE_EDGE_METADATA_PRESENT_FIELD]: false,
+        [NO_WRITE_SMOKE_REQUEST_CONTRACT_PRESENT_FIELD]: true,
+        contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+        suppressed_writes: [],
+        suppressed_calls: [],
+        capsule_name: null,
+        knowledge_answer_present: false,
+        main_message_present: false,
+        match_strategy: null,
+        resolved_chunk_count: 0,
+    };
+}
+
+function waitForNoWriteSmokePreflightPaint(): Promise<void> {
+    return new Promise((resolve) => {
+        setTimeout(resolve, 0);
+    });
 }
 
 export function useAIConcierge() {
@@ -607,6 +633,14 @@ export function useAIConcierge() {
             } as Partial<ConciergeMessage>);
             return;
         }
+
+        addMessage({
+            content: 'No-write RAG quality smoke pending: six-prompt audit armed before execution.',
+            capsule_contract: {
+                [NO_WRITE_SMOKE_AUDIT_FIELD]: buildNoWriteSmokePendingAuditSummary(),
+            },
+        } as Partial<ConciergeMessage>);
+        await waitForNoWriteSmokePreflightPaint();
 
         for (const { category, prompt } of NO_WRITE_RAG_QUALITY_PROMPTS) {
             await runAssistantTurn({

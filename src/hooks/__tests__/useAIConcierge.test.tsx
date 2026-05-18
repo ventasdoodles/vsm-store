@@ -295,8 +295,16 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         const auditMessages = result.current.messages.filter((message) =>
             Boolean((message as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit),
         );
-        expect(auditMessages).toHaveLength(6);
+        expect(auditMessages).toHaveLength(7);
         expect((auditMessages[0] as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            prompt_category: 'rag_quality_smoke',
+            prompt_label: null,
+            status: 'pending',
+            metadata_present: false,
+            contract: 'customer_intelligence_no_write_v1',
+            resolved_chunk_count: 0,
+        });
+        expect((auditMessages[1] as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
             prompt_category: 'payment_method',
             prompt_label: expectedPrompts[0],
             status: 'ok',
@@ -304,6 +312,49 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             contract: 'customer_intelligence_no_write_v1',
             resolved_chunk_count: 2,
         });
+    });
+
+    it('renders pending six-prompt smoke audit evidence before the first prompt resolves', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true',
+        );
+        const deferred = createDeferred<ReturnType<typeof createNoWriteSmokeResponse>>();
+        chatMock
+            .mockImplementationOnce(() => deferred.promise)
+            .mockResolvedValue(createNoWriteSmokeResponse('Respuesta segura.', 1));
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => {
+            const pendingAudit = result.current.messages.find((message) =>
+                (message as { capsule_contract?: { no_write_smoke_audit?: { status?: string } } }).capsule_contract?.no_write_smoke_audit?.status === 'pending',
+            ) as { capsule_contract?: { no_write_smoke_audit?: Record<string, unknown> } } | undefined;
+
+            expect(pendingAudit?.capsule_contract?.no_write_smoke_audit).toMatchObject({
+                prompt_category: 'rag_quality_smoke',
+                prompt_label: null,
+                status: 'pending',
+                metadata_present: false,
+                request_contract_present: true,
+                contract: 'customer_intelligence_no_write_v1',
+            });
+        });
+
+        expect(chatMock).toHaveBeenCalledTimes(1);
+        const pendingAudit = result.current.messages.find((message) =>
+            (message as { capsule_contract?: { no_write_smoke_audit?: { status?: string } } }).capsule_contract?.no_write_smoke_audit?.status === 'pending',
+        ) as { capsule_contract?: { no_write_smoke_audit?: Record<string, unknown> } } | undefined;
+        const serializedAudit = JSON.stringify(pendingAudit?.capsule_contract?.no_write_smoke_audit);
+        expect(serializedAudit).not.toContain('access_token');
+        expect(serializedAudit).not.toContain('refresh_token');
+        expect(serializedAudit).not.toContain('Authorization');
+        expect(serializedAudit).not.toContain('cookie');
+        expect(serializedAudit).not.toContain('apikey');
+
+        deferred.resolve(createNoWriteSmokeResponse('Respuesta segura.', 1));
+        await waitFor(() => expect(chatMock).toHaveBeenCalledTimes(6));
     });
 
     it('does not activate the multi-prompt RAG quality smoke for missing or incorrect mode params', async () => {
@@ -429,6 +480,34 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
 
         expect(chatMock).not.toHaveBeenCalled();
         expect((result.current.messages.at(-1) as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            metadata_present: false,
+            contract: 'customer_intelligence_no_write_v1',
+            blocked_reason: 'authenticated_session_required',
+        });
+    });
+
+    it('blocks the six-prompt no-write smoke trigger without an authenticated app user', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true',
+        );
+        authState = {
+            user: null,
+            profile: null,
+            loading: false,
+        };
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => {
+            expect(result.current.messages.at(-1)?.content).toContain('authenticated session required');
+        });
+
+        expect(chatMock).not.toHaveBeenCalled();
+        expect((result.current.messages.at(-1) as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            prompt_category: 'rag_quality_smoke',
+            status: 'blocked',
             metadata_present: false,
             contract: 'customer_intelligence_no_write_v1',
             blocked_reason: 'authenticated_session_required',
