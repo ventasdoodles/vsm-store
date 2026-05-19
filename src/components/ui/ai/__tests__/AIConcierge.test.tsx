@@ -249,7 +249,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                 {
                     id: 'assistant-smoke-1',
                     role: 'assistant',
-                    content: 'Puedes pagar con tarjeta o transferencia.',
+                    content: 'Puedes pagar por transferencia o deposito bancario.',
                     timestamp: new Date(),
                     intent: 'info',
                     capsule_contract: {

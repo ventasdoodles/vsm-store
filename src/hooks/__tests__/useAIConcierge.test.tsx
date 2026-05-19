@@ -213,12 +213,12 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1',
         );
         chatMock.mockResolvedValueOnce({
-            message: 'Puedes pagar con tarjeta y transferencia.',
+            message: 'Puedes pagar por transferencia o deposito bancario.',
             intent: 'info',
             suggestedProducts: [],
             capsule_contract: {
                 capsule_name: 'knowledge_rag_foundation',
-                ui_render_hint: 'Puedes pagar con tarjeta y transferencia.',
+                ui_render_hint: 'Puedes pagar por transferencia o deposito bancario.',
                 match_strategy: 'HIGH_CONFIDENCE_POLICY_MATCH',
                 resolved_chunks: [{ id: 'chunk-1' }],
                 no_write_smoke: {
@@ -245,7 +245,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             { noWriteSmoke: true },
         );
         await waitFor(() => {
-            expect(result.current.messages.at(-1)?.content).toContain('tarjeta');
+            expect(result.current.messages.at(-1)?.content).toContain('transferencia');
         });
         expect((result.current.messages.at(-1) as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
             prompt_category: 'combined_payment_shipping',

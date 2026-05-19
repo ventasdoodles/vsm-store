@@ -188,7 +188,7 @@ Nuestro asistente Cesarin puede ayudarte a elegir el producto ideal según tu ex
         `.trim()
     },
     {
-        title: 'Métodos de Pago Expandidos',
+        title: 'Métodos de Pago Operativos',
         source_id: 'politica-pagos-v2',
         category: 'payments',
         source_type: 'policy_doc',
@@ -196,21 +196,16 @@ Nuestro asistente Cesarin puede ayudarte a elegir el producto ideal según tu ex
         raw_text: `
 ## Métodos de Pago Aceptados — VSM Store
 
-Aceptamos múltiples métodos de pago para tu comodidad y seguridad:
+Para la base de conocimiento operativa, VSM Store acepta pagos mediante **transferencia bancaria** o **depósito bancario**.
 
-### 1. Tarjetas de Crédito y Débito
-Procesamos pagos de forma segura vía **MercadoPago**. Aceptamos:
-- Visa
-- Mastercard
-- American Express
+### 1. Transferencia Bancaria (SPEI)
+Puedes realizar transferencias directas. Los datos bancarios se comparten al finalizar tu pedido o por WhatsApp cuando se confirma la orden.
 
-### 2. Transferencia Bancaria (SPEI)
-Puedes realizar transferencias directas. Nuestra CLABE interbancaria se muestra automáticamente al finalizar tu pedido en el checkout.
+### 2. Depósito Bancario
+También puedes pagar mediante depósito bancario con el monto exacto indicado para tu pedido.
 
-### 3. Efectivo (Solo Xalapa)
-Aceptamos pagos en efectivo únicamente para entregas personales previamente acordadas en la ciudad de Xalapa, Veracruz.
-
-**Nota:** Todos los pedidos nacionales deben ser liquidados antes del envío.
+### Confirmación de pago
+Todos los pedidos deben quedar liquidados y confirmados antes del envío. Por ahora esta política no confirma pagos con tarjeta, efectivo ni PayPal desde la base RAG estática.
         `.trim()
     },
     {
@@ -250,9 +245,9 @@ Al vapear eliminas la combustión, el alquitrán y cientos de químicos tóxicos
 - **Zonas:** Cubrimos toda el área metropolitana de Xalapa.
 
 ### 2. Envíos Nacionales
-- **Costo:** Fijo entre $150 y $180 MXN.
-- **Paquetería:** DHL Express o Estafeta (según cobertura).
-- **Tiempos:** 2 a 4 días hábiles.
+- **Costo:** Se calcula según peso, destino y cobertura; se confirma antes de cerrar el pedido.
+- **Paquetería:** DHL Express a sucursal OCURRE.
+- **Tiempos:** Estimados según cobertura y operación de paquetería.
 
 ### 3. Rastreo
 Todos los envíos generan un número de guía que te compartiremos por WhatsApp para que sigas tu paquete en tiempo real.
