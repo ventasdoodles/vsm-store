@@ -2,6 +2,11 @@ name: Run Knowledge Ingestion
 
 on:
   workflow_dispatch: # Allows manual trigger
+    inputs:
+      source_ids:
+        description: 'Optional comma-separated store_knowledge source_id allowlist'
+        required: false
+        type: string
 
 jobs:
   ingest:
@@ -42,4 +47,11 @@ jobs:
         run: npm install # Using install instead of ci to be more flexible with lockfiles
 
       - name: Run Knowledge Ingestor
-        run: npx tsx supabase/seeds/seed_runner.ts
+        env:
+          SOURCE_IDS: ${{ inputs.source_ids }}
+        run: |
+          ARGS=()
+          if [ -n "$SOURCE_IDS" ]; then
+            ARGS+=("--sources=$SOURCE_IDS")
+          fi
+          npx tsx supabase/seeds/seed_runner.ts "${ARGS[@]}"

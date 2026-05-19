@@ -30,6 +30,24 @@ const doc: SeedDocument = {
   title: 'Politica de envio DHL',
 }
 
+const paymentDoc: SeedDocument = {
+  category: 'payments',
+  raw_text: '## Politica de pagos\n\nEl pago se realiza por transferencia o deposito bancario.',
+  source_filename: 'payments.md',
+  source_id: 'politica-pagos-v2',
+  source_type: 'policy_doc',
+  title: 'Politica de pagos',
+}
+
+const onboardingDoc: SeedDocument = {
+  category: 'onboarding',
+  raw_text: '## Guia de compra\n\nAgrega productos al carrito y confirma tu pedido por WhatsApp.',
+  source_filename: 'onboarding.md',
+  source_id: 'guia-onboarding-v1',
+  source_type: 'policy_doc',
+  title: 'Guia de compra',
+}
+
 class FakeSupabase implements SeedSupabaseClient {
   coverageCalls = 0
   coverageSnapshots: CoverageSnapshot[]
@@ -144,6 +162,94 @@ class FakeQuery implements PromiseLike<{ count?: number; data?: unknown; error?:
 }
 
 describe('store knowledge seed runner activation safety', () => {
+  it('processes every provided document when no source allowlist is configured', async () => {
+    const fakeSupabase = new FakeSupabase([{ total: 2, withEmbedding: 2 }])
+
+    await expect(
+      runSeed({
+        deps: {
+          generateEmbedding: async () => vector,
+          logger: silentLogger,
+          sleep: async () => undefined,
+          supabase: fakeSupabase,
+        },
+        docs: [doc, paymentDoc],
+      }),
+    ).resolves.toMatchObject({
+      docsFailed: 0,
+      docsOk: 2,
+      processedDocs: 2,
+    })
+
+    const insertedSourceIds = fakeSupabase.insertedRows.flat().map((row) => (row as { source_id: string }).source_id)
+    expect(insertedSourceIds).toEqual(['politica-envios-detallada-v1', 'politica-pagos-v2'])
+  })
+
+  it('processes exactly the configured source allowlist', async () => {
+    const fakeSupabase = new FakeSupabase([{ total: 2, withEmbedding: 2 }])
+
+    await expect(
+      runSeed({
+        deps: {
+          generateEmbedding: async () => vector,
+          logger: silentLogger,
+          sleep: async () => undefined,
+          supabase: fakeSupabase,
+        },
+        docs: [onboardingDoc, paymentDoc, doc],
+        sourceIds: ['politica-pagos-v2', 'politica-envios-detallada-v1'],
+      }),
+    ).resolves.toMatchObject({
+      docsFailed: 0,
+      docsOk: 2,
+      processedDocs: 2,
+    })
+
+    const insertedSourceIds = fakeSupabase.insertedRows.flat().map((row) => (row as { source_id: string }).source_id)
+    expect(insertedSourceIds).toEqual(['politica-pagos-v2', 'politica-envios-detallada-v1'])
+    expect(insertedSourceIds).not.toContain('guia-onboarding-v1')
+  })
+
+  it('fails safely when the source allowlist contains an unknown source_id', async () => {
+    const fakeSupabase = new FakeSupabase()
+
+    await expect(
+      runSeed({
+        deps: {
+          generateEmbedding: async () => vector,
+          logger: silentLogger,
+          sleep: async () => undefined,
+          supabase: fakeSupabase,
+        },
+        docs: [doc, paymentDoc],
+        sourceIds: ['politica-pagos-v2', 'missing-source-id'],
+      }),
+    ).rejects.toThrow(/Knowledge seed failed safety checks/)
+
+    expect(fakeSupabase.insertedRows).toHaveLength(0)
+    expect(fakeSupabase.deactivateCalls).toHaveLength(0)
+  })
+
+  it('leaves previous active rows untouched when a selected source fails', async () => {
+    const fakeSupabase = new FakeSupabase()
+
+    await expect(
+      runSeed({
+        deps: {
+          generateEmbedding: async () => null,
+          logger: silentLogger,
+          sleep: async () => undefined,
+          supabase: fakeSupabase,
+        },
+        docs: [doc, paymentDoc],
+        sourceIds: ['politica-pagos-v2'],
+      }),
+    ).rejects.toThrow(/Knowledge seed failed safety checks/)
+
+    expect(fakeSupabase.insertedRows).toHaveLength(0)
+    expect(fakeSupabase.deactivateCalls).toHaveLength(0)
+  })
+
   it('does not deactivate current active rows when embedding generation fails', async () => {
     const fakeSupabase = new FakeSupabase()
 

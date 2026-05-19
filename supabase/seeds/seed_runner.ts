@@ -93,6 +93,30 @@ function parseResumeSourceId(argv = process.argv) {
   return resumeIndex >= 0 ? argv[resumeIndex + 1]?.trim() || null : null
 }
 
+function parseSourceIds(argv = process.argv) {
+  const sourcesArg = argv.find((arg) => arg.startsWith('--sources='))
+  const rawSources = sourcesArg?.split('=')[1] ?? null
+
+  if (rawSources !== null) {
+    return rawSources
+      .split(',')
+      .map((sourceId) => sourceId.trim())
+      .filter(Boolean)
+  }
+
+  const sourcesIndex = argv.indexOf('--sources')
+  const indexedSources = sourcesIndex >= 0 ? argv[sourcesIndex + 1] : null
+
+  if (!indexedSources) {
+    return null
+  }
+
+  return indexedSources
+    .split(',')
+    .map((sourceId) => sourceId.trim())
+    .filter(Boolean)
+}
+
 function assertRequiredEnv() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL
   const serviceRoleKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY
@@ -340,8 +364,14 @@ export async function runSeed(options: {
   deps: SeedRunnerDeps
   docs?: readonly SeedDocument[]
   resumeSourceId?: string | null
+  sourceIds?: readonly string[] | null
 }): Promise<SeedRunResult> {
-  const docs = options.docs ?? SEED_DOCUMENTS
+  const availableDocs = options.docs ?? SEED_DOCUMENTS
+  const requestedSourceIds = options.sourceIds?.map((sourceId) => sourceId.trim()).filter(Boolean) ?? null
+  const requestedSourceIdSet = requestedSourceIds ? new Set(requestedSourceIds) : null
+  const docs = requestedSourceIdSet
+    ? availableDocs.filter((doc) => requestedSourceIdSet.has(doc.source_id))
+    : availableDocs
   const logger = options.deps.logger ?? console
   const deps = {
     generateEmbedding: options.deps.generateEmbedding,
@@ -350,7 +380,10 @@ export async function runSeed(options: {
   }
 
   logger.log('Starting store knowledge seed runner')
-  logger.log(`Documents available: ${docs.length}`)
+  logger.log(`Documents available: ${availableDocs.length}`)
+  if (requestedSourceIds) {
+    logger.log(`Source allowlist: ${requestedSourceIds.join(', ')}`)
+  }
   logger.log(`Embedding model: ${EMBEDDING_MODEL} (${EMBEDDING_DIMS}d)`)
 
   const preAudit = await coverageAudit(options.deps.supabase)
@@ -362,7 +395,20 @@ export async function runSeed(options: {
   const errors: string[] = []
   let resumeReached = !options.resumeSourceId
 
+  if (requestedSourceIds) {
+    const availableSourceIds = new Set(availableDocs.map((doc) => doc.source_id))
+    const missingSourceIds = requestedSourceIds.filter((sourceId) => !availableSourceIds.has(sourceId))
+
+    if (missingSourceIds.length > 0) {
+      errors.push(`Unknown source_id in allowlist: ${missingSourceIds.join(', ')}`)
+    }
+  }
+
   for (const doc of docs) {
+    if (errors.length > 0) {
+      break
+    }
+
     if (!resumeReached && doc.source_id !== options.resumeSourceId) {
       logger.log(`Skipping ${doc.source_id} until resume point ${options.resumeSourceId}`)
       continue
@@ -407,7 +453,13 @@ export async function runSeed(options: {
   }
 
   if (processedDocs === 0) {
-    errors.push(options.resumeSourceId ? `No seed documents processed; resume source_id not found: ${options.resumeSourceId}` : 'No seed documents processed')
+    errors.push(
+      options.resumeSourceId
+        ? `No seed documents processed; resume source_id not found: ${options.resumeSourceId}`
+        : requestedSourceIds
+          ? `No seed documents processed for source allowlist: ${requestedSourceIds.join(', ')}`
+          : 'No seed documents processed',
+    )
   }
 
   const postAudit = await coverageAudit(options.deps.supabase)
@@ -464,6 +516,7 @@ async function main() {
       supabase,
     },
     resumeSourceId: parseResumeSourceId(),
+    sourceIds: parseSourceIds(),
   })
 }
 
