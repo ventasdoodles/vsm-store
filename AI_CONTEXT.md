@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: controlled deployed `56e8ef4` valid-trigger no-write RAG evidence, verdict ACCEPT WITH RESIDUAL RISK.
+- Latest post-split accepted canon lane: `caec050` payment/shipping static RAG corpus normalization, verdict ACCEPT WITH RESIDUAL RISK, local/source-test only until deployed DB corpus is separately ingested/verified.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,19 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Controlled 56e8ef4 Valid-Trigger No-Write RAG Evidence
+## Latest Accepted Lane: Payment / Shipping Static RAG Corpus Normalization
+- Implementation commit: `caec050` (`test: normalize payment shipping RAG corpus policy`).
+- Changed files: `supabase/seeds/seed_knowledge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- This is a local source/test normalization for the static RAG seed corpus after the controlled `56e8ef4` run exposed payment/shipping corpus inconsistency.
+- Static RAG payment corpus no longer claims MercadoPago/cards/cash as active accepted policy; it preserves transfer/deposit-only operational policy.
+- Static RAG shipping-cost corpus no longer states fixed `$150-$180 MXN` as settled national shipping policy; it frames cost as calculated/estimated/confirmed before closing order.
+- DHL Express to sucursal OCURRE and no-domicilio policy remain preserved.
+- Validation accepted: focused Vitest PASS with 3 files / 62 tests for `src/hooks/__tests__/useAIConcierge.test.tsx`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, and `src/lib/__tests__/knowledge-rag-capsule.test.ts`; `git diff --check` PASS with only Git line-ending warnings.
+- This does not mutate deployed `store_knowledge` rows, run ingestion, run Supabase CLI, deploy, run workflows, run live smoke, or prove deployed runtime behavior. MercadoPago infrastructure is not claimed absent; any future MercadoPago policy should come from dynamic store settings or an explicit policy change.
+- Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
+
+## Accepted Lane: Controlled 56e8ef4 Valid-Trigger No-Write RAG Evidence
 - Deployed baseline: `56e8ef4` (`test: add no-write smoke preflight audit state`).
 - Freshness before validation: public `runtime-build.json` returned `gitShortHash` `56e8ef4` and `runtimeBuildFingerprint` `v113-56e8ef4`; deployed AIConcierge lazy chunk contained pending/preflight markers including `No-write RAG quality smoke pending`, `six-prompt audit armed`, `status:"pending"`, `rag_quality_smoke`, and `authenticated_session_required`.
 - Exactly one deployed app-triggered valid no-write RAG trigger was opened: `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
@@ -223,9 +235,9 @@
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
 - Visible no-write audit evidence is accepted for all six prompts in the controlled `56e8ef4` run, but DB transaction-log mutation absence is not proven.
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, no-write audit visibility, and bounded answer evidence for that one run; it does not prove full RAG quality or all customer-intelligence routes.
-- Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke, but payment/shipping corpus consistency remains unresolved.
-- No claim is made that the payment corpus is internally consistent: visible evidence still has a MercadoPago/cards versus transfer/deposit-only tension.
-- No claim is made that shipping cost policy is internally settled: visible evidence used a `$150-$180 MXN` range while confirmation/estimate handling remains a residual.
+- Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke; `caec050` normalizes the local static seed corpus, but deployed DB `store_knowledge` rows are not changed until a separate ingestion/DB lane.
+- Payment/shipping corpus consistency is accepted only at local source/test level after `caec050`; deployed corpus consistency remains unproven.
+- No claim is made that shipping cost policy is settled in deployed DB rows: `caec050` removes fixed `$150-$180 MXN` from the local seed and keeps calculated/confirmed-before-close language, but no ingestion has applied it remotely.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` was insufficient in the older `fa305b2` live rerun. Follow-up `2443caa` plus the deployed `56e8ef4` controlled run now has targeted runtime answer evidence for `unsupported_delivery_guarantee`, limited to that one run.
 - `cff68c1` stable public no-write smoke markers and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.

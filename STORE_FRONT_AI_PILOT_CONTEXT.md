@@ -29,6 +29,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Verdict for the fa305b2 rerun: PARTIAL / NEEDS TARGETED FIX. No-write coverage passed, but `unsupported_delivery_guarantee` still did not clearly refuse or qualify guaranteed next-day home delivery because the live result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of OCURRE/no-domicilio evidence.
 - Controlled 56e8ef4 valid-trigger run: after deployed freshness proved `gitShortHash` `56e8ef4`, runtime fingerprint `v113-56e8ef4`, and deployed pending/preflight markers, exactly one valid trigger open rendered normally, did not reproduce the prior blank page, and showed one pending/preflight audit row plus six `ok` category rows.
 - Existing-tab answer capture for that run is ACCEPT WITH RESIDUAL RISK: `unsupported_delivery_guarantee` and `shipping_scope` are accepted; `payment_method`, `shipping_cost`, `combined_payment_shipping`, and `store_hours_limitation` remain accepted with residuals for payment corpus consistency, fixed-cost versus confirmation/estimate policy, and support-hours versus broad store-hours scope.
+- `caec050` normalizes the local static RAG seed corpus for payment/shipping consistency: static payment policy is transfer/deposit-only, static shipping cost is calculated/estimated/confirmed before closing, and DHL OCURRE/no-domicilio policy remains preserved. This is local source/test proof only until a separate ingestion/DB lane updates and verifies deployed `store_knowledge`.
 - Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
 
 ## Current Knowledge RAG Local Harness Truth
@@ -63,7 +64,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run, not all-routes safety.
 - DB transaction-log mutation absence is not proven.
-- No claim is made that the payment/shipping policy corpus is internally consistent.
+- Payment/shipping policy corpus consistency is accepted only for local source/test after `caec050`; deployed DB `store_knowledge` consistency remains unproven until separate ingestion/DB verification.
 - Unsupported delivery-guarantee successful client-capsule RAG-path behavior has accepted targeted deployed evidence in the controlled `56e8ef4` run; older `fa305b2` evidence remains historical partial evidence.
 - `cff68c1` marker visibility and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.

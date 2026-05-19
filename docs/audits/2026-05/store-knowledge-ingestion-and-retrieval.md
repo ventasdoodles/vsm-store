@@ -13,6 +13,7 @@
 - Partial deployed six-prompt no-write RAG smoke evidence.
 - fa305b2 deployed six-prompt no-write RAG smoke partial evidence.
 - Local/source unsupported delivery-guarantee retrieval guard hardening.
+- Local/source payment/shipping static RAG corpus normalization.
 - Store knowledge ingestion activation safety hardening.
 - Ingest failure-mode safety observation.
 - Post-Gemini-repair ingest verification.
@@ -30,6 +31,7 @@
 - `826927f` added local/source successful `knowledge_rag_foundation` client-capsule answer shaping for unsupported delivery guarantee prompts; it uses query context plus shipping / DHL OCURRE / sucursal policy evidence to refuse or qualify next-day home-delivery guarantees and require timing/cost confirmation before closing the order.
 - After storefront freshness for `fa305b2` / `826927f` was proven, exactly one authenticated deployed six-prompt no-write RAG smoke rerun executed. All six prompts again returned visible no-write metadata, contract `customer_intelligence_no_write_v1`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks. The smoke remains PARTIAL / NEEDS TARGETED FIX because `unsupported_delivery_guarantee` still did not clearly refuse or qualify guaranteed next-day home delivery.
 - `2443caa` added local/source retrieval/guard-gating hardening for that gap: unsupported next-day/home-delivery guarantee premises can now activate the successful RAG-path guard on DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence even without OCURRE/no-domicilio chunks; timing-only evidence is framed as estimated/conditional and does not confirm guaranteed next-day/home delivery.
+- `caec050` normalized the local static RAG seed corpus for payment/shipping consistency. `politica-pagos-v2` no longer claims MercadoPago/cards/cash as active accepted static policy and now preserves transfer/deposit-only operational policy. The detailed national shipping-cost seed no longer states fixed `$150-$180 MXN` as settled policy and now frames cost as calculated by weight/destination/coverage and confirmed before closing. DHL Express to sucursal OCURRE and no-domicilio policy remain preserved.
 - `05e3401` locally hardened `seed_runner.ts` so chunks/embeddings are prepared before deactivation and previous active rows are only deactivated after inserted row IDs exist.
 - Failed run `25947955038` is accepted only as failure-mode safety evidence: Gemini `403 PERMISSION_DENIED` blocked embedding generation, the run failed non-zero, and logs reported previous active rows untouched.
 - Post-Gemini-repair run `25969669995` passed and post-run read-only validation found `41` active embedded `768d` rows eligible for `match_knowledge`.
@@ -48,12 +50,13 @@
 - Unsupported delivery guarantee successful RAG-path hardening `826927f`: targeted Vitest PASS for `knowledge-rag-capsule.test.ts`, `customer-intelligence-policy-degraded-fallback.test.ts`, and `concierge.service.knowledge-harness.test.ts` with 3 files / 19 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 826927f^ 826927f` PASS; commit-diff secret scan `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
 - fa305b2 deployed six-prompt no-write RAG smoke partial evidence: runtime `fa305b2` / `v113-fa305b2`, deployed assets with `826927f` and no-write trigger/audit markers, all six prompts with visible no-write audit metadata and `3` resolved chunks. `unsupported_delivery_guarantee` remained NEEDS FIX because the live result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of OCURRE/no-domicilio evidence needed by the guard.
 - Unsupported delivery guarantee retrieval guard hardening `2443caa`: targeted Vitest PASS for `knowledge-rag-capsule.test.ts`, `customer-intelligence-policy-degraded-fallback.test.ts`, and `concierge.service.knowledge-harness.test.ts` with 3 files / 20 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 2443caa^ 2443caa` PASS; commit-diff secret scan `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
+- Payment/shipping static RAG corpus normalization `caec050`: focused Vitest PASS for `src/hooks/__tests__/useAIConcierge.test.tsx`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, and `src/lib/__tests__/knowledge-rag-capsule.test.ts` with 3 files / 62 tests; `git diff --check` PASS with only Git line-ending warnings. No docs/canon, workflow, deploy, Supabase CLI, DB work, ingestion, live smoke, auth/browser/storage, cache/service-worker, or secret inspection occurred in the implementation/validation lane.
 
 ## Non-Claims / Residuals
 - No full RAG quality proof.
 - The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not all-routes customer-intelligence safety.
 - No DB transaction-log mutation absence proof.
-- No claim is made that the payment/shipping policy corpus is internally consistent.
+- Payment/shipping policy corpus consistency is accepted only at local source/test level after `caec050`; deployed DB `store_knowledge` corpus consistency remains unproven until a separate ingestion/DB verification lane.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but live answer quality remains unaccepted under the latest retrieved timing-estimate chunk set.
 - `2443caa` locally hardens that timing-estimate retrieval gap, but no deployed availability proof, live smoke success, or production answer-quality proof is claimed.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
@@ -65,4 +68,6 @@
 - `metadata.embedding_dims` mismatch remains open.
 - Retained inactive embedded rows remain as a non-blocking residual.
 - No future-ingestion guarantee is claimed.
+- No deployed DB `store_knowledge` rows changed from `caec050`; no ingestion was run.
+- MercadoPago infrastructure is not claimed absent; future activation should come from dynamic store settings or explicit business-policy change.
 - No secret value exposure is claimed.

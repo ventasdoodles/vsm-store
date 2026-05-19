@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-18 | Payment/shipping static RAG corpus normalization | ACCEPT WITH RESIDUAL RISK | `caec050` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
 | 2026-05-18 | Controlled 56e8ef4 valid-trigger no-write RAG evidence | ACCEPT WITH RESIDUAL RISK | `56e8ef4`, one deployed valid-trigger open with existing-tab answer capture | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-18 | Stable no-write smoke public bundle markers | ACCEPT WITH RESIDUAL RISK | `cff68c1` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Unsupported delivery-guarantee retrieval guard hardening | ACCEPT WITH RESIDUAL RISK | `2443caa` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
@@ -62,7 +63,7 @@
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run, not broad customer-intelligence safety.
 - DB transaction-log mutation absence is not proven.
 - The controlled `56e8ef4` run accepts answer evidence for the six prompt categories in that one run; it does not prove broad production answer quality.
-- No claim is made that the payment/shipping policy corpus is internally consistent.
+- Payment/shipping policy corpus consistency is accepted only at local source/test level after `caec050`; deployed DB `store_knowledge` corpus consistency remains unproven until a separate ingestion/DB verification lane.
 - The older `fa305b2` rerun left `unsupported_delivery_guarantee` as NEEDS FIX under a retrieved timing-estimate chunk set; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` answer evidence for one run.
 - `2443caa` retrieval/guard-gating hardening and `cff68c1` public no-write markers have deployed freshness/runtime evidence only through the bounded `56e8ef4` lane described above.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
@@ -74,4 +75,4 @@
 - No metadata cleanup.
 - No fix for `metadata.embedding_dims`.
 - No retained inactive embedded row cleanup.
-- No DB/Supabase mutation, deploy, workflow run, ingestion rerun, live smoke, or secret exposure during doc/canon split.
+- No DB/Supabase mutation, deploy, workflow run, ingestion rerun, live smoke, or secret exposure during doc/canon split or `caec050` canonization.

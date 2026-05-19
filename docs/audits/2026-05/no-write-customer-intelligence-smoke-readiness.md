@@ -298,6 +298,7 @@
 - Final verdict: ACCEPT WITH RESIDUAL RISK.
 - Accepted: deployed trigger observability, pending/preflight render, bounded six-prompt no-write audit execution, visible no-write audit metadata, no blank-render reproduction, no console warnings/errors, and targeted `unsupported_delivery_guarantee` answer-quality behavior for this one run.
 - Not accepted: DB mutation absence, Product Search proof, all-routes customer-intelligence safety, original blank-render root cause, broad production readiness, broad production Cesarin answer quality, and internal payment/shipping corpus consistency.
+- Follow-up `caec050` later normalized this payment/shipping inconsistency at local static seed/test level only; deployed DB `store_knowledge` rows and deployed trigger behavior remain unchanged until a separate ingestion/runtime lane.
 
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run.
@@ -305,7 +306,7 @@
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run.
 - No DB transaction-log mutation absence proof is claimed.
 - Bounded answer-quality evidence is accepted for the six prompt categories in the controlled `56e8ef4` run only; broad production answer-quality proof is not accepted.
-- No claim is made that payment/shipping policy corpus evidence is internally consistent.
+- Payment/shipping policy corpus consistency is accepted only at local source/test level after `caec050`; deployed DB `store_knowledge` rows may still contain the old conflicting payment/shipping chunks until separately ingested and verified.
 - The older `fa305b2` live rerun remains historical partial evidence where `unsupported_delivery_guarantee` was NEEDS FIX; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` behavior for one run.
 - `2443caa` retrieval/guard-gating hardening and `cff68c1` marker observability have deployed/runtime evidence only through the bounded `56e8ef4` lane described above.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
