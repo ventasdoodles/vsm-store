@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: `caec050` payment/shipping static RAG corpus normalization, verdict ACCEPT WITH RESIDUAL RISK, local/source-test only until deployed DB corpus is separately ingested/verified.
+- Latest post-split accepted canon lane: `7fb0a77` targeted knowledge ingestion source allowlist, verdict ACCEPT WITH RESIDUAL RISK, local source/workflow/test only until a separately authorized workflow/ingestion/DB lane executes and verifies it.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,19 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Payment / Shipping Static RAG Corpus Normalization
+## Latest Accepted Lane: Targeted Knowledge Ingestion Source Allowlist
+- Implementation commit: `7fb0a77` (`ci: add targeted knowledge ingestion source allowlist`).
+- Changed files: `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, and `src/__tests__/seed_runner.test.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- This is a local source/workflow/test patch that adds a future exact source-id allowlist path for `Run Knowledge Ingestion`.
+- `seed_runner.ts` now accepts `--sources=` with comma-separated source IDs, trims entries, processes exactly the listed seed documents, preserves missing-allowlist full-ingestion behavior, and fails safely for unknown source IDs before insert/update/deactivation.
+- The manual `Run Knowledge Ingestion` workflow remains `workflow_dispatch`; it now has optional `source_ids` input and passes `--sources=$SOURCE_IDS` only when the input is non-empty.
+- Seed-runner safety semantics remain preserved: selected docs prepare chunks/embeddings before replacement, insert active replacement rows before deactivating previous active rows, deactivate previous active rows only after inserted IDs exist, and fail non-zero if any selected source fails.
+- Validation accepted: `npm run test:run -- src/__tests__/seed_runner.test.ts` PASS with 1 file / 8 tests; `npm run typecheck` PASS; `git diff --check` PASS.
+- This did not run a workflow, ingestion, Supabase CLI, DB mutation, deploy, live smoke, auth/browser/storage action, or secret inspection. Production `store_knowledge` remains unchanged and still conflicting until a later authorized targeted execution and verification lane.
+- Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
+
+## Accepted Lane: Payment / Shipping Static RAG Corpus Normalization
 - Implementation commit: `caec050` (`test: normalize payment shipping RAG corpus policy`).
 - Changed files: `supabase/seeds/seed_knowledge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -228,6 +240,7 @@
 - `626a730` added `customer-intelligence` to the `deploy-functions` workflow, and workflow_dispatch run `25980183647` successfully deployed `customer-intelligence` plus the existing function deploy steps.
 - Workflow_dispatch run `26000841773` later succeeded on `main` at `d50379e` and confirmed current `customer-intelligence` deploy freshness for `cb6311e`, `7905b60`, and `9637596`.
 - Runtime verifications are accepted for `deploy-functions` run `25924147087`, `graqle-sync` run `25925139071`, and `ingest-knowledge` run `25927827351`.
+- `7fb0a77` adds an accepted local source allowlist path for future targeted `Run Knowledge Ingestion`; no workflow execution or ingestion is implied by that patch.
 - Detailed workflow history is indexed in `AUDIT_LOG.md` and preserved in `docs/audits/2026-05/github-actions-runtime-verification.md` plus the full archive snapshot.
 
 ## Active Residuals / Non-Claims
@@ -238,6 +251,7 @@
 - Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke; `caec050` normalizes the local static seed corpus, but deployed DB `store_knowledge` rows are not changed until a separate ingestion/DB lane.
 - Payment/shipping corpus consistency is accepted only at local source/test level after `caec050`; deployed corpus consistency remains unproven.
 - No claim is made that shipping cost policy is settled in deployed DB rows: `caec050` removes fixed `$150-$180 MXN` from the local seed and keeps calculated/confirmed-before-close language, but no ingestion has applied it remotely.
+- `7fb0a77` only provides a future targeted ingestion path; it does not apply `caec050` to deployed `store_knowledge`, run a workflow, or mutate DB rows.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` was insufficient in the older `fa305b2` live rerun. Follow-up `2443caa` plus the deployed `56e8ef4` controlled run now has targeted runtime answer evidence for `unsupported_delivery_guarantee`, limited to that one run.
 - `cff68c1` stable public no-write smoke markers and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
