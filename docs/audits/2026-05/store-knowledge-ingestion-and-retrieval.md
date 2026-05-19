@@ -15,6 +15,7 @@
 - Local/source unsupported delivery-guarantee retrieval guard hardening.
 - Local/source payment/shipping static RAG corpus normalization.
 - Local/source targeted knowledge ingestion source allowlist.
+- Targeted Run Knowledge Ingestion payment/shipping execution.
 - Store knowledge ingestion activation safety hardening.
 - Ingest failure-mode safety observation.
 - Post-Gemini-repair ingest verification.
@@ -34,6 +35,10 @@
 - `2443caa` added local/source retrieval/guard-gating hardening for that gap: unsupported next-day/home-delivery guarantee premises can now activate the successful RAG-path guard on DHL/shipping timing, cutoff, estimate, cost, coverage, or confirmation evidence even without OCURRE/no-domicilio chunks; timing-only evidence is framed as estimated/conditional and does not confirm guaranteed next-day/home delivery.
 - `caec050` normalized the local static RAG seed corpus for payment/shipping consistency. `politica-pagos-v2` no longer claims MercadoPago/cards/cash as active accepted static policy and now preserves transfer/deposit-only operational policy. The detailed national shipping-cost seed no longer states fixed `$150-$180 MXN` as settled policy and now frames cost as calculated by weight/destination/coverage and confirmed before closing. DHL Express to sucursal OCURRE and no-domicilio policy remain preserved.
 - `7fb0a77` added a local source/workflow/test path for future targeted `store_knowledge` ingestion. `seed_runner.ts` accepts `--sources=` comma-separated source IDs, processes exactly the listed seed documents, preserves missing-allowlist all-doc ingestion behavior, and fails safely for unknown source IDs before insert/update/deactivation. The manual `Run Knowledge Ingestion` workflow remains `workflow_dispatch` and adds optional `source_ids` input that passes `--sources=$SOURCE_IDS` only when provided. No workflow run, ingestion, DB mutation, deploy, Supabase CLI, live smoke, auth/browser/storage action, or secret inspection occurred.
+- Targeted run `26124496125` used the `7fb0a77` allowlist path on `main` at `ae34c110013213c15669d47dd6fc8fe5c051d7bb` with exactly `source_ids=politica-pagos-v2,politica-envios-detallada-v1`. The run succeeded, processed exactly those two source IDs, inserted `4` active replacement chunks for each, deactivated previous rows for each target, and reported `Documents processed: 2`, `Documents ok: 2`, `Documents failed: 0`.
+- Post-run read-only verification accepted deployed active target rows for `politica-pagos-v2`: `4` active rows, `4` active embedded rows, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, latest created/updated `2026-05-19T20:50:47.218463+00:00`, transfer/deposit-only payment language present, and old MercadoPago/cards/cash active accepted-payment claims absent. Remaining card/cash/PayPal wording is negative/qualifying, not an accepted-payment claim.
+- Post-run read-only verification accepted deployed active target rows for `politica-envios-detallada-v1`: `4` active rows, `4` active embedded rows, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, latest created/updated `2026-05-19T20:50:48.909625+00:00`, calculated by weight/destination/coverage and confirmed-before-closing shipping-cost language present, DHL Express to sucursal OCURRE present, and old fixed `$150-$180` / `fijo` settled national shipping-cost claim absent.
+- Adjacent source IDs `politica-pagos-v1`, `guia-onboarding-v1`, and `politica-envios-v1` appeared unchanged by active row count, active embedded count, dims/model, and older timestamps. This is accepted as sanity evidence with residual risk, not a complete DB diff.
 - `05e3401` locally hardened `seed_runner.ts` so chunks/embeddings are prepared before deactivation and previous active rows are only deactivated after inserted row IDs exist.
 - Failed run `25947955038` is accepted only as failure-mode safety evidence: Gemini `403 PERMISSION_DENIED` blocked embedding generation, the run failed non-zero, and logs reported previous active rows untouched.
 - Post-Gemini-repair run `25969669995` passed and post-run read-only validation found `41` active embedded `768d` rows eligible for `match_knowledge`.
@@ -54,13 +59,14 @@
 - Unsupported delivery guarantee retrieval guard hardening `2443caa`: targeted Vitest PASS for `knowledge-rag-capsule.test.ts`, `customer-intelligence-policy-degraded-fallback.test.ts`, and `concierge.service.knowledge-harness.test.ts` with 3 files / 20 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 2443caa^ 2443caa` PASS; commit-diff secret scan `COMMIT_DIFF_NO_SECRET_PATTERN_MATCHES`.
 - Payment/shipping static RAG corpus normalization `caec050`: focused Vitest PASS for `src/hooks/__tests__/useAIConcierge.test.tsx`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, and `src/lib/__tests__/knowledge-rag-capsule.test.ts` with 3 files / 62 tests; `git diff --check` PASS with only Git line-ending warnings. No docs/canon, workflow, deploy, Supabase CLI, DB work, ingestion, live smoke, auth/browser/storage, cache/service-worker, or secret inspection occurred in the implementation/validation lane.
 - Targeted knowledge ingestion source allowlist `7fb0a77`: focused Vitest PASS for `src/__tests__/seed_runner.test.ts` with 1 file / 8 tests; `npm run typecheck` PASS; `git diff --check` PASS. Changed only `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, and `src/__tests__/seed_runner.test.ts`.
+- Targeted Run Knowledge Ingestion `26124496125`: workflow conclusion SUCCESS, job `ingest` SUCCESS, sanitized logs confirm source allowlist `politica-pagos-v2, politica-envios-detallada-v1`, `Documents processed: 2`, `Documents ok: 2`, and `Documents failed: 0`. Post-run read-only DB verification accepted normalized active target rows and expected 768d Gemini embedding metadata.
 
 ## Non-Claims / Residuals
 - No full RAG quality proof.
 - The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not all-routes customer-intelligence safety.
 - No DB transaction-log mutation absence proof.
-- Payment/shipping policy corpus consistency is accepted only at local source/test level after `caec050`; deployed DB `store_knowledge` corpus consistency remains unproven until a separate ingestion/DB verification lane.
-- `7fb0a77` is accepted only as a future targeted ingestion path; it does not run the workflow, mutate DB rows, or apply the normalized `caec050` corpus to deployed `store_knowledge`.
+- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050` and for deployed active target rows after run `26124496125`; retrieval/RPC ranking and runtime answer quality after ingestion remain unproven.
+- `7fb0a77` is accepted as the targeted ingestion path used by run `26124496125`; no broader workflow/ingestion behavior or production corpus change outside `politica-pagos-v2` and `politica-envios-detallada-v1` is claimed.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but live answer quality remains unaccepted under the latest retrieved timing-estimate chunk set.
 - `2443caa` locally hardens that timing-estimate retrieval gap, but no deployed availability proof, live smoke success, or production answer-quality proof is claimed.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
@@ -72,7 +78,6 @@
 - `metadata.embedding_dims` mismatch remains open.
 - Retained inactive embedded rows remain as a non-blocking residual.
 - No future-ingestion guarantee is claimed.
-- No deployed DB `store_knowledge` rows changed from `caec050`; no ingestion was run.
-- No deployed DB `store_knowledge` rows changed from `7fb0a77`; no targeted workflow/ingestion has run.
+- Targeted run `26124496125` changed active deployed rows for `politica-pagos-v2` and `politica-envios-detallada-v1`; no full DB diff, inactive-row state, Product Search proof, retrieval/ranking proof, runtime answer-quality proof, live smoke, deploy, Supabase CLI, or broad production readiness is claimed.
 - MercadoPago infrastructure is not claimed absent; future activation should come from dynamic store settings or explicit business-policy change.
 - No secret value exposure is claimed.

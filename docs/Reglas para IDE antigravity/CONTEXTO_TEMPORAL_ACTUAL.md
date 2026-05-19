@@ -7,7 +7,7 @@
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
 - Fecha: 2026-05-19
-- Bloque vigente: post `7fb0a77` targeted knowledge ingestion source allowlist, aceptado con riesgo residual como prueba local source/workflow/test solamente hasta targeted workflow/ingestion/DB verification separado, sobre `caec050` payment/shipping static RAG corpus normalization, controlled deployed `56e8ef4` valid-trigger no-write RAG evidence, stable no-write smoke public bundle markers `cff68c1`, unsupported delivery-guarantee retrieval guard hardening `2443caa`, fa305b2 live six-prompt no-write RAG smoke partial evidence, unsupported delivery-guarantee successful RAG-path hardening `826927f`, payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, unsupported delivery guarantee degraded fallback answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
+- Bloque vigente: post targeted `Run Knowledge Ingestion` run `26124496125`, aceptado con riesgo residual como deployed active-row normalization para `politica-pagos-v2` y `politica-envios-detallada-v1` solamente, sobre `7fb0a77` targeted knowledge ingestion source allowlist, `caec050` payment/shipping static RAG corpus normalization, controlled deployed `56e8ef4` valid-trigger no-write RAG evidence, stable no-write smoke public bundle markers `cff68c1`, unsupported delivery-guarantee retrieval guard hardening `2443caa`, fa305b2 live six-prompt no-write RAG smoke partial evidence, unsupported delivery-guarantee successful RAG-path hardening `826927f`, payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, unsupported delivery guarantee degraded fallback answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
 - Baseline esperado: `main` alineado con `origin/main` tras el commit doc-only correspondiente.
 
 ## 2. Estado autoritativo actual
@@ -19,6 +19,7 @@
 - No se permite crear `AI_CONTEXT2.md` ni `AUDIT_LOG2.md` como continuacion lineal.
 
 ## 3. Ultimos hitos cerrados
+- Targeted Run Knowledge Ingestion payment/shipping execution: aceptado con riesgo residual. Run `26124496125`; workflow `Run Knowledge Ingestion`, `workflow_dispatch`, ref `main`, head `ae34c110013213c15669d47dd6fc8fe5c051d7bb`, input exacto `source_ids=politica-pagos-v2,politica-envios-detallada-v1`. Logs sanitizados: allowlist con esos dos source IDs, procesados `politica-pagos-v2` y `politica-envios-detallada-v1`, `4` active replacement chunks insertados para cada target, previous rows deactivated para cada target, `Documents processed: 2`, `Documents ok: 2`, `Documents failed: 0`. Post-run read-only verification acepta active target rows con `4` active / `4` embedded para cada source ID, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, payment transfer/deposit-only presente, shipping calculated/confirmed-before-close presente, DHL Express a sucursal OCURRE presente, y conflictos viejos MercadoPago/cards/cash/fixed `$150-$180` ausentes en target active rows. No prueba retrieval/RPC ranking, runtime answer quality, Product Search, all-routes safety, inactive-row state, full DB diff, ni broad production readiness.
 - Targeted knowledge ingestion source allowlist: aceptado con riesgo residual. Commit `7fb0a77`; patch local source/workflow/test estrecho en `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, y `src/__tests__/seed_runner.test.ts`. `seed_runner.ts` acepta `--sources=` con source IDs separados por coma, procesa exactamente los source IDs listados, falla con source IDs desconocidos antes de insert/update/deactivation, y conserva el full-ingestion behavior si no hay allowlist. El workflow `Run Knowledge Ingestion` sigue manual por `workflow_dispatch`, agrega input opcional `source_ids`, y pasa `--sources=$SOURCE_IDS` solo si el input no esta vacio. Se preservan los semantics de insert-before-deactivate del seed runner. Validado con focused Vitest 1 file / 8 tests, `npm run typecheck`, y `git diff --check`. No corrio workflow, ingestion, Supabase CLI, DB mutation, deploy, smoke, auth/browser/storage action, ni secret inspection. Production `store_knowledge` sigue unchanged y conflicting hasta una lane separada de targeted execution + verification.
 - Payment/shipping static RAG corpus normalization: aceptado con riesgo residual. Commit `caec050`; patch local/source-test estrecho en `supabase/seeds/seed_knowledge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, y `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. La static RAG payment corpus ya no declara MercadoPago/cards/cash como active accepted policy y conserva transfer/deposit-only operational policy. La static RAG shipping-cost corpus ya no declara fixed `$150-$180 MXN` como settled national shipping policy y ahora usa calculated/estimated/confirmed-before-close language. DHL OCURRE/no-domicilio sigue preservado. Validado con focused Vitest 3 files / 62 tests y `git diff --check`. No cambia deployed DB `store_knowledge`, no corre ingestion, no Supabase CLI, no DB mutation, no deploy, no workflow, no smoke, y no prueba runtime deployed.
 - Controlled 56e8ef4 valid-trigger no-write RAG evidence: aceptado con riesgo residual. Baseline deployed `56e8ef4`, runtime `v113-56e8ef4`, AIConcierge lazy chunk con markers pending/preflight. Se abrio exactamente una vez el trigger valido `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; no hubo reload, retry, segundo trigger open, auth, storage inspection, cache clear, service-worker unregister, workflow, deploy, Supabase CLI, DB work, ingestion, implementacion, test change ni secret exposure. La pagina renderizo normal, no reprodujo blank render, mostro una pending/preflight row y seis rows `ok`. Answer evidence: `unsupported_delivery_guarantee` ACCEPT; `shipping_scope` ACCEPT; `payment_method`, `shipping_cost`, `combined_payment_shipping`, y `store_hours_limitation` ACCEPT WITH RESIDUAL. No prueba DB mutation absence, Product Search, all-routes safety, root cause del blank original, ni broad production readiness.
@@ -45,8 +46,8 @@
 - Remote `customer-intelligence` smoke queda limitado a esos smokes deployed app-triggered explicitamente descritos.
 - El controlled `56e8ef4` run prueba ejecucion del trigger desplegado, pending/preflight observability, audit rows visibles no-write, y bounded answer evidence para ese run, no full RAG quality ni all-routes safety.
 - No DB transaction-log mutation absence proof.
-- Consistencia payment/shipping queda aceptada solo en local source/test despues de `caec050`; deployed DB `store_knowledge` puede seguir con rows anteriores hasta ingestion/DB verification separado.
-- `7fb0a77` solo agrega el bisturi para future targeted ingestion; no aplica `caec050` a deployed DB, no corre workflow, no ingestion y no DB mutation.
+- Consistencia payment/shipping queda aceptada en local source/test despues de `caec050` y en deployed active target rows despues de run `26124496125`; retrieval/RPC ranking y runtime answer quality quedan sin prueba.
+- `26124496125` cubre solo `politica-pagos-v2` y `politica-envios-detallada-v1`; no es full DB diff ni prueba inactive-row state.
 - `unsupported_delivery_guarantee` tiene accepted targeted deployed evidence en el controlled `56e8ef4` run; el live rerun `fa305b2` queda como evidencia historica parcial.
 - `cff68c1` markers publicos y `56e8ef4` pending/preflight markers tienen freshness evidence en el controlled lane actual.
 - Cualquier server-side Sommelier path distinto que evite el client-capsule mapper sigue sin prueba.
@@ -56,8 +57,8 @@
 - No Product Search quality proof.
 - No broad production readiness ni all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
-- No deployed runtime proof para `caec050`; no ingestion ni DB mutation aplicaron el corpus normalizado.
-- No deployed DB/runtime proof para `7fb0a77`; el allowlist path aun no se ejecuto.
+- No retrieval/RPC ranking proof despues de `26124496125`.
+- No deployed runtime answer-quality proof despues de `26124496125`.
 - `metadata.embedding_dims` mismatch sigue abierto salvo reparacion futura.
 - Retained inactive embedded rows siguen como residual no bloqueante salvo limpieza futura.
 - Remote sandbox RPC smoke y production admin UI observation siguen sin resolver salvo canon nuevo.
@@ -65,6 +66,7 @@
 
 ## 5. Lanes cerrados / no reabrir
 - Post-Gemini Run Knowledge Ingestion verification.
+- Targeted Run Knowledge Ingestion payment/shipping execution.
 - Targeted knowledge ingestion source allowlist.
 - `store_knowledge` active corpus repair.
 - Direct `match_knowledge` retrieval smoke.

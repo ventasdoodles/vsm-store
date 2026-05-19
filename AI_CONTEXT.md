@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: `7fb0a77` targeted knowledge ingestion source allowlist, verdict ACCEPT WITH RESIDUAL RISK, local source/workflow/test only until a separately authorized workflow/ingestion/DB lane executes and verifies it.
+- Latest post-split accepted canon lane: targeted `Run Knowledge Ingestion` run `26124496125`, verdict ACCEPT WITH RESIDUAL RISK, deployed active-row normalization accepted for `politica-pagos-v2` and `politica-envios-detallada-v1` only.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,18 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Targeted Knowledge Ingestion Source Allowlist
+## Latest Accepted Lane: Targeted Knowledge Ingestion Run
+- Workflow run: `26124496125` (`Run Knowledge Ingestion`, `workflow_dispatch`) on `main` at `ae34c110013213c15669d47dd6fc8fe5c051d7bb`.
+- Input exactly: `source_ids=politica-pagos-v2,politica-envios-detallada-v1`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- Sanitized logs showed the source allowlist, processed exactly `politica-pagos-v2` and `politica-envios-detallada-v1`, inserted `4` active replacement chunks for each, deactivated previous rows for each target, and finished with `Documents processed: 2`, `Documents ok: 2`, `Documents failed: 0`.
+- Post-run read-only verification accepted active target rows for `politica-pagos-v2`: `4` active rows, `4` active embedded rows, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, latest created/updated `2026-05-19T20:50:47.218463+00:00`, normalized transfer/deposit-only payment language present, and old MercadoPago/cards/cash accepted-payment claims absent.
+- Post-run read-only verification accepted active target rows for `politica-envios-detallada-v1`: `4` active rows, `4` active embedded rows, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, latest created/updated `2026-05-19T20:50:48.909625+00:00`, calculated/confirmed-before-closing shipping-cost language present, DHL Express to sucursal OCURRE language present, and old fixed `$150-$180` / `fijo` settled national shipping-cost claim absent.
+- Adjacent source IDs `politica-pagos-v1`, `guia-onboarding-v1`, and `politica-envios-v1` appeared unchanged by active row count, embedding count, dims/model, and older timestamps; this is sanity evidence, not a complete DB diff.
+- This run did not deploy, run live smoke, run Supabase CLI, expose secrets, prove retrieval/RPC ranking, prove runtime answer quality after ingestion, prove Product Search, prove all-routes customer-intelligence safety, prove inactive-row state, or prove broad production readiness.
+- Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
+
+## Accepted Lane: Targeted Knowledge Ingestion Source Allowlist
 - Implementation commit: `7fb0a77` (`ci: add targeted knowledge ingestion source allowlist`).
 - Changed files: `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, and `src/__tests__/seed_runner.test.ts`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -45,7 +56,7 @@
 - The manual `Run Knowledge Ingestion` workflow remains `workflow_dispatch`; it now has optional `source_ids` input and passes `--sources=$SOURCE_IDS` only when the input is non-empty.
 - Seed-runner safety semantics remain preserved: selected docs prepare chunks/embeddings before replacement, insert active replacement rows before deactivating previous active rows, deactivate previous active rows only after inserted IDs exist, and fail non-zero if any selected source fails.
 - Validation accepted: `npm run test:run -- src/__tests__/seed_runner.test.ts` PASS with 1 file / 8 tests; `npm run typecheck` PASS; `git diff --check` PASS.
-- This did not run a workflow, ingestion, Supabase CLI, DB mutation, deploy, live smoke, auth/browser/storage action, or secret inspection. Production `store_knowledge` remains unchanged and still conflicting until a later authorized targeted execution and verification lane.
+- This patch by itself did not run a workflow, ingestion, Supabase CLI, DB mutation, deploy, live smoke, auth/browser/storage action, or secret inspection. Later run `26124496125` used this path for the two accepted payment/shipping targets.
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
 ## Accepted Lane: Payment / Shipping Static RAG Corpus Normalization
@@ -240,7 +251,7 @@
 - `626a730` added `customer-intelligence` to the `deploy-functions` workflow, and workflow_dispatch run `25980183647` successfully deployed `customer-intelligence` plus the existing function deploy steps.
 - Workflow_dispatch run `26000841773` later succeeded on `main` at `d50379e` and confirmed current `customer-intelligence` deploy freshness for `cb6311e`, `7905b60`, and `9637596`.
 - Runtime verifications are accepted for `deploy-functions` run `25924147087`, `graqle-sync` run `25925139071`, and `ingest-knowledge` run `25927827351`.
-- `7fb0a77` adds an accepted local source allowlist path for future targeted `Run Knowledge Ingestion`; no workflow execution or ingestion is implied by that patch.
+- `7fb0a77` added the accepted local source allowlist path, and workflow run `26124496125` later used it for exactly `politica-pagos-v2` and `politica-envios-detallada-v1`.
 - Detailed workflow history is indexed in `AUDIT_LOG.md` and preserved in `docs/audits/2026-05/github-actions-runtime-verification.md` plus the full archive snapshot.
 
 ## Active Residuals / Non-Claims
@@ -248,10 +259,9 @@
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
 - Visible no-write audit evidence is accepted for all six prompts in the controlled `56e8ef4` run, but DB transaction-log mutation absence is not proven.
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, no-write audit visibility, and bounded answer evidence for that one run; it does not prove full RAG quality or all customer-intelligence routes.
-- Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke; `caec050` normalizes the local static seed corpus, but deployed DB `store_knowledge` rows are not changed until a separate ingestion/DB lane.
-- Payment/shipping corpus consistency is accepted only at local source/test level after `caec050`; deployed corpus consistency remains unproven.
-- No claim is made that shipping cost policy is settled in deployed DB rows: `caec050` removes fixed `$150-$180 MXN` from the local seed and keeps calculated/confirmed-before-close language, but no ingestion has applied it remotely.
-- `7fb0a77` only provides a future targeted ingestion path; it does not apply `caec050` to deployed `store_knowledge`, run a workflow, or mutate DB rows.
+- Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke; `caec050` normalized the local static seed corpus, and targeted run `26124496125` applied the normalized active rows for `politica-pagos-v2` and `politica-envios-detallada-v1` only.
+- Payment/shipping corpus consistency is accepted for local source/test after `caec050` and for deployed active target rows after `26124496125`; retrieval/RPC ranking and runtime answer quality after ingestion remain unproven.
+- No broad shipping-cost production claim is made: target active rows now carry calculated/confirmed-before-close language, but runtime retrieval and answer behavior still need separate proof.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` was insufficient in the older `fa305b2` live rerun. Follow-up `2443caa` plus the deployed `56e8ef4` controlled run now has targeted runtime answer evidence for `unsupported_delivery_guarantee`, limited to that one run.
 - `cff68c1` stable public no-write smoke markers and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
