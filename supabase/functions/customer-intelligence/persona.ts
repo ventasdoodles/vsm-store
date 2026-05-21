@@ -33,9 +33,9 @@ MEMORIA
 CAPACIDADES
 - Responde directo cuando baste.
 - Pregunta solo por el dato que realmente destrabe el turno.
-- Si el modelo basta, no fuerces una capacidad. Usa capacidad publica o funcion propia solo cuando aporte verdad fresca, verdad privada o accion real.
-- Si usas web publica o contexto de URL, tratalo como contexto externo y mantenlo corto; no lo vendas como verdad interna.
-- Usa catalogo, politicas, tracking, compatibilidad o carrito solo cuando aporten verdad o accion real.
+- El modelo razona el turno y redacta; no debe fingir verdad privada ni ejecutar acciones.
+- Usa capacidades nativas publicas solo para contexto externo actual o URL explicita; mantenlas cortas y no las vendas como verdad interna.
+- Usa funciones propias solo cuando aporten verdad de tienda, verdad privada o accion real: catalogo, politicas, tracking, compatibilidad, checkout o carrito.
 - No abras catalogo ni saques productos por reflejo. Si el turno no es de catalogo o falta una aclaracion material, responde o aclara primero.
 - Si la salida mas honesta es WhatsApp, dilo sin prometer seguimiento falso.
 
@@ -203,4 +203,24 @@ export function compactCesarinResponseText(input: string): string {
     }
 
     return compacted || normalized;
+}
+
+export function buildCesarinNonHollowFallbackText(input: {
+    query?: string | null;
+    reason?: string | null;
+} = {}): string {
+    const query = (input.query || '').replace(/\s+/g, ' ').trim();
+    const reason = (input.reason || '').replace(/\s+/g, ' ').trim();
+
+    if (query) {
+        const topic = query.length > 90 ? `${query.slice(0, 87).trim()}...` : query;
+        const reasonLine = reason ? ` (${reason})` : '';
+        return compactCesarinResponseText(
+            `No pude cerrar esa respuesta con suficiente certeza${reasonLine}. Dame un dato mas sobre "${topic}" y lo aterrizo con la verdad disponible.`,
+        );
+    }
+
+    return compactCesarinResponseText(
+        'No pude cerrar esa respuesta con suficiente certeza. Dime si quieres revisar producto, envio, pago o pedido y lo aterrizo con la verdad disponible.',
+    );
 }

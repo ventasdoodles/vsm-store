@@ -25,7 +25,7 @@ import {
     getGeminiRuntimePolicy,
 } from '../_shared/gemini-api.ts'
 
-import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, compactCesarinResponseText } from './persona.ts'
+import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, buildCesarinNonHollowFallbackText, compactCesarinResponseText } from './persona.ts'
 import { buildDegradedPolicyInquiryFallback } from './policy-degraded-fallback.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
@@ -1966,7 +1966,10 @@ serve(async (req) => {
             // TEXT GUARANTEE: Ensure aiData always has a text field before returning
             if (!aiData.text && !aiData.message) {
                 console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
-                aiData.text = compactCesarinResponseText(aiData.response || 'Estoy aquÃ­ para ayudarte. Â¿QuÃ© necesitas?') || aiData.response || 'Estoy aquÃ­ para ayudarte. Â¿QuÃ© necesitas?';
+                aiData.text = compactCesarinResponseText(aiData.response || '') || buildCesarinNonHollowFallbackText({
+                    query: query || '',
+                    reason: sommelier_gemini_error || geminiError || 'empty_model_response',
+                });
                 aiData.intent = analystReport.intent || 'support';
             }
 
