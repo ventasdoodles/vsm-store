@@ -32,6 +32,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - `caec050` normalizes the local static RAG seed corpus for payment/shipping consistency: static payment policy is transfer/deposit-only, static shipping cost is calculated/estimated/confirmed before closing, and DHL OCURRE/no-domicilio policy remains preserved. This is local source/test proof only until a separate ingestion/DB lane updates and verifies deployed `store_knowledge`.
 - `7fb0a77` adds a local source/workflow/test allowlist path for future targeted `Run Knowledge Ingestion`: `seed_runner.ts` accepts `--sources=`, the manual workflow has optional `source_ids`, and missing input preserves full ingestion behavior. This is not a workflow run, ingestion, DB mutation, or production corpus change.
 - Targeted run `26124496125` used that allowlist on `main` with exactly `source_ids=politica-pagos-v2,politica-envios-detallada-v1` and succeeded. Post-run read-only verification accepts normalized active deployed rows for those two source IDs with `768d` Gemini embeddings, old payment/shipping conflicts absent, and adjacent source IDs apparently unchanged by count/timestamp sanity check.
+- Read-only retrieval/RPC ranking after `26124496125` is ACCEPT WITH RESIDUAL RISK. `match_knowledge` with deployed `embeddings-processor`, threshold `0.5`, and count `3` retrieved normalized payment/shipping evidence for the relevant queries and did not surface old MercadoPago/cards/cash accepted-policy or fixed `$150-$180` shipping-cost claims as active accepted policy. Residuals remain because `combined_payment_shipping` did not surface `politica-pagos-v2` in top 3 and `unsupported_delivery_guarantee` did not surface explicit no-domicilio/OCURRE evidence in top 3.
 - Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
 
 ## Current Knowledge RAG Local Harness Truth
@@ -58,6 +59,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Post-Gemini-repair `Run Knowledge Ingestion` run `25969669995` passed.
 - `seed_runner.ts` has accepted local activation-safety hardening and later strictness repair; project-wide typecheck was green at `70ca5f2`.
 - `7fb0a77` adds accepted targeted source-id allowlist readiness, and run `26124496125` executed it successfully for `politica-pagos-v2` and `politica-envios-detallada-v1` only.
+- Read-only retrieval/RPC ranking after that run is accepted with residual risk; it proves normalized corpus can be retrieved by `match_knowledge`, not generated answer quality.
 - Retained inactive embedded rows remain as a non-blocking residual.
 - `metadata.embedding_dims` mismatch remains open unless separately repaired.
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` and `docs/audits/2026-05/seed-runner-typecheck-strictness.md`.
@@ -67,7 +69,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run, not all-routes safety.
 - DB transaction-log mutation absence is not proven.
-- Payment/shipping policy corpus consistency is accepted for local source/test after `caec050` and for deployed active target rows after run `26124496125`; retrieval/RPC ranking and runtime answer quality after ingestion remain unproven.
+- Payment/shipping policy corpus consistency is accepted for local source/test after `caec050`, for deployed active target rows after run `26124496125`, and for read-only retrieval/RPC ranking with residual risk; runtime answer quality after ingestion remains unproven.
 - The `26124496125` evidence covers only `politica-pagos-v2` and `politica-envios-detallada-v1`; it is not a full DB diff and does not prove inactive-row state.
 - Unsupported delivery-guarantee successful client-capsule RAG-path behavior has accepted targeted deployed evidence in the controlled `56e8ef4` run; older `fa305b2` evidence remains historical partial evidence.
 - `cff68c1` marker visibility and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.

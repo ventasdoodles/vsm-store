@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-19 | Read-only retrieval/RPC ranking after targeted ingestion | ACCEPT WITH RESIDUAL RISK | `match_knowledge`, threshold `0.5`, count `3` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
 | 2026-05-19 | Targeted Run Knowledge Ingestion payment/shipping execution | ACCEPT WITH RESIDUAL RISK | run `26124496125` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
 | 2026-05-19 | Targeted knowledge ingestion source allowlist | ACCEPT WITH RESIDUAL RISK | `7fb0a77` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
 | 2026-05-18 | Payment/shipping static RAG corpus normalization | ACCEPT WITH RESIDUAL RISK | `caec050` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
@@ -65,7 +66,7 @@
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run, not broad customer-intelligence safety.
 - DB transaction-log mutation absence is not proven.
 - The controlled `56e8ef4` run accepts answer evidence for the six prompt categories in that one run; it does not prove broad production answer quality.
-- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050` and for deployed active target rows `politica-pagos-v2` / `politica-envios-detallada-v1` after targeted run `26124496125`; retrieval/RPC ranking and runtime answer quality remain unproven.
+- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050`, for deployed active target rows `politica-pagos-v2` / `politica-envios-detallada-v1` after targeted run `26124496125`, and for read-only retrieval/RPC ranking with residual risk after the follow-up verification lane; runtime answer quality remains unproven.
 - `7fb0a77` is accepted as the local source/workflow/test allowlist path used by targeted run `26124496125`; no broader workflow/ingestion behavior or production corpus change outside the two target source IDs is claimed.
 - The older `fa305b2` rerun left `unsupported_delivery_guarantee` as NEEDS FIX under a retrieved timing-estimate chunk set; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` answer evidence for one run.
 - `2443caa` retrieval/guard-gating hardening and `cff68c1` public no-write markers have deployed freshness/runtime evidence only through the bounded `56e8ef4` lane described above.

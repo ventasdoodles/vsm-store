@@ -298,7 +298,7 @@
 - Final verdict: ACCEPT WITH RESIDUAL RISK.
 - Accepted: deployed trigger observability, pending/preflight render, bounded six-prompt no-write audit execution, visible no-write audit metadata, no blank-render reproduction, no console warnings/errors, and targeted `unsupported_delivery_guarantee` answer-quality behavior for this one run.
 - Not accepted: DB mutation absence, Product Search proof, all-routes customer-intelligence safety, original blank-render root cause, broad production readiness, broad production Cesarin answer quality, and internal payment/shipping corpus consistency.
-- Follow-up `caec050` later normalized this payment/shipping inconsistency at local static seed/test level, and targeted `Run Knowledge Ingestion` run `26124496125` later applied normalized active deployed rows for `politica-pagos-v2` and `politica-envios-detallada-v1`. Deployed trigger behavior and runtime answer quality after that ingestion remain unproven until a separate retrieval/runtime lane.
+- Follow-up `caec050` later normalized this payment/shipping inconsistency at local static seed/test level, and targeted `Run Knowledge Ingestion` run `26124496125` later applied normalized active deployed rows for `politica-pagos-v2` and `politica-envios-detallada-v1`. A later read-only retrieval/RPC lane accepted normalized `match_knowledge` ranking evidence with residual risk; deployed trigger behavior and runtime answer quality after that ingestion remain unproven until a separate bounded no-write/runtime lane.
 
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run.
@@ -306,7 +306,7 @@
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run.
 - No DB transaction-log mutation absence proof is claimed.
 - Bounded answer-quality evidence is accepted for the six prompt categories in the controlled `56e8ef4` run only; broad production answer-quality proof is not accepted.
-- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050` and for deployed active target rows after targeted run `26124496125`; retrieval/RPC ranking and runtime no-write answer quality after ingestion remain unproven.
+- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050`, for deployed active target rows after targeted run `26124496125`, and for read-only retrieval/RPC ranking with residual risk; runtime no-write answer quality after ingestion remains unproven.
 - The older `fa305b2` live rerun remains historical partial evidence where `unsupported_delivery_guarantee` was NEEDS FIX; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` behavior for one run.
 - `2443caa` retrieval/guard-gating hardening and `cff68c1` marker observability have deployed/runtime evidence only through the bounded `56e8ef4` lane described above.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
