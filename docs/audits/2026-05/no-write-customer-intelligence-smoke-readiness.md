@@ -25,6 +25,8 @@
 - Stable no-write smoke public bundle markers commit: `cff68c1` (`test: add stable no-write smoke public bundle markers`).
 - Controlled 56e8ef4 valid-trigger no-write RAG evidence verdict: ACCEPT WITH RESIDUAL RISK.
 - Controlled 56e8ef4 baseline: deployed storefront runtime `gitShortHash` `56e8ef4`, `runtimeBuildFingerprint` `v113-56e8ef4`, and deployed AIConcierge lazy chunk containing pending/preflight markers.
+- Controlled post-ingestion six-prompt no-write RAG validation verdict: ACCEPT WITH RESIDUAL RISK.
+- Controlled post-ingestion baseline: targeted ingestion run `26124496125` accepted normalized active target rows, retrieval/RPC ranking canon `1510d84` accepted read-only `match_knowledge` evidence with residual risk, and runtime generated answer quality after ingestion was pending before this validation.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -300,19 +302,57 @@
 - Not accepted: DB mutation absence, Product Search proof, all-routes customer-intelligence safety, original blank-render root cause, broad production readiness, broad production Cesarin answer quality, and internal payment/shipping corpus consistency.
 - Follow-up `caec050` later normalized this payment/shipping inconsistency at local static seed/test level, and targeted `Run Knowledge Ingestion` run `26124496125` later applied normalized active deployed rows for `politica-pagos-v2` and `politica-envios-detallada-v1`. A later read-only retrieval/RPC lane accepted normalized `match_knowledge` ranking evidence with residual risk; deployed trigger behavior and runtime answer quality after that ingestion remain unproven until a separate bounded no-write/runtime lane.
 
+## Controlled Post-Ingestion Six-Prompt No-Write RAG Validation
+- Baseline before validation:
+  - Targeted ingestion run `26124496125` succeeded for exactly `politica-pagos-v2` and `politica-envios-detallada-v1`.
+  - Post-run DB verification accepted normalized active target rows with `768d` `models/gemini-embedding-001` metadata.
+  - Read-only retrieval/RPC ranking after targeted ingestion was canonized at `1510d84` as ACCEPT WITH RESIDUAL RISK.
+  - Runtime generated answer quality after ingestion remained unproven before this lane.
+- Exactly one existing deployed no-write RAG quality app trigger was opened:
+  - `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`.
+- An existing authenticated browser session was present.
+- The URL stayed on the exact trigger URL, title was `VSM Store`, `document.readyState` was `complete`, and sanitized console warnings/errors were `0`.
+- No reload, retry, second trigger, login, storage/cookie/localStorage/token/auth-header/password/key/env inspection, manual extra prompt, workflow run, deploy, Supabase CLI, DB work, ingestion, cache clear, service-worker unregister, implementation, test change, docs/canon change, or secret exposure occurred during validation.
+- Visible audit rows:
+  - One pending/preflight row for `rag_quality_smoke`.
+  - Six `ok` prompt rows for `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, and `unsupported_delivery_guarantee`.
+- For each of the six prompt rows, visible sanitized audit evidence showed:
+  - `metadata: present`.
+  - `contract: customer_intelligence_no_write_v1`.
+  - `writes: ai_customer_memory, ai_analytics`.
+  - `calls: cesarin-qa-judge`.
+  - `capsule: knowledge_rag_foundation`.
+  - `answer/main message: present`.
+  - `match: MODERATE_CONFIDENCE_MULTI_SOURCE`.
+  - `chunks: 3`.
+
+### Post-Ingestion Per-Prompt Answer-Quality Classification
+- `payment_method`: ACCEPT WITH RESIDUAL RISK. No MercadoPago/cards/cash active accepted-payment claim appeared. Transfer/deposit grounding was visible in chunks, but the main text was terse/truncated.
+- `shipping_scope`: ACCEPT. DHL OCURRE / sucursal and no domicilio were preserved.
+- `shipping_cost`: ACCEPT. The answer said cost is calculated by weight, destination, and coverage and confirmed before closing; it did not present fixed `$150-$180` as settled national policy.
+- `combined_payment_shipping`: ACCEPT WITH RESIDUAL RISK. Normalized chunks included transfer/deposit, DHL OCURRE/no domicilio, and variable/calculated shipping; residual remains because the main answer foregrounded payment more than shipping.
+- `store_hours_limitation`: ACCEPT WITH RESIDUAL RISK and non-focus for this payment/shipping lane. The answer provided support/order-confirmation hours only, not broad store-opening proof.
+- `unsupported_delivery_guarantee`: ACCEPT. The answer refused or qualified guaranteed next-day home delivery and kept timing/cost estimated, conditional, or confirmed before closing.
+
+### Post-Ingestion Verdict
+- Final verdict: ACCEPT WITH RESIDUAL RISK.
+- Accepted: one controlled six-prompt no-write RAG validation completed successfully; no-write audit metadata passed for all six prompts; payment/shipping runtime answer/chunk evidence reflected normalized corpus for this bounded run; old MercadoPago/cards/cash active accepted-policy and fixed `$150-$180` settled shipping-cost conflicts were not present in accepted runtime evidence; unsupported delivery guarantee behavior met the bounded refusal/qualification expectation; console was clean.
+- Not accepted: DB transaction-log mutation absence proof, Product Search proof, all-routes customer-intelligence safety proof, broad production readiness, inactive-row state proof, auth/session/storage/secret proof, broad Cesarin runtime proof, a claim that MercadoPago infrastructure does not exist, proof that one bounded trigger covers all customer-intelligence routes, full RAG quality proof, or semantic completeness proof.
+- Residual risks: `store_hours_limitation` is included by the existing trigger but is not part of payment/shipping normalization; `payment_method` and `combined_payment_shipping` main messages are somewhat terse and visible chunks carry stronger grounding; visible no-write metadata is not DB transaction-log mutation proof; this is bounded runtime evidence for one controlled trigger only.
+
 ## Non-Claims / Residuals
-- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, and the controlled deployed `56e8ef4` valid-trigger run.
+- Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke, the older partial six-prompt no-write RAG smokes, the controlled deployed `56e8ef4` valid-trigger run, and the controlled post-ingestion six-prompt no-write validation.
 - Remote `customer-intelligence` smoke evidence is limited to those explicitly described deployed app-triggered no-write smokes.
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, visible no-write audit rows, and bounded answer evidence for that one run.
 - No DB transaction-log mutation absence proof is claimed.
-- Bounded answer-quality evidence is accepted for the six prompt categories in the controlled `56e8ef4` run only; broad production answer-quality proof is not accepted.
-- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050`, for deployed active target rows after targeted run `26124496125`, and for read-only retrieval/RPC ranking with residual risk; runtime no-write answer quality after ingestion remains unproven.
+- Bounded answer-quality evidence is accepted for the six prompt categories in the controlled `56e8ef4` run and for the controlled post-ingestion six-prompt no-write validation only; broad production answer-quality proof is not accepted.
+- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050`, for deployed active target rows after targeted run `26124496125`, for read-only retrieval/RPC ranking with residual risk, and for one controlled no-write runtime validation with residual risk.
 - The older `fa305b2` live rerun remains historical partial evidence where `unsupported_delivery_guarantee` was NEEDS FIX; the controlled deployed `56e8ef4` run now accepts targeted `unsupported_delivery_guarantee` behavior for one run.
 - `2443caa` retrieval/guard-gating hardening and `cff68c1` marker observability have deployed/runtime evidence only through the bounded `56e8ef4` lane described above.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual only: support/order-confirmation hours were returned, not broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
-- No broad production Cesarin answer-quality proof beyond the bounded `56e8ef4` six-prompt run.
+- No broad production Cesarin answer-quality proof beyond the bounded `56e8ef4` six-prompt run and the bounded post-ingestion six-prompt no-write validation.
 - No full RAG quality proof.
 - No Product Search quality proof.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.

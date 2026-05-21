@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: read-only retrieval/RPC ranking verification after targeted ingestion `26124496125`, verdict ACCEPT WITH RESIDUAL RISK, normalized payment/shipping corpus retrievable with residual ranking gaps and no runtime answer-quality proof.
+- Latest post-split accepted canon lane: controlled six-prompt no-write RAG validation after targeted ingestion `26124496125` and retrieval/RPC canon `1510d84`, verdict ACCEPT WITH RESIDUAL RISK, bounded runtime answer/chunk evidence accepted for one trigger with residual main-message limits.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -33,8 +33,19 @@
 - VSM Store is a PWA storefront/admin system for Vape / 420 commerce with Cesarin as the AI concierge.
 - Storefront and Cesarin OS/admin coding fronts are not reopened by default. Closed lanes stay closed unless a new prompt explicitly selects one with evidence.
 - The storefront/customer-intelligence path has accepted local harnesses for `knowledge_rag_foundation` chunk visibility, service-level knowledge handoff, main-message synthesis, scoped RAG answer-quality fixtures, seed-runner activation safety, seed-runner strictness, and no-write smoke readiness.
-- Direct `match_knowledge` retrieval has accepted read-only evidence after the active-corpus repair and after targeted ingestion `26124496125`, but that is not full RAG, Product Search, no-write behavior, or production answer-quality proof.
+- Direct `match_knowledge` retrieval has accepted read-only evidence after the active-corpus repair and after targeted ingestion `26124496125`; the later controlled six-prompt no-write trigger accepts bounded runtime answer evidence for that one run only, not Product Search, all-routes safety, or broad production readiness.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
+
+## Latest Accepted Lane: Controlled Six-Prompt No-Write RAG Validation After Targeted Ingestion
+- Validation target: existing deployed app trigger `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true` after targeted ingestion run `26124496125` and retrieval/RPC canon `1510d84`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- Execution evidence accepted: an existing authenticated browser session was present; the trigger URL was opened exactly once; no reload, retry, second trigger, login, storage inspection, manual extra prompt, workflow, deploy, Supabase CLI, DB mutation, ingestion, cache clear, service-worker unregister, or secret inspection occurred; title `VSM Store`, `document.readyState=complete`, and sanitized console warnings/errors `0`.
+- Visible audit evidence: one pending/preflight row for `rag_quality_smoke` and six `ok` prompt rows for `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, and `unsupported_delivery_guarantee`.
+- No-write metadata accepted for all six prompt rows: metadata present, contract `customer_intelligence_no_write_v1`, suppressed writes `ai_customer_memory` and `ai_analytics`, suppressed call `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- Per-prompt verdicts: `payment_method` ACCEPT WITH RESIDUAL RISK because no MercadoPago/cards/cash active accepted-policy claim appeared and transfer/deposit grounding was visible in chunks, but the main text was terse/truncated; `shipping_scope` ACCEPT for DHL OCURRE/sucursal and no domicilio; `shipping_cost` ACCEPT for calculated-by-weight/destination/coverage and confirmed-before-closing language with no fixed `$150-$180` settled national policy; `combined_payment_shipping` ACCEPT WITH RESIDUAL RISK because normalized chunks include transfer/deposit, DHL OCURRE/no domicilio, and variable/calculated shipping, while the main answer foregrounded payment more than shipping; `store_hours_limitation` ACCEPT WITH RESIDUAL RISK as non-focus support/order-confirmation hours only; `unsupported_delivery_guarantee` ACCEPT because it refused/qualified guaranteed next-day home delivery and kept timing/cost estimated, conditional, or confirmed before closing.
+- Accepted bounded claim: payment/shipping runtime answer/chunk evidence reflects the normalized corpus for this one controlled trigger, and old MercadoPago/cards/cash active accepted-policy plus fixed `$150-$180` settled shipping-cost conflicts were not present in the accepted runtime evidence.
+- Non-claims preserved: no DB transaction-log mutation absence proof, Product Search proof, all-routes customer-intelligence safety proof, broad production readiness, inactive-row state proof, auth/session/storage/secret proof, broad Cesarin runtime proof, full RAG quality proof, or semantic completeness proof.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
 
 ## Latest Accepted Lane: Read-Only Retrieval/RPC Ranking After Targeted Ingestion
 - Verification target: production `match_knowledge` through deployed `embeddings-processor`, target host metadata only `cvvlorbiwtuhkxolhfie.supabase.co`.
@@ -46,7 +57,7 @@
 - `shipping_scope`: ACCEPT. Rank 1 returned `politica-envios-v1` with OCURRE/no-home-delivery evidence; ranks 2-3 returned `politica-envios-detallada-v1`.
 - `unsupported_delivery_guarantee`: ACCEPT WITH RESIDUAL for retrieval evidence only. Top matches included timing/cutoff/estimate evidence and `politica-envios-detallada-v1` local cost/time confirmation, but no explicit no-domicilio/OCURRE chunk appeared in top 3.
 - Old conflict absence accepted for top matches: no MercadoPago/cards/cash accepted active payment policy and no fixed `$150-$180` / `fijo` settled national shipping-cost claim appeared as accepted active policy. Card/cash/PayPal wording in `politica-pagos-v2` is negative/qualifying.
-- This lane did not mutate DB, run ingestion, run workflow, deploy, run live smoke, expose secrets, prove no-write behavior, prove runtime answer quality, prove Product Search, prove all-routes customer-intelligence safety, prove inactive-row state, or prove broad production readiness.
+- This lane did not mutate DB, run ingestion, run workflow, deploy, run live smoke, expose secrets, prove no-write behavior, prove Product Search, prove all-routes customer-intelligence safety, prove inactive-row state, or prove broad production readiness. Runtime answer quality was addressed later only by the bounded six-prompt no-write trigger lane above.
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
 ## Accepted Lane: Targeted Knowledge Ingestion Run
@@ -57,7 +68,7 @@
 - Post-run read-only verification accepted active target rows for `politica-pagos-v2`: `4` active rows, `4` active embedded rows, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, latest created/updated `2026-05-19T20:50:47.218463+00:00`, normalized transfer/deposit-only payment language present, and old MercadoPago/cards/cash accepted-payment claims absent.
 - Post-run read-only verification accepted active target rows for `politica-envios-detallada-v1`: `4` active rows, `4` active embedded rows, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, latest created/updated `2026-05-19T20:50:48.909625+00:00`, calculated/confirmed-before-closing shipping-cost language present, DHL Express to sucursal OCURRE language present, and old fixed `$150-$180` / `fijo` settled national shipping-cost claim absent.
 - Adjacent source IDs `politica-pagos-v1`, `guia-onboarding-v1`, and `politica-envios-v1` appeared unchanged by active row count, embedding count, dims/model, and older timestamps; this is sanity evidence, not a complete DB diff.
-- This run did not deploy, run live smoke, run Supabase CLI, expose secrets, prove runtime answer quality after ingestion, prove Product Search, prove all-routes customer-intelligence safety, prove inactive-row state, or prove broad production readiness. Retrieval/RPC ranking was accepted later with residual risk in a separate read-only lane.
+- This run did not deploy, run live smoke, run Supabase CLI, expose secrets, prove Product Search, prove all-routes customer-intelligence safety, prove inactive-row state, or prove broad production readiness. Retrieval/RPC ranking and then bounded no-write runtime answer evidence were accepted later with residual risk in separate lanes.
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
 ## Accepted Lane: Targeted Knowledge Ingestion Source Allowlist
@@ -273,14 +284,14 @@
 - Visible no-write audit evidence is accepted for all six prompts in the controlled `56e8ef4` run, but DB transaction-log mutation absence is not proven.
 - The controlled `56e8ef4` run proves deployed trigger execution, preflight/pending observability, no-write audit visibility, and bounded answer evidence for that one run; it does not prove full RAG quality or all customer-intelligence routes.
 - Runtime failures for `payment_method` and `shipping_cost` were not reproduced in the partial smoke; `caec050` normalized the local static seed corpus, and targeted run `26124496125` applied the normalized active rows for `politica-pagos-v2` and `politica-envios-detallada-v1` only.
-- Payment/shipping corpus consistency is accepted for local source/test after `caec050`, for deployed active target rows after `26124496125`, and for read-only retrieval/RPC ranking with residual risk; runtime answer quality after ingestion remains unproven.
-- No broad shipping-cost production claim is made: target active rows now carry calculated/confirmed-before-close language and read-only retrieval/RPC can surface it, but generated runtime answer behavior still needs separate proof.
+- Payment/shipping corpus consistency is accepted for local source/test after `caec050`, for deployed active target rows after `26124496125`, for read-only retrieval/RPC ranking with residual risk, and for one controlled six-prompt no-write runtime validation with residual risk.
+- No broad shipping-cost production claim is made: target active rows now carry calculated/confirmed-before-close language, read-only retrieval/RPC can surface it, and one bounded no-write answer run accepted it, but broad generated runtime behavior still needs separate proof.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening from `826927f` was insufficient in the older `fa305b2` live rerun. Follow-up `2443caa` plus the deployed `56e8ef4` controlled run now has targeted runtime answer evidence for `unsupported_delivery_guarantee`, limited to that one run.
 - `cff68c1` stable public no-write smoke markers and `56e8ef4` pending/preflight markers have deployed freshness evidence in the current controlled lane.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual in the latest smoke: it returned WhatsApp/support/order-confirmation hours without broad store-opening proof.
 - Existing raw console diagnostics remain outside the no-write lanes.
-- No broad production Cesarin answer-quality proof is claimed beyond the bounded controlled `56e8ef4` six-prompt run.
+- No broad production Cesarin answer-quality proof is claimed beyond the bounded controlled `56e8ef4` six-prompt run and the bounded post-ingestion six-prompt no-write validation described above.
 - No full RAG quality proof is claimed.
 - No Product Search quality proof is claimed.
 - No broad production readiness or all-routes `customer-intelligence` safety proof is claimed.

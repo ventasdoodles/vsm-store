@@ -19,6 +19,7 @@
 - fa305b2 live six-prompt no-write RAG smoke verdict: PARTIAL / NEEDS TARGETED FIX.
 - Unsupported delivery guarantee retrieval guard hardening verdict: ACCEPT WITH RESIDUAL RISK.
 - Unsupported delivery guarantee retrieval guard hardening commit: `2443caa` (`test: harden unsupported delivery guarantee retrieval guard`).
+- Controlled post-ingestion six-prompt no-write RAG validation verdict: ACCEPT WITH RESIDUAL RISK.
 
 ## Accepted Scope
 - Changed implementation files:
@@ -114,6 +115,12 @@
 - Root-cause hypothesis: the `826927f` guard likely did not activate because the live result retrieved timing-estimate / same-day cutoff / local delivery chunks instead of the shipping / DHL OCURRE / sucursal / no-domicilio evidence required by the guard.
 - This points to a retrieval/guard-gating plus answer-shaping interaction, not a no-write audit failure.
 
+## Controlled Post-Ingestion Runtime Answer Evidence
+- After payment/shipping static corpus normalization, targeted ingestion run `26124496125`, and retrieval/RPC canon `1510d84`, exactly one deployed six-prompt no-write RAG quality trigger was executed and accepted with residual risk in `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+- The run showed six `ok` prompt rows with contract `customer_intelligence_no_write_v1`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks.
+- Runtime answer/chunk evidence accepted normalized payment/shipping behavior for that bounded run: no MercadoPago/cards/cash active accepted-payment claim, calculated/confirmed shipping cost instead of fixed `$150-$180`, DHL OCURRE/no domicilio where relevant, and refusal/qualification of guaranteed next-day home delivery.
+- Residuals remain because `payment_method` and `combined_payment_shipping` main messages were terse or foregrounded payment while chunks carried stronger grounding, `store_hours_limitation` is non-focus support/order-confirmation-hours evidence, and one controlled trigger does not prove broad Cesarin runtime behavior.
+
 ## Unsupported Delivery Guarantee Retrieval Guard Hardening
 - Commit `2443caa` is accepted with residual risk as a narrow local/source patch for the successful `knowledge_rag_foundation` / client-capsule RAG retrieval/guard-gating gap found after the `fa305b2` smoke.
 - Changed files: `src/lib/knowledge-rag-capsule.ts` and `src/lib/__tests__/knowledge-rag-capsule.test.ts`.
@@ -177,15 +184,15 @@
   - The stderr from the harness was the expected mocked Edge error-path log; tests passed.
 
 ## Non-Claims / Residuals
-- No live production Cesarin answer-quality proof.
-- Live retrieval-to-answer proof is limited to the separately canonized single post-deploy no-write customer-intelligence smoke and the partial six-prompt no-write RAG smoke.
+- No broad production Cesarin answer-quality proof.
+- Live retrieval-to-answer proof is limited to the separately canonized single post-deploy no-write customer-intelligence smoke, the partial six-prompt no-write RAG smokes, and the controlled post-ingestion six-prompt no-write validation.
 - Remote `customer-intelligence` smoke evidence is limited to those separately canonized deployed app-triggered no-write smokes.
 - No full RAG quality proof.
 - No Product Search quality proof.
-- The partial six-prompt smoke does not prove production answer quality for all six prompts.
-- No claim is made that the payment/shipping policy corpus is internally consistent.
-- Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but live answer quality remains unaccepted because the rerun still did not clearly refuse or qualify guaranteed next-day home delivery.
-- `2443caa` locally hardens the timing/cutoff retrieval guard gap, but it has no deployed availability proof, live smoke success, production answer-quality proof, or all-routes safety proof.
+- The partial six-prompt smokes do not prove production answer quality for all six prompts; the later controlled post-ingestion validation accepts bounded runtime evidence only for one trigger.
+- Payment/shipping policy consistency is accepted for local source/test, deployed target rows, retrieval/RPC, and one bounded no-write runtime validation, all with preserved residual risks.
+- Unsupported delivery-guarantee successful client-capsule RAG-path behavior has bounded accepted post-ingestion runtime evidence for one controlled trigger; older `fa305b2` remains historical partial evidence.
+- `2443caa` locally hardened the timing/cutoff retrieval guard gap, and later bounded runtime evidence accepted unsupported guarantee behavior for one controlled trigger only; no all-routes safety proof is claimed.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` improved in the fa305b2 rerun and is accepted with residual only: it returned WhatsApp/support/order-confirmation hours, not broad store-opening proof.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.

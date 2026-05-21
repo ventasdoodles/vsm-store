@@ -17,6 +17,7 @@
 - Local/source targeted knowledge ingestion source allowlist.
 - Targeted Run Knowledge Ingestion payment/shipping execution.
 - Read-only retrieval/RPC ranking after targeted ingestion.
+- Controlled no-write RAG runtime validation after targeted ingestion.
 - Store knowledge ingestion activation safety hardening.
 - Ingest failure-mode safety observation.
 - Post-Gemini-repair ingest verification.
@@ -42,6 +43,7 @@
 - Adjacent source IDs `politica-pagos-v1`, `guia-onboarding-v1`, and `politica-envios-v1` appeared unchanged by active row count, active embedded count, dims/model, and older timestamps. This is accepted as sanity evidence with residual risk, not a complete DB diff.
 - Read-only retrieval/RPC ranking after targeted ingestion is accepted with residual risk. Verification used deployed `embeddings-processor` plus RPC `match_knowledge` against target host metadata `cvvlorbiwtuhkxolhfie.supabase.co`, `match_threshold=0.5`, and `match_count=3`, without printing key/token/env/header values and without service-role-as-user-bearer. `payment_method` retrieved `politica-pagos-v1` rank 1 and normalized `politica-pagos-v2` ranks 2-3; `combined_payment_shipping` retrieved normalized payment plus DHL OCURRE evidence but not `politica-pagos-v2` in top 3; `shipping_cost` retrieved `politica-envios-detallada-v1` rank 1 with similarity `0.752457` and calculated/confirmed-before-close language; `shipping_scope` retrieved `politica-envios-v1` rank 1 with OCURRE/no-home-delivery and `politica-envios-detallada-v1` ranks 2-3; `unsupported_delivery_guarantee` retrieved timing/cutoff/estimate and local cost/time confirmation evidence but no explicit no-domicilio/OCURRE chunk in top 3.
 - The retrieval/RPC lane found no old conflict text in top matches as active accepted-policy content: no MercadoPago/cards/cash accepted payment policy and no fixed `$150-$180` / `fijo` settled national shipping-cost claim. Card/cash/PayPal wording in `politica-pagos-v2` is negative/qualifying.
+- Controlled no-write RAG runtime validation after targeted ingestion is accepted with residual risk in `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`. One existing deployed six-prompt app trigger ran exactly once after `26124496125` and retrieval/RPC canon `1510d84`; all six prompt rows were `ok` with `customer_intelligence_no_write_v1`, suppressed writes/call metadata, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, and `3` chunks. Payment/shipping runtime answer/chunk evidence reflected the normalized corpus for that bounded run, with residuals for terse payment/combined main messages and non-focus `store_hours_limitation`.
 - `05e3401` locally hardened `seed_runner.ts` so chunks/embeddings are prepared before deactivation and previous active rows are only deactivated after inserted row IDs exist.
 - Failed run `25947955038` is accepted only as failure-mode safety evidence: Gemini `403 PERMISSION_DENIED` blocked embedding generation, the run failed non-zero, and logs reported previous active rows untouched.
 - Post-Gemini-repair run `25969669995` passed and post-run read-only validation found `41` active embedded `768d` rows eligible for `match_knowledge`.
@@ -64,25 +66,26 @@
 - Targeted knowledge ingestion source allowlist `7fb0a77`: focused Vitest PASS for `src/__tests__/seed_runner.test.ts` with 1 file / 8 tests; `npm run typecheck` PASS; `git diff --check` PASS. Changed only `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, and `src/__tests__/seed_runner.test.ts`.
 - Targeted Run Knowledge Ingestion `26124496125`: workflow conclusion SUCCESS, job `ingest` SUCCESS, sanitized logs confirm source allowlist `politica-pagos-v2, politica-envios-detallada-v1`, `Documents processed: 2`, `Documents ok: 2`, and `Documents failed: 0`. Post-run read-only DB verification accepted normalized active target rows and expected 768d Gemini embedding metadata.
 - Read-only retrieval/RPC ranking after targeted ingestion: `match_knowledge` with threshold `0.5` and count `3` accepted normalized payment/shipping retrieval with residual risk. Per-query verdicts: `payment_method` ACCEPT, `combined_payment_shipping` ACCEPT WITH RESIDUAL, `shipping_cost` ACCEPT, `shipping_scope` ACCEPT, and `unsupported_delivery_guarantee` ACCEPT WITH RESIDUAL for retrieval evidence only.
+- Controlled post-ingestion no-write RAG validation: exactly one deployed six-prompt app-trigger validation accepted bounded runtime answer/chunk evidence with residual risk. Per-prompt verdicts: `payment_method` ACCEPT WITH RESIDUAL, `shipping_scope` ACCEPT, `shipping_cost` ACCEPT, `combined_payment_shipping` ACCEPT WITH RESIDUAL, `store_hours_limitation` ACCEPT WITH RESIDUAL as non-focus, and `unsupported_delivery_guarantee` ACCEPT.
 
 ## Non-Claims / Residuals
 - No full RAG quality proof.
 - The partial six-prompt smoke proves deployed trigger execution and visible no-write suppression metadata for that one run, not all-routes customer-intelligence safety.
 - No DB transaction-log mutation absence proof.
-- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050`, for deployed active target rows after run `26124496125`, and for read-only retrieval/RPC ranking with residual risk; runtime answer quality after ingestion remains unproven.
+- Payment/shipping policy corpus consistency is accepted at local source/test level after `caec050`, for deployed active target rows after run `26124496125`, for read-only retrieval/RPC ranking with residual risk, and for one controlled no-write runtime validation with residual risk.
 - `7fb0a77` is accepted as the targeted ingestion path used by run `26124496125`; no broader workflow/ingestion behavior or production corpus change outside `politica-pagos-v2` and `politica-envios-detallada-v1` is claimed.
 - Unsupported delivery-guarantee successful client-capsule RAG-path hardening is deployed/fresh at `fa305b2`, but live answer quality remains unaccepted under the latest retrieved timing-estimate chunk set.
 - `2443caa` locally hardens that timing-estimate retrieval gap, but no deployed availability proof, live smoke success, or production answer-quality proof is claimed.
 - Any distinct server-side Sommelier path that bypasses the client-capsule mapper remains unproven.
 - `store_hours_limitation` is accepted with residual in the fa305b2 rerun: support/order-confirmation hours were returned, not broad store-opening proof.
 - No Product Search quality proof.
-- No production Cesarin answer-quality proof.
+- No broad production Cesarin answer-quality proof beyond the bounded controlled no-write runtime validations.
 - No semantic completeness proof.
 - No metadata cleanup.
 - `metadata.embedding_dims` mismatch remains open.
 - Retained inactive embedded rows remain as a non-blocking residual.
 - No future-ingestion guarantee is claimed.
-- Targeted run `26124496125` changed active deployed rows for `politica-pagos-v2` and `politica-envios-detallada-v1`; no full DB diff, inactive-row state, Product Search proof, runtime answer-quality proof, live smoke, deploy, Supabase CLI, or broad production readiness is claimed. Retrieval/ranking proof is accepted only with residual risk in the separate read-only RPC lane.
-- Retrieval/RPC residuals remain: `combined_payment_shipping` did not surface `politica-pagos-v2` in top 3, `unsupported_delivery_guarantee` did not surface explicit no-domicilio/OCURRE in top 3, and good retrieval does not prove generated assistant answers.
+- Targeted run `26124496125` changed active deployed rows for `politica-pagos-v2` and `politica-envios-detallada-v1`; no full DB diff, inactive-row state, Product Search proof, deploy, Supabase CLI, or broad production readiness is claimed. Retrieval/ranking proof is accepted only with residual risk in the separate read-only RPC lane, and generated answer behavior is accepted only for the bounded post-ingestion no-write validation.
+- Retrieval/RPC residuals remain: `combined_payment_shipping` did not surface `politica-pagos-v2` in top 3 and `unsupported_delivery_guarantee` did not surface explicit no-domicilio/OCURRE in top 3. The later bounded no-write runtime validation accepted generated answers with residual risk, not broad answer-quality coverage.
 - MercadoPago infrastructure is not claimed absent; future activation should come from dynamic store settings or explicit business-policy change.
 - No secret value exposure is claimed.
