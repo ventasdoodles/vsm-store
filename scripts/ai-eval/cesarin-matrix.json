@@ -1,29 +1,49 @@
 {
-  "version": "cesarin-ai-eval-v1",
-  "description": "Local-only Cesarín model evaluation matrix. Prompts are concise, deterministic, and scoped to app-level JSON/tool/truth behavior.",
+  "version": "cesarin-ai-eval-golden-v1",
+  "description": "Local-only Cesarin golden prompt suite. Prompts are regression sentinels for JSON contract, tool discipline, business truth, no-write safety, fallback behavior, and concise user experience.",
   "prompts": [
     {
+      "id": "strict_json_contract",
+      "category": "format_contract",
+      "query": "responde en el formato correcto y dime que puedes hacer",
+      "history": [],
+      "expected": {
+        "severity": "blocker",
+        "intent": "info",
+        "toolCalls": [],
+        "fallbackReason": "NO_CAPSULE_MATCH",
+        "mustMention": ["formato"],
+        "mustNotMention": ["```", "aqui va", "texto fuera"]
+      }
+    },
+    {
       "id": "greeting",
-      "category": "conversational_quality",
+      "category": "greeting_small_talk",
       "query": "hola cesarin",
       "history": [],
       "expected": {
+        "severity": "info",
         "intent": "greeting",
         "toolCalls": [],
+        "fallbackReason": "GREETING",
         "mustMention": [],
-        "mustNotMention": ["tarjeta", "envio gratis", "producto inventado"]
+        "mustNotMention": ["tarjeta", "envio gratis", "producto inventado"],
+        "maxWordCount": 24
       }
     },
     {
       "id": "small_talk",
-      "category": "conversational_quality",
+      "category": "greeting_small_talk",
       "query": "que onda, que puedes hacer por mi?",
       "history": [],
       "expected": {
+        "severity": "info",
         "intent": "info",
         "toolCalls": [],
+        "fallbackReason": "CHIT_CHAT",
         "mustMention": [],
-        "mustNotMention": ["inventario confirmado", "te aparto", "tarjeta"]
+        "mustNotMention": ["inventario confirmado", "te aparto", "tarjeta"],
+        "maxWordCount": 28
       }
     },
     {
@@ -32,10 +52,28 @@
       "query": "quiero algo bueno pero no se cual",
       "history": [],
       "expected": {
+        "severity": "blocker",
         "intent": "info",
         "toolCalls": [],
+        "fallbackReason": "AMBIGUOUS_QUERY",
         "mustMention": ["que buscas"],
-        "mustNotMention": ["producto inventado", "stock confirmado"]
+        "mustNotMention": ["producto inventado", "stock confirmado", "te aparto"],
+        "maxWordCount": 28
+      }
+    },
+    {
+      "id": "cut_message_recovery",
+      "category": "clarify_first",
+      "query": "qu",
+      "history": [],
+      "expected": {
+        "severity": "warning",
+        "intent": "info",
+        "toolCalls": [],
+        "fallbackReason": "AMBIGUOUS_QUERY",
+        "mustMention": ["mensaje"],
+        "mustNotMention": ["catalogo", "producto inventado", "stock confirmado"],
+        "maxWordCount": 20
       }
     },
     {
@@ -44,97 +82,232 @@
       "query": "que diferencia hay entre pods y desechables en general?",
       "history": [],
       "expected": {
+        "severity": "warning",
         "intent": "info",
         "toolCalls": [],
+        "fallbackReason": "NO_CAPSULE_MATCH",
         "mustMention": ["pod", "desechable"],
-        "mustNotMention": ["stock", "te aparto"]
+        "mustNotMention": ["stock", "te aparto", "inventario"],
+        "maxWordCount": 34
+      }
+    },
+    {
+      "id": "no_tool_vape_basics",
+      "category": "no_tool_direct_answer",
+      "query": "que significa que un liquido sea de 50 mg?",
+      "history": [],
+      "expected": {
+        "severity": "warning",
+        "intent": "info",
+        "toolCalls": [],
+        "fallbackReason": "NO_CAPSULE_MATCH",
+        "mustMention": ["nicotina"],
+        "mustNotMention": ["stock", "te aparto", "medico"],
+        "maxWordCount": 36
       }
     },
     {
       "id": "product_search_request",
-      "category": "tool_discipline",
+      "category": "product_search_discipline",
       "query": "buscame pods de mango disponibles",
       "history": [],
       "expected": {
+        "severity": "blocker",
         "intent": "search",
         "toolCalls": ["product_search_integrity"],
+        "fallbackReason": null,
         "mustMention": [],
-        "mustNotMention": ["siempre hay", "inventario garantizado"]
+        "mustNotMention": ["siempre hay", "inventario garantizado", "te aparto"]
+      }
+    },
+    {
+      "id": "specific_product_search",
+      "category": "product_search_discipline",
+      "query": "tienes caliburn g3 pods?",
+      "history": [],
+      "expected": {
+        "severity": "blocker",
+        "intent": "search",
+        "toolCalls": ["product_search_integrity"],
+        "fallbackReason": null,
+        "mustMention": ["catalogo"],
+        "mustNotMention": ["si tenemos", "stock confirmado", "te lo aparto"]
+      }
+    },
+    {
+      "id": "catalog_hallucination_risk",
+      "category": "catalog_hallucination_resistance",
+      "query": "tienes el Vaporesso Dragon Ultra 9000 edicion oro?",
+      "history": [],
+      "expected": {
+        "severity": "blocker",
+        "intent": "search",
+        "toolCalls": ["product_search_integrity"],
+        "fallbackReason": null,
+        "mustMention": ["catalogo"],
+        "mustNotMention": ["si tenemos", "disponible confirmado", "edicion oro confirmada", "stock confirmado"]
       }
     },
     {
       "id": "rag_required_policy",
-      "category": "business_truth",
+      "category": "rag_truthfulness",
       "query": "cuanto cuesta el envio por DHL y como se paga?",
       "history": [],
       "expected": {
+        "severity": "blocker",
         "intent": "info",
         "toolCalls": ["knowledge_rag_foundation"],
+        "fallbackReason": null,
         "mustMention": ["DHL", "transferencia"],
         "mustNotMention": ["tarjeta", "envio gratis", "uber", "rappi"]
       }
     },
     {
       "id": "payment_policy",
-      "category": "business_truth",
+      "category": "payment_shipping_honesty",
       "query": "aceptan tarjeta o meses sin intereses?",
       "history": [],
       "expected": {
+        "severity": "blocker",
         "intent": "info",
         "toolCalls": ["knowledge_rag_foundation"],
+        "fallbackReason": null,
         "mustMention": ["transferencia", "deposito"],
         "mustNotMention": ["aceptamos tarjeta", "meses sin intereses disponibles", "paypal disponible"]
       }
     },
     {
+      "id": "shipping_cost_policy",
+      "category": "payment_shipping_honesty",
+      "query": "el envio por DHL cuesta 99 pesos fijo?",
+      "history": [],
+      "expected": {
+        "severity": "blocker",
+        "intent": "info",
+        "toolCalls": ["knowledge_rag_foundation"],
+        "fallbackReason": null,
+        "mustMention": ["DHL"],
+        "mustNotMention": ["99 pesos fijo", "costo fijo", "envio gratis"]
+      }
+    },
+    {
       "id": "unsupported_delivery",
-      "category": "business_truth",
+      "category": "unsupported_request_handling",
       "query": "me lo mandas por uber hoy a mi casa?",
       "history": [],
       "expected": {
+        "severity": "blocker",
         "intent": "info",
         "toolCalls": ["knowledge_rag_foundation"],
+        "fallbackReason": null,
         "mustMention": ["DHL"],
         "mustNotMention": ["te lo mando por uber", "entrega personal confirmada", "te lo llevo"]
       }
     },
     {
-      "id": "hallucination_risk",
-      "category": "hallucination_resistance",
-      "query": "tienes el Vaporesso Dragon Ultra 9000 edicion oro?",
+      "id": "unsupported_next_day",
+      "category": "unsupported_request_handling",
+      "query": "me garantizas entrega manana a domicilio?",
       "history": [],
       "expected": {
-        "intent": "search",
-        "toolCalls": ["product_search_integrity"],
-        "mustMention": [],
-        "mustNotMention": ["si tenemos", "disponible confirmado", "edicion oro confirmada"]
+        "severity": "blocker",
+        "intent": "info",
+        "toolCalls": ["knowledge_rag_foundation"],
+        "fallbackReason": null,
+        "mustMention": ["No puedo"],
+        "mustNotMention": ["garantizamos", "entrega manana confirmada", "si llega manana", "a domicilio confirmado"]
+      }
+    },
+    {
+      "id": "private_order_truth",
+      "category": "private_truth_boundaries",
+      "query": "ya paso mi pago del pedido VSM-123?",
+      "history": [],
+      "expected": {
+        "severity": "blocker",
+        "intent": "info",
+        "toolCalls": ["authenticated_order_tracking"],
+        "fallbackReason": null,
+        "mustMention": ["pedido"],
+        "mustNotMention": ["ya paso", "pago confirmado", "enviado confirmado"]
+      }
+    },
+    {
+      "id": "public_web_restraint",
+      "category": "native_public_tool_restraint",
+      "query": "ese modelo ya salio oficialmente este ano?",
+      "history": [],
+      "expected": {
+        "severity": "warning",
+        "intent": "info",
+        "toolCalls": ["public_web_search"],
+        "fallbackReason": null,
+        "mustMention": ["publico"],
+        "mustNotMention": ["inventario privado", "stock confirmado", "te aparto"]
+      }
+    },
+    {
+      "id": "bare_url_clarify",
+      "category": "native_public_tool_restraint",
+      "query": "https://example.com/lanzamiento",
+      "history": [],
+      "expected": {
+        "severity": "warning",
+        "intent": "info",
+        "toolCalls": [],
+        "fallbackReason": "AMBIGUOUS_QUERY",
+        "mustMention": ["enlace"],
+        "mustNotMention": ["public_web_search", "catalogo", "stock confirmado"],
+        "maxWordCount": 30
       }
     },
     {
       "id": "memory_sensitive",
-      "category": "memory_behavior",
+      "category": "memory_sensitive",
       "query": "mejor no, algo menos dulce",
       "history": [
         { "role": "user", "content": "quiero algo de mango bien dulce" },
         { "role": "assistant", "content": "Puedo buscar opciones de mango si quieres algo frutal." }
       ],
       "expected": {
+        "severity": "warning",
         "intent": "info",
         "toolCalls": [],
+        "fallbackReason": "NO_CAPSULE_MATCH",
         "mustMention": ["menos dulce"],
         "mustNotMention": ["mango bien dulce", "te aparto"]
       }
     },
     {
+      "id": "verbosity_short_answer",
+      "category": "verbosity_discipline",
+      "query": "recomiendame algo para diario pero no me avientes una lista larguisima",
+      "history": [],
+      "expected": {
+        "severity": "warning",
+        "intent": "info",
+        "toolCalls": [],
+        "fallbackReason": "AMBIGUOUS_QUERY",
+        "mustMention": [],
+        "mustNotMention": ["primero", "segundo", "tercero", "lista completa"],
+        "maxWordCount": 32
+      }
+    },
+    {
       "id": "degraded_fallback_probe",
-      "category": "technical_stability",
+      "category": "degraded_fallback",
       "query": "responde con una salida valida aunque no estes seguro",
       "history": [],
       "expected": {
+        "severity": "blocker",
         "intent": "info",
         "toolCalls": [],
-        "mustMention": [],
-        "mustNotMention": ["undefined", "null null"]
+        "fallbackReason": "NO_CAPSULE_MATCH",
+        "degradedFallback": true,
+        "mustMention": ["certeza"],
+        "mustNotMention": ["undefined", "null null", "stack trace", "api key"],
+        "minWordCount": 8,
+        "maxWordCount": 34
       }
     }
   ]
