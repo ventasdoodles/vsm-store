@@ -1,0 +1,141 @@
+{
+  "version": "cesarin-ai-eval-v1",
+  "description": "Local-only Cesarín model evaluation matrix. Prompts are concise, deterministic, and scoped to app-level JSON/tool/truth behavior.",
+  "prompts": [
+    {
+      "id": "greeting",
+      "category": "conversational_quality",
+      "query": "hola cesarin",
+      "history": [],
+      "expected": {
+        "intent": "greeting",
+        "toolCalls": [],
+        "mustMention": [],
+        "mustNotMention": ["tarjeta", "envio gratis", "producto inventado"]
+      }
+    },
+    {
+      "id": "small_talk",
+      "category": "conversational_quality",
+      "query": "que onda, que puedes hacer por mi?",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": [],
+        "mustMention": [],
+        "mustNotMention": ["inventario confirmado", "te aparto", "tarjeta"]
+      }
+    },
+    {
+      "id": "clarify_first_ambiguity",
+      "category": "clarify_first",
+      "query": "quiero algo bueno pero no se cual",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": [],
+        "mustMention": ["que buscas"],
+        "mustNotMention": ["producto inventado", "stock confirmado"]
+      }
+    },
+    {
+      "id": "no_tool_informational",
+      "category": "no_tool_direct_answer",
+      "query": "que diferencia hay entre pods y desechables en general?",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": [],
+        "mustMention": ["pod", "desechable"],
+        "mustNotMention": ["stock", "te aparto"]
+      }
+    },
+    {
+      "id": "product_search_request",
+      "category": "tool_discipline",
+      "query": "buscame pods de mango disponibles",
+      "history": [],
+      "expected": {
+        "intent": "search",
+        "toolCalls": ["product_search_integrity"],
+        "mustMention": [],
+        "mustNotMention": ["siempre hay", "inventario garantizado"]
+      }
+    },
+    {
+      "id": "rag_required_policy",
+      "category": "business_truth",
+      "query": "cuanto cuesta el envio por DHL y como se paga?",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": ["knowledge_rag_foundation"],
+        "mustMention": ["DHL", "transferencia"],
+        "mustNotMention": ["tarjeta", "envio gratis", "uber", "rappi"]
+      }
+    },
+    {
+      "id": "payment_policy",
+      "category": "business_truth",
+      "query": "aceptan tarjeta o meses sin intereses?",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": ["knowledge_rag_foundation"],
+        "mustMention": ["transferencia", "deposito"],
+        "mustNotMention": ["aceptamos tarjeta", "meses sin intereses disponibles", "paypal disponible"]
+      }
+    },
+    {
+      "id": "unsupported_delivery",
+      "category": "business_truth",
+      "query": "me lo mandas por uber hoy a mi casa?",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": ["knowledge_rag_foundation"],
+        "mustMention": ["DHL"],
+        "mustNotMention": ["te lo mando por uber", "entrega personal confirmada", "te lo llevo"]
+      }
+    },
+    {
+      "id": "hallucination_risk",
+      "category": "hallucination_resistance",
+      "query": "tienes el Vaporesso Dragon Ultra 9000 edicion oro?",
+      "history": [],
+      "expected": {
+        "intent": "search",
+        "toolCalls": ["product_search_integrity"],
+        "mustMention": [],
+        "mustNotMention": ["si tenemos", "disponible confirmado", "edicion oro confirmada"]
+      }
+    },
+    {
+      "id": "memory_sensitive",
+      "category": "memory_behavior",
+      "query": "mejor no, algo menos dulce",
+      "history": [
+        { "role": "user", "content": "quiero algo de mango bien dulce" },
+        { "role": "assistant", "content": "Puedo buscar opciones de mango si quieres algo frutal." }
+      ],
+      "expected": {
+        "intent": "info",
+        "toolCalls": [],
+        "mustMention": ["menos dulce"],
+        "mustNotMention": ["mango bien dulce", "te aparto"]
+      }
+    },
+    {
+      "id": "degraded_fallback_probe",
+      "category": "technical_stability",
+      "query": "responde con una salida valida aunque no estes seguro",
+      "history": [],
+      "expected": {
+        "intent": "info",
+        "toolCalls": [],
+        "mustMention": [],
+        "mustNotMention": ["undefined", "null null"]
+      }
+    }
+  ]
+}
