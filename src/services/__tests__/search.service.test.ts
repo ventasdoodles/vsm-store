@@ -11,7 +11,7 @@ vi.mock('@/lib/supabase', () => ({
 }));
 
 vi.mock('@/services/products.service', () => ({
-    mapProductVariations: (...args: unknown[]) => mapProductVariationsMock(...args),
+    mapProductVariations: (products: unknown[]) => mapProductVariationsMock(products),
 }));
 
 function createProductsQuery(data: unknown[] = []) {
