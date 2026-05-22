@@ -1510,7 +1510,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       capsule_name: 'product_search_integrity',
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
-      customer_response_draft: 'Waka Pod es compatible con cartuchos Waka X.',
+      customer_response_draft: 'La ficha de Waka Pod indica compatibilidad con cartuchos Waka X.',
       truth_signals: {
         direct_answer_complete: true,
         direct_answer_kind: 'FACT',
@@ -1577,9 +1577,16 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     const response = await conciergeService.chat('waka pod compatible con que', []);
 
     expect(response.catalog_gate?.is_open).toBe(true);
-    expect(response.message).toContain('Waka Pod es compatible con cartuchos Waka X.');
+    expect(response.message).toContain('La ficha de Waka Pod indica compatibilidad con cartuchos Waka X.');
+    expect(response.message).not.toContain('Waka Pod es compatible con');
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['waka-pod']);
     expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
+    expect((response as any).capsule_contract?.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'FACT',
+      fact_family: 'Compatibilidad',
+    });
+    expect((response as any).capsule_contract?.help_contract?.action_strength).toBe('review_only');
     expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
   });
 
