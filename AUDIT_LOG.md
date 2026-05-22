@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | Local Typewriter visual validation | ACCEPT WITH RESIDUAL RISK | focused Vitest `2` files / `33` tests; local Vite + dummy local endpoint browser QA | current canon | current canon |
 | 2026-05-22 | Customer-intelligence recovery + Typewriter UX block | ACCEPT WITH RESIDUAL RISK | `d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31` | current canon | current canon |
 | 2026-05-22 | Read-only metadata dims observer | ACCEPT - OBSERVED RESOLVED FOR CURRENT ROWS | one read-only observer command after no-DB self-check | current canon | current canon |
 | 2026-05-21 | Product Search compatibility wording micro-fix | ACCEPT WITH RESIDUAL RISK | `ba2e39a` | current canon | current canon |
@@ -86,3 +87,4 @@
 - No retained inactive embedded row cleanup occurred or is claimed.
 - No deploy, Supabase CLI, live smoke, or secret exposure during doc/canon split, `caec050` canonization, `7fb0a77` canonization, or this doc/canon update; run `26124496125` is the bounded targeted workflow/DB ingestion exception recorded above.
 - Customer-intelligence recovery + Typewriter UX block claims are local/bounded only: no production runtime behavior, deployed bundle proof, live smoke, deploy, secret change, provider/Gemini call, or real chat send-flow visual QA is claimed; Analyst `response_schema` provider compatibility remains unproven until a separate authorized provider-validation lane.
+- Local Typewriter visual validation is accepted only as local source/test plus local browser simulated-send-flow evidence; no deployed bundle, production runtime, real backend/customer-intelligence send-flow, Supabase/DB, Gemini/provider, authenticated-session, full responsive/browser matrix, or typecheck proof is claimed.

@@ -13,7 +13,7 @@
 ## 2. Baseline actual de entrada
 - Rama esperada: `main`.
 - Estado esperado: `main` limpio y alineado con `origin/main`.
-- Ultimo bloque aceptado antes de este snapshot: customer-intelligence recovery + Typewriter UX (`d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31`), canonizado como verdad local/bounded.
+- Ultimo bloque aceptado antes de este snapshot: customer-intelligence recovery + Typewriter UX (`d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31`) mas validacion visual local Typewriter, canonizado como verdad local/bounded.
 - Hito work-kit reciente: `README_WORKKIT.md` fue reducido a entrypoint/order-of-reading y ACCEPTED por Codex.
 - No hay reconciliacion canon/doc pendiente para ese hito ni para el bloque customer-intelligence recovery + Typewriter UX.
 
@@ -30,6 +30,7 @@
 - Esto no prueba estado DB futuro, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow, live smoke ni secret/auth proof.
 - Customer-intelligence recovery + Typewriter UX: ACCEPTED WITH RESIDUAL RISK. `tool_calls` malformed non-array cae a fallback neutral con metadata sanitizada; `response_schema` Analyst queda preservado por tests locales, no por provider proof; Google-first Gemini rule aplica solo a detalles de integracion Google/Gemini; token telemetry queda sanitizada como metadata; Typewriter UX queda aceptado por tests locales y visual QA local bounded para welcome latest assistant.
 - Ese bloque no prueba production runtime behavior, deployed bundle behavior, provider/Gemini acceptance, deploy/live smoke/secrets/provider calls, ni real chat send-flow visual QA.
+- Validacion visual local Typewriter posterior: ACCEPTED WITH RESIDUAL RISK. Focused Vitest Typewriter/frontend paso `2` archivos / `33` tests; browser QA local uso Vite local, placeholders publicos dummy y endpoint dummy process-local. Acepta evidencia local de animacion latest assistant, full text para usuario, full text para assistant anterior tras nueva respuesta, send-flow simulado por boton visible y layout sin ruptura obvia. No prueba deployed bundle, production runtime, backend real, Supabase/DB, Gemini/provider, auth session, responsive matrix ni typecheck.
 
 ## 5. Lanes cerrados / no reabrir por arrastre
 - `product_search_integrity` queda cerrado como wording governance solamente.
