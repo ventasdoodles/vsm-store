@@ -70,6 +70,36 @@ const AUXILIARY_MODEL = Deno.env.get('AUXILIARY_MODEL') || 'gemini-2.5-flash';
 const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-pro';
 const CONCIERGE_SOMMELIER_MODEL = Deno.env.get('CONCIERGE_SOMMELIER_MODEL') || 'gemini-2.5-pro';
 
+type GeminiTokenUsageTelemetry = {
+    model: string;
+    promptTokenCount: number | null;
+    candidatesTokenCount: number | null;
+    totalTokenCount: number | null;
+    cachedContentTokenCount: number | null;
+};
+
+function sanitizeTokenCount(value: unknown): number | null {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function buildGeminiTokenUsageTelemetry(
+    model: string,
+    usageMetadata: unknown,
+): GeminiTokenUsageTelemetry | null {
+    if (!usageMetadata || typeof usageMetadata !== 'object') {
+        return null;
+    }
+
+    const usage = usageMetadata as Record<string, unknown>;
+    return {
+        model,
+        promptTokenCount: sanitizeTokenCount(usage.promptTokenCount),
+        candidatesTokenCount: sanitizeTokenCount(usage.candidatesTokenCount),
+        totalTokenCount: sanitizeTokenCount(usage.totalTokenCount),
+        cachedContentTokenCount: sanitizeTokenCount(usage.cachedContentTokenCount),
+    };
+}
+
 const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
     { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
@@ -741,7 +771,11 @@ serve(async (req) => {
                 } else {
                     analystResult = await analystResponse.json();
                     rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    const analystUsage = buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult.usageMetadata);
                     console.warn(`[Analyst] raw status: ${analystResponse.status}, text length: ${rawAnalystText.length}`);
+                    if (analystUsage) {
+                        console.warn('[Analyst Tokens]', JSON.stringify(analystUsage));
+                    }
                 }
             } catch (e: any) {
                 if (e.name === 'AbortError') {
@@ -1709,7 +1743,11 @@ serve(async (req) => {
                     } else {
                         sommelierResult = await sommelierResponse.json();
                         rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                        const sommelierUsage = buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, sommelierResult.usageMetadata);
                         console.warn(`[Sommelier] HTTP ${sommelierResponse.status}, text length: ${rawText.length}`);
+                        if (sommelierUsage) {
+                            console.warn('[Sommelier Tokens]', JSON.stringify(sommelierUsage));
+                        }
                     }
                 } catch (e: any) {
                     if (e.name === 'AbortError') {
@@ -2092,7 +2130,12 @@ serve(async (req) => {
                             fallback_empty: fallbackEmpty
                         },
                         product_match_count: productMatchCount,
-                        policy_match_count: knowledgeMatchCountForTelemetry
+                        policy_match_count: knowledgeMatchCountForTelemetry,
+                        // Token usage observability for cost analysis
+                        token_usage: {
+                            analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata),
+                            sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, sommelierResult?.usageMetadata),
+                        },
                     }
                 };
                 const suppressEdgeAnalytics = shouldSuppressCustomerIntelligenceWrite(noWriteSmoke, 'ai_analytics');

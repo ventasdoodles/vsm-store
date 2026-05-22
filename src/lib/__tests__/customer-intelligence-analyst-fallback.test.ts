@@ -75,6 +75,25 @@ function parseAnalystReportForContract(rawAnalystText: string) {
   return analystReport;
 }
 
+function sanitizeTestTokenCount(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function buildTestGeminiTokenUsageTelemetry(model: string, usageMetadata: unknown) {
+  if (!usageMetadata || typeof usageMetadata !== 'object') {
+    return null;
+  }
+
+  const usage = usageMetadata as Record<string, unknown>;
+  return {
+    model,
+    promptTokenCount: sanitizeTestTokenCount(usage.promptTokenCount),
+    candidatesTokenCount: sanitizeTestTokenCount(usage.candidatesTokenCount),
+    totalTokenCount: sanitizeTestTokenCount(usage.totalTokenCount),
+    cachedContentTokenCount: sanitizeTestTokenCount(usage.cachedContentTokenCount),
+  };
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -239,5 +258,72 @@ describe('customer-intelligence analyst degradation fallback', () => {
     expect(analystRequestBlock).toContain("name: { type: 'STRING' }");
     expect(analystRequestBlock).toContain("args: { type: 'OBJECT' }");
     expect(analystRequestBlock).toContain("required: ['name', 'args']");
+  });
+
+  it('builds sanitized token_usage from model identifiers and numeric token metadata only', () => {
+    const telemetry = buildTestGeminiTokenUsageTelemetry('gemini-2.5-pro', {
+      promptTokenCount: 12,
+      candidatesTokenCount: 34,
+      totalTokenCount: 46,
+      cachedContentTokenCount: 5,
+      prompt: 'SECRET_PROMPT_DO_NOT_LOG',
+      customer_text: 'CUSTOMER_MESSAGE_DO_NOT_LOG',
+      raw_provider_response: 'RAW_PROVIDER_RESPONSE_DO_NOT_LOG',
+      headers: { Authorization: 'Bearer token' },
+      api_key: 'sk-live-secret',
+    });
+
+    expect(telemetry).toEqual({
+      model: 'gemini-2.5-pro',
+      promptTokenCount: 12,
+      candidatesTokenCount: 34,
+      totalTokenCount: 46,
+      cachedContentTokenCount: 5,
+    });
+    expect(JSON.stringify(telemetry)).not.toMatch(
+      /SECRET_PROMPT_DO_NOT_LOG|CUSTOMER_MESSAGE_DO_NOT_LOG|RAW_PROVIDER_RESPONSE_DO_NOT_LOG|Authorization|Bearer token|sk-live-secret/
+    );
+  });
+
+  it('keeps Analyst and Sommelier token logs sanitized', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const analystUsage = buildTestGeminiTokenUsageTelemetry('gemini-2.5-pro', {
+      promptTokenCount: 1,
+      candidatesTokenCount: 2,
+      totalTokenCount: 3,
+      prompt: 'SECRET_PROMPT_DO_NOT_LOG',
+      raw_provider_response: 'RAW_PROVIDER_RESPONSE_DO_NOT_LOG',
+    });
+    const sommelierUsage = buildTestGeminiTokenUsageTelemetry('gemini-2.5-pro', {
+      promptTokenCount: 4,
+      candidatesTokenCount: 5,
+      totalTokenCount: 9,
+      customer_text: 'CUSTOMER_MESSAGE_DO_NOT_LOG',
+      secret: 'sk-live-secret',
+    });
+
+    console.warn('[Analyst Tokens]', JSON.stringify(analystUsage));
+    console.warn('[Sommelier Tokens]', JSON.stringify(sommelierUsage));
+
+    const warningText = warnSpy.mock.calls.flat().join(' ');
+    expect(warningText).toContain('[Analyst Tokens]');
+    expect(warningText).toContain('[Sommelier Tokens]');
+    expect(warningText).toContain('promptTokenCount');
+    expect(warningText).toContain('candidatesTokenCount');
+    expect(warningText).toContain('totalTokenCount');
+    expect(warningText).not.toMatch(
+      /SECRET_PROMPT_DO_NOT_LOG|CUSTOMER_MESSAGE_DO_NOT_LOG|RAW_PROVIDER_RESPONSE_DO_NOT_LOG|Authorization|Bearer token|sk-live-secret/
+    );
+  });
+
+  it('persists ai_analytics token_usage through the sanitized telemetry helper only', () => {
+    const source = readCustomerIntelligenceSource();
+
+    expect(source).toContain('function buildGeminiTokenUsageTelemetry(');
+    expect(source).toContain('token_usage: {');
+    expect(source).toContain('analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata)');
+    expect(source).toContain('sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, sommelierResult?.usageMetadata)');
+    expect(source).not.toContain('analyst: analystResult?.usageMetadata ?? null');
+    expect(source).not.toContain('sommelier: sommelierResult?.usageMetadata ?? null');
   });
 });

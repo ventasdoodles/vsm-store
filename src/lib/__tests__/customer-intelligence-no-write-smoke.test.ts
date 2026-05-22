@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   buildCustomerIntelligenceNoWriteSmokeRequestFields,
@@ -58,6 +58,40 @@ describe('customer-intelligence no-write smoke contract', () => {
     expect(shouldSuppressCustomerIntelligenceWrite(metadata, 'ai_customer_memory')).toBe(true);
     expect(shouldSuppressCustomerIntelligenceWrite(metadata, 'ai_analytics')).toBe(true);
     expect(shouldSuppressCustomerIntelligenceCall(metadata, 'cesarin-qa-judge')).toBe(true);
+  });
+
+  it('suppresses analytics writes even when token_usage metadata would be present', () => {
+    const metadata = buildCustomerIntelligenceNoWriteSmokeMetadata();
+    const analyticsPayload = {
+      ai_logic_debug: {
+        token_usage: {
+          analyst: {
+            model: 'gemini-2.5-pro',
+            promptTokenCount: 10,
+            candidatesTokenCount: 20,
+            totalTokenCount: 30,
+            cachedContentTokenCount: 0,
+          },
+          sommelier: {
+            model: 'gemini-2.5-pro',
+            promptTokenCount: 5,
+            candidatesTokenCount: 15,
+            totalTokenCount: 20,
+            cachedContentTokenCount: null,
+          },
+        },
+      },
+    };
+    const analyticsWriter = {
+      insert: vi.fn(),
+    };
+
+    if (!shouldSuppressCustomerIntelligenceWrite(metadata, 'ai_analytics')) {
+      analyticsWriter.insert(analyticsPayload);
+    }
+
+    expect(shouldSuppressCustomerIntelligenceWrite(metadata, 'ai_analytics')).toBe(true);
+    expect(analyticsWriter.insert).not.toHaveBeenCalled();
   });
 
   it('lets the storefront request and response sides agree on the same contract', () => {
