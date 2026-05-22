@@ -81,5 +81,6 @@
 - No semantic completeness proof.
 - No metadata cleanup.
 - `metadata.embedding_dims` is accepted as observed resolved for current rows by one read-only observer result: `41` observed rows, `41` active with `768`, `0` observed `3072`, and `0` observed missing dims.
-- No retained inactive embedded row cleanup.
+- Retained inactive embedded rows are accepted as observed absent for the current observer result: `inactiveWith768=0`, `inactiveWith3072=0`, and `inactiveMissingDims=0`.
+- No retained inactive embedded row cleanup occurred or is claimed.
 - No deploy, Supabase CLI, live smoke, or secret exposure during doc/canon split, `caec050` canonization, `7fb0a77` canonization, or this doc/canon update; run `26124496125` is the bounded targeted workflow/DB ingestion exception recorded above.

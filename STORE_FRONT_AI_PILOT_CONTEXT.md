@@ -62,7 +62,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - `seed_runner.ts` has accepted local activation-safety hardening and later strictness repair; project-wide typecheck was green at `70ca5f2`.
 - `7fb0a77` adds accepted targeted source-id allowlist readiness, and run `26124496125` executed it successfully for `politica-pagos-v2` and `politica-envios-detallada-v1` only.
 - Read-only retrieval/RPC ranking after that run is accepted with residual risk; it proves normalized corpus can be retrieved by `match_knowledge`, not generated answer quality.
-- Retained inactive embedded rows remain as a non-blocking residual.
+- Retained inactive embedded rows are accepted as observed absent for the current observer result: `inactiveWith768=0`, `inactiveWith3072=0`, and `inactiveMissingDims=0`.
 - `metadata.embedding_dims` is accepted as observed resolved for current rows by a later read-only metadata observer: `41` observed `store_knowledge` rows, `41` active with `metadata.embedding_dims=768`, `0` observed `3072`, and `0` observed missing dims. Target `politica-envios-detallada-v1` and `politica-pagos-v2` each have `4` active embedded rows with derived dimension `768`, `metadata.embedding_dims=768`, and `metadata.embedding_model=models/gemini-embedding-001`.
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` and `docs/audits/2026-05/seed-runner-typecheck-strictness.md`.
 
@@ -83,7 +83,7 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.
-- No retained inactive embedded row cleanup.
+- No retained inactive embedded row cleanup occurred or is claimed.
 - The metadata observer result does not prove future DB state, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow, or live-smoke behavior.
 - No DB/Supabase mutation, deploy, workflow run, ingestion rerun, or secret exposure is implied by this canon update; live smoke claims are limited to the explicitly described runs.
 

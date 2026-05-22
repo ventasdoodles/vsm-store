@@ -26,8 +26,8 @@
 - DB/RAG metadata observation: ACCEPTED AS OBSERVED RESOLVED FOR CURRENT ROWS.
 - La observacion read-only aceptada vio `41` filas actuales de `store_knowledge`: `41` activas con `metadata.embedding_dims=768`, `0` con `3072` observado y `0` sin dims observado.
 - `politica-envios-detallada-v1` y `politica-pagos-v2` tienen `4` filas activas embebidas cada una, dimension derivada `768`, `metadata.embedding_dims=768` y `metadata.embedding_model=models/gemini-embedding-001`.
-- Retained inactive embedded rows siguen como residual no bloqueante salvo limpieza futura autorizada.
-- Esto no prueba estado DB futuro, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow ni live smoke.
+- Retained inactive embedded rows quedan aceptadas como observadas ausentes para el resultado actual del observer: `inactiveWith768=0`, `inactiveWith3072=0` e `inactiveMissingDims=0`.
+- Esto no prueba estado DB futuro, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow, live smoke ni secret/auth proof.
 
 ## 5. Lanes cerrados / no reabrir por arrastre
 - `product_search_integrity` queda cerrado como wording governance solamente.
