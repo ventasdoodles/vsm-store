@@ -112,6 +112,11 @@ describe('normalizePaymentStatus', () => {
         expect(normalizePaymentStatus('refunded')).toBe('refunded');
     });
 
+    it('maps provider rejected or cancelled payment states to failed storefront truth', () => {
+        expect(normalizePaymentStatus('rejected')).toBe('failed');
+        expect(normalizePaymentStatus('cancelled')).toBe('failed');
+    });
+
     it('falls back to pending for unknown or missing statuses', () => {
         expect(normalizePaymentStatus('approved')).toBe('pending');
         expect(normalizePaymentStatus(undefined)).toBe('pending');
@@ -153,6 +158,20 @@ describe('getStorefrontOrderPaymentView', () => {
         expect(view.paymentLabel).toBe('No aprobado');
         expect(view.paymentTone).toBe('danger');
         expect(view.headline).toContain('Pago no confirmado');
+    });
+
+    it('treats rejected or cancelled payment statuses as not confirmed even when order status is still pending', () => {
+        for (const paymentStatus of ['rejected', 'cancelled']) {
+            const view = getStorefrontOrderPaymentView({
+                status: 'pending',
+                payment_status: paymentStatus,
+                payment_method: 'mercadopago',
+            });
+
+            expect(view.paymentLabel).toBe('No aprobado');
+            expect(view.paymentTone).toBe('danger');
+            expect(view.headline).toBe('Pago no confirmado');
+        }
     });
 
     it('keeps transfer orders in validation instead of fake payment success', () => {
@@ -363,6 +382,20 @@ describe('getStorefrontOrdersIndexActionView', () => {
         expect(view.actionHeadline).toBe('Esperar validacion');
         expect(view.showContinuePayment).toBe(false);
         expect(view.showReorder).toBe(false);
+    });
+
+    it('does not show continue payment or confirmed-order actions for rejected mercadopago payment truth', () => {
+        const view = getStorefrontOrdersIndexActionView({
+            status: 'pending',
+            payment_status: 'rejected',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.actionHeadline).toBe('Revisar antes de actuar');
+        expect(view.showContinuePayment).toBe(false);
+        expect(view.showReorder).toBe(true);
+        expect(view.detailLabel).toBe('Ver pedido y revisar pago');
     });
 });
 

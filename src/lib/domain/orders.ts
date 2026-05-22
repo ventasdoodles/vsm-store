@@ -178,6 +178,9 @@ export function normalizePaymentStatus(status: string | null | undefined): Store
         case 'failed':
         case 'refunded':
             return status;
+        case 'rejected':
+        case 'cancelled':
+            return 'failed';
         default:
             return 'pending';
     }

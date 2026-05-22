@@ -97,6 +97,36 @@ describe('PaymentFailure continuity', () => {
         expect(screen.getAllByRole('link', { name: /Ver pedido y revisar pago/i })).toHaveLength(2);
     });
 
+    it('does not show confirmed success or payment continuation for rejected persisted payment truth', () => {
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-4',
+                order_number: 'VSM-004',
+                created_at: '2026-03-25T00:00:00.000Z',
+                total: 180,
+                items: [{ product_id: 'p4', name: 'Item', price: 180, quantity: 1 }],
+                status: 'pending',
+                payment_status: 'rejected',
+                payment_method: 'mercadopago',
+            },
+            refetch: refetchMock,
+            isFetching: false,
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/payment/failure?order_id=order-4']}>
+                <Routes>
+                    <Route path="/payment/failure" element={<PaymentFailure />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByRole('heading', { name: /Pago no confirmado/i })).toBeInTheDocument();
+        expect(screen.queryByText(/Pedido y pago confirmados/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
+        expect(screen.getAllByRole('link', { name: /Ver pedido y revisar pago/i })).toHaveLength(2);
+    });
+
     it('drops failure-route chrome when persisted truth is already paid', () => {
         useOrderMock.mockReturnValue({
             data: {
