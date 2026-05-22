@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | Product Search query construction safety patch | ACCEPT WITH RESIDUAL RISK | `cd9ac1e`; bounded `search.service.test.ts` Vitest `1` file / `3` tests; `git diff --check cd9ac1e^ cd9ac1e` | current canon | current canon |
 | 2026-05-22 | Production Typewriter visual QA | ACCEPT WITH RESIDUAL RISK | public bundle `v113-5e4f8ee`; storefront shell and welcome Typewriter animation observed; no chat send | current canon | current canon |
 | 2026-05-22 | Pages static 500 fix | ACCEPT WITH RESIDUAL RISK | `47862ae`; run `26300707725`; `--skip-caching`; static serving fresh at `v113-47862ae` | current canon | current canon |
 | 2026-05-22 | Public Typewriter bundle freshness validation | ACCEPT WITH RESIDUAL RISK | deployed `runtime-build.json` at `11e9f71`; `6ad7f31` static markers present; stale vs `bf2f3a7` | current canon | current canon |
