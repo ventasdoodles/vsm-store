@@ -33,23 +33,32 @@ serve(async (req) => {
         const result = await processMercadoPagoWebhook(notification, {
             getPayment: (paymentId) => paymentClient.get({ id: paymentId }),
             getOrderAttribution: async (orderId) => {
-                const { data } = await supabase
+                const { data, error } = await supabase
                     .from('orders')
                     .select('id, cesarin_session_id, conversion_source, total, payment_status')
                     .eq('id', orderId)
                     .maybeSingle()
+                if (error) {
+                    throw error
+                }
                 return data
             },
             updateOrderPayment: async (orderId, update) => {
-                await supabase
+                const { error } = await supabase
                     .from('orders')
                     .update(update)
                     .eq('id', orderId)
+                if (error) {
+                    throw error
+                }
             },
             insertConversionEvent: async (event) => {
-                await supabase
+                const { error } = await supabase
                     .from('conversation_conversion_events')
                     .insert(event)
+                if (error) {
+                    throw error
+                }
             },
             now: () => new Date().toISOString(),
         })
@@ -65,6 +74,6 @@ serve(async (req) => {
 
     } catch (error) {
         console.error('Webhook error:', error)
-        return new Response('OK', { status: 200 })
+        return new Response('Webhook processing failed', { status: 500 })
     }
 })

@@ -135,4 +135,32 @@ describe('mercadopago webhook contract', () => {
         expect(deps.updateOrderPayment).toHaveBeenCalledTimes(1);
         expect(deps.insertConversionEvent).not.toHaveBeenCalled();
     });
+
+    it('surfaces order update failures instead of accepting the webhook as successful', async () => {
+        const deps = createDeps({
+            id: 999,
+            external_reference: 'order-123',
+            status: 'approved',
+        });
+        vi.mocked(deps.updateOrderPayment).mockRejectedValueOnce(new Error('orders update failed'));
+
+        await expect(processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps))
+            .rejects.toThrow('orders update failed');
+
+        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
+    });
+
+    it('surfaces conversion insert failures after the order payment update', async () => {
+        const deps = createDeps({
+            id: 999,
+            external_reference: 'order-123',
+            status: 'approved',
+        });
+        vi.mocked(deps.insertConversionEvent).mockRejectedValueOnce(new Error('conversion insert failed'));
+
+        await expect(processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps))
+            .rejects.toThrow('conversion insert failed');
+
+        expect(deps.updateOrderPayment).toHaveBeenCalledTimes(1);
+    });
 });
