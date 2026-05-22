@@ -342,7 +342,7 @@ function resolveConcreteFactAnswer(
       }
       return {
         request,
-        answer: `${productName} es compatible con ${value.trim()}.`,
+        answer: `La ficha de ${productName} indica compatibilidad con ${value.trim()}.`,
         directAnswerKind: 'FACT',
       };
     }

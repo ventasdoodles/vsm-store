@@ -279,7 +279,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     });
 
     expect(contract.match_strategy).toBe('EXACT');
-    expect(contract.customer_response_draft).toBe('Waka Pod es compatible con cartuchos Waka X.');
+    expect(contract.customer_response_draft).toBe('La ficha de Waka Pod indica compatibilidad con cartuchos Waka X.');
+    expect(contract.customer_response_draft).not.toContain('Waka Pod es compatible con');
     expect(contract.customer_response_draft).not.toContain('Abre la ficha');
   });
 
