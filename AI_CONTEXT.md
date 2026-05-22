@@ -28,6 +28,8 @@
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
+- Gemini / Google AI / Vertex AI implementation decisions must use official Google documentation and recommendations as the primary technical authority for the integration surface only (API request shape, SDK/API usage, `generationConfig`, `response_mime_type`, `response_schema`, structured output, tools/function calling, model selection, provider limits, and compatibility). This does not make Gemini the project orchestrator and does not override the work-kit roles or Codex acceptance. Deviations from Google-recommended patterns must be explicit, justified, locally tested when possible, and accepted by Codex.
+- Documentation alone does not prove provider compatibility, production behavior, deploy readiness, secret safety, live-smoke readiness, or runtime correctness. The accepted local Analyst `response_schema` preservation still needs a later explicitly authorized provider-validation lane before production confidence.
 
 ## Current Product / Runtime Truth
 - VSM Store is a PWA storefront/admin system for Vape / 420 commerce with Cesarin as the AI concierge.

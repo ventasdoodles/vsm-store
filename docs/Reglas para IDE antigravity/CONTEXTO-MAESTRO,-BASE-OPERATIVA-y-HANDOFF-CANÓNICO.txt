@@ -35,6 +35,12 @@ No reemplaza reglas inmutables ni plantillas.
 - no se usa como autoridad general del proyecto
 - no desplaza a Codex, Antigravity ni ChatGPT
 
+## Regla Google-first para Gemini
+- Para detalles de implementacion de Gemini, Google AI o Vertex AI, la autoridad tecnica primaria son la documentacion oficial y recomendaciones vigentes de Google.
+- Esta regla aplica a arquitectura y mejores practicas del plano de integracion Gemini: request shape, SDK/API, `generationConfig`, `response_mime_type`, `response_schema`, structured output, function calling/tools, seleccion de modelo, limites del proveedor y compatibilidad.
+- No aplica a vision de producto ni convierte a Gemini en orquestador general; ChatGPT, Codex, Antigravity y usuario conservan sus roles del work-kit.
+- Cualquier desviacion de patrones recomendados por Google debe quedar explicita, justificada, probada localmente cuando aplique y aceptada por Codex antes de consolidarse.
+
 ### Usuario
 - fija vision
 - autoriza o congela frentes
