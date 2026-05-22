@@ -18,6 +18,12 @@ interface SearchOptions {
     limit?: number;
 }
 
+function buildSafeTagFilter(query: string): string | null {
+    const tag = query.trim();
+    if (!/^[\p{L}\p{N}-]+$/u.test(tag)) return null;
+    return `tags.cs.{${tag}}`;
+}
+
 /**
  * Busca productos por múltiples campos (nombre, descripción, tags, SKU)
  * 
@@ -37,6 +43,13 @@ export async function searchProducts(
         // Escape special ILIKE chars (% and _) in user input
         const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
         const pattern = `%${escaped}%`;
+        const searchFilters = [
+            `name.ilike.${pattern}`,
+            `short_description.ilike.${pattern}`,
+            `description.ilike.${pattern}`,
+            `sku.ilike.${pattern}`,
+            buildSafeTagFilter(query),
+        ].filter(Boolean);
 
         let dbQuery = supabase
             .from('products')
@@ -51,7 +64,7 @@ export async function searchProducts(
             .eq('status', 'active');
 
         // Búsqueda multi-campo incluyendo SKU
-        dbQuery = dbQuery.or(`name.ilike.${pattern},short_description.ilike.${pattern},description.ilike.${pattern},sku.ilike.${pattern},tags.cs.{${query}}`);
+        dbQuery = dbQuery.or(searchFilters.join(','));
 
         dbQuery = dbQuery
             .order('is_featured', { ascending: false })
