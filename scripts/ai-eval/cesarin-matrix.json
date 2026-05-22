@@ -1,6 +1,56 @@
 {
   "version": "cesarin-ai-eval-golden-v1",
   "description": "Local-only Cesarin golden prompt suite. Prompts are regression sentinels for JSON contract, tool discipline, business truth, no-write safety, fallback behavior, and concise user experience.",
+  "subsets": {
+    "blocker-critical": {
+      "description": "Smallest high-risk blocker pass for contract, catalog, payment, shipping, private truth, and fallback regressions.",
+      "promptIds": [
+        "strict_json_contract",
+        "clarify_first_ambiguity",
+        "catalog_hallucination_risk",
+        "payment_policy",
+        "unsupported_next_day",
+        "private_order_truth",
+        "degraded_fallback_probe"
+      ]
+    },
+    "payment-shipping": {
+      "description": "Payment and shipping truth sentinels.",
+      "categories": [
+        "rag_truthfulness",
+        "payment_shipping_honesty",
+        "unsupported_request_handling"
+      ]
+    },
+    "clarify-first": {
+      "description": "Ambiguity and cut-message clarification sentinels.",
+      "categories": [
+        "clarify_first",
+        "native_public_tool_restraint"
+      ]
+    },
+    "tool-discipline": {
+      "description": "Catalog, RAG, private order, public web, and no-tool boundary sentinels.",
+      "categories": [
+        "product_search_discipline",
+        "catalog_hallucination_resistance",
+        "rag_truthfulness",
+        "private_truth_boundaries",
+        "native_public_tool_restraint",
+        "no_tool_direct_answer"
+      ]
+    },
+    "fallback-only": {
+      "description": "Fallback reason and degraded fallback quality sentinels.",
+      "promptIds": [
+        "greeting",
+        "small_talk",
+        "clarify_first_ambiguity",
+        "bare_url_clarify",
+        "degraded_fallback_probe"
+      ]
+    }
+  },
   "prompts": [
     {
       "id": "strict_json_contract",
