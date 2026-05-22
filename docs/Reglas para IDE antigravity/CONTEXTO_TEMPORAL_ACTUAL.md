@@ -23,11 +23,11 @@
 - El siguiente trabajo debe seleccionarse en una lane separada de roadmap/readiness o por instruccion explicita del usuario.
 
 ## 4. Residuales vivos que afectan handoff
-- DB/RAG metadata observation: ACCEPT AS BLOCKED / NO-GO.
-- No hubo observacion DB completada para `metadata.embedding_dims`.
-- `metadata.embedding_dims` mismatch sigue abierto hasta observacion o reparacion autorizada.
+- DB/RAG metadata observation: ACCEPTED AS OBSERVED RESOLVED FOR CURRENT ROWS.
+- La observacion read-only aceptada vio `41` filas actuales de `store_knowledge`: `41` activas con `metadata.embedding_dims=768`, `0` con `3072` observado y `0` sin dims observado.
+- `politica-envios-detallada-v1` y `politica-pagos-v2` tienen `4` filas activas embebidas cada una, dimension derivada `768`, `metadata.embedding_dims=768` y `metadata.embedding_model=models/gemini-embedding-001`.
 - Retained inactive embedded rows siguen como residual no bloqueante salvo limpieza futura autorizada.
-- No hay prueba nueva de DB/Supabase/deploy/workflow/live-smoke.
+- Esto no prueba estado DB futuro, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow ni live smoke.
 
 ## 5. Lanes cerrados / no reabrir por arrastre
 - `product_search_integrity` queda cerrado como wording governance solamente.

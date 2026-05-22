@@ -26,6 +26,7 @@
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
 | 2026-05-21 | Product Search compatibility wording micro-fix | ACCEPT WITH RESIDUAL RISK | `ba2e39a` | current canon | current canon |
+| 2026-05-22 | Read-only metadata dims observer | ACCEPT - OBSERVED RESOLVED FOR CURRENT ROWS | one read-only observer command after no-DB self-check | current canon | current canon |
 | 2026-05-19 | Controlled six-prompt no-write RAG validation after targeted ingestion | ACCEPT WITH RESIDUAL RISK | one deployed app-trigger no-write validation after run `26124496125` and canon `1510d84` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-19 | Read-only retrieval/RPC ranking after targeted ingestion | ACCEPT WITH RESIDUAL RISK | `match_knowledge`, threshold `0.5`, count `3` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
 | 2026-05-19 | Targeted Run Knowledge Ingestion payment/shipping execution | ACCEPT WITH RESIDUAL RISK | run `26124496125` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
@@ -79,6 +80,6 @@
 - No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.
-- No fix for `metadata.embedding_dims`.
+- `metadata.embedding_dims` is accepted as observed resolved for current rows by one read-only observer result: `41` observed rows, `41` active with `768`, `0` observed `3072`, and `0` observed missing dims.
 - No retained inactive embedded row cleanup.
 - No deploy, Supabase CLI, live smoke, or secret exposure during doc/canon split, `caec050` canonization, `7fb0a77` canonization, or this doc/canon update; run `26124496125` is the bounded targeted workflow/DB ingestion exception recorded above.

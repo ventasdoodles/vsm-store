@@ -72,6 +72,13 @@
 - This run did not deploy, run live smoke, run Supabase CLI, expose secrets, prove Product Search, prove all-routes customer-intelligence safety, prove inactive-row state, or prove broad production readiness. Retrieval/RPC ranking and then bounded no-write runtime answer evidence were accepted later with residual risk in separate lanes.
 - Detail: `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
+## Accepted Lane: Read-Only Metadata Dims Observer
+- Observer tooling commit `8eb02af` (`tooling: add read-only store knowledge metadata observer`) and credential-requirements canon `debb6c1` were accepted with residual risk before execution.
+- A later same-shell, read-only observer execution completed successfully with `node scripts/db-observation/store-knowledge-metadata-dims-observer.mjs --observe --allow-remote-db-read` after the no-DB self-check passed. No DB mutation, cleanup, ingestion, Supabase CLI, deploy, workflow, live smoke, file edit, staging, commit, push, or secret exposure occurred in that observation lane.
+- Current observed `store_knowledge` rows are accepted as aligned to `metadata.embedding_dims=768`: `totalRows=41`, `activeWith768=41`, `activeWith3072=0`, `activeMissingDims=0`, `inactiveWith768=0`, `inactiveWith3072=0`, and `inactiveMissingDims=0`.
+- Target source status from the observer: `politica-envios-detallada-v1` has `4` active embedded rows with derived embedding dimension `768`, `metadata.embedding_dims=768`, and `metadata.embedding_model=models/gemini-embedding-001`; `politica-pagos-v2` has `4` active embedded rows with derived embedding dimension `768`, `metadata.embedding_dims=768`, and `metadata.embedding_model=models/gemini-embedding-001`.
+- Classification: the prior `metadata.embedding_dims` residual is accepted as observed resolved for current rows. This does not prove future DB state, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow, or live-smoke behavior.
+
 ## Accepted Lane: Targeted Knowledge Ingestion Source Allowlist
 - Implementation commit: `7fb0a77` (`ci: add targeted knowledge ingestion source allowlist`).
 - Changed files: `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, and `src/__tests__/seed_runner.test.ts`.
@@ -298,11 +305,9 @@
 - No broad production readiness or all-routes `customer-intelligence` safety proof is claimed.
 - No semantic completeness proof is claimed.
 - No metadata cleanup is claimed.
-- `metadata.embedding_dims` mismatch remains open: active vectors parse as `768d`, but metadata still records `3072` on many rows and is missing on one row unless separately repaired.
-- Metadata observer tooling `8eb02af` (`tooling: add read-only store knowledge metadata observer`) is accepted with residual risk as local tooling only. It has not completed DB observation.
-- Read-only metadata observer execution is currently ACCEPT AS BLOCKED / NO-GO because observer-specific config is missing. Required variable names only: `SUPABASE_OBSERVER_URL` and `SUPABASE_OBSERVER_KEY`.
-- Those variables are only for a future explicitly authorized read-only observation of `store_knowledge.metadata.embedding_dims` through `scripts/db-observation/store-knowledge-metadata-dims-observer.mjs`. Setup must happen outside chat/logs/docs, and credential values must never be stored in repo docs or printed. Presence checks may report only `PRESENT`/`MISSING`.
-- The observer config record does not prove credential validity, DB/Supabase readiness, current metadata state, metadata cleanup, retained inactive-row cleanup, Product Search, Cesarin runtime, production, deploy, workflow, or live-smoke behavior.
+- The prior `metadata.embedding_dims` mismatch is accepted as observed resolved for current rows by the read-only metadata observer: `41` observed rows, all active with `metadata.embedding_dims=768`, with `0` observed `3072` rows and `0` observed missing dims.
+- Metadata observer tooling `8eb02af` (`tooling: add read-only store knowledge metadata observer`) and credential-requirements canon `debb6c1` are accepted with residual risk; the later read-only observer execution completed and did not mutate DB, run cleanup, ingest, deploy, run workflow, run live smoke, edit files, or expose secrets.
+- The observer result does not prove future DB state, semantic content correctness, metadata cleanup, retained inactive-row cleanup beyond the bounded observer counts, Product Search, Cesarin runtime, production, deploy, workflow, or live-smoke behavior.
 - Retained inactive embedded rows remain open/non-blocking unless separately repaired.
 - Migration history divergence remains intentionally unresolved unless selected.
 - Remote sandbox RPC smoke and production admin UI observation remain unresolved unless canon changes.
