@@ -230,7 +230,19 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).toBe('El sabor de Waka Menta es menta helada.');
+    expect(contract.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'FACT',
+      fact_family: 'Sabor',
+    });
+    expect(contract.help_contract).toEqual({
+      compare_supported: false,
+      preferred_product_id: '11111111-1111-1111-1111-111111111111',
+      secondary_product_id: null,
+      action_strength: 'review_only',
+    });
     expect(contract.customer_response_draft).not.toContain('Abre la ficha');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 
   it('answers a version fact question directly from model-version aliases', () => {
@@ -242,6 +254,7 @@ describe('evaluateProductSearchFallbackTree', () => {
       },
       exact_matches: [
         makeProduct({
+          id: '33333333-3333-3333-3333-333333333333',
           name: 'Caliburn G3',
           slug: 'caliburn-g3',
           specs: {
@@ -255,7 +268,19 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).toBe('La version de Caliburn G3 es G3 Pro.');
+    expect(contract.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'FACT',
+      fact_family: 'Modelo',
+    });
+    expect(contract.help_contract).toEqual({
+      compare_supported: false,
+      preferred_product_id: '33333333-3333-3333-3333-333333333333',
+      secondary_product_id: null,
+      action_strength: 'review_only',
+    });
     expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 
   it('answers a compatibility fact question directly when that supported spec is present', () => {
@@ -280,8 +305,20 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).toBe('La ficha de Waka Pod indica compatibilidad con cartuchos Waka X.');
+    expect(contract.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'FACT',
+      fact_family: 'Compatibilidad',
+    });
+    expect(contract.help_contract).toEqual({
+      compare_supported: false,
+      preferred_product_id: '11111111-1111-1111-1111-111111111111',
+      secondary_product_id: null,
+      action_strength: 'review_only',
+    });
     expect(contract.customer_response_draft).not.toContain('Waka Pod es compatible con');
     expect(contract.customer_response_draft).not.toContain('Abre la ficha');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 
   it('stays honest when compatibility is asked but the supported spec is missing', () => {
@@ -311,8 +348,15 @@ describe('evaluateProductSearchFallbackTree', () => {
       direct_answer_kind: 'HONEST_MISSING_FACT',
       fact_family: 'Compatibilidad',
     });
+    expect(contract.help_contract).toEqual({
+      compare_supported: false,
+      preferred_product_id: '11111111-1111-1111-1111-111111111111',
+      secondary_product_id: null,
+      action_strength: 'review_only',
+    });
     expect(contract.customer_response_draft).not.toContain('compatible con');
     expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 
   it('does not add checkout-readiness to a true single exact path without a qualifying selector or recovery support', () => {
