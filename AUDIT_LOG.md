@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-21 | Product Search compatibility wording micro-fix | ACCEPT WITH RESIDUAL RISK | `ba2e39a` | current canon | current canon |
 | 2026-05-19 | Controlled six-prompt no-write RAG validation after targeted ingestion | ACCEPT WITH RESIDUAL RISK | one deployed app-trigger no-write validation after run `26124496125` and canon `1510d84` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-19 | Read-only retrieval/RPC ranking after targeted ingestion | ACCEPT WITH RESIDUAL RISK | `match_knowledge`, threshold `0.5`, count `3` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
 | 2026-05-19 | Targeted Run Knowledge Ingestion payment/shipping execution | ACCEPT WITH RESIDUAL RISK | run `26124496125` | current canon | `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md` |
