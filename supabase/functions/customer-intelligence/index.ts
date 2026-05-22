@@ -745,8 +745,14 @@ serve(async (req) => {
                         console.error(`[Analyst] Invalid intent: "${reportIntent}", valid options: ${VALID_INTENTS.join(', ')}`);
                         geminiError = `Analyst invalid intent: "${reportIntent}"`;
                     } else if (!Array.isArray(parsed.tool_calls)) {
-                        console.error('[Analyst] tool_calls is not an array');
-                        geminiError = 'Analyst tool_calls not array';
+                        const toolCallsType = parsed.tool_calls === null ? 'null' : typeof parsed.tool_calls;
+                        console.warn('[Analyst] Structured output invalid:', JSON.stringify({
+                            reason: 'tool_calls_not_array',
+                            field: 'tool_calls',
+                            received_type: toolCallsType,
+                            intent: reportIntent,
+                        }));
+                        throw new Error('Analyst tool_calls not array');
                     } else {
                         // Contract valid: required fields present and well-formed
                         analystReport = parsed;
