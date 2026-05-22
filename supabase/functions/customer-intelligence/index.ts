@@ -677,7 +677,49 @@ serve(async (req) => {
                     model: CONCIERGE_ANALYST_MODEL,
                     body: {
                         contents: [{ parts: [{ text: analystPrompt }] }],
-                        generationConfig: { temperature: 0.1 },
+                        generationConfig: {
+                            temperature: 0.1,
+                            response_mime_type: 'application/json',
+                            response_schema: {
+                                type: 'OBJECT',
+                                properties: {
+                                    intent: {
+                                        type: 'STRING',
+                                        enum: ['CART_OPERATION', 'CHECKOUT_READINESS', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'],
+                                    },
+                                    primary_intent: { type: 'STRING' },
+                                    secondary_intents: { type: 'ARRAY', items: { type: 'STRING' } },
+                                    turn_priority: { type: 'ARRAY', items: { type: 'STRING' } },
+                                    current_turn_decision: {
+                                        type: 'STRING',
+                                        enum: ['DIRECT_ANSWER', 'ASK_CLARIFYING_QUESTION', 'USE_CAPABILITY'],
+                                    },
+                                    turn_decision: { type: 'STRING' },
+                                    doubts: { type: 'ARRAY', items: { type: 'STRING' } },
+                                    tool_calls: {
+                                        type: 'ARRAY',
+                                        items: {
+                                            type: 'OBJECT',
+                                            properties: {
+                                                name: { type: 'STRING' },
+                                                args: { type: 'OBJECT' },
+                                                reason: { type: 'STRING' },
+                                            },
+                                            required: ['name', 'args'],
+                                        },
+                                    },
+                                    customer_dna: {
+                                        type: 'OBJECT',
+                                        properties: {
+                                            interests: { type: 'ARRAY', items: { type: 'STRING' } },
+                                            preference_signals: { type: 'ARRAY', items: { type: 'OBJECT' } },
+                                        },
+                                    },
+                                    conversational_prefix: { type: 'STRING' },
+                                },
+                                required: ['intent', 'current_turn_decision', 'tool_calls'],
+                            },
+                        },
                         safetySettings: SAFETY_SETTINGS,
                     },
                     signal: controller.signal,
@@ -721,12 +763,12 @@ serve(async (req) => {
 
             if (rawAnalystText) {
                 try {
-                    // Parse JSON: try direct parse first, fall back to regex extraction if needed
+                    // Structured output (response_schema) guarantees valid JSON from Gemini.
+                    // Direct parse is the primary path; regex fallback retained for resilience.
                     let parsed: any = null;
                     try {
                         parsed = JSON.parse(rawAnalystText);
                     } catch {
-                        // Fallback: regex extraction for cases with leading/trailing text
                         const jsonMatch = rawAnalystText.match(/\{[\s\S]*\}/);
                         if (jsonMatch) {
                             parsed = JSON.parse(jsonMatch[0]);

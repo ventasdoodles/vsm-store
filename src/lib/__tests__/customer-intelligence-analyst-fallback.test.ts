@@ -12,6 +12,28 @@ const CUSTOMER_INTELLIGENCE_INDEX = resolve(
   '../../../supabase/functions/customer-intelligence/index.ts'
 );
 
+function readCustomerIntelligenceSource() {
+  return readFileSync(CUSTOMER_INTELLIGENCE_INDEX, 'utf8');
+}
+
+function extractStringArray(source: string, pattern: RegExp) {
+  const match = source.match(pattern);
+  expect(match).not.toBeNull();
+
+  const arraySource = match?.[1] ?? '';
+  return Array.from(arraySource.matchAll(/'([^']+)'/g), ([, value]) => value);
+}
+
+function extractAnalystRequestBlock(source: string) {
+  const analystCallStart = source.indexOf('analystResponse = await geminiGenerateContent({');
+  const analystTimeoutStart = source.indexOf('clearTimeout(timeoutId);', analystCallStart);
+
+  expect(analystCallStart).toBeGreaterThanOrEqual(0);
+  expect(analystTimeoutStart).toBeGreaterThan(analystCallStart);
+
+  return source.slice(analystCallStart, analystTimeoutStart);
+}
+
 function parseAnalystReportForContract(rawAnalystText: string) {
   let geminiError = '';
   let analystParseValid = false;
@@ -163,10 +185,59 @@ describe('customer-intelligence analyst degradation fallback', () => {
   });
 
   it('does not keep the production silent coercion branch for malformed tool_calls', () => {
-    const source = readFileSync(CUSTOMER_INTELLIGENCE_INDEX, 'utf8');
+    const source = readCustomerIntelligenceSource();
 
     expect(source).not.toContain('parsed.tool_calls = Array.isArray(parsed.tool_calls) ? parsed.tool_calls : []');
     expect(source).toContain("reason: 'tool_calls_not_array'");
     expect(source).toContain("throw new Error('Analyst tool_calls not array')");
+  });
+
+  it('keeps the Analyst model fallback on gemini-2.5-pro', () => {
+    const source = readCustomerIntelligenceSource();
+
+    expect(source).toContain("const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-pro';");
+    expect(source).not.toContain("const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-flash';");
+  });
+
+  it('preserves JSON response MIME type on the Analyst Gemini request', () => {
+    const analystRequestBlock = extractAnalystRequestBlock(readCustomerIntelligenceSource());
+
+    expect(analystRequestBlock).toContain('model: CONCIERGE_ANALYST_MODEL');
+    expect(analystRequestBlock).toContain("response_mime_type: 'application/json'");
+    expect(analystRequestBlock).toContain('response_schema: {');
+  });
+
+  it('keeps Analyst response_schema intent enum aligned with VALID_INTENTS', () => {
+    const source = readCustomerIntelligenceSource();
+    const validIntents = extractStringArray(
+      source,
+      /const VALID_INTENTS = \[([\s\S]*?)\];/
+    );
+    const schemaIntents = extractStringArray(
+      source,
+      /intent:\s*\{\s*type:\s*'STRING',\s*enum:\s*\[([\s\S]*?)\]/
+    );
+
+    expect(schemaIntents).toEqual(validIntents);
+  });
+
+  it('keeps Analyst response_schema required fields stable', () => {
+    const source = readCustomerIntelligenceSource();
+    const requiredFields = extractStringArray(
+      source,
+      /required:\s*\[([^\]]*'intent'[^\]]*'current_turn_decision'[^\]]*'tool_calls'[^\]]*)\]/
+    );
+
+    expect(requiredFields).toEqual(['intent', 'current_turn_decision', 'tool_calls']);
+  });
+
+  it('keeps tool_calls response_schema as an array of named tool objects with args', () => {
+    const analystRequestBlock = extractAnalystRequestBlock(readCustomerIntelligenceSource());
+
+    expect(analystRequestBlock).toContain('tool_calls: {');
+    expect(analystRequestBlock).toContain("type: 'ARRAY'");
+    expect(analystRequestBlock).toContain("name: { type: 'STRING' }");
+    expect(analystRequestBlock).toContain("args: { type: 'OBJECT' }");
+    expect(analystRequestBlock).toContain("required: ['name', 'args']");
   });
 });
