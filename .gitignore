@@ -64,3 +64,6 @@ temp-debug/
 # GraQle — configuration uses environment variables
 graqle.json
 .graqle/
+
+# Local Supabase CLI metadata
+supabase/.branches/
