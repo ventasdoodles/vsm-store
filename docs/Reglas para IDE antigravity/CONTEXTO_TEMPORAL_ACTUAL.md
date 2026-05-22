@@ -13,7 +13,7 @@
 ## 2. Baseline actual de entrada
 - Rama esperada: `main`.
 - Estado esperado: `main` limpio y alineado con `origin/main`.
-- Ultimo bloque aceptado antes de este snapshot: customer-intelligence recovery + Typewriter UX (`d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31`) mas validacion visual local Typewriter, canonizado como verdad local/bounded.
+- Ultimo bloque aceptado antes de este snapshot: customer-intelligence recovery + Typewriter UX (`d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31`), validacion visual local Typewriter, validacion publica estatica Typewriter y fix Pages static 500 `47862ae`, canonizados como verdad bounded.
 - Hito work-kit reciente: `README_WORKKIT.md` fue reducido a entrypoint/order-of-reading y ACCEPTED por Codex.
 - No hay reconciliacion canon/doc pendiente para ese hito ni para el bloque customer-intelligence recovery + Typewriter UX.
 
@@ -32,6 +32,7 @@
 - Ese bloque no prueba production runtime behavior, deployed bundle behavior, provider/Gemini acceptance, deploy/live smoke/secrets/provider calls, ni real chat send-flow visual QA.
 - Validacion visual local Typewriter posterior: ACCEPTED WITH RESIDUAL RISK. Focused Vitest Typewriter/frontend paso `2` archivos / `33` tests; browser QA local uso Vite local, placeholders publicos dummy y endpoint dummy process-local. Acepta evidencia local de animacion latest assistant, full text para usuario, full text para assistant anterior tras nueva respuesta, send-flow simulado por boton visible y layout sin ruptura obvia. No prueba deployed bundle, production runtime, backend real, Supabase/DB, Gemini/provider, auth session, responsive matrix ni typecheck.
 - Validacion publica estatica Typewriter: ACCEPTED WITH RESIDUAL RISK. `runtime-build.json` publico reporto `gitShortHash` `11e9f71` y `runtimeBuildFingerprint` `v113-11e9f71`: el bundle publico desplegado esta stale versus `bf2f3a7`, pero incluye `6ad7f31` por ancestry y el chunk publico AIConcierge contiene marcadores Typewriter (`setInterval`, `clearInterval`, `displayedText`, `isTyping`, `slice(0)`, `Que onda`, speed `3`, interval `12`). Esto solo prueba inclusion estatica de bundle para `6ad7f31`, no latest-canon deployment, runtime UX, visual QA productivo, chat send-flow, backend/customer-intelligence, Supabase/DB, Gemini/provider, auth session, live smoke ni service-worker activation.
+- Fix Pages static 500: ACCEPTED WITH RESIDUAL RISK. `47862ae` cambio solo `.github/workflows/deploy-pages.yml` para agregar `--skip-caching` al deploy manual Pages. Antes, deploys repetidos en `011233e` tenian `runtime-build.json` current pero `/` y JS Vite devolvian HTTP 500 con cache reuse; despues, run `26300707725` subio `362/362`, `runtime-build.json` reporto `gitShortHash` `47862ae` / `runtimeBuildFingerprint` `v113-47862ae`, y root, metadata, service worker, JS/CSS assets, robots, sitemap y offline sirvieron en production alias y unique URL. Esto solo prueba static serving/freshness, no visual QA productivo, chat send-flow, customer-intelligence smoke, backend runtime, Supabase/DB, Gemini/provider, auth session, service-worker activation para clientes existentes ni runtime UX/chat/backend.
 
 ## 5. Lanes cerrados / no reabrir por arrastre
 - `product_search_integrity` queda cerrado como wording governance solamente.

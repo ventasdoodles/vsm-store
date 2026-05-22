@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | Pages static 500 fix | ACCEPT WITH RESIDUAL RISK | `47862ae`; run `26300707725`; `--skip-caching`; static serving fresh at `v113-47862ae` | current canon | current canon |
 | 2026-05-22 | Public Typewriter bundle freshness validation | ACCEPT WITH RESIDUAL RISK | deployed `runtime-build.json` at `11e9f71`; `6ad7f31` static markers present; stale vs `bf2f3a7` | current canon | current canon |
 | 2026-05-22 | Local Typewriter visual validation | ACCEPT WITH RESIDUAL RISK | focused Vitest `2` files / `33` tests; local Vite + dummy local endpoint browser QA | current canon | current canon |
 | 2026-05-22 | Customer-intelligence recovery + Typewriter UX block | ACCEPT WITH RESIDUAL RISK | `d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31` | current canon | current canon |
@@ -90,3 +91,4 @@
 - Customer-intelligence recovery + Typewriter UX block claims are local/bounded only: no production runtime behavior, deployed bundle proof, live smoke, deploy, secret change, provider/Gemini call, or real chat send-flow visual QA is claimed; Analyst `response_schema` provider compatibility remains unproven until a separate authorized provider-validation lane.
 - Local Typewriter visual validation is accepted only as local source/test plus local browser simulated-send-flow evidence; no deployed bundle, production runtime, real backend/customer-intelligence send-flow, Supabase/DB, Gemini/provider, authenticated-session, full responsive/browser matrix, or typecheck proof is claimed.
 - Public Typewriter bundle freshness validation accepts only static deployed evidence that `11e9f71` is live, that `6ad7f31` Typewriter markers are present in the public AIConcierge chunk, and that the deployed bundle is stale versus `bf2f3a7`; it does not prove latest-canon deployment, production visual/runtime UX, chat send-flow, backend/customer-intelligence behavior, Supabase/DB, Gemini/provider, authenticated-session, live smoke, or service-worker activation for real clients.
+- Pages static 500 fix accepts only workflow-scope deploy-command evidence and public static serving/freshness at `47862ae`; it does not prove production visual QA, chat send-flow, customer-intelligence smoke, backend/customer-intelligence behavior, Supabase/DB, Gemini/provider, authenticated-session behavior, service-worker activation for existing clients, Cloudflare settings/cache mutation, or runtime UX/chat/backend behavior.
