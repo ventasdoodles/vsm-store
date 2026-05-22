@@ -1,106 +1,42 @@
 # CONTEXTO TEMPORAL ACTUAL
 
 > Ancla temporal vigente para VSM Store.
-> Este archivo es subordinado al estado autoritativo del prompt actual, al canon real del proyecto y a las reglas inmutables del work-kit.
-> Live canon is now current-state-first: `AI_CONTEXT.md` summarizes active technical truth, `AUDIT_LOG.md` is the chronological index, and detailed evidence lives in `docs/audits/` plus `docs/archive/` snapshots.
+> Este archivo es subordinado al prompt actual, al canon real del proyecto y a las reglas inmutables del work-kit.
+> No es canon de producto ni reemplaza `AI_CONTEXT.md`, `AUDIT_LOG.md`, `STORE_FRONT_AI_PILOT_CONTEXT.md` ni `docs/audits/`.
 
 ## 1. Identidad del bloque
-- Proyecto: VSM Store
-- Fecha: 2026-05-21
-- Bloque vigente: post `product_search_integrity` wording-governance closure. Runtime fix `ba2e39a` (`test: narrow product search compatibility wording`) fue aceptado con riesgo residual y canon fix `57fe5e0` (`docs: canonize product search compatibility wording fix`) lo registro en canon. Este cierre se apoya sobre el bloque anterior de controlled six-prompt no-write RAG validation after targeted `Run Knowledge Ingestion` run `26124496125` and retrieval/RPC canon `1510d84`, `7fb0a77` targeted knowledge ingestion source allowlist, `caec050` payment/shipping static RAG corpus normalization, controlled deployed `56e8ef4` valid-trigger no-write RAG evidence, stable no-write smoke public bundle markers `cff68c1`, unsupported delivery-guarantee retrieval guard hardening `2443caa`, fa305b2 live six-prompt no-write RAG smoke partial evidence, unsupported delivery-guarantee successful RAG-path hardening `826927f`, payment/shipping-cost no-write RAG smoke path hardening `cb6311e`, unsupported delivery guarantee degraded fallback answer-shaping `9637596`, no-write error metadata preservation `7905b60`, multi-prompt no-write RAG quality trigger `3f61e13`, scoped local RAG answer-quality harness `3f7bb4b`, y single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
-- Baseline esperado: `main` alineado con `origin/main` tras `57fe5e0`.
+- Proyecto: VSM Store.
+- Fecha del snapshot: 2026-05-22.
+- Rol de este archivo: snapshot temporal de ejecucion y handoff, no historial ni fuente primaria de verdad.
+- Canon vigente: usar `AI_CONTEXT.md` para verdad tecnica current-state-first, `AUDIT_LOG.md` como indice cronologico, `STORE_FRONT_AI_PILOT_CONTEXT.md` como contexto tactico storefront/Cesarin, y `docs/audits/` para evidencia detallada.
 
-## 2. Estado autoritativo actual
-- `AI_CONTEXT.md` queda como fuente tecnica live/current-state-first.
-- `AUDIT_LOG.md` queda como indice cronologico compacto.
-- `STORE_FRONT_AI_PILOT_CONTEXT.md` queda tactico para Cesarin/storefront.
-- Detalle historico focalizado vive en `docs/audits/2026-05/`.
-- Snapshots completos pre-split viven en `docs/archive/`.
-- No se permite crear `AI_CONTEXT2.md` ni `AUDIT_LOG2.md` como continuacion lineal.
+## 2. Baseline actual de entrada
+- Rama esperada: `main`.
+- Estado esperado: `main` limpio y alineado con `origin/main`.
+- Ultimo commit aceptado antes de este snapshot: `820c707 docs: compact workkit readme entrypoint`.
+- Hito work-kit reciente: `README_WORKKIT.md` fue reducido a entrypoint/order-of-reading y ACCEPTED por Codex.
+- No hay reconciliacion canon/doc pendiente para ese hito.
 
-## 3. Ultimos hitos cerrados
-- Product Search compatibility wording micro-fix: aceptado con riesgo residual y canonizado. Runtime fix `ba2e39a`; canon fix `57fe5e0`. El claim aceptado es solo disciplina de wording para `product_search_integrity`: cuando la evidencia viene de ficha/catalogo, la respuesta debe presentar compatibilidad como indicada por la ficha, no como certeza graph-confirmed. Esto protege el invariante de que confidence de compatibilidad no debe superar la fuerza real de la relacion grounded. No prueba broad Product Search quality, global compatibility correctness, calidad de relacion `storefront_compatibility_check`, production runtime behavior, ni all-routes `customer-intelligence`.
-- Controlled six-prompt no-write RAG validation after targeted ingestion: aceptado con riesgo residual. Se uso una sesion autenticada existente y se abrio exactamente una vez `https://vsm-store.pages.dev/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true`; no hubo reload, retry, segundo trigger, login, storage inspection, prompt manual extra, workflow, deploy, Supabase CLI, DB mutation, ingestion, cache clear, service-worker unregister, ni secret inspection. La pagina quedo en el URL exacto, title `VSM Store`, `document.readyState=complete`, console warnings/errors sanitizados `0`. Se observaron una pending/preflight row `rag_quality_smoke` y seis rows `ok` para `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, y `unsupported_delivery_guarantee`. Cada prompt mostro metadata present, contract `customer_intelligence_no_write_v1`, writes suprimidos `ai_customer_memory` / `ai_analytics`, call suprimida `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, y `3` chunks. Verdicts: `payment_method` ACCEPT WITH RESIDUAL por main text terse/truncated aunque chunks transfer/deposit y sin MercadoPago/cards/cash accepted-policy; `shipping_scope` ACCEPT; `shipping_cost` ACCEPT sin fixed `$150-$180` settled policy; `combined_payment_shipping` ACCEPT WITH RESIDUAL porque el main foregrounded payment mas que shipping aunque chunks normalizados incluyen transfer/deposit, DHL OCURRE/no domicilio y shipping calculated; `store_hours_limitation` ACCEPT WITH RESIDUAL non-focus; `unsupported_delivery_guarantee` ACCEPT. Prueba bounded runtime answer/chunk evidence para este trigger solamente; no prueba DB transaction-log mutation absence, Product Search, all-routes safety, broad production readiness, inactive-row state, auth/session/storage/secret proof, broad Cesarin runtime, full RAG quality, ni semantic completeness.
-- Read-only retrieval/RPC ranking after targeted ingestion: aceptado con riesgo residual. Verificacion via deployed `embeddings-processor` + RPC `match_knowledge`, target host metadata `cvvlorbiwtuhkxolhfie.supabase.co`, `match_threshold=0.5`, `match_count=3`, sin key/token/env/header impreso y sin service-role-as-user-bearer. `payment_method` ACCEPT: rank 1 `politica-pagos-v1`, ranks 2-3 `politica-pagos-v2`, transfer/deposit y qualifier negativo card/cash/PayPal presentes. `combined_payment_shipping` ACCEPT WITH RESIDUAL: rank 1 `politica-pagos-v1`, rank 3 `guia-onboarding-v1`, payment normalizado + DHL OCURRE presente, pero `politica-pagos-v2` no aparecio top 3. `shipping_cost` ACCEPT: rank 1 `politica-envios-detallada-v1`, similarity `0.752457`, cost calculated by weight/destination/coverage y confirmed-before-closing. `shipping_scope` ACCEPT: rank 1 `politica-envios-v1` con OCURRE/no-home-delivery, ranks 2-3 `politica-envios-detallada-v1`. `unsupported_delivery_guarantee` ACCEPT WITH RESIDUAL como retrieval evidence only: top matches con timing/cutoff/estimate evidence y `politica-envios-detallada-v1` local cost/time confirmation, sin explicit no-domicilio/OCURRE chunk en top 3. No prueba runtime answer quality, no-write behavior, Product Search, all-routes safety, inactive-row state, broad production readiness, ni DB mutation/ingestion en esta lane.
-- Targeted Run Knowledge Ingestion payment/shipping execution: aceptado con riesgo residual. Run `26124496125`; workflow `Run Knowledge Ingestion`, `workflow_dispatch`, ref `main`, head `ae34c110013213c15669d47dd6fc8fe5c051d7bb`, input exacto `source_ids=politica-pagos-v2,politica-envios-detallada-v1`. Logs sanitizados: allowlist con esos dos source IDs, procesados `politica-pagos-v2` y `politica-envios-detallada-v1`, `4` active replacement chunks insertados para cada target, previous rows deactivated para cada target, `Documents processed: 2`, `Documents ok: 2`, `Documents failed: 0`. Post-run read-only verification acepta active target rows con `4` active / `4` embedded para cada source ID, `metadata.embedding_dims=768`, `metadata.embedding_model=models/gemini-embedding-001`, payment transfer/deposit-only presente, shipping calculated/confirmed-before-close presente, DHL Express a sucursal OCURRE presente, y conflictos viejos MercadoPago/cards/cash/fixed `$150-$180` ausentes en target active rows. La execution lane por si sola no probo runtime answer quality, Product Search, all-routes safety, inactive-row state, full DB diff, ni broad production readiness; retrieval/RPC ranking fue aceptado despues con riesgo residual en una lane read-only separada.
-- Targeted knowledge ingestion source allowlist: aceptado con riesgo residual. Commit `7fb0a77`; patch local source/workflow/test estrecho en `supabase/seeds/seed_runner.ts`, `.github/workflows/ingest-knowledge.yml`, y `src/__tests__/seed_runner.test.ts`. `seed_runner.ts` acepta `--sources=` con source IDs separados por coma, procesa exactamente los source IDs listados, falla con source IDs desconocidos antes de insert/update/deactivation, y conserva el full-ingestion behavior si no hay allowlist. El workflow `Run Knowledge Ingestion` sigue manual por `workflow_dispatch`, agrega input opcional `source_ids`, y pasa `--sources=$SOURCE_IDS` solo si el input no esta vacio. Se preservan los semantics de insert-before-deactivate del seed runner. Validado con focused Vitest 1 file / 8 tests, `npm run typecheck`, y `git diff --check`. No corrio workflow, ingestion, Supabase CLI, DB mutation, deploy, smoke, auth/browser/storage action, ni secret inspection. Production `store_knowledge` sigue unchanged y conflicting hasta una lane separada de targeted execution + verification.
-- Payment/shipping static RAG corpus normalization: aceptado con riesgo residual. Commit `caec050`; patch local/source-test estrecho en `supabase/seeds/seed_knowledge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, y `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. La static RAG payment corpus ya no declara MercadoPago/cards/cash como active accepted policy y conserva transfer/deposit-only operational policy. La static RAG shipping-cost corpus ya no declara fixed `$150-$180 MXN` como settled national shipping policy y ahora usa calculated/estimated/confirmed-before-close language. DHL OCURRE/no-domicilio sigue preservado. Validado con focused Vitest 3 files / 62 tests y `git diff --check`. No cambia deployed DB `store_knowledge`, no corre ingestion, no Supabase CLI, no DB mutation, no deploy, no workflow, no smoke, y no prueba runtime deployed.
-- Controlled 56e8ef4 valid-trigger no-write RAG evidence: aceptado con riesgo residual. Baseline deployed `56e8ef4`, runtime `v113-56e8ef4`, AIConcierge lazy chunk con markers pending/preflight. Se abrio exactamente una vez el trigger valido `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; no hubo reload, retry, segundo trigger open, auth, storage inspection, cache clear, service-worker unregister, workflow, deploy, Supabase CLI, DB work, ingestion, implementacion, test change ni secret exposure. La pagina renderizo normal, no reprodujo blank render, mostro una pending/preflight row y seis rows `ok`. Answer evidence: `unsupported_delivery_guarantee` ACCEPT; `shipping_scope` ACCEPT; `payment_method`, `shipping_cost`, `combined_payment_shipping`, y `store_hours_limitation` ACCEPT WITH RESIDUAL. No prueba DB mutation absence, Product Search, all-routes safety, root cause del blank original, ni broad production readiness.
-- Stable no-write smoke public bundle markers: aceptado con riesgo residual. Commit `cff68c1`; patch local/source estrecho en `src/lib/customer-intelligence-no-write-smoke.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, y `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`. Agrega `CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS` con strings publicos no secretos `ci_no_write_smoke`, `ci_rag_quality_smoke`, `smoke_contract`, `customer_intelligence_no_write_v1`, `no_write_smoke`, `no_write_smoke_audit`, `edge_metadata_present`, y `request_contract_present`, referenciados por el trigger/audit existente para futuros freshness checks de bundle. No habilita smoke por si solo, no cambia condiciones de trigger, payload, metadata no-write, allowlist de seis prompts, `sendMessage` normal, UI normal, ni el guard `2443caa`. Validado localmente con 3 files / 26 tests, ESLint 0 errors con warnings existentes, typecheck, diff check, y secret-value scan sin valores secretos.
-- Unsupported delivery-guarantee retrieval guard hardening: aceptado con riesgo residual. Commit `2443caa`; patch local/source estrecho en `src/lib/knowledge-rag-capsule.ts` y `src/lib/__tests__/knowledge-rag-capsule.test.ts`. Reemplaza el gate previo solo-OCURRE por un clasificador de evidencia de dos niveles: `ocurre_policy` conserva grounding fuerte DHL OCURRE / sucursal cuando existe, y `shipping_timing_policy` activa con evidencia DHL/shipping de tiempo, corte, estimado, costo, cobertura o confirmacion. Para premisas de garantia de entrega manana/a domicilio, ahora puede rechazar/calificar aun sin chunks OCURRE/no-domicilio; los tiempos quedan como estimados/condicionales y no se confirma entrega garantizada. No cambia no-write trigger ni metadata. Validado localmente con 3 files / 20 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
-- Unsupported delivery-guarantee successful RAG-path hardening: aceptado con riesgo residual. Commit `826927f`; patch local/source estrecho en `src/lib/knowledge-rag-capsule.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, y `src/services/ai-capsule-orchestrator.service.ts`. `evaluateKnowledgeRAGTree` acepta query context opcional y `executeKnowledgeCapsule` pasa `toolArgs.query`; el guard detecta unsupported shipping-promise questions, exige evidencia de shipping / DHL OCURRE / sucursal en chunks resueltos, y responde que no se confirma entrega garantizada al dia siguiente a domicilio, aterriza a DHL ocurre / sucursal, y pide confirmar tiempos/costos antes de cerrar la orden. Validado localmente con 3 files / 19 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
-- fa305b2 live six-prompt no-write RAG smoke partial evidence: veredicto PARTIAL / NEEDS TARGETED FIX. Freshness previa: runtime storefront `fa305b2`, fingerprint `v113-fa305b2`, assets con marcadores `826927f` y marcadores no-write trigger/audit. Se ejecuto exactamente un smoke autenticado via trigger `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; corrio solo `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, y `unsupported_delivery_guarantee`. Los seis mostraron `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes suprimidos `ai_customer_memory` / `ai_analytics`, call suprimida `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, answer/main message present, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, y `3` chunks. La prueba sigue parcial: `unsupported_delivery_guarantee` no rechazo/califico claramente la garantia de entrega manana a domicilio; hipotesis: el guard `826927f` no activo porque retrieval devolvio chunks de estimado/corte/local delivery en vez de evidencia OCURRE/no-domicilio.
-- Partial six-prompt no-write RAG smoke evidence: veredicto PARTIAL / NEEDS TARGETED FIX. Runtime storefront `d50379e`, fingerprint `v113-d50379e`, run deploy-functions `26000841773` success, `Deploy customer-intelligence` success, y source desplegado conteniendo `cb6311e`, `7905b60`, y `9637596`. Se ejecuto exactamente un smoke autenticado via trigger `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, `ci_rag_quality_smoke=true`; corrio solo `payment_method`, `shipping_scope`, `shipping_cost`, `combined_payment_shipping`, `store_hours_limitation`, y `unsupported_delivery_guarantee`. Los seis mostraron `status: ok`, `metadata: present`, contract `customer_intelligence_no_write_v1`, writes suprimidos `ai_customer_memory` / `ai_analytics`, call suprimida `cesarin-qa-judge`, capsule `knowledge_rag_foundation`, match `MODERATE_CONFIDENCE_MULTI_SOURCE`, y `3` chunks. La prueba de calidad queda parcial: `unsupported_delivery_guarantee` necesitaba fix al momento del smoke y queda cubierto solo local/source en `826927f`; `store_hours_limitation`, `payment_method`, y `shipping_cost` conservan residuales.
-- Payment/shipping-cost no-write RAG smoke path hardening: aceptado con riesgo residual. Commit `cb6311e`; bajo `customer_intelligence_no_write_v1`, los prompts exactos `¿Aceptan tarjeta o cómo puedo pagar?` y `¿Cuánto cuesta el envío por DHL?` se fuerzan a `POLICY_INQUIRY` / `knowledge_rag_foundation` en vez de `storefront_checkout_readiness`; checkout-readiness normal sigue intacto para frases como `ya puedo pagar?`; el audit sanitizado distingue `edge_metadata_present` de `request_contract_present`; validado localmente con 4 files / 70 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
-- No-write error metadata preservation: aceptado con riesgo residual. Commit `7905b60`; errores Edge reconocidos como `customer_intelligence_no_write_v1` incluyen metadata sanitizada `no_write_smoke`; el servicio conserva metadata de error responses; se suprime client telemetry para no-write error paths; el hook renderiza audit rows con metadata presente cuando existe; validado localmente con 3 files / 25 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
-- Unsupported delivery guarantee answer-shaping: aceptado con riesgo residual. Commit `9637596`; agrega fallback local deterministico `unsupported_shipping_promise_limit` para promesas no soportadas de envio/garantia cuando hay contexto de politica de envio; indica que no se puede confirmar entrega garantizada al dia siguiente a domicilio; aterriza envio a DHL OCURRE / sucursal; exige confirmar tiempo/costo antes de cerrar la orden; validado localmente con 2 files / 13 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
-- Multi-prompt no-write RAG quality trigger: aceptado con riesgo residual. Commit `3f61e13`; requiere `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, y `ci_rag_quality_smoke=true`; corre solo seis prompts allowlisted; cada request usa `conciergeService.chat` con `{ noWriteSmoke: true }`; validado localmente con 2 files / 46 tests, ESLint, typecheck, diff check, y secret-pattern scan sin valores secretos.
-- Scoped local RAG answer-quality harness: aceptado con riesgo residual. Commit `3f7bb4b`; cubre seis categorias policy/RAG con fixtures deterministicos y sin Edge/Supabase/DB/network/provider/live app/workflow/deploy/ingestion/smoke.
-- Post-deploy live no-write customer-intelligence smoke: aceptado con riesgo residual. Commit workflow `626a730`; run `25980183647` success; one deployed authenticated smoke; contract `customer_intelligence_no_write_v1`; capsule `knowledge_rag_foundation`; match `MODERATE_CONFIDENCE_MULTI_SOURCE`; chunks `3`.
-- Deploy-functions customer-intelligence refresh: run `25980183647` por `workflow_dispatch` desplego `knowledge-ingestor`, `customer-intelligence`, `create-payment`, y `mercadopago-webhook` con conclusion success.
-- No-write customer-intelligence smoke readiness: aceptado con riesgo residual y canonizado. Commit `0795c51`; canon `8e0dab7`; contract identity `customer_intelligence_no_write_v1`.
-- Seed_runner typecheck strictness repair: aceptado con riesgo residual y canonizado. Commit `70ca5f2`; project-wide `npm run typecheck` green at that lane.
-- Cesarin knowledge main-message synthesis improvement: aceptado con riesgo residual y canonizado. Commit `c65ba23`.
-- Post-Gemini-repair ingest verification: aceptada con riesgo residual. Run `25969669995` PASS.
-- Ingest failure-mode safety observation: aceptada como evidencia historica con riesgo residual. Run `25947955038` failed por Gemini `403 PERMISSION_DENIED`, pero mostro safety behavior.
+## 3. Estado operativo actual
+- Estado de ciclo: STOP / sin hito product-runtime activo.
+- No abrir Product Search, Cesarin runtime, DB/Supabase, deploy, workflow, live smoke, secrets, source/runtime o canon sin prompt explicito.
+- El siguiente trabajo debe seleccionarse en una lane separada de roadmap/readiness o por instruccion explicita del usuario.
 
-## 4. Residuos explicitos
-- Live retrieval-to-answer proof queda limitado al single post-deploy no-write `customer-intelligence` smoke de politica/envio/pago, los older partial six-prompt no-write RAG smokes, el controlled deployed `56e8ef4` valid-trigger run, y el controlled post-ingestion six-prompt no-write validation descrito arriba.
-- Remote `customer-intelligence` smoke queda limitado a esos smokes deployed app-triggered explicitamente descritos.
-- El controlled `56e8ef4` run prueba ejecucion del trigger desplegado, pending/preflight observability, audit rows visibles no-write, y bounded answer evidence para ese run, no full RAG quality ni all-routes safety.
-- No DB transaction-log mutation absence proof.
-- Consistencia payment/shipping queda aceptada en local source/test despues de `caec050`, en deployed active target rows despues de run `26124496125`, en read-only retrieval/RPC ranking con riesgo residual, y en un controlled six-prompt no-write runtime validation con riesgo residual.
-- `26124496125` cubre solo `politica-pagos-v2` y `politica-envios-detallada-v1`; no es full DB diff ni prueba inactive-row state.
-- `unsupported_delivery_guarantee` tiene accepted targeted deployed evidence en el controlled `56e8ef4` run; el live rerun `fa305b2` queda como evidencia historica parcial.
-- `cff68c1` markers publicos y `56e8ef4` pending/preflight markers tienen freshness evidence en el controlled lane actual.
-- Cualquier server-side Sommelier path distinto que evite el client-capsule mapper sigue sin prueba.
-- `store_hours_limitation` queda ACCEPT WITH RESIDUAL: devolvio horarios de WhatsApp/soporte/confirmacion de pedidos, no prueba de horario general de tienda.
-- No broad production Cesarin answer-quality proof mas alla del bounded controlled `56e8ef4` six-prompt run y el bounded post-ingestion six-prompt no-write validation.
-- No full RAG quality proof.
-- No Product Search quality proof.
-- No global Product Search compatibility correctness proof.
-- No `storefront_compatibility_check` relation-quality proof.
-- No Product Search production runtime proof.
-- No broad production readiness ni all-routes `customer-intelligence` safety proof.
-- No semantic completeness proof.
-- Retrieval/RPC ranking despues de `26124496125` esta aceptado con riesgo residual; generated answer quality queda probada solo por el bounded controlled six-prompt no-write validation descrito arriba.
-- No broad deployed runtime answer-quality proof despues de `26124496125`; solo existe el bounded controlled trigger evidence con residuales.
-- `metadata.embedding_dims` mismatch sigue abierto salvo reparacion futura.
-- Retained inactive embedded rows siguen como residual no bloqueante salvo limpieza futura.
-- Remote sandbox RPC smoke y production admin UI observation siguen sin resolver salvo canon nuevo.
-- Migration history divergence sigue intencionalmente sin reparar.
+## 4. Residuales vivos que afectan handoff
+- DB/RAG metadata observation: ACCEPT AS BLOCKED / NO-GO.
+- No hubo observacion DB completada para `metadata.embedding_dims`.
+- `metadata.embedding_dims` mismatch sigue abierto hasta observacion o reparacion autorizada.
+- Retained inactive embedded rows siguen como residual no bloqueante salvo limpieza futura autorizada.
+- No hay prueba nueva de DB/Supabase/deploy/workflow/live-smoke.
 
-## 5. Lanes cerrados / no reabrir
-- Product Search compatibility wording micro-fix (`product_search_integrity`) como wording governance solamente.
-- Post-Gemini Run Knowledge Ingestion verification.
-- Targeted Run Knowledge Ingestion payment/shipping execution.
-- Controlled six-prompt no-write RAG validation after targeted ingestion.
-- Targeted knowledge ingestion source allowlist.
-- `store_knowledge` active corpus repair.
-- Direct `match_knowledge` retrieval smoke.
-- Local no-mutation AIConcierge chunk visibility harness.
-- Local no-mutation Cesarin service-level knowledge harness.
-- `store_knowledge` ingestion activation safety hardening.
-- Ingest failure-mode safety observation.
-- Post-Gemini-repair Run Knowledge Ingestion runtime verification.
-- Local no-mutation Cesarin knowledge main-message synthesis improvement.
-- Seed-runner local typecheck strictness repair.
-- No-write customer-intelligence smoke readiness.
-- Post-deploy live no-write customer-intelligence smoke.
-- Scoped local RAG answer-quality harness.
-- Multi-prompt no-write RAG quality trigger.
-- No-write error metadata preservation.
-- Unsupported delivery guarantee answer-shaping.
-- Payment/shipping-cost no-write RAG smoke path hardening.
-- Partial six-prompt no-write RAG smoke evidence.
-- Unsupported delivery-guarantee successful RAG-path hardening.
-- fa305b2 live six-prompt no-write RAG smoke partial evidence.
-- Unsupported delivery-guarantee retrieval guard hardening.
+## 5. Lanes cerrados / no reabrir por arrastre
+- `product_search_integrity` queda cerrado como wording governance solamente.
+- Product Search runtime/retrieval/compatibility quality sigue en hold salvo seleccion explicita.
+- Cesarin runtime y live model/provider evaluation siguen cerrados salvo seleccion explicita.
+- Local validation baselines aceptados no prueban produccion ni runtime broad behavior.
+- Para la lista completa de closed lanes y non-claims, consultar `AI_CONTEXT.md`, `AUDIT_LOG.md`, `STORE_FRONT_AI_PILOT_CONTEXT.md` y los audit details relevantes.
 
-## 6. Proximo paso correcto
-- El hito `product_search_integrity` queda cerrado como wording governance. El siguiente hito tecnico/productivo debe seleccionarse en una lane separada de roadmap/readiness o por instruccion explicita del usuario, sin reabrir Product Search, Cesarin/customer-intelligence, DB/Supabase, deploy, workflow, live smoke, ni dirty eval harness salvo autorizacion especifica.
-
-## 7. Regla de continuidad
-- Si cambia el frente real, este archivo se reemplaza.
-- Si el canon cambia, el contexto temporal se actualiza; nunca al reves.
-- No cargar la historia completa en prompts futuros; usar `AI_CONTEXT.md` + `AUDIT_LOG.md` + detalle especifico en `docs/audits/` segun necesidad.
+## 6. Regla de continuidad
+- Si cambia el frente real, reemplazar este snapshot.
+- Si cambia el canon, actualizar este snapshot despues; nunca usar este archivo para cambiar canon.
+- No cargar historia larga en prompts futuros; resumir solo meta activa, baseline, bloqueos, residual vivo y siguiente herramienta.
