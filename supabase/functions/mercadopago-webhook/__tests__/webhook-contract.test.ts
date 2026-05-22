@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
     extractMercadoPagoNotification,
+    handleMercadoPagoWebhookRequest,
     processMercadoPagoWebhook,
     resolvePaymentState,
     type MercadoPagoPaymentPayload,
@@ -162,5 +163,71 @@ describe('mercadopago webhook contract', () => {
             .rejects.toThrow('conversion insert failed');
 
         expect(deps.updateOrderPayment).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('mercadopago webhook request handler', () => {
+    function createHandlerDeps() {
+        return {
+            processWebhook: vi.fn(async () => ({
+                handled: true,
+                ignored: false,
+                orderId: 'order-123',
+                paymentId: '999',
+                paymentStatus: 'paid',
+                orderStatus: 'processing',
+                conversionInserted: true,
+            })),
+            log: {
+                log: vi.fn(),
+                error: vi.fn(),
+            },
+        };
+    }
+
+    it('returns 500 when webhook processing throws', async () => {
+        const deps = createHandlerDeps();
+        deps.processWebhook.mockRejectedValueOnce(new Error('processing failed'));
+
+        const response = await handleMercadoPagoWebhookRequest(
+            new Request('https://example.test/webhook?topic=payment&id=999'),
+            deps,
+        );
+
+        await expect(response.text()).resolves.toBe('Webhook processing failed');
+        expect(response.status).toBe(500);
+        expect(deps.log.error).toHaveBeenCalledWith('Webhook error:', expect.any(Error));
+    });
+
+    it('keeps non-payment or missing payment id requests acknowledged without processing', async () => {
+        const deps = createHandlerDeps();
+
+        const response = await handleMercadoPagoWebhookRequest(
+            new Request('https://example.test/webhook?topic=merchant_order&id=999'),
+            deps,
+        );
+
+        await expect(response.text()).resolves.toBe('OK');
+        expect(response.status).toBe(200);
+        expect(deps.processWebhook).not.toHaveBeenCalled();
+    });
+
+    it('keeps missing external_reference acknowledged without false failure', async () => {
+        const deps = createHandlerDeps();
+        deps.processWebhook.mockResolvedValueOnce({
+            handled: true,
+            ignored: true,
+            reason: 'missing_external_reference',
+            paymentId: '999',
+        });
+
+        const response = await handleMercadoPagoWebhookRequest(
+            new Request('https://example.test/webhook?topic=payment&id=999'),
+            deps,
+        );
+
+        await expect(response.text()).resolves.toBe('OK');
+        expect(response.status).toBe(200);
+        expect(deps.log.error).toHaveBeenCalledWith('No external_reference found in payment');
     });
 });

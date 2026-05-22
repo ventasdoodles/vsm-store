@@ -55,6 +55,11 @@ export interface WebhookContractResult {
     conversionInserted?: boolean;
 }
 
+export interface MercadoPagoWebhookRequestHandlerDeps {
+    processWebhook(notification: MercadoPagoWebhookNotification): Promise<WebhookContractResult>;
+    log?: Pick<Console, 'log' | 'error'>;
+}
+
 export function extractMercadoPagoNotification(url: URL, body: unknown): MercadoPagoWebhookNotification {
     const queryType = url.searchParams.get('topic') || url.searchParams.get('type');
     const queryId = url.searchParams.get('id') || url.searchParams.get('data.id');
@@ -90,6 +95,44 @@ export function resolvePaymentState(status: string | null | undefined): {
     }
 
     return { paymentStatus: 'pending', orderStatus: 'pending' };
+}
+
+export async function handleMercadoPagoWebhookRequest(
+    req: Request,
+    deps: MercadoPagoWebhookRequestHandlerDeps,
+): Promise<Response> {
+    const logger = deps.log ?? console;
+
+    try {
+        const url = new URL(req.url);
+
+        let body = null;
+        try {
+            body = await req.json();
+        } catch {
+            // Body might be empty if query params are used.
+        }
+
+        const notification = extractMercadoPagoNotification(url, body);
+
+        if (notification.type !== 'payment' || !notification.paymentId) {
+            return new Response('OK', { status: 200 });
+        }
+
+        const result = await deps.processWebhook(notification);
+
+        if (result.reason === 'missing_external_reference') {
+            logger.error('No external_reference found in payment');
+            return new Response('OK', { status: 200 });
+        }
+
+        logger.log(`Webhook processed for Order ${result.orderId}: Status ${result.paymentStatus}`);
+
+        return new Response('OK', { status: 200 });
+    } catch (error) {
+        logger.error('Webhook error:', error);
+        return new Response('Webhook processing failed', { status: 500 });
+    }
 }
 
 export async function processMercadoPagoWebhook(
