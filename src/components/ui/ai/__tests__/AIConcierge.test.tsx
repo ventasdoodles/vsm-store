@@ -230,6 +230,50 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Sigo pensando...')).not.toBeInTheDocument();
     });
 
+    it('renders user, older assistant, and latest assistant text deterministically in tests', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isSlowResponse: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-old',
+                    role: 'assistant',
+                    content: 'Respuesta anterior completa.',
+                    timestamp: new Date(),
+                },
+                {
+                    id: 'user-1',
+                    role: 'user',
+                    content: 'Quiero revisar sabores.',
+                    timestamp: new Date(),
+                },
+                {
+                    id: 'assistant-latest',
+                    role: 'assistant',
+                    content: 'Respuesta nueva completa.',
+                    timestamp: new Date(),
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Respuesta anterior completa.')).toBeInTheDocument();
+        expect(screen.getByText('Quiero revisar sabores.')).toBeInTheDocument();
+        expect(screen.getByText('Respuesta nueva completa.')).toBeInTheDocument();
+    });
+
     it('does not expose the no-write smoke audit surface during normal browsing', () => {
         render(<AIConcierge />);
 

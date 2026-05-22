@@ -19,6 +19,7 @@ import {
 } from '@/lib/cesarin-cart-assembly';
 import { emitConversationConversionEvent } from '@/lib/conversion-measurement';
 import { CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS } from '@/lib/customer-intelligence-no-write-smoke';
+import { useTypewriter } from '@/hooks/useTypewriter';
 
 function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
@@ -303,6 +304,25 @@ function getVisibleHelpSurface(input: {
 type CartAssemblyFeedback = {
     tone: 'success' | 'warning' | 'error';
     text: string;
+};
+
+const TypewriterBubble: React.FC<{ text: string; isLatest: boolean; onTick?: () => void }> = ({ text, isLatest, onTick }) => {
+    const { displayedText, isTyping } = useTypewriter(text, isLatest, 3, 12);
+
+    useEffect(() => {
+        if (isTyping && onTick) {
+            onTick();
+        }
+    }, [displayedText, isTyping, onTick]);
+
+    return (
+        <>
+            {displayedText}
+            {isTyping && (
+                <span className="inline-block w-[3px] h-[1em] ml-0.5 bg-vape-400/70 animate-pulse align-text-bottom" />
+            )}
+        </>
+    );
 };
 
 export const AIConcierge: React.FC = () => {
@@ -610,7 +630,9 @@ export const AIConcierge: React.FC = () => {
                                 ref={scrollRef}
                                 className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent custom-scrollbar"
                             >
-                                {messages.map((message) => {
+                                {(() => {
+                                    const lastAssistantId = [...messages].reverse().find(m => m.role === 'assistant')?.id ?? null;
+                                    return messages.map((message) => {
                                     const turnAnalysis = (message as ConciergeMessage).turn_analysis ?? (message as any).capsule_contract?.turn_analysis ?? null;
                                     const catalogGate = latestCatalogGate ?? (message as ConciergeMessage).catalog_gate ?? buildConciergeCatalogGate({
                                         query: message.content,
@@ -693,7 +715,19 @@ export const AIConcierge: React.FC = () => {
                                                     : 'bg-white/[0.03] text-white/90 border border-white/5 rounded-tl-none',
                                             )}
                                         >
-                                            {message.content}
+                                            {message.role === 'assistant' ? (
+                                                <TypewriterBubble
+                                                    text={message.content}
+                                                    isLatest={message.id === lastAssistantId}
+                                                    onTick={() => {
+                                                        if (scrollRef.current) {
+                                                            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                                                        }
+                                                    }}
+                                                />
+                                            ) : (
+                                                message.content
+                                            )}
                                         </div>
 
                                         {message.role === 'assistant' && noWriteSmokeAudit && (
@@ -1047,7 +1081,8 @@ export const AIConcierge: React.FC = () => {
                                         )}
                                     </motion.div>
                                     );
-                                })}
+                                });
+                                })()}
 
                                 {isLoading && (
                                     <div className="flex items-center gap-2 text-vape-400/50">
