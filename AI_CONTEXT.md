@@ -299,6 +299,10 @@
 - No semantic completeness proof is claimed.
 - No metadata cleanup is claimed.
 - `metadata.embedding_dims` mismatch remains open: active vectors parse as `768d`, but metadata still records `3072` on many rows and is missing on one row unless separately repaired.
+- Metadata observer tooling `8eb02af` (`tooling: add read-only store knowledge metadata observer`) is accepted with residual risk as local tooling only. It has not completed DB observation.
+- Read-only metadata observer execution is currently ACCEPT AS BLOCKED / NO-GO because observer-specific config is missing. Required variable names only: `SUPABASE_OBSERVER_URL` and `SUPABASE_OBSERVER_KEY`.
+- Those variables are only for a future explicitly authorized read-only observation of `store_knowledge.metadata.embedding_dims` through `scripts/db-observation/store-knowledge-metadata-dims-observer.mjs`. Setup must happen outside chat/logs/docs, and credential values must never be stored in repo docs or printed. Presence checks may report only `PRESENT`/`MISSING`.
+- The observer config record does not prove credential validity, DB/Supabase readiness, current metadata state, metadata cleanup, retained inactive-row cleanup, Product Search, Cesarin runtime, production, deploy, workflow, or live-smoke behavior.
 - Retained inactive embedded rows remain open/non-blocking unless separately repaired.
 - Migration history divergence remains intentionally unresolved unless selected.
 - Remote sandbox RPC smoke and production admin UI observation remain unresolved unless canon changes.
