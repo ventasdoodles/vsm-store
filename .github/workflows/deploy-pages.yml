@@ -54,3 +54,4 @@ jobs:
           --project-name "$CLOUDFLARE_PAGES_PROJECT"
           --branch "${GITHUB_REF_NAME}"
           --commit-hash "${GITHUB_SHA}"
+          --skip-caching
