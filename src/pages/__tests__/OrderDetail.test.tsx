@@ -387,4 +387,130 @@ describe('OrderDetail payment continuation', () => {
         expect(writeTextMock).not.toHaveBeenCalledWith(tracking_notes);
         expect(notifySuccessMock).toHaveBeenCalledWith('Copiado', 'Número de guía listo.');
     });
+
+    it('shows preparation copy for processing orders without fake shipment or tracking availability', () => {
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-7',
+                order_number: 'VSM-007',
+                customer_id: 'user-1',
+                items: [{ product_id: 'p7', name: 'Item', price: 100, quantity: 1 }],
+                subtotal: 100,
+                shipping_cost: 0,
+                discount: 0,
+                total: 100,
+                status: 'processing',
+                payment_method: 'cash',
+                payment_status: 'paid',
+                shipping_address_id: null,
+                billing_address_id: null,
+                tracking_number: null,
+                tracking_notes: null,
+                whatsapp_sent: false,
+                whatsapp_sent_at: null,
+                created_at: '2026-03-25T00:00:00.000Z',
+                updated_at: '2026-03-25T00:00:00.000Z',
+            },
+            isLoading: false,
+            refetch: vi.fn(),
+            isFetching: false,
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/orders/order-7']}>
+                <Routes>
+                    <Route path="/orders/:orderId" element={<OrderDetail />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText(/Pedido en preparacion/i)).toBeInTheDocument();
+        expect(screen.getByText(/Sin guia persistida/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Numero de Guia/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Pedido enviado con guia registrada/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Pedido marcado como entregado/i)).not.toBeInTheDocument();
+    });
+
+    it('shows shipped-without-guide copy without fake tracking number availability', () => {
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-8',
+                order_number: 'VSM-008',
+                customer_id: 'user-1',
+                items: [{ product_id: 'p8', name: 'Item', price: 100, quantity: 1 }],
+                subtotal: 100,
+                shipping_cost: 0,
+                discount: 0,
+                total: 100,
+                status: 'shipped',
+                payment_method: 'cash',
+                payment_status: 'paid',
+                shipping_address_id: null,
+                billing_address_id: null,
+                tracking_number: null,
+                tracking_notes: null,
+                whatsapp_sent: false,
+                whatsapp_sent_at: null,
+                created_at: '2026-03-25T00:00:00.000Z',
+                updated_at: '2026-03-25T00:00:00.000Z',
+            },
+            isLoading: false,
+            refetch: vi.fn(),
+            isFetching: false,
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/orders/order-8']}>
+                <Routes>
+                    <Route path="/orders/:orderId" element={<OrderDetail />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText(/Guia pendiente/i)).toBeInTheDocument();
+        expect(screen.getByText(/Pedido enviado sin guia visible/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Numero de Guia/i)).not.toBeInTheDocument();
+    });
+
+    it('does not expose stale guide or shipment continuation for cancelled orders', () => {
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-9',
+                order_number: 'VSM-009',
+                customer_id: 'user-1',
+                items: [{ product_id: 'p9', name: 'Item', price: 100, quantity: 1 }],
+                subtotal: 100,
+                shipping_cost: 0,
+                discount: 0,
+                total: 100,
+                status: 'cancelled',
+                payment_method: 'cash',
+                payment_status: 'failed',
+                shipping_address_id: null,
+                billing_address_id: null,
+                tracking_number: 'STALE-123',
+                tracking_notes: 'Old carrier note',
+                whatsapp_sent: false,
+                whatsapp_sent_at: null,
+                created_at: '2026-03-25T00:00:00.000Z',
+                updated_at: '2026-03-25T00:00:00.000Z',
+            },
+            isLoading: false,
+            refetch: vi.fn(),
+            isFetching: false,
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/orders/order-9']}>
+                <Routes>
+                    <Route path="/orders/:orderId" element={<OrderDetail />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText(/Sin continuidad de envio/i)).toBeInTheDocument();
+        expect(screen.queryByText('STALE-123')).not.toBeInTheDocument();
+        expect(screen.queryByText(/Old carrier note/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Numero de Guia/i)).not.toBeInTheDocument();
+    });
 });

@@ -6,7 +6,10 @@ vi.mock('@/services/orders.service', () => ({
   getCustomerOrders: (...args: unknown[]) => (getCustomerOrdersMock as any)(...args),
 }));
 
-import { resolveStorefrontAuthenticatedOrderTracking } from '../storefront-order-tracking.service';
+import {
+  getStorefrontOrderTrackingTrustView,
+  resolveStorefrontAuthenticatedOrderTracking,
+} from '../storefront-order-tracking.service';
 
 function makeOrder(overrides: Record<string, unknown> = {}) {
   return {
@@ -110,5 +113,77 @@ describe('resolveStorefrontAuthenticatedOrderTracking', () => {
     expect(resolution.kind).toBe('FOUND');
     expect(resolution.signal.tracking_number).toBeNull();
     expect(resolution.message).toContain('Todavia no veo numero de guia persistido');
+  });
+});
+
+describe('getStorefrontOrderTrackingTrustView', () => {
+  it('frames processing orders without tracking as preparation, not shipped or delivered', () => {
+    const view = getStorefrontOrderTrackingTrustView(makeOrder({
+      status: 'processing',
+      tracking_number: null,
+      tracking_notes: null,
+    }));
+
+    expect(view.showPanel).toBe(true);
+    expect(view.headline).toBe('Pedido en preparacion');
+    expect(view.detail).toContain('aun no figura como enviado');
+    expect(view.showTrackingNumber).toBe(false);
+    expect(view.canCopyTrackingNumber).toBe(false);
+  });
+
+  it('exposes shipped orders with a persisted tracking number as a copyable guide reference', () => {
+    const view = getStorefrontOrderTrackingTrustView(makeOrder({
+      status: 'shipped',
+      tracking_number: 'TRACK-123',
+      tracking_notes: 'https://carrier.example/track/TRACK-123',
+    }));
+
+    expect(view.headline).toBe('Pedido enviado con guia registrada');
+    expect(view.trackingNumber).toBe('TRACK-123');
+    expect(view.showTrackingNumber).toBe(true);
+    expect(view.canCopyTrackingNumber).toBe(true);
+    expect(view.showTrackingNotes).toBe(true);
+  });
+
+  it('keeps shipped orders without tracking from showing fake tracking availability', () => {
+    const view = getStorefrontOrderTrackingTrustView(makeOrder({
+      status: 'shipped',
+      tracking_number: null,
+      tracking_notes: null,
+    }));
+
+    expect(view.subtitle).toBe('Guia pendiente');
+    expect(view.headline).toBe('Pedido enviado sin guia visible');
+    expect(view.detail).toContain('no hay una guia persistida visible');
+    expect(view.showTrackingNumber).toBe(false);
+    expect(view.canCopyTrackingNumber).toBe(false);
+  });
+
+  it('frames delivered orders as closed without requiring recovery actions', () => {
+    const view = getStorefrontOrderTrackingTrustView(makeOrder({
+      status: 'delivered',
+      tracking_number: null,
+      tracking_notes: null,
+    }));
+
+    expect(view.title).toBe('Seguimiento cerrado');
+    expect(view.headline).toBe('Pedido marcado como entregado');
+    expect(view.detail).toContain('figura como entregado');
+    expect(view.canCopyTrackingNumber).toBe(false);
+  });
+
+  it('prevents cancelled orders from exposing stale shipment continuation', () => {
+    const view = getStorefrontOrderTrackingTrustView(makeOrder({
+      status: 'cancelled',
+      tracking_number: 'STALE-123',
+      tracking_notes: 'Old carrier note',
+    }));
+
+    expect(view.title).toBe('Seguimiento cerrado');
+    expect(view.headline).toBe('Sin continuidad de envio');
+    expect(view.trackingNumber).toBeNull();
+    expect(view.trackingNotes).toBeNull();
+    expect(view.showTrackingNumber).toBe(false);
+    expect(view.showTrackingNotes).toBe(false);
   });
 });

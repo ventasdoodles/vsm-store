@@ -3,7 +3,6 @@ import {
   getStorefrontOrderLifecycleView,
   STOREFRONT_ORDER_STATUS,
 } from '@/lib/domain/orders';
-import { getCustomerOrders } from '@/services/orders.service';
 import type { OrderRecord } from '@/types/order';
 
 type OrderTrackingFocus =
@@ -57,6 +56,19 @@ export interface StorefrontOrderTrackingResolution {
     tracking_link?: string | null;
     matched_by?: 'explicit_order_number' | 'recent_active_order' | 'recent_order' | 'none';
   };
+}
+
+export interface StorefrontOrderTrackingTrustView {
+  showPanel: boolean;
+  title: string;
+  subtitle: string;
+  headline: string;
+  detail: string;
+  trackingNumber: string | null;
+  trackingNotes: string | null;
+  showTrackingNumber: boolean;
+  canCopyTrackingNumber: boolean;
+  showTrackingNotes: boolean;
 }
 
 const RECENT_ORDER_LOOKBACK_LIMIT = 12;
@@ -117,6 +129,91 @@ function extractTrackingLink(notes: string | null | undefined): string | null {
   if (!notes) return null;
   const match = notes.match(/https?:\/\/[^\s<>"')\]]+/i);
   return match?.[0] ?? null;
+}
+
+export function getStorefrontOrderTrackingTrustView(order: Pick<OrderRecord, 'status' | 'tracking_number' | 'tracking_notes'>): StorefrontOrderTrackingTrustView {
+  const status = (order.status || '').toLowerCase();
+  const trackingNumber = order.tracking_number?.trim() || null;
+  const trackingNotes = order.tracking_notes?.trim() || null;
+
+  if (status === 'cancelled') {
+    return {
+      showPanel: true,
+      title: 'Seguimiento cerrado',
+      subtitle: 'Pedido cancelado',
+      headline: 'Sin continuidad de envio',
+      detail: 'Este pedido figura como cancelado. No uses guias o notas anteriores como seguimiento activo.',
+      trackingNumber: null,
+      trackingNotes: null,
+      showTrackingNumber: false,
+      canCopyTrackingNumber: false,
+      showTrackingNotes: false,
+    };
+  }
+
+  if (status === 'delivered') {
+    return {
+      showPanel: true,
+      title: 'Seguimiento cerrado',
+      subtitle: trackingNumber ? 'Guia persistida de entrega' : 'Entrega registrada',
+      headline: 'Pedido marcado como entregado',
+      detail: trackingNumber
+        ? 'El pedido figura como entregado y conserva una guia persistida como referencia historica.'
+        : 'El pedido figura como entregado. No hay una guia persistida visible en esta vista.',
+      trackingNumber,
+      trackingNotes,
+      showTrackingNumber: Boolean(trackingNumber),
+      canCopyTrackingNumber: Boolean(trackingNumber),
+      showTrackingNotes: Boolean(trackingNotes),
+    };
+  }
+
+  if (status === 'shipped') {
+    return {
+      showPanel: true,
+      title: 'Seguimiento',
+      subtitle: trackingNumber ? 'Guia persistida' : 'Guia pendiente',
+      headline: trackingNumber ? 'Pedido enviado con guia registrada' : 'Pedido enviado sin guia visible',
+      detail: trackingNumber
+        ? 'Usa la guia persistida como referencia de rastreo. Si necesitas mas detalle, contacta soporte.'
+        : 'El pedido figura como enviado, pero todavia no hay una guia persistida visible en esta vista.',
+      trackingNumber,
+      trackingNotes,
+      showTrackingNumber: Boolean(trackingNumber),
+      canCopyTrackingNumber: Boolean(trackingNumber),
+      showTrackingNotes: Boolean(trackingNotes),
+    };
+  }
+
+  if (trackingNumber || trackingNotes || status === 'confirmed' || status === 'processing') {
+    return {
+      showPanel: true,
+      title: trackingNumber ? 'Seguimiento' : 'Preparacion',
+      subtitle: trackingNumber ? 'Guia persistida' : 'Sin guia persistida',
+      headline: trackingNumber ? 'Guia registrada antes del cierre' : 'Pedido en preparacion',
+      detail: trackingNumber
+        ? 'Hay una guia persistida, pero el estado del pedido todavia no figura como enviado. Confirma el avance real antes de asumir entrega.'
+        : 'El pedido aun no figura como enviado. Todavia no hay una guia persistida visible para rastrear.',
+      trackingNumber,
+      trackingNotes,
+      showTrackingNumber: Boolean(trackingNumber),
+      canCopyTrackingNumber: Boolean(trackingNumber),
+      showTrackingNotes: Boolean(trackingNotes),
+    };
+  }
+
+  return {
+    showPanel: false,
+    title: 'Seguimiento',
+    subtitle: 'Sin datos de envio',
+    headline: 'Sin seguimiento visible',
+    detail: 'Todavia no hay informacion de seguimiento persistida para este pedido.',
+    trackingNumber: null,
+    trackingNotes: null,
+    showTrackingNumber: false,
+    canCopyTrackingNumber: false,
+    showTrackingNotes: false,
+  };
 }
 
 function isActiveOrder(order: OrderRecord): boolean {
@@ -240,6 +337,7 @@ export async function resolveStorefrontAuthenticatedOrderTracking(input: {
     });
   }
 
+  const { getCustomerOrders } = await import('@/services/orders.service');
   const orders = await getCustomerOrders(input.customerId);
   const boundedOrders = orders.slice(0, RECENT_ORDER_LOOKBACK_LIMIT);
   const explicitOrderNumber = extractExplicitOrderNumber(input.query);
