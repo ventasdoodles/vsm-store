@@ -13,9 +13,9 @@
 ## 2. Baseline actual de entrada
 - Rama esperada: `main`.
 - Estado esperado: `main` limpio y alineado con `origin/main`.
-- Ultimo commit aceptado antes de este snapshot: `820c707 docs: compact workkit readme entrypoint`.
+- Ultimo bloque aceptado antes de este snapshot: customer-intelligence recovery + Typewriter UX (`d69dc05`, `5f4d169`, `059e3e5`, `ebae4bf`, `6ad7f31`), canonizado como verdad local/bounded.
 - Hito work-kit reciente: `README_WORKKIT.md` fue reducido a entrypoint/order-of-reading y ACCEPTED por Codex.
-- No hay reconciliacion canon/doc pendiente para ese hito.
+- No hay reconciliacion canon/doc pendiente para ese hito ni para el bloque customer-intelligence recovery + Typewriter UX.
 
 ## 3. Estado operativo actual
 - Estado de ciclo: STOP / sin hito product-runtime activo.
@@ -28,6 +28,8 @@
 - `politica-envios-detallada-v1` y `politica-pagos-v2` tienen `4` filas activas embebidas cada una, dimension derivada `768`, `metadata.embedding_dims=768` y `metadata.embedding_model=models/gemini-embedding-001`.
 - Retained inactive embedded rows quedan aceptadas como observadas ausentes para el resultado actual del observer: `inactiveWith768=0`, `inactiveWith3072=0` e `inactiveMissingDims=0`.
 - Esto no prueba estado DB futuro, semantic content correctness, Product Search quality, Cesarin runtime behavior, production readiness, cleanup, ingestion, deploy, workflow, live smoke ni secret/auth proof.
+- Customer-intelligence recovery + Typewriter UX: ACCEPTED WITH RESIDUAL RISK. `tool_calls` malformed non-array cae a fallback neutral con metadata sanitizada; `response_schema` Analyst queda preservado por tests locales, no por provider proof; Google-first Gemini rule aplica solo a detalles de integracion Google/Gemini; token telemetry queda sanitizada como metadata; Typewriter UX queda aceptado por tests locales y visual QA local bounded para welcome latest assistant.
+- Ese bloque no prueba production runtime behavior, deployed bundle behavior, provider/Gemini acceptance, deploy/live smoke/secrets/provider calls, ni real chat send-flow visual QA.
 
 ## 5. Lanes cerrados / no reabrir por arrastre
 - `product_search_integrity` queda cerrado como wording governance solamente.
