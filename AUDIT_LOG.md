@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-23 | vsm-implementation Skill artifact | ACCEPT WITH RESIDUAL RISK | `6561d40`; fourth real procedural Skill; single-file artifact `skills/vsm-implementation/SKILL.md`; residuals: guidance-only compliance, no automated enforcement proof, and future high-risk use still requires explicit authorization and phase separation | current canon | current canon |
 | 2026-05-23 | vsm-canon-reconciliation Skill artifact | ACCEPT WITH RESIDUAL RISK | `67bd84d`; third real procedural Skill; single-file artifact `skills/vsm-canon-reconciliation/SKILL.md`; residuals: guidance-only compliance and no automated enforcement proof | current canon | current canon |
 | 2026-05-23 | vsm-acceptance-audit Skill artifact | ACCEPT WITH RESIDUAL RISK | `4fe9d1e`; second real procedural Skill; single-file artifact `skills/vsm-acceptance-audit/SKILL.md`; process-state residual only: artifact was already tracked/pushed during audit, not untracked | current canon | current canon |
 | 2026-05-23 | vsm-readiness Skill artifact | ACCEPT WITH RESIDUAL RISK | `e12cd96`; first real procedural Skill; single-file artifact `skills/vsm-readiness/SKILL.md`; pushed and aligned `0 0` | current canon | current canon |
