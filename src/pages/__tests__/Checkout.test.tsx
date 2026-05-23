@@ -185,6 +185,24 @@ describe('Checkout page cart integrity display', () => {
         expect(screen.getAllByText(/1 ajuste aplicado/i).length).toBeGreaterThan(0);
     });
 
+    it('keeps checkout shipping summary as an estimate until confirmation', () => {
+        useCartStore.setState({
+            items: [{ product: makeProduct({ price: 199 }), quantity: 1, variant_id: null, variant_name: null }],
+        });
+
+        render(
+            <MemoryRouter>
+                <Checkout />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText(/Calculado al confirmar/i)).toBeInTheDocument();
+        expect(screen.getByText(/Total estimado/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Total Final/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Envío Gratis Desbloqueado/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Meta \$500/i)).not.toBeInTheDocument();
+    });
+
     it('surfaces open-order recovery guidance when an authenticated payable order already exists', () => {
         useCartStore.setState({
             items: [{ product: makeProduct(), quantity: 1, variant_id: null, variant_name: null }],

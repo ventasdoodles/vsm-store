@@ -237,12 +237,12 @@ export function Checkout() {
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="font-medium text-theme-tertiary">Envío</span>
-                                        <span className="font-bold text-herbal-400 underline decoration-dotted underline-offset-4 cursor-help">Calculado al enviar</span>
+                                        <span className="font-bold text-herbal-400 underline decoration-dotted underline-offset-4 cursor-help">Calculado al confirmar</span>
                                     </div>
 
                                     <div className="pt-4 border-t border-white/5 flex justify-between items-end">
                                         <div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total Final</p>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total estimado</p>
                                             <p className="text-3xl font-black text-white tracking-tighter">{formatPrice(displaySubtotal)}</p>
                                         </div>
                                         <div className="text-right">
