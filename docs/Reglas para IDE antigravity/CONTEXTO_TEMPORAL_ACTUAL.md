@@ -8,7 +8,7 @@
 - Proyecto: VSM Store.
 - Fecha del snapshot: 2026-05-23.
 - Estado de salida esperado: `main` limpio y alineado con `origin/main`.
-- Ultimo canon docs-only observado: `93fa35b docs: canonize graqle graph artifact update`.
+- Ultimo canon docs-only observado: `bbdb0be docs: canonize graqle trust-language cleanup`.
 - Rol de este archivo: memoria compacta de handoff, no historial completo ni fuente primaria de verdad.
 
 ## 2. Estado operativo
@@ -27,6 +27,7 @@
 - `vsm-implementation` `6561d40` / canon `e729edd`: cuarto Skill real para implementation solo cuando el prompt autoriza cambios acotados, files/surfaces claros, risk classification, validation autorizada y scope checks. No self-accept, no canoniza sin acceptance/owner authorization y no toca high-risk surfaces sin autorizacion explicita.
 - Storefront trust-language micro-pass `13ba6a5` / canon `cece48b`: ACCEPT WITH RESIDUAL RISK como local UI/copy-only scope. En `TrustBadges` se suavizo `Proteccion al 100%` a `Pago con revision`; en `MegaMenu` se suavizo `Calidad premium garantizada en cada producto...` a `Seleccion destacada de productos...`. El avance remoto intermedio `54c6ed2 chore(graqle): update knowledge graph [skip ci]` ya fue reconciliado antes del canon.
 - Graqle graph artifact update `54c6ed2` / canon `93fa35b`: ACCEPT WITH RESIDUAL RISK como generated-artifact only. Solo cambio `graqle.json`, el JSON fue valido y un chunk de `TrustBadges` actualizo `Proteccion al 100%` a `Pago con revision`. Residual vivo: se observaron strings stale de trust-language en otros puntos de `graqle.json`; no hay semantic graph correctness proof ni graph completeness proof.
+- Graqle trust-language cleanup `e35c282` / canon `bbdb0be`: ACCEPT WITH RESIDUAL RISK como generated-artifact-only cleanup. Solo cambio `graqle.json`; el JSON siguio valido; se removieron strings stale acotados de graph text para `TrustBadges` y `MegaMenu`; `Envio Gratis` no fue reemplazado en bloque.
 - Codex workflow profile `dc39b7a` / canon `57932f5`: ACCEPT WITH RESIDUAL RISK como guia repo-level solamente. Preserva ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, user final judge, independent acceptance audit y que el implementer no acepte su propio cambio.
 - Cart shipping trust copy `db93fc3`: ACCEPT WITH RESIDUAL RISK como local UI/test proof only. No prueba checkout/payment runtime, DB/Supabase, provider, deploy, live smoke ni auth/session/storage/secrets.
 - Checkout shipping estimate copy `9f07704`: ACCEPT WITH RESIDUAL RISK como local UI/test proof only. No cambia totales, CTA, checkout flow, payment runtime, provider behavior ni order semantics.
