@@ -27,9 +27,10 @@ export function Checkout() {
     const { data: cartDependencyOffer } = useStorefrontCartDependencyOffer(items);
     const checkoutStarted = useRef(false);
     const checkoutStartedMeasured = useRef(false);
-    const displayItems = items;
-    const displaySubtotal = items.length > 0 ? subtotal : 0;
     const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult, cartDependencyOffer ?? null);
+    const canContinueCheckout = transitionView.canSubmitCheckout;
+    const displayItems = canContinueCheckout ? items : [];
+    const displaySubtotal = canContinueCheckout && items.length > 0 ? subtotal : 0;
     const openOrderRecoveryView = openRecoverableOrder
         ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder)
         : null;
@@ -175,11 +176,28 @@ export function Checkout() {
                         </div>
 
                         {/* Main Form container */}
-                        <CheckoutForm
-                            onSuccess={() => { }}
-                            onBack={() => navigate(-1)}
-                            openRecoverableOrder={openRecoverableOrder ?? null}
-                        />
+                        {canContinueCheckout ? (
+                            <CheckoutForm
+                                onSuccess={() => { }}
+                                onBack={() => navigate(-1)}
+                                openRecoverableOrder={openRecoverableOrder ?? null}
+                            />
+                        ) : (
+                            <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-8 text-center shadow-2xl">
+                                <ShoppingBag className="mx-auto mb-4 h-10 w-10 text-red-300" />
+                                <h2 className="text-xl font-black text-white">{transitionView.headline}</h2>
+                                <p className="mt-3 text-sm font-medium leading-relaxed text-theme-secondary">
+                                    {transitionView.detail}
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/')}
+                                    className="mt-6 rounded-2xl bg-white px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-slate-900 transition-colors hover:bg-vape-100"
+                                >
+                                    Volver al catalogo
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* RIGHTSIDE: Sticky Summary (Desktop) */}
@@ -245,11 +263,13 @@ export function Checkout() {
                                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total estimado</p>
                                             <p className="text-3xl font-black text-white tracking-tighter">{formatPrice(displaySubtotal)}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-vape-500/10 px-3 py-1 text-[10px] font-bold text-vape-400 border border-vape-500/20">
-                                                Pagarás en MXN
-                                            </span>
-                                        </div>
+                                        {canContinueCheckout && (
+                                            <div className="text-right">
+                                                <span className="inline-flex items-center gap-1.5 rounded-full bg-vape-500/10 px-3 py-1 text-[10px] font-bold text-vape-400 border border-vape-500/20">
+                                                    Pagarás en MXN
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

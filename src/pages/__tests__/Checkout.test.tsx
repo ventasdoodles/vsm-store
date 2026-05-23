@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -164,6 +164,13 @@ describe('Checkout page cart integrity display', () => {
 
         expect(screen.getAllByText(/Tu carrito ya no tiene articulos comprables vigentes/i).length).toBeGreaterThan(0);
         expect(screen.queryByText('Producto checkout')).not.toBeInTheDocument();
+        expect(screen.queryByText('checkout-form')).not.toBeInTheDocument();
+        expect(screen.getAllByText(/Tu carrito no esta listo para checkout/i).length).toBeGreaterThan(0);
+        expect(screen.getByRole('button', { name: /Volver al catalogo/i })).toBeInTheDocument();
+        expect(screen.queryByText(/Pagar.s en MXN/i)).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: /Volver al catalogo/i }));
+        expect(navigateMock).toHaveBeenCalledWith('/');
     });
 
     it('shows the shared review state when cart corrections were already applied', () => {
