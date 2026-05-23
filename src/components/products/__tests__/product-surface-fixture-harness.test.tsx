@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createElement, forwardRef, type PropsWithChildren, type ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { ProductPriceSection } from '../ProductPriceSection';
 import { QuickViewModal } from '../QuickViewModal';
-import type { Product } from '@/types/product';
+import { makeProductSurfaceFixture } from '../productSurfaceFixture';
+import { ProductSurfaceFixture } from '@/pages/ProductSurfaceFixture';
 
 const quickViewMocks = vi.hoisted(() => ({
     addItem: vi.fn(),
@@ -84,89 +85,7 @@ vi.mock('@/stores/wishlist.store', () => ({
     }),
 }));
 
-function makeProduct(overrides: Partial<Product> = {}): Product {
-    return {
-        id: 'fixture-product-1',
-        name: 'Producto fixture vape',
-        slug: 'producto-fixture-vape',
-        description: 'Producto local determinista para render tests.',
-        short_description: 'Copy local representativo para quick view.',
-        price: 850,
-        compare_at_price: 1000,
-        stock: 12,
-        sku: 'FIXTURE-VAPE-1',
-        section: 'vape',
-        category_id: 'fixture-category',
-        tags: ['fixture'],
-        status: 'active',
-        images: ['/fixtures/product-front.webp', '/fixtures/product-side.webp'],
-        cover_image: '/fixtures/product-cover.webp',
-        is_featured: true,
-        is_featured_until: null,
-        is_new: true,
-        is_new_until: null,
-        is_bestseller: false,
-        is_bestseller_until: null,
-        is_active: true,
-        created_at: '2026-05-23T00:00:00.000Z',
-        updated_at: '2026-05-23T00:00:00.000Z',
-        specs: {
-            brand: 'VSM Fixture',
-            capacity: '2 ml',
-        },
-        badges: ['fixture'],
-        ai_is_featured: false,
-        ai_sales_note: null,
-        ai_exclude: false,
-        variants: [
-            {
-                id: 'fixture-variant-mint',
-                product_id: 'fixture-product-1',
-                sku: 'FIXTURE-VAPE-MINT',
-                price: 850,
-                stock: 8,
-                images: [],
-                is_active: true,
-                options: [
-                    {
-                        variant_id: 'fixture-variant-mint',
-                        attribute_value_id: 'fixture-flavor-mint',
-                        attribute_name: 'Sabor',
-                        attribute_value: {
-                            id: 'fixture-flavor-mint',
-                            attribute_id: 'fixture-flavor',
-                            value: 'Menta',
-                        },
-                    },
-                ],
-            },
-            {
-                id: 'fixture-variant-sold-out',
-                product_id: 'fixture-product-1',
-                sku: 'FIXTURE-VAPE-SOLD',
-                price: 850,
-                stock: 0,
-                images: [],
-                is_active: true,
-                options: [
-                    {
-                        variant_id: 'fixture-variant-sold-out',
-                        attribute_value_id: 'fixture-flavor-sold',
-                        attribute_name: 'Sabor',
-                        attribute_value: {
-                            id: 'fixture-flavor-sold',
-                            attribute_id: 'fixture-flavor',
-                            value: 'Agotado',
-                        },
-                    },
-                ],
-            },
-        ],
-        ...overrides,
-    };
-}
-
-function renderQuickView(product: Product) {
+function renderQuickView(product = makeProductSurfaceFixture()) {
     return render(
         <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
             <QuickViewModal product={product} isOpen onClose={vi.fn()} />
@@ -185,7 +104,7 @@ describe('product surface local fixture harness', () => {
     });
 
     it('renders QuickViewModal with representative local product data without runtime products', () => {
-        const product = makeProduct();
+        const product = makeProductSurfaceFixture();
 
         renderQuickView(product);
 
@@ -201,5 +120,24 @@ describe('product surface local fixture harness', () => {
             'href',
             '/vape/producto-fixture-vape',
         );
+    });
+
+    it('exposes a local browser-renderable fixture surface for visual QA', () => {
+        render(
+            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+                <ProductSurfaceFixture />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByTestId('product-price-fixture')).toHaveTextContent('$850.00');
+        expect(screen.getByTestId('product-price-fixture')).toHaveTextContent('$1,000.00');
+        expect(screen.getByTestId('product-price-fixture')).toHaveTextContent('-15%');
+        expect(screen.getByTestId('product-price-fixture')).toHaveTextContent('Cobertura por confirmar');
+
+        fireEvent.click(screen.getByRole('button', { name: /Open quick view/i }));
+
+        expect(screen.getByRole('dialog', { name: 'Producto fixture vape' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Menta/i })).toBeEnabled();
+        expect(screen.getByRole('button', { name: /Agotado/i })).toBeDisabled();
     });
 });

@@ -63,6 +63,9 @@ const Wishlist = lazy(() => import('@/pages/Wishlist').then(m => ({ default: m.W
 const NewArrivals = lazy(() => import('@/pages/NewArrivals').then(m => ({ default: m.NewArrivals })));
 const BestsellersPage = lazy(() => import('@/pages/BestsellersPage').then(m => ({ default: m.BestsellersPage })));
 const OffersPage = lazy(() => import('@/pages/OffersPage').then(m => ({ default: m.OffersPage })));
+const ProductSurfaceFixture = import.meta.env.DEV
+    ? lazy(() => import('@/pages/ProductSurfaceFixture').then(m => ({ default: m.ProductSurfaceFixture })))
+    : null;
 
 
 // ─── Páginas lazy (admin) ─────────────────────────────────────────────────────
@@ -102,6 +105,16 @@ function PageLoader() {
 
 
 export function App() {
+    const { pathname } = useLocation();
+
+    if (import.meta.env.DEV && pathname === '/__qa/product-surface' && ProductSurfaceFixture) {
+        return <ProductSurfaceFixture />;
+    }
+
+    return <StorefrontApp />;
+}
+
+function StorefrontApp() {
     const { pathname, search } = useLocation();
     const { user } = useAuth();
     const { data: settings } = useStoreSettings();
