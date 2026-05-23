@@ -13,21 +13,21 @@ const BADGES: Badge[] = [
     {
         id: '1',
         icon: <Shield className="w-8 h-8" />,
-        title: 'Pago Seguro',
-        description: 'Pago con revisión',
+        title: 'Pago con revisión',
+        description: 'Confirmamos antes de cerrar',
         color: 'rgb(16, 185, 129)', // emerald
     },
     {
         id: '2',
         icon: <Truck className="w-8 h-8" />,
         title: 'Envío DHL',
-        description: 'A todo México',
+        description: 'Cobertura por confirmar',
         color: 'rgb(234, 179, 8)', // yellow
     },
     {
         id: '3',
         icon: <Zap className="w-8 h-8" />,
-        title: 'Entrega Segura',
+        title: 'Entrega coordinada',
         description: 'Solo por DHL',
         color: 'rgb(168, 85, 247)', // purple
     },
@@ -35,7 +35,7 @@ const BADGES: Badge[] = [
         id: '4',
         icon: <RotateCcw className="w-8 h-8" />,
         title: 'Devoluciones',
-        description: '7 días para cambios',
+        description: 'Cambios sujetos a revisión',
         color: 'rgb(59, 130, 246)', // blue
     },
     {
@@ -49,7 +49,7 @@ const BADGES: Badge[] = [
         id: '6',
         icon: <CreditCard className="w-8 h-8" />,
         title: 'Pagos',
-        description: 'Efectivo y más',
+        description: 'Transferencia y revisión',
         color: 'rgb(6, 182, 212)', // cyan
     },
 ];

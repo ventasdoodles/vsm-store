@@ -49,8 +49,8 @@ export function ProductPriceSection({ price, compareAtPrice, section }: ProductP
                     <Truck className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Envío DHL Seguro</span>
-                    <span className="text-xs text-emerald-400/70">A todo México</span>
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Envío por DHL</span>
+                    <span className="text-xs text-emerald-400/70">Cobertura por confirmar</span>
                 </div>
             </div>
         </div>

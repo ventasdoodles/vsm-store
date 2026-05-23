@@ -30,7 +30,7 @@ export function TrackOrder() {
                         Rastrea tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Pedido</span>
                     </h1>
                     <p className="text-theme-secondary text-sm md:text-base max-w-md mx-auto">
-                        Ingresa tu número de guía para conocer el estado actual de tu envío en tiempo real.
+                        Ingresa tu número de guía para revisar el estado disponible de tu envío.
                     </p>
                 </div>
 

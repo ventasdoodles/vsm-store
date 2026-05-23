@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const PROMOS = [
     { 
-        content: <><span className="font-bold tracking-widest uppercase text-xs">🚀 ENVÍO GRATIS</span> <span className="font-light opacity-90 mx-1.5 text-xs">a partir de</span> <span className="font-semibold border-b border-white/30 pb-[1px] text-xs">$999 MXN</span></>, 
+        content: <><span className="font-bold tracking-widest uppercase text-xs">🚀 ENVÍOS DHL</span> <span className="font-light opacity-90 mx-1.5 text-xs">cotización</span> <span className="font-semibold border-b border-white/30 pb-[1px] text-xs">antes de confirmar</span></>,
         link: '/vape',
         urgency: false
     },
