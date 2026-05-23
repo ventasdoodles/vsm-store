@@ -29,42 +29,42 @@ const LINKS: QuickLink[] = [
         to: '/wishlist',
         icon: <Heart className="h-5 w-5" />,
         label: 'Mis favoritos',
-        description: 'Objetos de deseo',
+        description: 'Productos guardados',
         gradient: 'from-red-500 to-rose-400',
     },
     {
         to: '/orders',
         icon: <ShoppingBag className="h-5 w-5" />,
         label: 'Mis pedidos',
-        description: 'Historial y bitácora',
+        description: 'Historial y estado',
         gradient: 'from-blue-500 to-cyan-400',
     },
     {
         to: '/addresses',
         icon: <MapPin className="h-5 w-5" />,
         label: 'Mis direcciones',
-        description: 'Puntos de entrega',
+        description: 'Direcciones de entrega',
         gradient: 'from-emerald-500 to-teal-400',
     },
     {
         to: '/loyalty',
         icon: <Star className="h-5 w-5" />,
         label: 'Lealtad VSM',
-        description: 'Puntos y privilegios',
+        description: 'Puntos y beneficios',
         gradient: 'from-yellow-500 to-amber-400',
     },
     {
         to: '/stats',
         icon: <BarChart3 className="h-5 w-5" />,
-        label: 'Estadísticas',
-        description: 'Análisis de actividad',
+        label: 'Actividad',
+        description: 'Resumen de cuenta',
         gradient: 'from-violet-500 to-purple-400',
     },
     {
         to: '/notifications',
         icon: <Bell className="h-5 w-5" />,
         label: 'Alertas',
-        description: 'Notificaciones críticas',
+        description: 'Notificaciones de cuenta',
         gradient: 'from-rose-500 to-pink-400',
     },
 ];
@@ -73,7 +73,7 @@ export function ProfileQuickLinks() {
     return (
         <section className="space-y-4">
             <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] px-2 opacity-40">
-                Accesos Críticos
+                Accesos de cuenta
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {LINKS.map((link) => (

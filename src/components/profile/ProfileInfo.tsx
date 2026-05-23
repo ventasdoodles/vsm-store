@@ -43,7 +43,7 @@ export function ProfileInfo() {
             
             <header className="flex justify-between items-center mb-8">
                 <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">
-                    Bitácora de Identidad
+                    Información de contacto
                 </h2>
                 <ShieldCheck className="h-4 w-4 text-herbal-500 animate-pulse" />
             </header>
@@ -52,21 +52,21 @@ export function ProfileInfo() {
                 {user?.email && (
                     <InfoRow
                         icon={<Mail size={20} />}
-                        label="Email Codificado"
+                        label="Email"
                         value={user.email}
                     />
                 )}
                 {profile.phone && (
                     <InfoRow
                         icon={<Phone size={20} />}
-                        label="Línea de Voz"
+                        label="Teléfono"
                         value={profile.phone}
                     />
                 )}
                 {profile.whatsapp && (
                     <InfoRow
                         icon={<MessageCircle size={20} />}
-                        label="Protocolo WhatsApp"
+                        label="WhatsApp"
                         value={profile.whatsapp}
                     />
                 )}
