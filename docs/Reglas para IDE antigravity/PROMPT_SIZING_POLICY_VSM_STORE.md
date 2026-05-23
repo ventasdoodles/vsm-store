@@ -15,6 +15,11 @@ Mantener prompts:
 El prompt debe cargar solo el contexto necesario para que la herramienta haga bien la tarea actual.
 Mas contexto no significa mejor prompt.
 
+## Regla para Skills
+Una Skill no justifica cargar contexto excesivo.
+
+Los prompts skill-aware deben seguir cargando solo el minimo contexto necesario para la lane activa. No cargar auditorias historicas, plantillas, suplementos o canon duplicado por defecto salvo que afecten la decision, el scope, la evidencia o la validacion de la tarea.
+
 ## Capas de contexto
 ### Capa 1. Innegociable
 Siempre incluir:

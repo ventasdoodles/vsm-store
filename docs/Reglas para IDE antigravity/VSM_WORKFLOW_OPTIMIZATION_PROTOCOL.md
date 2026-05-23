@@ -291,6 +291,22 @@ En estos frentes no mezclar fix + deploy + canonización en una sola orden.
 
 ## 10. Reglas de optimización
 
+### Regla 0 - Skills aceleran, no aflojan
+
+Las Skills son procedimientos reutilizables. No reemplazan reglas, canon, owner judgment, prompt scope ni lane discipline.
+
+Con Skills:
+
+```text
+- Low-risk: se puede combinar readiness + implementation + local validation si el scope es estrecho.
+- Medium-risk: se puede combinar implementation + local validation, pero acceptance debe quedar separado cuando el cambio afecte comportamiento visible o logica relevante.
+- High-risk: readiness, implementation, validation/smoke, acceptance y canon reconciliation deben permanecer separados.
+```
+
+```text
+Skills make the workflow faster, not looser.
+```
+
 ### Regla 1 — No pedir pasos que ya están probados
 
 Si Antigravity ya confirmó:

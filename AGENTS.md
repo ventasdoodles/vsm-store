@@ -21,6 +21,7 @@ Use these as the primary local references, loading only the parts needed for the
 - `AUDIT_LOG.md`
 - `STORE_FRONT_AI_PILOT_CONTEXT.md`
 - `docs/Reglas para IDE antigravity/README_WORKKIT.md`
+- `docs/Reglas para IDE antigravity/VSM_SKILL_USAGE_POLICY.md`
 - `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md`
 - `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md`
 - `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
@@ -35,6 +36,16 @@ Current user instructions override stale local context. Do not use temporal cont
 - The user is product owner and final judge.
 
 Never remove the independent acceptance audit. Never let the same actor both implement a change and perform the final acceptance audit for that change.
+
+## Skill Usage Policy
+
+Skills are operational procedures, not higher authority.
+
+They do not override prompt scope, project canon, immutable work-kit rules, owner decisions, or lane constraints. A Skill may narrow execution for safety and repeatability, but it must not expand authorized scope.
+
+High-risk work still requires explicit authorization and phase separation. Implementation cannot self-accept final high-risk work. Canon reconciliation requires `ACCEPT`, `ACCEPT WITH RESIDUAL RISK`, or explicit owner authorization.
+
+Full policy: `docs/Reglas para IDE antigravity/VSM_SKILL_USAGE_POLICY.md`.
 
 ## Lane Discipline
 

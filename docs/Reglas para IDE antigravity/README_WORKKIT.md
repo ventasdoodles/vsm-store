@@ -16,7 +16,8 @@ Para la guia detallada de uso diario, roles de cada archivo, autoridad rapida y 
 2. `CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
 3. `PROMPT_SIZING_POLICY_VSM_STORE.md`
 4. `CONTEXTO_TEMPORAL_ACTUAL.md`
-5. `PROMPT_LIBRARY_TEMPLATES.txt`
-6. `CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si vas a renovar el contexto temporal
-7. `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica una consulta o handoff heredado de Gemini
-8. `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias para decidir flujo, combinacion de fases y riesgo
+5. `VSM_SKILL_USAGE_POLICY.md` cuando el prompt use o disene Skills; es politica de procedimiento, no canon de producto
+6. `PROMPT_LIBRARY_TEMPLATES.txt`
+7. `CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si vas a renovar el contexto temporal
+8. `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica una consulta o handoff heredado de Gemini
+9. `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias para decidir flujo, combinacion de fases y riesgo

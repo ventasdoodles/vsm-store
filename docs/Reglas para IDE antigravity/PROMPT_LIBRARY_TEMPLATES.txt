@@ -201,3 +201,172 @@ Required output format:
 
 Success condition:
 [el micro-fix queda resuelto sin scope creep]
+
+---
+
+## G. TEMPLATE - USE SKILL: vsm-readiness
+[TITULO]
+
+STRICT MODE.
+USE SKILL: vsm-readiness.
+ROADMAP / READINESS ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[decision exacta que debe producir la readiness]
+
+Scope:
+[canon, docs, commits, surfaces o modulo a revisar]
+
+Forbidden actions:
+[source/runtime/test changes, DB/Supabase, deploy, provider calls, live smoke, secrets, commit/push, etc.]
+
+Evidence expectations:
+- confirm repo state when relevant
+- classify risk
+- identify closed lanes and non-claims
+- choose one best next move when prioritizing
+
+Required output format:
+1. PRE-STATE
+2. FILES READ
+3. CURRENT BASELINE
+4. RISK CLASSIFICATION
+5. BEST NEXT MOVE
+6. NON-CLAIMS
+7. RESIDUAL RISKS
+8. EXACT NEXT PROMPT
+9. GO / NO-GO
+
+Success condition:
+[GO / NO-GO and an actionable next prompt without scope creep]
+
+---
+
+## H. TEMPLATE - USE SKILL: vsm-implementation
+[TITULO]
+
+STRICT MODE.
+USE SKILL: vsm-implementation.
+IMPLEMENTATION AUTHORIZED.
+DO NOT REDESIGN FROM ZERO.
+DO NOT OPEN NEW FRONTS.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[cambio exacto a implementar]
+
+Scope:
+[archivos o superficies autorizadas]
+
+Forbidden actions:
+[todo lo no autorizado; include DB/Supabase, deploy, secrets, providers, live smoke, canon reconciliation unless explicitly authorized]
+
+Validation expectations:
+[comandos o evidencia local autorizada]
+
+Required output format:
+1. PRE-STATE
+2. FILES READ
+3. FILES MODIFIED
+4. EXACT CHANGES MADE
+5. VALIDATION PERFORMED
+6. CLAIMS VERIFIED
+7. NON-CLAIMS
+8. RESIDUAL RISKS
+9. COMMIT STATUS
+10. GO / NO-GO FOR REVIEW
+
+Success condition:
+[implemented and validated within scope, with no self-acceptance for high-risk work]
+
+---
+
+## I. TEMPLATE - USE SKILL: vsm-acceptance-audit
+[TITULO]
+
+STRICT MODE.
+USE SKILL: vsm-acceptance-audit.
+ACCEPTANCE AUDIT ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[commit, diff, reported validation, and relevant canon summary]
+
+Mission objective:
+[accept/reject the implemented lane]
+
+Scope:
+[commits, diffs, files, validation claims to inspect]
+
+Forbidden actions:
+[fixes, source/test/doc edits, deploy, DB/Supabase, secrets, providers, live smoke unless separately authorized]
+
+Evidence expectations:
+- inspect exact diff scope
+- rerun only authorized validation
+- separate claims from non-claims
+- preserve residual risks
+
+Required output format:
+1. FILES / COMMITS / RUNS INSPECTED
+2. REPO STATE
+3. DIFF SCOPE CHECK
+4. VALIDATION CHECK
+5. CLAIMS ACCEPTED
+6. CLAIMS NOT ACCEPTED / NON-CLAIMS
+7. RESIDUAL RISKS
+8. FINAL VERDICT
+9. EXACT NEXT PROMPT FOR CANON IF ACCEPTED
+
+Success condition:
+[ACCEPT, REJECT, or ACCEPT WITH RESIDUAL RISK without silently implementing]
+
+---
+
+## J. TEMPLATE - USE SKILL: vsm-canon-reconciliation
+[TITULO]
+
+STRICT MODE.
+USE SKILL: vsm-canon-reconciliation.
+CANON / DOC RECONCILIATION ONLY.
+NO SOURCE/RUNTIME/TEST CHANGES.
+
+Authoritative accepted state:
+[prior ACCEPT / ACCEPT WITH RESIDUAL RISK or explicit owner authorization]
+
+Mission objective:
+[canon facts to reconcile]
+
+Scope:
+[allowed canon/docs only]
+
+Forbidden actions:
+[source/runtime/test edits, DB/Supabase, deploy, secrets, provider calls, browser QA, live smoke, new product claims]
+
+Validation expectations:
+- `git diff --name-only`
+- `git diff --check`
+- inspect diff for docs-only scope
+- preserve non-claims and residual risks
+
+Required output format:
+1. PRE-STATE
+2. FILES READ
+3. FILES MODIFIED
+4. EXACT FACTUAL UPDATES MADE
+5. VALIDATION PERFORMED
+6. NON-CLAIMS PRESERVED
+7. RESIDUAL RISKS RECORDED
+8. COMMIT STATUS
+9. GO / NO-GO FOR OWNER DIFF REVIEW
+
+Success condition:
+[canon/doc diff reflects accepted facts only and does not authorize scope expansion]

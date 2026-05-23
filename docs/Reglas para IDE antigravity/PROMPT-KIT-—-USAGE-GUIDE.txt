@@ -33,26 +33,46 @@ El work-kit queda organizado por funcion, no por estetica:
 - Uso: memoria compacta del bloque activo.
 - Debe actualizarse por bloque grande o por cambio real de frente.
 
-### 5. Biblioteca de plantillas
+### 5. Skill usage policy
+- Archivo: `docs/Reglas para IDE antigravity/VSM_SKILL_USAGE_POLICY.md`
+- Uso: define como Skills entran como procedimientos reutilizables.
+- No es canon de producto, no reemplaza reglas, no autoriza scope extra y no convierte una lane high-risk en low-risk.
+
+### 6. Biblioteca de plantillas
 - Archivo: `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
 - Uso: redactar prompts concretos por tipo de tarea.
 - No guardar aqui estado temporal.
 
-### 6. Plantilla para renovar contexto temporal
+### 7. Plantilla para renovar contexto temporal
 - Archivo: `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt`
 - Uso: crear o reemplazar el contexto temporal vigente.
 - No usar como contexto vivo ni fuente activa por defecto.
 
-### 7. Suplemento heredado Gemini
+### 8. Suplemento heredado Gemini
 - Archivo: `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md`
 - Uso: solo como puente heredado o consulta puntual para trabajos del ecosistema Gemini.
 - No es el rector general del sistema ni fuente activa por defecto.
 
-### 8. Guias suplementarias de flujo optimizado
+### 9. Guias suplementarias de flujo optimizado
 - Archivo: `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md`
 - Archivo: `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md`
 - Uso: decidir cuando combinar fases, elegir flujo corto/medio/alto riesgo y evitar vueltas innecesarias sin mezclar responsabilidades.
 - No reemplazan reglas inmutables, contexto maestro, sizing policy, contexto temporal ni plantillas.
+
+## Skill-aware prompting
+
+Las Skills son procedimientos operativos reutilizables. No reemplazan reglas, canon, prompt scope, role separation ni owner judgment.
+
+Usar:
+
+- `vsm-readiness` para roadmap, readiness, GO / NO-GO, priorizacion y prompt exacto.
+- `vsm-implementation` para ejecutar cambios autorizados y validacion local dentro del scope.
+- `vsm-acceptance-audit` para auditar diffs, commits o patches ya implementados sin corregirlos silenciosamente.
+- `vsm-canon-reconciliation` solo despues de `ACCEPT`, `ACCEPT WITH RESIDUAL RISK` o autorizacion explicita del owner.
+- `vsm-browser-visual-qa` solo cuando el prompt autorice navegador, entorno objetivo y alcance de evidencia.
+- `vsm-high-risk-lane` para imponer fase separada en DB/Supabase, auth, secrets, deploy, payments, Product Search, Cesarin runtime, providers o live smoke.
+
+El implementer no realiza independent final acceptance para high-risk work. Una Skill puede estrechar la ejecucion, pero nunca ampliar lo autorizado.
 
 ## Bootstrap canonico
 Para uso completo del work-kit, leer en este orden:
@@ -60,14 +80,16 @@ Para uso completo del work-kit, leer en este orden:
 2. `docs/Reglas para IDE antigravity/CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
 3. `docs/Reglas para IDE antigravity/PROMPT_SIZING_POLICY_VSM_STORE.md`
 4. `docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md`
-5. `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
-6. `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si toca renovar el contexto
-7. `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica
-8. `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias cuando toca decidir combinacion de fases o nivel de riesgo
+5. `docs/Reglas para IDE antigravity/VSM_SKILL_USAGE_POLICY.md` cuando el prompt use o disene Skills
+6. `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
+7. `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si toca renovar el contexto
+8. `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica
+9. `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias cuando toca decidir combinacion de fases o nivel de riesgo
 
 ## Fuentes activas por defecto
 - Default Codex: `AGENTS.md`, `AI_CONTEXT.md`, `AUDIT_LOG.md`, `STORE_FRONT_AI_PILOT_CONTEXT.md`, `README_WORKKIT.md` y `CONTEXTO_TEMPORAL_ACTUAL.md` cuando el snapshot temporal aporte valor.
 - Default ChatGPT/Antigravity: reglas inmutables, contexto maestro, sizing policy, contexto temporal vigente y la plantilla concreta de la lane.
+- Skill-aware prompts: cargar `VSM_SKILL_USAGE_POLICY.md` cuando el prompt invoque, cree o modifique Skills.
 - Repo docs no-default: `CONTEXTO-TEMPORAL-—-TEMPLATE.txt`, `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md`, `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md`. Mantenerlos disponibles, pero no cargarlos como fuente activa salvo que el prompt o la lane los necesite.
 
 ## Regla de autoridad rapida
@@ -76,6 +98,7 @@ Para uso completo del work-kit, leer en este orden:
 - La politica de sizing regula el tamano del prompt, no su verdad.
 - El contexto temporal nunca reabre lanes cerrados ni contradice el estado autoritativo actual.
 - Las plantillas ayudan a escribir; no autorizan trabajo por si mismas.
+- Las Skills ayudan a ejecutar procedimientos; no autorizan trabajo por si mismas.
 
 ## Flujo recomendado de uso
 1. Identificar el tipo de tarea.

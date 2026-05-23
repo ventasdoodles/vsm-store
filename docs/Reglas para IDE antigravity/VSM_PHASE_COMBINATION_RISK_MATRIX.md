@@ -36,6 +36,25 @@ La pregunta central:
 
 ---
 
+## 2.1 Skill-enabled execution
+
+| Tipo de tarea | Skill-enabled execution allowed? | Regla |
+|---|---:|---|
+| Comentario/copy/doc menor | Si | Puede combinar readiness + implementation + local validation si el scope es claro. |
+| CSS simple/UI menor | Si, con cuidado | Puede ejecutar y validar localmente; browser QA solo si se autoriza. |
+| Componente frontend | Si | Implementation + local validation puede combinarse; acceptance separada si afecta comportamiento visible. |
+| Service/query | Si, con acceptance separada | No convertir pruebas locales en DB/Supabase o production proof. |
+| Workflow/CI | Limitado | Requiere scope explicito; no deploy o workflow run por Skill sola. |
+| Deploy/secrets | No por si misma | Skills no autorizan deploy, secrets, auth ni inspeccion de valores. |
+| DB/migrations/Supabase | No por si misma | Requiere autorizacion explicita y fases separadas. |
+| Checkout/payments/provider | No por si misma | Requiere protocolo high-risk y acceptance fuerte. |
+| AI/Cesarin runtime | No por si misma | Requiere protocolo high-risk, provider boundaries y non-claims. |
+| Product Search/retrieval | No por si misma | Requiere protocolo high-risk; no inferir quality/runtime proof. |
+
+Una Skill nunca autoriza DB/Supabase, deploy, auth, secrets, payment/provider, Product Search, Cesarin runtime, production smoke o live smoke por si misma.
+
+---
+
 ## 3. Flujos permitidos
 
 ### Flujo corto
