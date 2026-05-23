@@ -4,6 +4,12 @@
 Este documento explica como usar el work-kit sin mezclar autoridad, contexto temporal y plantillas.
 No reemplaza las reglas inmutables. Sirve como mapa de bootstrap y uso diario.
 
+## Politica post-AGENTS.md
+- Para Codex, empezar por `AGENTS.md` y cargar despues solo el canon/work-kit necesario para la lane.
+- Para Antigravity, ChatGPT y handoffs largos, usar este work-kit como fuente canonica de roles, sizing, plantillas y contexto temporal.
+- No usar presencia de `AGENTS.md` como prueba de automatizacion, runtime, produccion, DB/Supabase, provider, deploy, live smoke, auth/session/storage/secrets ni source/test behavior.
+- Mantener separadas implementation, independent acceptance audit y canon reconciliation. El implementer no acepta su propio cambio.
+
 ## Modelo canonico de piezas
 El work-kit queda organizado por funcion, no por estetica:
 
@@ -24,7 +30,7 @@ El work-kit queda organizado por funcion, no por estetica:
 
 ### 4. Contexto temporal vigente
 - Archivo: `docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md`
-- Uso: memoria de trabajo del bloque activo.
+- Uso: memoria compacta del bloque activo.
 - Debe actualizarse por bloque grande o por cambio real de frente.
 
 ### 5. Biblioteca de plantillas
@@ -35,12 +41,12 @@ El work-kit queda organizado por funcion, no por estetica:
 ### 6. Plantilla para renovar contexto temporal
 - Archivo: `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt`
 - Uso: crear o reemplazar el contexto temporal vigente.
-- No usar como contexto vivo.
+- No usar como contexto vivo ni fuente activa por defecto.
 
 ### 7. Suplemento heredado Gemini
 - Archivo: `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md`
 - Uso: solo como puente heredado o consulta puntual para trabajos del ecosistema Gemini.
-- No es el rector general del sistema.
+- No es el rector general del sistema ni fuente activa por defecto.
 
 ### 8. Guias suplementarias de flujo optimizado
 - Archivo: `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md`
@@ -49,7 +55,7 @@ El work-kit queda organizado por funcion, no por estetica:
 - No reemplazan reglas inmutables, contexto maestro, sizing policy, contexto temporal ni plantillas.
 
 ## Bootstrap canonico
-Leer en este orden:
+Para uso completo del work-kit, leer en este orden:
 1. `docs/Reglas para IDE antigravity/PROMPT-SYSTEM-RULES-—-IMMUTABLE.txt`
 2. `docs/Reglas para IDE antigravity/CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
 3. `docs/Reglas para IDE antigravity/PROMPT_SIZING_POLICY_VSM_STORE.md`
@@ -58,6 +64,11 @@ Leer en este orden:
 6. `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si toca renovar el contexto
 7. `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica
 8. `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias cuando toca decidir combinacion de fases o nivel de riesgo
+
+## Fuentes activas por defecto
+- Default Codex: `AGENTS.md`, `AI_CONTEXT.md`, `AUDIT_LOG.md`, `STORE_FRONT_AI_PILOT_CONTEXT.md`, `README_WORKKIT.md` y `CONTEXTO_TEMPORAL_ACTUAL.md` cuando el snapshot temporal aporte valor.
+- Default ChatGPT/Antigravity: reglas inmutables, contexto maestro, sizing policy, contexto temporal vigente y la plantilla concreta de la lane.
+- Repo docs no-default: `CONTEXTO-TEMPORAL-—-TEMPLATE.txt`, `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md`, `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md`. Mantenerlos disponibles, pero no cargarlos como fuente activa salvo que el prompt o la lane los necesite.
 
 ## Regla de autoridad rapida
 - Lo inmutable manda sobre lo temporal.
@@ -68,7 +79,7 @@ Leer en este orden:
 
 ## Flujo recomendado de uso
 1. Identificar el tipo de tarea.
-2. Cargar el bootstrap canonico.
+2. Cargar solo el bootstrap necesario para la lane.
 3. Recortar el contexto con la sizing policy.
 4. Escoger la plantilla correcta.
 5. Completar mission objective, scope, constraints, output format y success condition.
@@ -81,6 +92,7 @@ Actualizar solo cuando:
 - el frente anterior cierra de verdad
 - cambia la naturaleza del trabajo
 - hay una nueva restriccion autoritativa que afecta el siguiente handoff
+- se canoniza un bloque importante y el snapshot queda stale
 
 No actualizarlo por cada micro-cambio ni por ruido operativo menor.
 
@@ -103,4 +115,5 @@ No inventar nombres alternos como `USAGE_GUIDE.md` o `PROMPT_SYSTEM_RULES_IMMUTA
 - usar contexto temporal viejo como si fuera canon
 - duplicar reglas en varios docs
 - tratar el suplemento Gemini como autoridad general
+- cargar plantillas o suplementos como fuentes activas por defecto
 - saltarse la politica de sizing y sobrecargar prompts sin necesidad
