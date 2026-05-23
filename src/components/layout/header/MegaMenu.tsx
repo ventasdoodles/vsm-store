@@ -224,7 +224,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                     </div>
                                 </div>
                                 <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-2 italic">Destacado</h4>
-                                <p className="text-xs font-bold text-white leading-relaxed px-4">Calidad premium garantizada en cada producto de {activeCategory?.name}.</p>
+                                <p className="text-xs font-bold text-white leading-relaxed px-4">Selección destacada de productos de {activeCategory?.name}.</p>
                             </div>
 
                         </div>

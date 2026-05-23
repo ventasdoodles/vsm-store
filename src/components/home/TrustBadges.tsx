@@ -14,7 +14,7 @@ const BADGES: Badge[] = [
         id: '1',
         icon: <Shield className="w-8 h-8" />,
         title: 'Pago Seguro',
-        description: 'Protección al 100%',
+        description: 'Pago con revisión',
         color: 'rgb(16, 185, 129)', // emerald
     },
     {
