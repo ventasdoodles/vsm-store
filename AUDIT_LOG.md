@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | Codex workflow profile | ACCEPT WITH RESIDUAL RISK | `dc39b7a`; root `AGENTS.md` guidance-only profile; `git diff --check dc39b7a^ dc39b7a` | current canon | current canon |
 | 2026-05-22 | Checkout shipping estimate copy micro-fix | ACCEPT WITH RESIDUAL RISK | `9f07704`; two-file Checkout UI/test patch; focused Checkout suite `1` file / `5` tests; `npm run typecheck`; `git diff --check 9f07704^ 9f07704` | current canon | current canon |
 | 2026-05-22 | Cart shipping trust copy micro-fix | ACCEPT WITH RESIDUAL RISK | `db93fc3`; two-file CartSidebar UI/test patch; focused CartSidebar suite `1` file / `5` tests; bounded CartSidebar/Checkout/cart-domain suite `3` files / `14` tests; `npm run typecheck`; `git diff --check db93fc3^ db93fc3` | current canon | current canon |
 | 2026-05-22 | Storefront order tracking trust view | ACCEPT WITH RESIDUAL RISK | `f205bcc`; four-file UI/service trust-view patch; focused tracking suite `2` files / `19` tests; bounded orders/detail regression suite `3` files / `71` tests; `npm run typecheck`; `git diff --check f205bcc^ f205bcc`; literal PowerShell `**tests**` glob did not expand, accepted validation used real `__tests__` paths | current canon | current canon |
