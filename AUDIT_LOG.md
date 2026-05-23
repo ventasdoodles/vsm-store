@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | OrderDetail trust copy micro-pass | ACCEPT WITH RESIDUAL RISK | `188681b`; two-file OrderDetail UI/test copy patch; OrderDetail suite `1` file / `10` tests; PaymentPending/PaymentSuccess/PaymentFailure suites `3` files / `11` tests; `npm run typecheck`; `git diff --check 188681b^ 188681b` | current canon | current canon |
 | 2026-05-22 | Work-kit source hygiene | ACCEPT WITH RESIDUAL RISK | `ff4c034`; three-file docs/work-kit hygiene; `git diff --check ff4c034^ ff4c034` | current canon | current canon |
 | 2026-05-22 | Checkout empty/invalid cart trust guard | ACCEPT WITH RESIDUAL RISK | `02f2d4d`; two-file Checkout UI/test guard; focused Checkout suite `1` file / `5` tests; `npm run typecheck`; `git diff --check 02f2d4d^ 02f2d4d` | current canon | current canon |
 | 2026-05-22 | Codex workflow profile | ACCEPT WITH RESIDUAL RISK | `dc39b7a`; root `AGENTS.md` guidance-only profile; `git diff --check dc39b7a^ dc39b7a` | current canon | current canon |
