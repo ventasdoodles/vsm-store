@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | Profile account hub trust copy micro-pass | ACCEPT WITH RESIDUAL RISK | `e3cc4d3`; three-file Profile UI/test copy patch; focused profile trust-copy suite `1` file / `2` tests; `npm run typecheck`; `git diff --check e3cc4d3^ e3cc4d3` | current canon | current canon |
 | 2026-05-22 | Orders index trust copy micro-pass | ACCEPT WITH RESIDUAL RISK | `6e97a38`; two-file Orders UI/test copy patch; Orders suite `1` file / `6` tests; OrderDetail suite `1` file / `10` tests; `npm run typecheck`; `git diff --check 6e97a38^ 6e97a38` | current canon | current canon |
 | 2026-05-22 | OrderDetail trust copy micro-pass | ACCEPT WITH RESIDUAL RISK | `188681b`; two-file OrderDetail UI/test copy patch; OrderDetail suite `1` file / `10` tests; PaymentPending/PaymentSuccess/PaymentFailure suites `3` files / `11` tests; `npm run typecheck`; `git diff --check 188681b^ 188681b` | current canon | current canon |
 | 2026-05-22 | Work-kit source hygiene | ACCEPT WITH RESIDUAL RISK | `ff4c034`; three-file docs/work-kit hygiene; `git diff --check ff4c034^ ff4c034` | current canon | current canon |
