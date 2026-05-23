@@ -9,7 +9,7 @@
 - Fecha del snapshot: 2026-05-23.
 - Estado de salida esperado: `main` limpio y alineado con `origin/main`.
 - Ultimo canon docs-only observado antes de esta reconciliacion: `bbdb0be docs: canonize graqle trust-language cleanup`.
-- Ultimo commit aceptado para canonizar: `ed8f348 chore(graqle): update knowledge graph [skip ci]`.
+- Ultimo resultado aceptado para canonizar: storefront trust-softening local visual QA, ACCEPT WITH RESIDUAL RISK.
 - Rol de este archivo: memoria compacta de handoff, no historial completo ni fuente primaria de verdad.
 
 ## 2. Estado operativo
@@ -21,6 +21,7 @@
 - El siguiente trabajo debe seleccionarse en una lane separada de readiness, implementation, validation/smoke, acceptance audit, canon reconciliation, deploy, DB/provider, visual QA o smoke.
 
 ## 3. Lanes recientes cerrados / canonizados
+- Storefront trust-softening local visual QA: ACCEPT WITH RESIDUAL RISK como browser QA local-only contra `127.0.0.1:5173`. Se revisaron desktop `1280x720` y mobile `390x844` en superficies alcanzables `TopBanner`, `PromoSection`, `TrustBadges` y `TrackOrder`; el copy suavizado renderizo y no se observaron frases viejas target en esas superficies inspeccionadas. La carga inicial estuvo bloqueada por env publico de Supabase faltante y se rerun con placeholders publicos dummy de proceso apuntando a `127.0.0.1:59999`, sin escribir `.env`, inspeccionar secretos ni usar DB/Supabase real. Residual vivo: `ProductPriceSection` y `QuickViewModal` no quedan aceptados como visualmente inspeccionados porque las rutas locales de producto no expusieron productos con el endpoint dummy; no hay full six-file visual proof, screenshot proof, production/deployed proof, live-smoke proof ni legal/policy correctness proof.
 - Graqle storefront copy-softening partial graph update `ed8f348`: ACCEPT WITH RESIDUAL RISK como generated-artifact-only partial update. Solo cambio `graqle.json`; JSON valido; `git diff --check ed8f348^ ed8f348` PASS; el diff actualizo graph text de `TrustBadges` hacia copy suavizado y `TopBanner` de `ENVIO GRATIS` / `$999 MXN` a `ENVIOS DHL` / `cotizacion antes de confirmar`. Residual vivo: frases viejas target siguen presentes en otras partes de `graqle.json`; no hay complete graph refresh proof para los seis archivos de `8eaea8a`, semantic graph correctness proof ni graph completeness proof.
 - Storefront copy softening micro-pass `8eaea8a`: ACCEPT WITH RESIDUAL RISK como visible storefront copy-only. Se suavizaron claims en `PromoSection`, `TrustBadges`, `TopBanner`, `ProductPriceSection`, `QuickViewModal` y `TrackOrder`: `Pago Seguro` -> `Pago con revision`; `A todo Mexico` -> `Cobertura por confirmar`; `Entrega Segura` -> `Entrega coordinada`; `7 dias para cambios` -> `Cambios sujetos a revision`; `Efectivo y mas` -> `Transferencia y revision`; `Envio DHL Seguro` -> `Envio por DHL`; `ENVIO GRATIS` / `$999 MXN` -> `ENVIOS DHL` / `cotizacion antes de confirmar`; tracking `tiempo real` -> `estado disponible`. Validacion aceptada: exact six-file diff, `git diff --check 8eaea8a^ 8eaea8a` PASS, old-phrase search sin matches. No prueba browser visual QA, produccion/deploy, DB/Supabase, DHL/API, payment/provider, checkout/order semantics, Product Search, Cesarin/runtime ni legal/policy correctness.
 - Skill Usage Policy `6e53c3f` / canon `8eaa090`: ACCEPT WITH RESIDUAL RISK como governance docs-only. Skills son procedurales, no authoritativas, pueden estrechar scope pero no expandir autorizacion.
@@ -46,7 +47,7 @@
 - No real payment transaction proof.
 - No real checkout transaction proof.
 - No Product Search, Typewriter, Pages o customer-intelligence proof nuevo fuera del canon existente.
-- No full repo-wide trust-language proof ni browser visual QA proof por el micro-pass de storefront.
+- No full repo-wide trust-language proof. Browser visual QA local queda aceptada solo para superficies alcanzables de la lane storefront trust-softening; no cubre `ProductPriceSection`, `QuickViewModal`, deploy, live smoke, DB/Supabase ni produccion.
 - No semantic graph correctness proof ni graph completeness proof por el artifact graqle.
 - No workflow automation proof mas alla de la presencia de `AGENTS.md` y docs aceptados.
 - No automated enforcement proof para Skills; cumplimiento depende de prompts, agentes y work-kit.
