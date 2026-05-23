@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-22 | Cart shipping trust copy micro-fix | ACCEPT WITH RESIDUAL RISK | `db93fc3`; two-file CartSidebar UI/test patch; focused CartSidebar suite `1` file / `5` tests; bounded CartSidebar/Checkout/cart-domain suite `3` files / `14` tests; `npm run typecheck`; `git diff --check db93fc3^ db93fc3` | current canon | current canon |
 | 2026-05-22 | Storefront order tracking trust view | ACCEPT WITH RESIDUAL RISK | `f205bcc`; four-file UI/service trust-view patch; focused tracking suite `2` files / `19` tests; bounded orders/detail regression suite `3` files / `71` tests; `npm run typecheck`; `git diff --check f205bcc^ f205bcc`; literal PowerShell `**tests**` glob did not expand, accepted validation used real `__tests__` paths | current canon | current canon |
 | 2026-05-22 | Storefront payment failure status normalization | ACCEPT WITH RESIDUAL RISK | `9ea44e5`; corrected real-path checkout/payment suite `5` files / `72` tests; `npm run typecheck`; `git diff --check 9ea44e5^ 9ea44e5` | current canon | current canon |
 | 2026-05-22 | Mercado Pago webhook handler response seam | ACCEPT WITH RESIDUAL RISK | `ffa4339`; webhook contract Vitest `1` file / `11` tests; bounded checkout/payment suite `5` files / `68` tests; `npm run typecheck`; `git diff --check ffa4339^ ffa4339` | current canon | current canon |
