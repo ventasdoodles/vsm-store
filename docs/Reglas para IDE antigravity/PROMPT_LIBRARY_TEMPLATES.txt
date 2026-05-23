@@ -204,11 +204,11 @@ Success condition:
 
 ---
 
-## G. TEMPLATE - USE SKILL: vsm-readiness
+## G. TEMPLATE - USE REPO PROCEDURE: skills/vsm-readiness/SKILL.md
 [TITULO]
 
 STRICT MODE.
-USE SKILL: vsm-readiness.
+USE REPO PROCEDURE: skills/vsm-readiness/SKILL.md.
 ROADMAP / READINESS ONLY.
 NO IMPLEMENTATION.
 NO DOC/CANON CHANGES.

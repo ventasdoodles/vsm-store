@@ -33,6 +33,8 @@ Una Skill es un procedimiento. No es una fuente superior de verdad.
 
 Una Skill puede estrechar la ejecucion para hacerla mas segura, pero no puede expandir lo autorizado por el prompt actual.
 
+En VSM Store, las Skills canonizadas bajo `skills/<nombre>/SKILL.md` son procedimientos del repo/work-kit. No deben asumirse como Codex runtime/global Skills instaladas salvo que el entorno actual las exponga explicitamente como Skills instaladas. Cuando no exista instalacion runtime, el prompt debe preferir `USE REPO PROCEDURE: skills/<nombre>/SKILL.md`; `USE SKILL: <nombre>` queda como shorthand historico del work-kit, no como prueba de instalacion en Codex.
+
 ---
 
 ## 3. Jerarquia de autoridad
@@ -56,9 +58,10 @@ Si una Skill contradice una capa superior, pierde la Skill.
 
 ChatGPT puede usar Skills para redactar prompts mas compactos y consistentes.
 
-Un prompt skill-aware debe indicar:
+Un prompt basado en procedimiento debe indicar:
 
-- `USE SKILL: <skill-name>`;
+- `USE REPO PROCEDURE: skills/<skill-name>/SKILL.md` cuando la Skill existe solo en el repo/work-kit;
+- `USE SKILL: <skill-name>` solo cuando se quiera usar shorthand historico del work-kit o cuando la Skill este instalada en el runtime de Codex;
 - tipo de lane;
 - mission objective;
 - scope autorizado;
@@ -74,6 +77,8 @@ ChatGPT no debe usar una Skill para omitir el contexto minimo. La sizing policy 
 ## 5. Como Codex / Antigravity reciben prompts con Skills
 
 Codex o Antigravity deben tratar `USE SKILL` como seleccion de procedimiento, no como autorizacion adicional.
+
+Si el procedimiento vive en el repo, Codex debe leer `skills/<nombre>/SKILL.md` como archivo de work-kit. Esto no implica que la Skill este instalada globalmente en Codex ni disponible por el mecanismo runtime de Skills.
 
 Si el prompt dice `USE SKILL: vsm-implementation`, pero prohibe source changes, la Skill no puede editar source.
 
