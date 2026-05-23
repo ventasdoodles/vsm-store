@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-23 | vsm-readiness Skill artifact | ACCEPT WITH RESIDUAL RISK | `e12cd96`; first real procedural Skill; single-file artifact `skills/vsm-readiness/SKILL.md`; pushed and aligned `0 0` | current canon | current canon |
 | 2026-05-22 | Skill Usage Policy work-kit integration | ACCEPT WITH RESIDUAL RISK | `6e53c3f`; docs-only governance update; pushed and aligned `0 0` | current canon | current canon |
 | 2026-05-22 | Profile account hub trust copy micro-pass | ACCEPT WITH RESIDUAL RISK | `e3cc4d3`; three-file Profile UI/test copy patch; focused profile trust-copy suite `1` file / `2` tests; `npm run typecheck`; `git diff --check e3cc4d3^ e3cc4d3` | current canon | current canon |
 | 2026-05-22 | Orders index trust copy micro-pass | ACCEPT WITH RESIDUAL RISK | `6e97a38`; two-file Orders UI/test copy patch; Orders suite `1` file / `6` tests; OrderDetail suite `1` file / `10` tests; `npm run typecheck`; `git diff --check 6e97a38^ 6e97a38` | current canon | current canon |
