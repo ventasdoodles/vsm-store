@@ -150,6 +150,22 @@ describe('CartSidebar transition clarity', () => {
         expect(screen.getByText(/Revisar checkout/i)).toBeInTheDocument();
     });
 
+    it('shows calculated-shipping expectations without a free-shipping threshold promise', () => {
+        useCartStore.setState({
+            items: [{ product: makeProduct({ price: 600 }), quantity: 1, variant_id: null, variant_name: null }],
+        });
+
+        render(<CartSidebar />);
+
+        expect(screen.getByText(/Envío revisado en checkout/i)).toBeInTheDocument();
+        expect(screen.getByText(/Costo final confirmado antes de cerrar/i)).toBeInTheDocument();
+        expect(screen.getByText(/Calculado al confirmar/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Envío Gratis Desbloqueado/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Faltan para envío gratis/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Meta \$500/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/^Gratis$/i)).not.toBeInTheDocument();
+    });
+
     it('blocks checkout navigation when validation leaves no purchasable items', async () => {
         runValidationMock.mockImplementation(async () => {
             useCartStore.setState({ items: [] });

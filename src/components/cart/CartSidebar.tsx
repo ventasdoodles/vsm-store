@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
-import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap, Check } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
@@ -563,7 +563,7 @@ export function CartSidebar() {
                             {/* Lista de items con scroll */}
                             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
 
-                                {/* Progress Bar de Envío Gratis Premium */}
+                                {/* Shipping expectation */}
                                 <div className="relative overflow-hidden rounded-[1.5rem] bg-white/[0.03] border border-white/10 p-5 mb-4 shadow-2xl group/progress">
                                     {/* Animated background glow rotation */}
                                     <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -572,40 +572,20 @@ export function CartSidebar() {
 
                                     <div className="flex justify-between items-center mb-3.5 relative z-10">
                                         <div className="flex flex-col gap-0.5">
-                                            {cartTotal >= 500 ? (
-                                                <motion.div
-                                                    initial={{ opacity: 0, scale: 0.8 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-herbal-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                                                        <Check className="h-3.5 w-3.5 text-white" />
-                                                    </div>
-                                                    <span className="text-[11px] font-black uppercase tracking-[0.1em] text-herbal-400">Envío Gratis Desbloqueado</span>
-                                                </motion.div>
-                                            ) : (
-                                                <>
-                                                    <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Faltan para envío gratis</span>
-                                                    <span className="text-sm font-black text-white tracking-tight">{formatPrice(500 - cartTotal)}</span>
-                                                </>
-                                            )}
+                                            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Envío revisado en checkout</span>
+                                            <span className="text-sm font-black text-white tracking-tight">Costo final confirmado antes de cerrar</span>
                                         </div>
                                         <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 shadow-inner">
-                                            <Truck className={cn("h-5 w-5 transition-colors", cartTotal >= 500 ? "text-herbal-400" : "text-white/20")} />
+                                            <Truck className="h-5 w-5 text-herbal-400 transition-colors" />
                                         </div>
                                     </div>
 
                                     <div className="h-3 w-full bg-black/40 rounded-full shadow-inner border border-white/5 relative overflow-hidden z-10">
                                         <motion.div
-                                            initial={{ width: `${Math.min((prevTotalRef.current / 500) * 100, 100)}%` }}
-                                            animate={{ width: `${Math.min((cartTotal / 500) * 100, 100)}%` }}
+                                            initial={{ width: `${items.length > 0 ? 100 : 0}%` }}
+                                            animate={{ width: `${items.length > 0 ? 100 : 0}%` }}
                                             transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
-                                            className={cn(
-                                                "h-full rounded-full relative",
-                                                cartTotal >= 500
-                                                    ? "bg-gradient-to-r from-herbal-600 to-herbal-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
-                                                    : "bg-gradient-to-r from-vape-600 to-vape-400 shadow-[0_0_20px_rgba(234,88,12,0.4)]"
-                                            )}
+                                            className="h-full rounded-full relative bg-gradient-to-r from-herbal-600 to-herbal-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
                                         >
                                             {/* Sparkle effect on progress end */}
                                             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-full w-4 bg-white/40 blur-sm rounded-full" />
@@ -615,8 +595,8 @@ export function CartSidebar() {
 
                                     {/* Micro-label for progress */}
                                     <div className="mt-2.5 flex justify-between px-1">
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Incio</span>
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Meta $500</span>
+                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Carrito</span>
+                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Confirmacion</span>
                                     </div>
                                 </div>
 
@@ -663,18 +643,8 @@ export function CartSidebar() {
                                         <span className="text-sm font-black text-white/80">{formatPrice(cartTotal)}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold uppercase tracking-widest text-white/60">Envío Escogido</span>
-                                        {cartTotal >= 500 ? (
-                                            <motion.div
-                                                initial={{ scale: 0.9 }} animate={{ scale: 1 }}
-                                                className="flex items-center gap-1.5 bg-herbal-500/20 text-herbal-400 font-black text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full border border-herbal-500/30"
-                                            >
-                                                <Truck className="h-3 w-3" />
-                                                Gratis
-                                            </motion.div>
-                                        ) : (
-                                            <span className="text-xs font-bold text-white/40">Checkout</span>
-                                        )}
+                                        <span className="text-xs font-bold uppercase tracking-widest text-white/60">Envío</span>
+                                        <span className="text-xs font-bold text-white/40">Calculado al confirmar</span>
                                     </div>
 
                                     <div className="pt-4 border-t border-white/5 flex items-end justify-between">
