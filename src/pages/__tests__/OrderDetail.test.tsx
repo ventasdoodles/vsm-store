@@ -118,7 +118,7 @@ describe('OrderDetail payment continuation', () => {
                 customer_id: 'user-1',
                 items: [{ product_id: 'p2', name: 'Item', price: 320, quantity: 1 }],
                 subtotal: 320,
-                shipping_cost: 0,
+                shipping_cost: 50,
                 discount: 0,
                 total: 320,
                 status: 'processing',
@@ -148,6 +148,22 @@ describe('OrderDetail payment continuation', () => {
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
         expect(screen.getByText(/Pedido liquidado y en curso/i)).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /Ver historial de pedidos/i })).toBeInTheDocument();
+        expect(screen.getByText(/Resumen del pedido/i)).toBeInTheDocument();
+        expect(screen.getByText(/Estado persistido del pedido/i)).toBeInTheDocument();
+        expect(screen.getByText(/Env[ií]o registrado/i)).toBeInTheDocument();
+        expect(screen.getByText(/Total registrado/i)).toBeInTheDocument();
+        expect(screen.getByText(/^Pago$/i)).toBeInTheDocument();
+        expect(screen.getByText(/^Estado persistido$/i)).toBeInTheDocument();
+        expect(screen.getByText(/M[eé]todo de pago/i)).toBeInTheDocument();
+        expect(screen.getByText(/Referencia persistida para seguimiento/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Recibo Oficial/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/VSM STORE FRONTEND UNIT/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Log[ií]stica de Env[ií]o/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Inversi[oó]n Total/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Transacci[oó]n/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Seguridad Encriptada/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/M[eé]todo Digital/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Thank you for your trust/i)).not.toBeInTheDocument();
     });
 
     it('does not show continue payment for cancelled mercadopago orders', () => {
@@ -362,7 +378,7 @@ describe('OrderDetail payment continuation', () => {
         );
 
         // 1. Assert Section Headers
-        expect(screen.getByText(/Seguimiento/i)).toBeInTheDocument();
+        expect(screen.getByText(/^Seguimiento$/i)).toBeInTheDocument();
         expect(screen.getByText(/Número de Guía/i)).toBeInTheDocument();
         expect(screen.getByText(/Notas de Envío/i)).toBeInTheDocument();
 

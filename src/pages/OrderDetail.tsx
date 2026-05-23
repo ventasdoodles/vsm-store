@@ -272,10 +272,10 @@ export function OrderDetail() {
                                 <Package className="h-10 w-10 text-theme-tertiary opacity-20 transition-opacity group-hover:opacity-40" />
                                 <div className="absolute -inset-2 bg-accent-primary/5 rounded-full blur-xl animate-pulse" />
                             </div>
-                            <h2 className="text-2xl font-black text-white uppercase italic tracking-[0.2em]">Recibo Oficial</h2>
+                            <h2 className="text-2xl font-black text-white uppercase italic tracking-[0.2em]">Resumen del pedido</h2>
                             <div className="flex flex-col items-center gap-1 opacity-60">
                                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">Cod. Reg: {order.order_number}</p>
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">VSM STORE FRONTEND UNIT</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">Estado persistido del pedido</p>
                             </div>
                         </div>
 
@@ -313,7 +313,7 @@ export function OrderDetail() {
                             </div>
                             {order.shipping_cost > 0 && (
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
-                                    <span>Logística de Envío</span>
+                                    <span>Envío registrado</span>
                                     <span className="text-white opacity-80">{formatPrice(order.shipping_cost)}</span>
                                 </div>
                             )}
@@ -324,13 +324,13 @@ export function OrderDetail() {
                                 </div>
                             )}
                             <div className="flex justify-between items-center pt-6 border-t border-white/5">
-                                <span className="text-sm font-black text-white uppercase italic tracking-[0.2em]">Inversión Total</span>
+                                <span className="text-sm font-black text-white uppercase italic tracking-[0.2em]">Total registrado</span>
                                 <span className="text-2xl font-black text-accent-primary italic drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">{formatPrice(order.total)}</span>
                             </div>
                         </div>
 
                         <div className="mt-12 text-center opacity-30">
-                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-theme-tertiary">★ Thank you for your trust ★</p>
+                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-theme-tertiary">Referencia persistida para seguimiento</p>
                         </div>
                     </div>
                     {/* Jagged Bottom Detail */}
@@ -408,14 +408,14 @@ export function OrderDetail() {
                                 <CreditCard size={24} />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black text-white uppercase tracking-widest">Transacción</h3>
-                                <p className="text-[10px] text-theme-tertiary font-bold uppercase opacity-60">Seguridad Encriptada</p>
+                                <h3 className="text-sm font-black text-white uppercase tracking-widest">Pago</h3>
+                                <p className="text-[10px] text-theme-tertiary font-bold uppercase opacity-60">Estado persistido</p>
                             </div>
                         </div>
 
                         <div className="grid gap-3">
                             <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Método Digital</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Método de pago</span>
                                 <span className="text-xs font-black text-white uppercase italic">{{ cash: 'Efectivo', transfer: 'Transferencia', mercadopago: 'Mercado Pago', card: 'Tarjeta', whatsapp: 'WhatsApp' }[order.payment_method as string] ?? order.payment_method}</span>
                             </div>
                             <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
