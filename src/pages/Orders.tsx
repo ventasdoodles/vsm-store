@@ -145,7 +145,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
 
                 <div className="relative z-10 mt-8 rounded-[1.75rem] border border-white/5 bg-black/20 p-5">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
-                        Estado real del pedido
+                        Estado del pedido
                     </p>
                     <p className="mt-2 text-sm font-black uppercase italic text-white">
                         {actionView.actionHeadline}
@@ -182,7 +182,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                     </div>
                     <div>
                         <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
-                            Accion real
+                            Siguiente accion
                         </span>
                         <span className="text-sm font-black uppercase italic text-white">
                             {actionView.actionHeadline}
@@ -270,9 +270,9 @@ export function Orders() {
                 <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border border-red-500/20 bg-red-500/10">
                     <Package className="h-10 w-10 text-red-500" />
                 </div>
-                <h2 className="mb-4 text-2xl font-black uppercase italic tracking-tighter text-white">Error de transmision</h2>
+                <h2 className="mb-4 text-2xl font-black uppercase italic tracking-tighter text-white">No pudimos cargar tus pedidos</h2>
                 <p className="mx-auto max-w-sm text-[10px] font-black uppercase tracking-widest leading-relaxed text-red-400/60">
-                    {(error as Error)?.message || 'No se han podido recuperar tus bitacoras de compra. Por favor, reintenta.'}
+                    {(error as Error)?.message || 'No se han podido recuperar tus pedidos. Por favor, reintenta.'}
                 </p>
             </div>
         );
@@ -296,7 +296,7 @@ export function Orders() {
                             <h1 className="text-4xl font-black uppercase italic tracking-tight text-white">Mis Pedidos</h1>
                         </div>
                         <p className="mt-1 text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary opacity-60">
-                            Bitacora historica con estado persistido y acciones reales
+                            Historial con estado de pago y acciones disponibles
                         </p>
                     </div>
                 </div>
@@ -327,16 +327,16 @@ export function Orders() {
                     </p>
                     <p className="mt-3 text-3xl font-black uppercase italic text-yellow-400">{payableCount}</p>
                     <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/70">
-                        Pedidos que siguen pagables en Mercado Pago desde la verdad persistida.
+                        Pedidos que siguen pagables en Mercado Pago segun el estado registrado.
                     </p>
                 </div>
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
-                        Pedidos liquidados
+                        Pagos confirmados
                     </p>
                     <p className="mt-3 text-3xl font-black uppercase italic text-herbal-500">{paidCount}</p>
                     <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/70">
-                        Pedidos con pago confirmado en el estado persistido.
+                        Pedidos con pago confirmado en el estado registrado.
                     </p>
                 </div>
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
@@ -355,7 +355,7 @@ export function Orders() {
                     <div className="flex flex-col items-center justify-center space-y-4 py-32">
                         <Loader2 className="h-10 w-10 animate-spin text-accent-primary opacity-50" />
                         <p className="animate-pulse text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">
-                            Sincronizando archivos...
+                            Cargando pedidos...
                         </p>
                     </div>
                 ) : filtered.length === 0 ? (
@@ -375,7 +375,7 @@ export function Orders() {
                                 </h2>
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed text-theme-tertiary/60">
                                     {filter === 'all'
-                                        ? 'Tu historial de pedidos sigue vacio. Cuando exista una orden persistida, aparecera aqui con su estado real.'
+                                        ? 'Tu historial de pedidos sigue vacio. Cuando exista una orden registrada, aparecera aqui con su estado de pago.'
                                         : 'No encontramos pedidos persistidos que coincidan con el filtro aplicado.'}
                                 </p>
                                 <div className="pt-6">

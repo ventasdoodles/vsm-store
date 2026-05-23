@@ -173,6 +173,16 @@ describe('Orders storefront visibility and self-service', () => {
             </MemoryRouter>,
         );
 
+        expect(screen.getByText(/Historial con estado de pago y acciones disponibles/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Estado del pedido/i)).toHaveLength(4);
+        expect(screen.getAllByText(/Siguiente accion/i)).toHaveLength(4);
+        expect(screen.getByText(/Pagos confirmados/i)).toBeInTheDocument();
+        expect(screen.getByText(/segun el estado registrado/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Bitacora historica/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Estado real del pedido/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Accion real/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Pedidos liquidados/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/verdad persistida/i)).not.toBeInTheDocument();
         expect(screen.getAllByText(/Retomar pago pendiente/i)).toHaveLength(2);
         expect(screen.getAllByText(/Seguir pedido liquidado/i)).toHaveLength(2);
         expect(screen.getAllByText(/Revisar antes de actuar/i)).toHaveLength(2);
