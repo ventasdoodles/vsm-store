@@ -8,6 +8,13 @@ export type CommerceFeatureFlag =
     | 'admin'
     | 'aiConcierge';
 
+export interface HomeHeroMarketingCopy {
+    title: string;
+    subtitle: string;
+    description: string;
+    tag: string;
+}
+
 export interface TenantConfig {
     id: string;
     displayName: string;
@@ -87,6 +94,11 @@ export interface VerticalPackConfig {
     compatibilityRuleLabels: string[];
     recommendationRuleLabels: string[];
     legalPolicyCaveatLabels: string[];
+    marketing: {
+        homeHero: {
+            primaryCopy: HomeHeroMarketingCopy;
+        };
+    };
     fixtureMetadata: {
         demoProductFamilies: string[];
         demoCategorySlugs: string[];

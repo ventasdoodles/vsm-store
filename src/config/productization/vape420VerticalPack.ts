@@ -100,6 +100,17 @@ export const vape420VerticalPackConfig = {
         'No prometer beneficios medicos',
         'No inventar disponibilidad, compatibilidad o tiempos de entrega',
     ],
+    marketing: {
+        homeHero: {
+            primaryCopy: {
+                title: 'Vapes y 420',
+                subtitle: 'seleccionados',
+                description:
+                    'Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.',
+                tag: 'Envíos Nacionales',
+            },
+        },
+    },
     fixtureMetadata: {
         demoProductFamilies: ['Caliburn', 'Nova Pod', 'Mango Ice', 'Vape Pen 22mm'],
         demoCategorySlugs: ['liquidos', 'mods', 'concentrados', 'accesorios-vape'],

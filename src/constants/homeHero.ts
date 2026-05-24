@@ -1,16 +1,14 @@
-export interface HomeHeroCopy {
+import { vape420VerticalPackConfig } from '@/config/productization';
+import type { HomeHeroMarketingCopy } from '@/config/productization/types';
+
+export interface HomeHeroCopy extends HomeHeroMarketingCopy {
     title: string;
     subtitle: string;
     description: string;
     tag: string;
 }
 
-export const NATIONAL_HOME_HERO_COPY: HomeHeroCopy = {
-    title: 'Vapes y 420',
-    subtitle: 'seleccionados',
-    description: 'Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.',
-    tag: 'Envíos Nacionales',
-};
+export const NATIONAL_HOME_HERO_COPY: HomeHeroCopy = vape420VerticalPackConfig.marketing.homeHero.primaryCopy;
 
 type HomeHeroSlideLike = Pick<HomeHeroCopy, 'title' | 'subtitle' | 'description' | 'tag'>;
 

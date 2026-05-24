@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { SITE_CONFIG } from '@/config/site';
+import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
 import { vape420VerticalPackConfig, vsmStoreTenantConfig } from '..';
 
@@ -24,6 +25,8 @@ describe('productization config boundary', () => {
         expect(tenantText).not.toContain('"routePrefix"');
         expect(tenantText).not.toContain('"categoryTaxonomyHints"');
         expect(tenantText).not.toContain('"productAttributeHints"');
+        expect(tenantText).not.toContain('"homeHero"');
+        expect(tenantText).not.toContain('"primaryCopy"');
     });
 
     it('feeds existing site metadata from tenant config without changing exported shapes', () => {
@@ -62,6 +65,14 @@ describe('productization config boundary', () => {
                 }),
             ]),
         );
+        expect(vape420VerticalPackConfig.marketing.homeHero.primaryCopy).toEqual({
+            title: 'Vapes y 420',
+            subtitle: 'seleccionados',
+            description:
+                'Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.',
+            tag: 'Envíos Nacionales',
+        });
+        expect(NATIONAL_HOME_HERO_COPY).toEqual(vape420VerticalPackConfig.marketing.homeHero.primaryCopy);
     });
 
     it('does not import runtime, provider, payment, database, search, or Cesarin dependencies', () => {
