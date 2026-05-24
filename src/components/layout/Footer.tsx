@@ -36,7 +36,7 @@ const SERVICE_LINKS = [
 const TRUST_BADGES = [
     { label: 'Encriptación 256-bit', icon: Shield, title: 'Pago Blindado' },
     { label: 'Logística Regional', icon: Truck, title: 'Envíos Blindados' },
-    { label: 'Pasarela Multi-Pago', icon: CreditCard, title: 'Transacciones Seguras' },
+    { label: 'Pasarela Multi-Pago', icon: CreditCard, title: 'Transacciones revisadas' },
 ];
 
 const SOCIAL_LINKS = [
