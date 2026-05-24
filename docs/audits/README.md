@@ -20,3 +20,4 @@ This directory holds detailed accepted audit evidence after the canon split.
 - `2026-05/admin-rpc-cancellation.md`
 - `2026-05/macro-root-cleanup.md`
 - `2026-05/graqle-manualization.md`
+- `2026-05/productization-config-boundary.md`
