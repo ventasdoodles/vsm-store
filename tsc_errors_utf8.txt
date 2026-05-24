@@ -1,7 +1,0 @@
-﻿src/components/layout/header/TopBanner.tsx(45,187): error TS18048: 'currentPromo' is possibly 'undefined'.
-src/hooks/useVoiceSearch.ts(58,38): error TS2532: Object is possibly 'undefined'.
-src/hooks/useVoiceSearch.ts(58,38): error TS2532: Object is possibly 'undefined'.
-src/hooks/useVoiceSearch.ts(61,17): error TS2532: Object is possibly 'undefined'.
-src/pages/admin/AdminProducts.tsx(12,10): error TS6133: 'Plus' is declared but its value is never read.
-src/pages/admin/AdminProducts.tsx(12,16): error TS6133: 'Search' is declared but its value is never read.
-src/pages/admin/AdminProducts.tsx(12,24): error TS6133: 'Filter' is declared but its value is never read.

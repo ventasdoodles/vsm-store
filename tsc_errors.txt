@@ -1,3 +1,0 @@
-src/components/admin/cesarin/TabKnowledge.tsx(3,47): error TS6133: 'Bot' is declared but its value is never read.
-src/components/admin/cesarin/TabKnowledge.tsx(3,62): error TS6133: 'Tag' is declared but its value is never read.
-src/components/admin/cesarin/TabKnowledge.tsx(3,116): error TS6133: 'CheckCircle2' is declared but its value is never read.
