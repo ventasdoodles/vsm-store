@@ -142,7 +142,7 @@ Debe:
 
 ---
 
-## 7. Future Optional Skills
+## 7. Additional Supported Skills
 
 ### vsm-canon-reconciliation
 
@@ -169,7 +169,7 @@ No puede inspeccionar cookies, localStorage, session storage, auth headers, pass
 
 ### vsm-high-risk-lane
 
-Uso para superficies sensibles.
+Uso para readiness/scoping de superficies sensibles.
 
 Debe imponer fase separada y autorizacion explicita para:
 
@@ -182,6 +182,8 @@ Debe imponer fase separada y autorizacion explicita para:
 - AI/Cesarin runtime;
 - production smoke/live smoke;
 - provider/Gemini calls.
+
+No ejecuta high-risk work por si misma, no inspecciona secretos/sesion/storage por defecto y no convierte guidance en automated enforcement.
 
 ---
 
