@@ -5,12 +5,20 @@ import { describe, expect, it } from 'vitest';
 import { SITE_CONFIG } from '@/config/site';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
-import { getVape420SectionPageConfig, vape420VerticalPackConfig, vsmStoreTenantConfig } from '..';
+import {
+    getVape420SectionDefaultSpecs,
+    getVape420SectionPageConfig,
+    getVape420SpecKeyNormalization,
+    getVape420SuggestedSpecs,
+    normalizeVape420SpecKey,
+    vape420VerticalPackConfig,
+    vsmStoreTenantConfig,
+} from '..';
 
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
 
 const readProductizationImports = () =>
-    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts', 'sectionPage.ts']
+    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts', 'sectionPage.ts', 'specs.ts']
         .map((fileName) => readFileSync(join(productizationDir, fileName), 'utf8'))
         .flatMap((source) => source.split('\n').filter((line) => line.trim().startsWith('import ')))
         .join('\n');
@@ -83,6 +91,26 @@ describe('productization config boundary', () => {
                 }),
             ]),
         );
+        expect(vape420VerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug.disposables).toEqual([
+            'Puffs',
+            'Capacidad',
+            'Batería',
+            'Nicotina',
+            'Puerto de Carga',
+        ]);
+        expect(vape420VerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug.extractos).toEqual([
+            'Concentración',
+            'Método de Extracción',
+            'Tipo',
+            'THC%',
+        ]);
+        expect(getVape420SuggestedSpecs()).toBe(vape420VerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug);
+        expect(getVape420SectionDefaultSpecs()).toEqual({
+            vape: ['Marca', 'Modelo', 'Color'],
+            '420': ['Marca', 'Tipo', 'Efecto'],
+        });
+        expect(getVape420SpecKeyNormalization().battery).toBe('Batería');
+        expect(normalizeVape420SpecKey(' battery:')).toBe('Batería');
         expect(vape420VerticalPackConfig.marketing.homeHero.primaryCopy).toEqual({
             title: 'Vapes y 420',
             subtitle: 'seleccionados',

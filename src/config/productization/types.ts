@@ -85,6 +85,12 @@ export interface ProductAttributeHint {
     attributes: string[];
 }
 
+export interface ProductAttributeSchemaConfig {
+    suggestedSpecsByCategorySlug: Record<string, string[]>;
+    defaultSpecsBySectionSlug: Record<string, string[]>;
+    specKeyNormalization: Record<string, string>;
+}
+
 export interface VerticalPackConfig {
     id: string;
     label: string;
@@ -92,6 +98,7 @@ export interface VerticalPackConfig {
     sections: VerticalSectionConfig[];
     categoryTaxonomyHints: CategoryTaxonomyHint[];
     productAttributeHints: ProductAttributeHint[];
+    attributeSchema: ProductAttributeSchemaConfig;
     compatibilityRuleLabels: string[];
     recommendationRuleLabels: string[];
     legalPolicyCaveatLabels: string[];
