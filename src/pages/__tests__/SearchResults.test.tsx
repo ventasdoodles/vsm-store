@@ -21,8 +21,24 @@ vi.mock('@/components/seo/SEO', () => ({
 }));
 
 vi.mock('@/components/products/ProductGrid', () => ({
-    ProductGrid: ({ products, isLoading }: { products: Product[]; isLoading?: boolean }) => (
+    ProductGrid: ({
+        products,
+        isLoading,
+        emptyStateTitle,
+        emptyStateSubtext,
+    }: {
+        products: Product[];
+        isLoading?: boolean;
+        emptyStateTitle?: string;
+        emptyStateSubtext?: string;
+    }) => (
         <div data-testid="product-grid" data-loading={String(!!isLoading)}>
+            {products.length === 0 && !isLoading && (
+                <div>
+                    <p>{emptyStateTitle}</p>
+                    <p>{emptyStateSubtext}</p>
+                </div>
+            )}
             {products.map((product) => (
                 <span key={product.id}>{product.name}</span>
             ))}
@@ -130,6 +146,42 @@ describe('SearchResults broad section terms', () => {
 
         expect(screen.queryByText('Vape Collection')).not.toBeInTheDocument();
         expect(screen.getByText('Pod System Starter Kit')).toBeInTheDocument();
+        expect(useSearchMock).toHaveBeenCalledWith('pod');
+        expect(getProductsMock).not.toHaveBeenCalled();
+    });
+
+    it('renders the short-query visible guard instead of the product grid', () => {
+        renderSearch('/buscar?q=po');
+
+        expect(screen.getByText('Escribe al menos 3 caracteres para buscar')).toBeInTheDocument();
+        expect(screen.queryByTestId('product-grid')).not.toBeInTheDocument();
+        expect(getProductsMock).not.toHaveBeenCalled();
+    });
+
+    it('wires normal search loading state into ProductGrid', () => {
+        useSearchMock.mockReturnValue({
+            data: [],
+            isLoading: true,
+        });
+
+        renderSearch('/buscar?q=pod');
+
+        expect(screen.getByTestId('product-grid')).toHaveAttribute('data-loading', 'true');
+        expect(useSearchMock).toHaveBeenCalledWith('pod');
+        expect(getProductsMock).not.toHaveBeenCalled();
+    });
+
+    it('wires normal search empty state copy into ProductGrid', () => {
+        useSearchMock.mockReturnValue({
+            data: [],
+            isLoading: false,
+        });
+
+        renderSearch('/buscar?q=pod');
+
+        expect(screen.getByTestId('product-grid')).toHaveAttribute('data-loading', 'false');
+        expect(screen.getByText('Sin resultados')).toBeInTheDocument();
+        expect(screen.getByText('Intenta con otros términos de búsqueda')).toBeInTheDocument();
         expect(useSearchMock).toHaveBeenCalledWith('pod');
         expect(getProductsMock).not.toHaveBeenCalled();
     });
