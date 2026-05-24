@@ -22,6 +22,42 @@ Usuario = dueño de producto y juez final.
 
 ---
 
+## 1.1 Execution Blocks
+
+Para LOW y MEDIUM risk, Codex readiness puede producir un **Execution Block** de hasta 4 lanes relacionadas.
+
+```text
+Lane 1 = executable now
+Lane 2 = conditional next lane
+Lane 3 = conditional next lane
+Lane 4 = reserve / continuation / stop-refresh lane
+```
+
+Esto reduce overhead de readiness, no quality gates.
+
+Reglas del bloque:
+
+```text
+- WIP = 1 lane activa a la vez
+- acceptance audit independiente despues de cada implementation commit
+- canon/doc reconciliation solo despues de ACCEPT o ACCEPT WITH RESIDUAL RISK
+- lanes condicionales no son autorizacion ciega
+- si aparece drift, se detiene el bloque y se pide fresh readiness
+- high-risk lanes no entran en Execution Blocks
+```
+
+Una lane condicional sigue vigente solo si:
+
+```text
+- repo stays clean/aligned
+- acceptance no agrega blocking residuals
+- canon no cambia el risk profile
+- no aparecen forbidden surfaces
+- scope y riesgo siguen en LOW o MEDIUM
+```
+
+---
+
 ## 2. Principio rector
 
 La optimización no consiste en saltarse controles. Consiste en combinar pasos compatibles.
@@ -75,6 +111,7 @@ Codex debe:
 5. Decidir GO / NO-GO.
 6. Definir scope exacto.
 7. Entregar el prompt exacto para Antigravity si procede.
+8. Si conviene, producir un Execution Block con 3-4 lanes y stop conditions.
 
 Codex no debe implementar en esta fase.
 
@@ -91,6 +128,21 @@ Codex no debe implementar en esta fase.
 8. EXACT NEXT PROMPT
 9. GO / NO-GO
 10. RESIDUAL RISKS
+```
+
+### Output alterno para Execution Block
+
+```text
+1. FILES READ
+2. CURRENT CANON BASELINE
+3. BLOCK GOAL
+4. LANE 1 - EXECUTABLE NOW
+5. LANE 2 - CONDITIONAL
+6. LANE 3 - CONDITIONAL
+7. LANE 4 - RESERVE / STOP-REFRESH
+8. BLOCK-LEVEL STOP CONDITIONS
+9. EXACT IMPLEMENTATION PROMPT FOR LANE 1
+10. GO / NO-GO
 ```
 
 ---
@@ -151,6 +203,7 @@ Codex debe:
 7. RESIDUAL RISKS
 8. FINAL VERDICT
 9. EXACT NEXT PROMPT FOR CANON / DOC RECONCILIATION
+10. NEXT PRE-PLANNED LANE VALIDITY
 ```
 
 ---
@@ -169,6 +222,14 @@ docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md
 ```
 
 No todos los archivos tienen que cambiar siempre. Solo los que correspondan al hito.
+
+Si el hito pertenece a un Execution Block, el cierre de canon debe incluir:
+
+```text
+NEXT LANE RECOMMENDATION:
+- continue with pre-approved Lane X
+- o stop and request fresh readiness because X changed
+```
 
 ### Output requerido recomendado
 
@@ -357,6 +418,15 @@ No meter backlog gigante.
 Máximo 1 hito principal.
 Máximo 3 candidatos en readiness.
 Elegir exactamente 1 best next move.
+```
+
+En Execution Blocks:
+
+```text
+- sigue habiendo 1 hito principal por bloque
+- hasta 4 lanes relacionadas
+- solo 1 lane activa a la vez
+- Lane 2/3/4 se ejecutan solo si las stop conditions siguen limpias
 ```
 
 ---

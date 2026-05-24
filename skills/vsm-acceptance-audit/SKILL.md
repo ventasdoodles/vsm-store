@@ -77,6 +77,7 @@ Do not load historical audits, supplements, templates, or duplicate canon by def
 7. Check that high-risk surfaces were not touched unless explicitly authorized.
 8. Emit exactly one verdict.
 9. If accepted, produce the exact next canon prompt when useful and authorized by the current lane.
+10. For pre-planned Execution Blocks, state whether the next pre-planned lane remains valid or whether fresh readiness is required.
 
 ## Verdict Rules
 
@@ -119,6 +120,10 @@ Use the prompt's required output format when provided. Otherwise use:
 5. NON-CLAIMS
 6. RESIDUAL RISKS
 7. NEXT ACTION
+
+For pre-planned Execution Blocks, add:
+
+8. NEXT PRE-PLANNED LANE VALIDITY
 
 Keep the audit bounded to the claim under review. Do not implement while auditing. Do not inflate claims beyond the evidence inspected in the current lane.
 

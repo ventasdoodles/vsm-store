@@ -20,4 +20,4 @@ Para la guia detallada de uso diario, roles de cada archivo, autoridad rapida y 
 6. `PROMPT_LIBRARY_TEMPLATES.txt`
 7. `CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si vas a renovar el contexto temporal
 8. `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica una consulta o handoff heredado de Gemini
-9. `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias para decidir flujo, combinacion de fases y riesgo
+9. `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias para decidir flujo, combinacion de fases, riesgo y uso de Execution Blocks de hasta 4 lanes LOW/MEDIUM con WIP=1

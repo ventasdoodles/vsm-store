@@ -241,6 +241,45 @@ Success condition:
 
 ---
 
+## G2. TEMPLATE - USE REPO PROCEDURE: skills/vsm-readiness/SKILL.md - 4-LANE EXECUTION BLOCK
+[TITULO]
+
+STRICT MODE.
+USE REPO PROCEDURE: skills/vsm-readiness/SKILL.md.
+ROADMAP / READINESS ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[definir un 4-lane execution block para un hito coherente]
+
+Block rules:
+- WIP = 1
+- Lane 1 executable now
+- Lane 2 conditional after accepted/canonized Lane 1
+- Lane 3 conditional after accepted/canonized Lane 2
+- Lane 4 reserve / continuation / stop-refresh
+- stop and request fresh readiness if repo/risk/scope drifts
+- no high-risk lanes inside the block
+
+Per-lane requirements:
+- risk
+- scope
+- forbidden actions
+- validation expectations
+- stop conditions
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+[one coherent execution block, exact implementation prompt for Lane 1, compact conditional prompts/specs for Lane 2/3/4, and explicit WIP=1 plus acceptance/canon after each implementation commit]
+
+---
+
 ## H. TEMPLATE - USE REPO PROCEDURE: skills/vsm-implementation/SKILL.md
 [TITULO]
 
@@ -308,6 +347,8 @@ Success condition:
 
 If the current prompt explicitly asks for the exact canon prompt after acceptance, append it as a short separate trailer after section 7.
 
+For pre-planned execution blocks, also require a compact `NEXT PRE-PLANNED LANE VALIDITY` statement.
+
 ---
 
 ## J. TEMPLATE - USE REPO PROCEDURE: skills/vsm-canon-reconciliation/SKILL.md
@@ -343,3 +384,5 @@ Success condition:
 [canon/doc diff reflects accepted facts only and does not authorize scope expansion]
 
 If the current prompt explicitly requests commit/push status, include it as a short inline trailer inside section 5.
+
+For pre-planned execution blocks, include a short `NEXT LANE RECOMMENDATION` trailer when the accepted lane changes continuation risk.

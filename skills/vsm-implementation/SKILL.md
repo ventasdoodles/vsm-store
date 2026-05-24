@@ -61,6 +61,7 @@ Do not load historical audits, templates, supplements, or duplicate canon by def
 8. Verify changed-file scope before staging or committing when the current prompt authorizes those actions.
 9. Report files read, files modified, validations run, claims verified, non-claims, residual risks, and commit status.
 10. Return `NO-GO / NEEDS SCOPING` when scope, files, risk, validation, authority, or success condition are unclear.
+11. If the lane belongs to a pre-planned Execution Block, execute only the currently active lane and stop if repo state, risk, or scope drifts.
 
 ## Risk Classification
 
@@ -106,6 +107,7 @@ Implementation must not:
 - claim browser QA, production smoke, provider behavior, DB behavior, deploy success, or secret safety unless that evidence was explicitly authorized and actually gathered;
 - silently fix issues outside the authorized scope;
 - expand the allowed file set by inference.
+- auto-execute Lane 2/3/4 of a pre-planned Execution Block without a fresh prompt confirming the lane is still active.
 
 For high-risk work, keep readiness, implementation, validation/smoke, acceptance audit, and canon reconciliation as separate phases unless the current prompt explicitly authorizes a safe subset.
 

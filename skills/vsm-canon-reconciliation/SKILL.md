@@ -69,6 +69,7 @@ Do not load historical audits, supplements, templates, or duplicate canon by def
 7. Keep current-state canon compact and place detailed evidence only where authorized.
 8. Verify the changed-file set before staging or committing when the current prompt authorizes those actions.
 9. Return `NO-GO / NEEDS SCOPING` when accepted state, allowed files, canon target, validation, risk, authority, or success condition are unclear.
+10. When a lane belongs to a pre-planned Execution Block, include a short next-lane recommendation based on repo state, residuals, and risk drift.
 
 ## Canon Rules
 
@@ -122,6 +123,10 @@ Use the prompt's required output format when provided. Otherwise use:
 3. NON-CLAIMS / RESIDUALS
 4. VALIDATION
 5. READY FOR COMMIT/PUSH
+
+When the current lane belongs to a pre-planned Execution Block, append a short:
+
+6. NEXT LANE RECOMMENDATION
 
 Keep the reconciliation bounded to the accepted facts and authorized files. Do not inflate claims beyond the evidence accepted in the current lane.
 

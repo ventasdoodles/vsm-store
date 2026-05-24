@@ -57,6 +57,7 @@ El work-kit queda organizado por funcion, no por estetica:
 - Archivo: `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md`
 - Archivo: `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md`
 - Uso: decidir cuando combinar fases, elegir flujo corto/medio/alto riesgo y evitar vueltas innecesarias sin mezclar responsabilidades.
+- Incluyen el patron `Execution Block` para hasta 4 lanes LOW/MEDIUM relacionadas, siempre con WIP=1, acceptance independiente y canon despues de cada implementation commit.
 - No reemplazan reglas inmutables, contexto maestro, sizing policy, contexto temporal ni plantillas.
 
 ## Skill-aware prompting

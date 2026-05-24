@@ -53,6 +53,27 @@ La pregunta central:
 
 Una Skill nunca autoriza DB/Supabase, deploy, auth, secrets, payment/provider, Product Search, Cesarin runtime, production smoke o live smoke por si misma.
 
+## 2.2 Execution Block eligibility
+
+Un **Execution Block** de hasta 4 lanes solo aplica a trabajo LOW/MEDIUM relacionado.
+
+```text
+Lane 1 = ejecutable ahora
+Lane 2 = condicional si Lane 1 queda accepted/canonized cleanly
+Lane 3 = condicional si Lane 2 sigue limpia
+Lane 4 = reserva / continuation / stop-refresh
+```
+
+No se permite cuando:
+
+```text
+- aparece una surface HIGH-risk
+- el repo deja de estar clean/aligned
+- acceptance agrega blocking residuals
+- canon cambia el risk profile
+- la siguiente lane ya no es LOW/MEDIUM
+```
+
 ---
 
 ## 3. Flujos permitidos
@@ -92,6 +113,8 @@ Usar por defecto para cambios normales.
 4. Antigravity canoniza + push
 5. ChatGPT cierra
 ```
+
+Tambien puede iniciar como Execution Block si Codex deja pre-planeadas hasta 4 lanes relacionadas bajo WIP=1 y con stop conditions explicitas.
 
 Permitido para:
 
@@ -149,6 +172,7 @@ Codex puede hacer:
 - clasificar riesgo
 - decidir GO / NO-GO
 - entregar prompt exacto para Antigravity
+- dejar un Execution Block de hasta 4 lanes si el riesgo sigue en LOW/MEDIUM
 ```
 
 ---
@@ -177,6 +201,7 @@ Codex puede hacer:
 - auditar commit
 - aceptar/rechazar
 - producir prompt exacto de canonización
+- declarar si la siguiente lane pre-planeada sigue vigente o si hace falta fresh readiness
 ```
 
 ---
@@ -190,6 +215,7 @@ Antigravity puede hacer:
 - validar
 - commit
 - push
+- recomendar continuar con la siguiente lane pre-planeada o parar por drift
 ```
 
 si existe aceptación previa.
@@ -214,6 +240,16 @@ Motivo:
 
 ```text
 canon puede registrar claims inflados o no probados
+```
+
+---
+
+### No: Ejecutar Lane 2/3/4 en automatico
+
+Motivo:
+
+```text
+las lanes condicionales requieren revisar stop conditions y riesgo despues de cada acceptance/canon pass
 ```
 
 ---

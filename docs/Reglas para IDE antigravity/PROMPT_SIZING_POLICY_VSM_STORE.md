@@ -136,6 +136,7 @@ Regla:
 ### ROADMAP / READINESS
 - priorizar exclusions y una sola decision
 - no convertirlo en backlog general
+- si el prompt usa un Execution Block, listar solo 3-4 lanes relacionadas, marcar Lane 1 como executable now y mantener Lane 2/3/4 como condicionales con stop conditions compactas
 
 ## Regla de recorte
 Si un prompt crece demasiado, recortar en este orden:

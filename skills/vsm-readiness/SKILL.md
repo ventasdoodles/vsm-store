@@ -18,6 +18,7 @@ Use when the user asks to:
 - classify risk and phase separation;
 - identify closed lanes and non-claims;
 - produce an exact prompt for the next actor.
+- produce a 3-4 lane Execution Block for related LOW/MEDIUM work.
 
 Do not use this Skill to implement, validate runtime behavior, audit final acceptance, canonize, deploy, or operate live systems.
 
@@ -58,6 +59,7 @@ Do not load historical audits, templates, supplements, or duplicate canon by def
 5. Choose exactly one best next move when prioritization is requested.
 6. Produce an exact next prompt only when the scope is safe and clear.
 7. Preserve implementation, acceptance, canon, deploy, DB/Supabase, provider, browser QA, and live-smoke lanes as separate phases unless the current prompt explicitly authorizes a safe combination.
+8. When the prompt asks for an Execution Block, keep WIP=1, mark only Lane 1 executable now, keep Lanes 2 and 3 conditional, keep Lane 4 as reserve or stop-refresh, and require fresh readiness if repo/risk/scope drifts.
 
 ## Risk Classification
 
@@ -89,10 +91,19 @@ Return `GO` only when:
 - forbidden actions are explicit;
 - the next actor and next lane are clear;
 - the exact next prompt can be written without expanding scope.
+- for Execution Blocks, only when each conditional lane stays LOW/MEDIUM, stop conditions are explicit, and no high-risk surface is bundled.
 
 Return `NO-GO / NEEDS SCOPING` when scope, files, risk, authority, environment, validation, or success condition are unclear.
 
 Return `NO-GO` when the requested next action would violate canon, immutable rules, owner constraints, lane discipline, or high-risk restrictions.
+
+For Execution Blocks, return `NO-GO` when:
+
+- any lane is HIGH risk;
+- the block depends on blind continuation;
+- acceptance or canon drift cannot be bounded up front;
+- the repo is already dirty/divergent and that state is not explicitly authorized;
+- more than one active implementation lane would be implied.
 
 Return `BLOCKED` when an external precondition prevents a safe next prompt.
 
@@ -128,3 +139,17 @@ Use the prompt's required output format when provided. Otherwise use:
 9. GO / NO-GO
 
 Keep the answer focused. Do not turn readiness into a backlog. Do not inflate claims beyond the evidence read in the current lane.
+
+When the prompt explicitly asks for an Execution Block, use this alternate default:
+
+1. PRE-STATE
+2. FILES READ
+3. CURRENT BASELINE
+4. BLOCK GOAL
+5. LANE 1 - EXECUTABLE NOW
+6. LANE 2 - CONDITIONAL
+7. LANE 3 - CONDITIONAL
+8. LANE 4 - RESERVE / STOP-REFRESH
+9. BLOCK-LEVEL STOP CONDITIONS
+10. EXACT IMPLEMENTATION PROMPT FOR LANE 1
+11. GO / NO-GO

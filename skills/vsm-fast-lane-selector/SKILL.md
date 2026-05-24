@@ -21,6 +21,7 @@ Use when the user asks to:
 - decide which phases can be combined;
 - pick the next actor and exact prompt;
 - reduce micro-steps while preserving acceptance and canon discipline.
+- pre-plan a short Execution Block of related LOW/MEDIUM lanes.
 
 Do not use this Skill to implement, validate runtime behavior, run browser QA, audit final acceptance, canonize, deploy, operate live systems, inspect secrets, or touch DB/Supabase.
 
@@ -72,6 +73,7 @@ Do not load historical audits, supplements, templates, or duplicate canon by def
 7. Choose the reporting mode: compact, standard, or full.
 8. Decide which phases may combine and which must remain separate.
 9. Produce exactly one next prompt for the correct actor, or return `NO-GO / NEEDS SCOPING`.
+10. For Execution Blocks, keep only one active lane at a time and treat later lanes as conditional, not blind authorization.
 
 ## Risk Classification
 
@@ -104,6 +106,8 @@ Use `SHORT` for low-risk tasks where readiness may be implicit and Antigravity m
 
 Use `MEDIUM` for normal bounded frontend/service/workflow/UX work. Codex readiness may produce an exact prompt; Antigravity may combine implementation, local validation, commit, and push; Codex acceptance remains separate; canon remains separate after acceptance.
 
+Execution Blocks are allowed only inside LOW/MEDIUM work and only when later lanes can be invalidated cleanly if acceptance/canon introduces drift.
+
 Use `HIGH-RISK` for sensitive or production-adjacent work. Keep readiness, implementation, validation/smoke, acceptance audit, canon reconciliation, deploy, DB/provider/auth work, and closeout as separate lanes unless the current prompt explicitly authorizes a safe subset.
 
 ## Reporting Modes
@@ -123,6 +127,10 @@ May combine:
 - acceptance audit + exact canon prompt;
 - canon reconciliation + validation + commit/push after acceptance when explicitly authorized.
 
+May pre-plan:
+
+- a 3-4 lane Execution Block for related LOW/MEDIUM work, with Lane 1 executable now, Lanes 2 and 3 conditional, and Lane 4 reserve or stop-refresh.
+
 Must keep separate:
 
 - implementation and independent final acceptance;
@@ -130,6 +138,7 @@ Must keep separate:
 - high-risk implementation and live smoke;
 - deploy/live smoke and canonization;
 - DB/Supabase, provider, auth/secrets, checkout/payment, Product Search, or Cesarin runtime work unless explicitly authorized.
+- multiple active implementation lanes inside one block.
 
 ## Exact Prompt Requirements
 
@@ -156,6 +165,8 @@ Return `GO` only when:
 - phase combination is safe;
 - forbidden actions are explicit;
 - the exact next prompt does not expand scope.
+
+For Execution Blocks, require explicit stop conditions and a rule for when fresh readiness becomes mandatory.
 
 Return `NO-GO / NEEDS SCOPING` when scope, files, actor, validation, risk, environment, or authorization is unclear.
 

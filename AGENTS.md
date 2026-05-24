@@ -59,6 +59,8 @@ Respect the lane wording exactly:
 
 Keep implementation, acceptance, canon, deploy, DB/Supabase, provider, auth, and live-smoke work in separate lanes unless the prompt explicitly authorizes a safe combination.
 
+Execution Blocks are allowed only for related LOW/MEDIUM lanes. Codex readiness may pre-plan up to 4 lanes, but only Lane 1 is executable now. Lanes 2 and 3 remain conditional on the prior lane being accepted/canonized cleanly with no risk drift. Lane 4 is reserve or explicit stop-and-refresh. This reduces readiness overhead; it does not remove WIP=1, independent acceptance, or canon gates.
+
 ## VSM Readiness Lane
 
 Use for `READINESS`, `ROADMAP`, or `CONFIG PLANNING` prompts.
@@ -71,6 +73,7 @@ Required behavior:
 - Classify risk.
 - Decide `GO` or `NO-GO`.
 - Produce the exact next prompt for the right actor when useful.
+- When authorized, produce a 3-4 lane Execution Block with explicit stop conditions, WIP=1, and one executable lane at a time.
 
 Do not implement, commit, push, deploy, run live smoke, inspect secrets, or touch DB/Supabase.
 
@@ -87,6 +90,7 @@ Required behavior:
 - Separate accepted claims from non-claims.
 - End with `ACCEPT`, `REJECT`, or `ACCEPT WITH RESIDUAL RISK`.
 - If accepted, produce the exact canon prompt.
+- For pre-planned execution blocks, state whether the next pre-planned lane remains valid or fresh readiness is required.
 
 Do not make implementation, test, or canon changes during acceptance audit.
 
@@ -112,6 +116,8 @@ Before committing or pushing, also check:
 git diff --cached --name-only
 git diff --name-only origin/main..HEAD
 ```
+
+When an accepted lane belongs to a pre-planned Execution Block, include a short next-lane recommendation: continue with the pre-approved next lane only if repo state, residuals, and risk profile remain compatible; otherwise stop and request fresh readiness.
 
 Do not modify source, tests, runtime, DB/Supabase, provider config, deploy workflows, auth, session, storage, or secrets unless the prompt explicitly names that scope.
 
