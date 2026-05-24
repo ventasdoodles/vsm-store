@@ -18,3 +18,4 @@ This directory holds detailed accepted audit evidence after the canon split.
 - `2026-05/store-knowledge-ingestion-and-retrieval.md`
 - `2026-05/github-actions-runtime-verification.md`
 - `2026-05/admin-rpc-cancellation.md`
+- `2026-05/macro-root-cleanup.md`
