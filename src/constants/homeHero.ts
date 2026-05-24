@@ -1,0 +1,42 @@
+export interface HomeHeroCopy {
+    title: string;
+    subtitle: string;
+    description: string;
+    tag: string;
+}
+
+export const NATIONAL_HOME_HERO_COPY: HomeHeroCopy = {
+    title: 'Vapes y 420',
+    subtitle: 'seleccionados',
+    description: 'Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.',
+    tag: 'Envíos Nacionales',
+};
+
+type HomeHeroSlideLike = Pick<HomeHeroCopy, 'title' | 'subtitle' | 'description' | 'tag'>;
+
+const normalizeCopy = (value?: string | null) =>
+    (value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+export const hasStaleCityHeroCopy = (slide: HomeHeroSlideLike) => {
+    const copy = normalizeCopy(`${slide.title} ${slide.subtitle} ${slide.description} ${slide.tag}`);
+    return (
+        copy.includes('xalapa') ||
+        copy.includes('envio gratis en') ||
+        copy.includes('entregas personales') ||
+        copy.includes('hechos en') ||
+        copy.includes('fabricados') ||
+        (copy.includes('acapulco') && !copy.includes('dhl'))
+    );
+};
+
+export const normalizeHomeHeroSlide = <T extends HomeHeroSlideLike>(slide: T): T => {
+    if (!hasStaleCityHeroCopy(slide)) return slide;
+
+    return {
+        ...slide,
+        ...NATIONAL_HOME_HERO_COPY,
+    };
+};

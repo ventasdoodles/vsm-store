@@ -20,6 +20,7 @@ import { WheelInvitation } from '@/components/home/WheelInvitation';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 import { SmartBanner } from '@/components/home/ai/SmartBanner';
 import { useAuth } from '@/hooks/useAuth';
+import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 
 // Lazy-load heavier components
 const SocialProof = lazy(() => import('@/components/home/SocialProof').then(m => ({ default: m.SocialProof })));
@@ -168,7 +169,7 @@ export function Home() {
         <div className="min-h-screen pb-20 pt-0 bg-theme-primary transition-colors duration-300">
             <SEO
                 title="Inicio"
-                description="Vapes y 420 seleccionados. Productos importados con envíos por DHL desde Acapulco."
+                description={`${NATIONAL_HOME_HERO_COPY.title} ${NATIONAL_HOME_HERO_COPY.subtitle}. ${NATIONAL_HOME_HERO_COPY.description}`}
             />
             <OrganizationJsonLd />
 

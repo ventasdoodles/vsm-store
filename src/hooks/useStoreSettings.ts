@@ -10,6 +10,7 @@ import { getStoreSettings, updateStoreSettings } from '@/services';
 import type { StoreSettings } from '@/services';
 import { SITE_CONFIG } from '@/config/site';
 import { STORE_SETTINGS_ID } from '@/constants/app';
+import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 
 export function useStoreSettings() {
     return useQuery({
@@ -42,10 +43,10 @@ export function useStoreSettings() {
                     hero_sliders: [
                         {
                             id: '1',
-                            title: 'Vapes y 420',
-                            subtitle: 'seleccionados',
-                            description: 'Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.',
-                            tag: 'Envíos DHL',
+                            title: NATIONAL_HOME_HERO_COPY.title,
+                            subtitle: NATIONAL_HOME_HERO_COPY.subtitle,
+                            description: NATIONAL_HOME_HERO_COPY.description,
+                            tag: NATIONAL_HOME_HERO_COPY.tag,
                             ctaText: 'Compra Ahora',
                             ctaLink: '/vape',
                             bgGradient: 'from-violet-900 via-fuchsia-900 to-purple-900',

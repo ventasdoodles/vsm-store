@@ -14,6 +14,7 @@ import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNeuralHero } from '@/hooks/useNeuralHero';
 import { MagneticButton } from '@/components/ui/MagneticButton';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 import type { PresetGradient } from '@/constants/slider';
 
@@ -40,10 +41,10 @@ const HERO_VAPE_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fal
 const HERO_EXTRACTS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-extracts.svg');
 const HERO_GENERIC_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-generic.svg');
 
-const NATIONAL_HERO_TITLE = 'Vapes y 420';
-const NATIONAL_HERO_SUBTITLE = 'seleccionados';
-const NATIONAL_HERO_DESCRIPTION = 'Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.';
-const NATIONAL_HERO_TAG = 'Envíos Nacionales';
+export const NATIONAL_HERO_TITLE = NATIONAL_HOME_HERO_COPY.title;
+export const NATIONAL_HERO_SUBTITLE = NATIONAL_HOME_HERO_COPY.subtitle;
+export const NATIONAL_HERO_DESCRIPTION = NATIONAL_HOME_HERO_COPY.description;
+export const NATIONAL_HERO_TAG = NATIONAL_HOME_HERO_COPY.tag;
 
 const normalizeCopy = (value?: string | null) =>
     (value ?? '')
@@ -68,23 +69,23 @@ const normalizeHomeHeroSlide = (slide: ActiveSlide): ActiveSlide => {
 
     return {
         ...slide,
-        title: NATIONAL_HERO_TITLE,
-        subtitle: NATIONAL_HERO_SUBTITLE,
-        description: NATIONAL_HERO_DESCRIPTION,
-        tag: NATIONAL_HERO_TAG,
+        title: NATIONAL_HOME_HERO_COPY.title,
+        subtitle: NATIONAL_HOME_HERO_COPY.subtitle,
+        description: NATIONAL_HOME_HERO_COPY.description,
+        tag: NATIONAL_HOME_HERO_COPY.tag,
     };
 };
 
 const FALLBACK_SLIDES: ActiveSlide[] = [
     {
         id: 'slide-1',
-        title: NATIONAL_HERO_TITLE,
-        subtitle: NATIONAL_HERO_SUBTITLE,
-        description: NATIONAL_HERO_DESCRIPTION,
+        title: NATIONAL_HOME_HERO_COPY.title,
+        subtitle: NATIONAL_HOME_HERO_COPY.subtitle,
+        description: NATIONAL_HOME_HERO_COPY.description,
         image: HERO_VAPE_FALLBACK_IMAGE,
         ctaText: 'Ver Dispositivos',
         ctaLink: '/vape/pods',
-        tag: NATIONAL_HERO_TAG,
+        tag: NATIONAL_HOME_HERO_COPY.tag,
         preset: PREMIUM_GRADIENTS[0] ?? DEFAULT_PRESET,
     },
     {
