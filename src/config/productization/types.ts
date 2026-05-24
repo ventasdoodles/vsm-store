@@ -67,6 +67,7 @@ export interface VerticalSectionConfig {
     shortLabel: string;
     routePrefix: string;
     description: string;
+    seoDescription: string;
     themeToken: string;
 }
 

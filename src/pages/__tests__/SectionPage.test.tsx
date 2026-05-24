@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SectionPage } from '../SectionPage';
+import { getVape420SectionPageConfig } from '@/config/productization';
 import type { Category } from '@/types/category';
 import type { Product } from '@/types/product';
 import type { Section } from '@/types/constants';
@@ -132,15 +133,14 @@ describe('SectionPage visible states', () => {
     });
 
     it('renders vape section title/copy and SEO metadata', () => {
+        const productizedSection = getVape420SectionPageConfig('vape');
+
         render(<SectionPage />);
 
-        expect(screen.getByRole('heading', { name: 'Vape Collection' })).toBeInTheDocument();
-        expect(screen.getByText(/Pods, l.quidos, accesorios/)).toBeInTheDocument();
-        expect(screen.getByTestId('seo')).toHaveAttribute('data-title', 'Vape Collection');
-        expect(screen.getByTestId('seo')).toHaveAttribute(
-            'data-description',
-            expect.stringContaining('colecci'),
-        );
+        expect(screen.getByRole('heading', { name: productizedSection.title })).toBeInTheDocument();
+        expect(screen.getByText(productizedSection.subtitle)).toBeInTheDocument();
+        expect(screen.getByTestId('seo')).toHaveAttribute('data-title', productizedSection.title);
+        expect(screen.getByTestId('seo')).toHaveAttribute('data-description', productizedSection.seoDescription);
         expect(useProductsMock).toHaveBeenCalledWith({ section: 'vape' });
         expect(useCategoriesMock).toHaveBeenCalledWith('vape');
     });
@@ -199,6 +199,7 @@ describe('SectionPage visible states', () => {
     });
 
     it('renders 420 section copy and SEO metadata', () => {
+        const productizedSection = getVape420SectionPageConfig('420');
         useSectionFromPathMock.mockReturnValue('420');
         useProductsMock.mockReturnValue({
             data: [makeProduct({ id: 'herbal-product', name: 'Herbal Kit', section: '420' })],
@@ -207,9 +208,10 @@ describe('SectionPage visible states', () => {
 
         render(<SectionPage />);
 
-        expect(screen.getByRole('heading', { name: '420 Zone' })).toBeInTheDocument();
-        expect(screen.getByText(/Herbal, grinders, papel/)).toBeInTheDocument();
-        expect(screen.getByTestId('seo')).toHaveAttribute('data-title', '420 Zone');
+        expect(screen.getByRole('heading', { name: productizedSection.title })).toBeInTheDocument();
+        expect(screen.getByText(productizedSection.subtitle)).toBeInTheDocument();
+        expect(screen.getByTestId('seo')).toHaveAttribute('data-title', productizedSection.title);
+        expect(screen.getByTestId('seo')).toHaveAttribute('data-description', productizedSection.seoDescription);
         expect(screen.getByTestId('social-proof')).toHaveTextContent('420');
         expect(useProductsMock).toHaveBeenCalledWith({ section: '420' });
         expect(useCategoriesMock).toHaveBeenCalledWith('420');

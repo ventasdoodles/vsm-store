@@ -5,12 +5,12 @@ import { describe, expect, it } from 'vitest';
 import { SITE_CONFIG } from '@/config/site';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
-import { vape420VerticalPackConfig, vsmStoreTenantConfig } from '..';
+import { getVape420SectionPageConfig, vape420VerticalPackConfig, vsmStoreTenantConfig } from '..';
 
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
 
 const readProductizationImports = () =>
-    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts']
+    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts', 'sectionPage.ts']
         .map((fileName) => readFileSync(join(productizationDir, fileName), 'utf8'))
         .flatMap((source) => source.split('\n').filter((line) => line.trim().startsWith('import ')))
         .join('\n');
@@ -50,6 +50,24 @@ describe('productization config boundary', () => {
 
     it('keeps Vape/420 taxonomy and specs in the vertical pack', () => {
         expect(vape420VerticalPackConfig.sections.map((section) => section.slug)).toEqual(['vape', '420']);
+        expect(getVape420SectionPageConfig('vape')).toEqual(
+            expect.objectContaining({
+                title: 'Vape Collection',
+                subtitle: 'Pods, l\u00edquidos, accesorios y todo lo que necesitas para vapear.',
+                seoDescription: 'Explora toda nuestra colecci\u00f3n de vapeo: pods, l\u00edquidos, accesorios y m\u00e1s.',
+                routePrefix: '/vape',
+                themeToken: 'vape',
+            }),
+        );
+        expect(getVape420SectionPageConfig('420')).toEqual(
+            expect.objectContaining({
+                title: '420 Zone',
+                subtitle: 'Herbal, grinders, papel, accesorios y m\u00e1s para tu sesi\u00f3n perfecta.',
+                seoDescription: 'Descubre nuestra selecci\u00f3n completa de productos 420: herbal, accesorios y m\u00e1s.',
+                routePrefix: '/420',
+                themeToken: 'herbal',
+            }),
+        );
         expect(vape420VerticalPackConfig.categoryTaxonomyHints.map((category) => category.slug)).toEqual(
             expect.arrayContaining(['liquidos', 'mods', 'concentrados', 'accesorios-vape']),
         );

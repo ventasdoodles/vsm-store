@@ -17,26 +17,19 @@ import { SEO } from '@/components/seo/SEO';
 import { SocialProof } from '@/components/home/SocialProof';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
+import { getVape420SectionPageConfig } from '@/config/productization';
 
-const SECTION_CONFIG = {
+const SECTION_PRESENTATION_CONFIG = {
     vape: {
-        title: 'Vape Collection',
-        subtitle: 'Pods, líquidos, accesorios y todo lo que necesitas para vapear.',
-        seoDesc: 'Explora toda nuestra colección de vapeo: pods, líquidos, accesorios y más.',
         icon: Flame,
-        accent: 'vape',
         gradient: 'from-vape-500/30 via-purple-500/10 to-transparent',
         blob: 'bg-vape-500',
         badge: 'text-vape-400 bg-vape-500/10 border-vape-500/20',
         sortActive: 'bg-vape-500/10 text-vape-400 border-vape-500/20',
         sortHighlight: 'bg-vape-500/10 font-semibold text-vape-400',
     },
-    '420': {
-        title: '420 Zone',
-        subtitle: 'Herbal, grinders, papel, accesorios y más para tu sesión perfecta.',
-        seoDesc: 'Descubre nuestra selección completa de productos 420: herbal, accesorios y más.',
+    herbal: {
         icon: Leaf,
-        accent: 'herbal',
         gradient: 'from-herbal-500/30 via-emerald-500/10 to-transparent',
         blob: 'bg-herbal-500',
         badge: 'text-herbal-400 bg-herbal-500/10 border-herbal-500/20',
@@ -47,9 +40,13 @@ const SECTION_CONFIG = {
 
 export function SectionPage() {
     const section = useSectionFromPath();
-    const cfg = SECTION_CONFIG[section];
+    const sectionConfig = getVape420SectionPageConfig(section);
+    const presentationConfig =
+        SECTION_PRESENTATION_CONFIG[sectionConfig.themeToken as keyof typeof SECTION_PRESENTATION_CONFIG] ??
+        SECTION_PRESENTATION_CONFIG.vape;
+    const cfg = { ...sectionConfig, ...presentationConfig };
     const Icon = cfg.icon;
-    const isVape = section === 'vape';
+    const isVape = cfg.themeToken === 'vape';
 
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
@@ -105,7 +102,7 @@ export function SectionPage() {
 
     return (
         <div className="min-h-screen pb-20 bg-theme-primary">
-            <SEO title={cfg.title} description={cfg.seoDesc} />
+            <SEO title={cfg.title} description={cfg.seoDescription} />
 
             {/* ═══ HERO BANNER ═══ */}
             <div className="relative overflow-hidden">
