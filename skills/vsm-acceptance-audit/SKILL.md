@@ -123,3 +123,5 @@ Use the prompt's required output format when provided. Otherwise use:
 Keep the audit bounded to the claim under review. Do not implement while auditing. Do not inflate claims beyond the evidence inspected in the current lane.
 
 If the current prompt explicitly requests an exact canon prompt after acceptance, append it only as a short separate trailer after section 7. For HIGH-risk lanes, unresolved blockers, or `REJECT`, expand only as needed to preserve evidence clarity and phase separation.
+
+When a caller already names this repo procedure, the caller should not duplicate this section list by default. A compact `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` instruction is sufficient unless the lane needs custom fields.

@@ -126,3 +126,5 @@ Use the prompt's required output format when provided. Otherwise use:
 Keep the reconciliation bounded to the accepted facts and authorized files. Do not inflate claims beyond the evidence accepted in the current lane.
 
 If the current prompt explicitly requests commit/push status, include it as a short inline trailer inside section 5. For HIGH-risk canon work, unresolved blockers, or conflicts, expand only as needed to keep phase separation and evidence clarity intact.
+
+When a caller already names this repo procedure, the caller should not duplicate this section list by default. A compact `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` instruction is sufficient unless the lane needs custom fields.

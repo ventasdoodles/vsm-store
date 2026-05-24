@@ -182,3 +182,5 @@ Use the prompt's required output format when provided. Otherwise use:
 7. NON-CLAIMS / RESIDUAL RISKS / GO / NO-GO
 
 Keep the report bounded to what was actually observed. Separate local, fixture, production, screenshot, authenticated, and live-smoke evidence.
+
+When a caller already names this repo procedure, the caller should not duplicate this section list by default. A compact `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` instruction is sufficient unless the lane needs custom fields.

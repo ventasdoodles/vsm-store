@@ -143,7 +143,7 @@ When producing a next prompt, include:
 - forbidden actions;
 - validation expectations;
 - commit/push authorization or prohibition;
-- required output format;
+- `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` unless a custom format is truly needed;
 - success condition;
 - explicit independent acceptance or canon follow-up when needed.
 
@@ -196,3 +196,5 @@ Use the prompt's required output format when provided. Otherwise use:
 10. GO / NO-GO
 
 Keep the output focused. Choose exactly one next move when prioritization is requested.
+
+When a caller already names this repo procedure, the caller should not duplicate this section list by default. A compact `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` instruction is sufficient unless the lane needs custom fields.

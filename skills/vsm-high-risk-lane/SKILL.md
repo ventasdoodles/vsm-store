@@ -182,7 +182,7 @@ When producing a next prompt, include:
 - evidence/non-claim/residual-risk reporting requirements;
 - commit/push authorization or prohibition;
 - exact stop conditions;
-- required output format;
+- `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` unless a custom format is truly needed;
 - success condition.
 
 For high-risk implementation, use `skills/vsm-implementation/SKILL.md` only when files and validation are explicit. For browser visual QA, use `skills/vsm-browser-visual-qa/SKILL.md`. For acceptance, use `skills/vsm-acceptance-audit/SKILL.md`. For canon after acceptance, use `skills/vsm-canon-reconciliation/SKILL.md`.
@@ -221,3 +221,5 @@ Use the prompt's required output format when provided. Otherwise use:
 10. GO / NO-GO
 
 Keep the report bounded to the current phase. Do not turn high-risk scoping into implementation, live validation, deploy, DB/provider/auth work, acceptance, or canon reconciliation.
+
+When a caller already names this repo procedure, the caller should not duplicate this section list by default. A compact `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT` instruction is sufficient unless the lane needs custom fields.

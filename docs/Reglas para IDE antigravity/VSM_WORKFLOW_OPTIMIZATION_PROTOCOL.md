@@ -418,17 +418,13 @@ Commit/push:
 - ...
 
 Required output:
-1. PRE-STATE
-2. FILES MODIFIED
-3. EXACT CHANGES
-4. VALIDATION
-5. COMMIT/PUSH
-6. RESIDUAL RISKS
-7. STATUS
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
 
 Success condition:
 - ...
 ```
+
+Si no se usa una repo procedure o la lane necesita campos custom, definir un formato corto y especifico. Si se usa `USE REPO PROCEDURE: skills/<name>/SKILL.md`, no duplicar la lista de secciones que ya vive en el procedimiento.
 
 ---
 

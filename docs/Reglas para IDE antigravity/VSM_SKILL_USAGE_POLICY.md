@@ -67,8 +67,10 @@ Un prompt basado en procedimiento debe indicar:
 - scope autorizado;
 - forbidden actions;
 - validacion o evidencia esperada;
-- output format;
+- `FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT`, salvo que exista una razon concreta para formato custom;
 - success condition.
+
+ChatGPT no debe duplicar el output contract completo de una repo procedure cuando el prompt ya apunta a `skills/<nombre>/SKILL.md`. La Skill debe cargar su propio formato, sus checks estandar, su taxonomia de riesgo y sus forbidden actions por defecto. El prompt conserva solo el contexto minimo que cambia la ejecucion.
 
 ChatGPT no debe usar una Skill para omitir el contexto minimo. La sizing policy sigue aplicando: cargar solo el contexto que cambie la decision o ejecucion de la lane.
 
@@ -251,18 +253,18 @@ Canon reconciliation debe:
 
 ## 11. Required Reporting Format
 
-Cuando una Skill ejecute o audite una lane, el output debe incluir las secciones relevantes:
+Cada `skills/<nombre>/SKILL.md` define su output contract para esa lane. Los prompts skill-aware deben delegar ese formato con:
 
-1. PRE-STATE
-2. FILES READ
-3. FILES MODIFIED
-4. EXACT CHANGES MADE
-5. VALIDATION PERFORMED
-6. CLAIMS VERIFIED
-7. NON-CLAIMS
-8. RESIDUAL RISKS
-9. COMMIT STATUS
-10. GO / NO-GO
+```text
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+```
+
+Solo copiar secciones en el prompt cuando:
+
+- el owner exige un formato custom;
+- la lane combina una evidencia excepcional;
+- el procedimiento aun no tiene output contract suficiente;
+- hay un blocker o high-risk detail que necesita campos extra.
 
 ---
 
