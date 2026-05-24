@@ -24,6 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
+- README repo-map refresh `a4eaa0f` (`docs: refresh repo map README`) is ACCEPT WITH RESIDUAL RISK as docs-only repo-organization guidance. `README.md` is now a compact workspace map that separates active canon, workflow surfaces, tool-specific folders, legacy/archive candidates, regenerable/local-only artifacts, and next safe cleanup lane. Accepted validation: `git diff --check a4eaa0f^ a4eaa0f` PASS; repo ended clean/aligned at divergence `0 0`. This is not runtime/product/deploy/DB/provider/browser proof, and the legacy/archive candidates still need later classification before any move/delete lane.
 - Latest accepted local storefront lane before this canon update: Legal pages visible-state tests `7998b72`, verdict ACCEPT WITH RESIDUAL RISK, test-only local mocked Privacy/Terms visible-state evidence with residual legal-correctness/SEO/browser/deployed non-claims.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
