@@ -1,8 +1,8 @@
 /**
- * ProductCard Component — VSM Store
+ * ProductCard Component â€” VSM Store
  *
- * Componente core para la visualización de productos en rejillas y rieles.
- * Incluye acciones rápidas, animaciones premium y soporte para estados de carga.
+ * Componente core para la visualizaciÃ³n de productos en rejillas y rieles.
+ * Incluye acciones rÃ¡pidas, animaciones premium y soporte para estados de carga.
  *
  * @author VSM Store
  * @version 1.1.0
@@ -25,7 +25,7 @@ import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 
-// Lazy-load: QuickViewModal solo se descarga al abrir "Vista Rápida"
+// Lazy-load: QuickViewModal solo se descarga al abrir "Vista RÃ¡pida"
 const QuickViewModal = lazy(() => import('./QuickViewModal').then(m => ({ default: m.QuickViewModal })));
 
 interface ProductCardProps {
@@ -264,7 +264,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </div>
                             )}
 
-                            {/* Badges (Top-left) — Single source of truth */}
+                            {/* Badges (Top-left) â€” Single source of truth */}
                             <div className="absolute top-4 left-4 z-10">
                                 <ProductBadgeGroup product={product} />
                             </div>
@@ -297,7 +297,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     className="flex-1 h-12 bg-white text-slate-900 font-black rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-all text-[10px] tracking-widest shadow-xl active:scale-95"
                                 >
                                     <Eye className="w-4 h-4" />
-                                    <span className={compact ? 'hidden' : 'inline'}>VISTA RÁPIDA</span>
+                                    <span className={compact ? 'hidden' : 'inline'}>VISTA RÃPIDA</span>
                                 </button>
                                 <button
                                     onClick={handleQuickAdd}
@@ -339,7 +339,9 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                             </span>
                                             <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">
-                                                Últimas {purchaseability.maxQuantity}
+                                                {purchaseability.maxQuantity <= 3
+                                                    ? `Stock limitado: ${purchaseability.maxQuantity} unidades`
+                                                    : `Disponibilidad limitada: ${purchaseability.maxQuantity} unidades`}
                                             </span>
                                         </div>
                                     )}
@@ -398,7 +400,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                 </Link>
             </motion.div>
 
-            {/* Quick View Modal — lazy-loaded, solo se descarga al abrir */}
+            {/* Quick View Modal â€” lazy-loaded, solo se descarga al abrir */}
             {isQuickViewOpen && (
                 <Suspense fallback={null}>
                     <QuickViewModal
