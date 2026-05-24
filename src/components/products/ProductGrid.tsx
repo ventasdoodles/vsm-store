@@ -43,7 +43,7 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
     // Estado: sin productos
     if (products.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-theme py-20 text-center animate-fade-in">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-theme py-20 text-center animate-fade-in" role="status" aria-live="polite">
                 <div className="mb-4 rounded-2xl bg-theme-tertiary/50 p-5">
                     <PackageOpen className="h-12 w-12 text-theme-secondary" />
                 </div>
@@ -63,11 +63,11 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                     </button>
                 ) : (
                     <Link
-                        to="/"
+                        to="/buscar"
                         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
                     >
                         <ShoppingBag className="h-4 w-4" />
-                        Ver tienda
+                        Explorar catálogo
                     </Link>
                 )}
             </div>
