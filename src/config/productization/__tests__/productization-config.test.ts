@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { SITE_CONFIG } from '@/config/site';
+import { STORE_META_COPY } from '@/constants/storeMeta';
 import { vape420VerticalPackConfig, vsmStoreTenantConfig } from '..';
 
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
@@ -22,6 +24,25 @@ describe('productization config boundary', () => {
         expect(tenantText).not.toContain('"routePrefix"');
         expect(tenantText).not.toContain('"categoryTaxonomyHints"');
         expect(tenantText).not.toContain('"productAttributeHints"');
+    });
+
+    it('feeds existing site metadata from tenant config without changing exported shapes', () => {
+        expect(SITE_CONFIG.name).toBe(vsmStoreTenantConfig.displayName);
+        expect(SITE_CONFIG.description).toBe(vsmStoreTenantConfig.description);
+        expect(SITE_CONFIG.logo).toBe(vsmStoreTenantConfig.brand.logoPath);
+        expect(SITE_CONFIG.whatsapp.number).toBe(vsmStoreTenantConfig.support.whatsappNumber);
+        expect(SITE_CONFIG.whatsapp.defaultMessage).toBe(vsmStoreTenantConfig.support.whatsappDefaultMessage);
+        expect(SITE_CONFIG.contact.email).toBe(vsmStoreTenantConfig.support.email);
+        expect(SITE_CONFIG.contact.phone).toBe(vsmStoreTenantConfig.support.phone);
+        expect(SITE_CONFIG.location).toEqual(vsmStoreTenantConfig.location);
+        expect(SITE_CONFIG.social).toEqual(vsmStoreTenantConfig.social);
+        expect(SITE_CONFIG.store).toEqual({
+            currency: vsmStoreTenantConfig.currency.code,
+            currencySymbol: vsmStoreTenantConfig.currency.symbol,
+            locale: vsmStoreTenantConfig.locale,
+            timezone: vsmStoreTenantConfig.timezone,
+        });
+        expect(STORE_META_COPY.home.hiddenHeading).toContain(vsmStoreTenantConfig.displayName);
     });
 
     it('keeps Vape/420 taxonomy and specs in the vertical pack', () => {

@@ -24,13 +24,27 @@ export interface TenantConfig {
     };
     support: {
         whatsappLabel: string;
+        whatsappNumber: string;
+        whatsappDefaultMessage: string;
         emailLabel: string;
+        email: string;
         phoneLabel: string;
+        phone: string;
     };
     location: {
+        address: string;
         city: string;
         state: string;
+        zipCode: string;
         country: string;
+        googleMapsUrl: string;
+    };
+    social: {
+        facebook: string;
+        instagram: string;
+        youtube: string;
+        tiktok: string;
+        whatsapp: string;
     };
     policyLabels: {
         fulfillment: string[];

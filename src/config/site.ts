@@ -4,34 +4,35 @@
  * // Proposito principal: Fuente única de verdad para identidad, contacto y lógica de WhatsApp.
  * // Regla / Notas: Constante inmutable. Sincronizada con VSM_STORE_FULL_CONTEXT.md.
  */
+import { vsmStoreTenantConfig } from '@/config/productization';
 import type { Order, CartItem } from '@/types/cart';
 
 export const SITE_CONFIG = {
     // Identidad
-    name: 'VSM Store',
-    description: 'Tu tienda de vape y productos 420',
-    logo: '/logo-vsm.png',
+    name: vsmStoreTenantConfig.displayName,
+    description: vsmStoreTenantConfig.description,
+    logo: vsmStoreTenantConfig.brand.logoPath,
 
     // WhatsApp
     whatsapp: {
-        number: '5212281234567', // Formato internacional sin +
-        defaultMessage: 'Hola, vengo de VSM Store y quiero hacer un pedido',
+        number: vsmStoreTenantConfig.support.whatsappNumber, // Formato internacional sin +
+        defaultMessage: vsmStoreTenantConfig.support.whatsappDefaultMessage,
     },
 
     // Contacto
     contact: {
-        email: 'ayuda@vsmstore.com',
-        phone: '2281234567',
+        email: vsmStoreTenantConfig.support.email,
+        phone: vsmStoreTenantConfig.support.phone,
     },
 
     // Ubicación física
     location: {
-        address: 'Av. Principal #123, Col. Centro',
-        city: 'Acapulco',
-        state: 'Guerrero',
-        zipCode: '91000',
-        country: 'México',
-        googleMapsUrl: 'https://maps.google.com/',
+        address: vsmStoreTenantConfig.location.address,
+        city: vsmStoreTenantConfig.location.city,
+        state: vsmStoreTenantConfig.location.state,
+        zipCode: vsmStoreTenantConfig.location.zipCode,
+        country: vsmStoreTenantConfig.location.country,
+        googleMapsUrl: vsmStoreTenantConfig.location.googleMapsUrl,
     },
 
     // Datos Bancarios Default
@@ -42,19 +43,19 @@ Beneficiario: VSM Store`,
 
     // Redes sociales
     social: {
-        facebook: 'https://www.facebook.com/vsmstore',
-        instagram: 'https://www.instagram.com/vsmstore',
-        youtube: 'https://www.youtube.com/@vsmstore',
-        tiktok: 'https://www.tiktok.com/@vsmstore',
-        whatsapp: 'https://wa.me/5212281234567',
+        facebook: vsmStoreTenantConfig.social.facebook,
+        instagram: vsmStoreTenantConfig.social.instagram,
+        youtube: vsmStoreTenantConfig.social.youtube,
+        tiktok: vsmStoreTenantConfig.social.tiktok,
+        whatsapp: vsmStoreTenantConfig.social.whatsapp,
     },
 
     // Configuración de tienda
     store: {
-        currency: 'MXN',
-        currencySymbol: '$',
-        locale: 'es-MX',
-        timezone: 'America/Mexico_City',
+        currency: vsmStoreTenantConfig.currency.code,
+        currencySymbol: vsmStoreTenantConfig.currency.symbol,
+        locale: vsmStoreTenantConfig.locale,
+        timezone: vsmStoreTenantConfig.timezone,
     },
 
     // Template de mensaje WhatsApp para pedidos

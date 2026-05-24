@@ -3,7 +3,7 @@ import type { TenantConfig } from './types';
 export const vsmStoreTenantConfig = {
     id: 'vsm-store',
     displayName: 'VSM Store',
-    description: 'Tienda especializada en vape y productos 420',
+    description: 'Tu tienda de vape y productos 420',
     locale: 'es-MX',
     currency: {
         code: 'MXN',
@@ -16,13 +16,27 @@ export const vsmStoreTenantConfig = {
     },
     support: {
         whatsappLabel: 'WhatsApp VSM Store',
+        whatsappNumber: '5212281234567',
+        whatsappDefaultMessage: 'Hola, vengo de VSM Store y quiero hacer un pedido',
         emailLabel: 'ayuda@vsmstore.com',
+        email: 'ayuda@vsmstore.com',
         phoneLabel: 'Telefono de soporte VSM Store',
+        phone: '2281234567',
     },
     location: {
+        address: 'Av. Principal #123, Col. Centro',
         city: 'Acapulco',
         state: 'Guerrero',
-        country: 'Mexico',
+        zipCode: '91000',
+        country: 'México',
+        googleMapsUrl: 'https://maps.google.com/',
+    },
+    social: {
+        facebook: 'https://www.facebook.com/vsmstore',
+        instagram: 'https://www.instagram.com/vsmstore',
+        youtube: 'https://www.youtube.com/@vsmstore',
+        tiktok: 'https://www.tiktok.com/@vsmstore',
+        whatsapp: 'https://wa.me/5212281234567',
     },
     policyLabels: {
         fulfillment: [
