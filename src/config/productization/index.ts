@@ -14,6 +14,11 @@ export { getVape420CategoryShowcaseFallbackCategories } from './categoryShowcase
 export { getVape420SectionPageConfig } from './sectionPage';
 export type { SectionPageProductizationConfig } from './sectionPage';
 export {
+    defineVerticalPack,
+    VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,
+    verticalPackAuthoringTemplate,
+} from './verticalPackAuthoring';
+export {
     assertValidVerticalPackContract,
     getVerticalPackContractViolations,
     summarizeVerticalPackContract,

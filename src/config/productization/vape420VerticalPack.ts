@@ -1,6 +1,6 @@
-import type { VerticalPackConfig } from './types';
+import { defineVerticalPack } from './verticalPackAuthoring';
 
-export const vape420VerticalPackConfig = {
+export const vape420VerticalPackConfig = defineVerticalPack({
     id: 'vape-420',
     label: 'Vape/420',
     description: 'Current VSM vertical pack for vape, 420 accessories, and related catalog assumptions.',
@@ -209,4 +209,4 @@ export const vape420VerticalPackConfig = {
         demoCategorySlugs: ['liquidos', 'mods', 'concentrados', 'accesorios-vape'],
         fallbackImageKeys: ['category-liquidos', 'category-pods', 'category-cannabis', 'category-accesorios'],
     },
-} satisfies VerticalPackConfig;
+});

@@ -7,20 +7,33 @@ import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
 import {
     assertValidVerticalPackContract,
+    defineVerticalPack,
     getVape420CategoryShowcaseFallbackCategories,
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
     normalizeVape420SpecKey,
+    VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,
     vape420VerticalPackConfig,
+    verticalPackAuthoringTemplate,
     vsmStoreTenantConfig,
 } from '..';
 
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
 
 const readProductizationImports = () =>
-    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts', 'categoryShowcase.ts', 'sectionPage.ts', 'specs.ts']
+    [
+        'index.ts',
+        'tenant.ts',
+        'types.ts',
+        'vape420VerticalPack.ts',
+        'categoryShowcase.ts',
+        'sectionPage.ts',
+        'specs.ts',
+        'verticalPackContract.ts',
+        'verticalPackAuthoring.ts',
+    ]
         .map((fileName) => readFileSync(join(productizationDir, fileName), 'utf8'))
         .flatMap((source) => source.split('\n').filter((line) => line.trim().startsWith('import ')))
         .join('\n');
@@ -168,5 +181,25 @@ describe('productization config boundary', () => {
         expect(source).not.toMatch(/cesarin|customer-intelligence|concierge\.service/i);
         expect(source).not.toMatch(/process\.env|import\.meta\.env|GEMINI|API_KEY/i);
         expect(source).not.toMatch(/@google\/genai|gemini/i);
+    });
+
+    it('exports a practical authoring scaffold for future vertical packs', () => {
+        expect(VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS.pack).toEqual(
+            expect.arrayContaining([
+                'id',
+                'sections',
+                'categoryTaxonomyHints',
+                'attributeSchema',
+                'marketing.homeHero.primaryCopy',
+                'fixtureMetadata.demoCategorySlugs',
+            ]),
+        );
+        expect(() => assertValidVerticalPackContract(verticalPackAuthoringTemplate)).not.toThrow();
+        expect(() => defineVerticalPack(verticalPackAuthoringTemplate)).not.toThrow();
+        expect(verticalPackAuthoringTemplate.id).toBe('template-vertical-pack');
+        expect(verticalPackAuthoringTemplate.sections.map((section) => section.slug)).toEqual([
+            'template-main',
+            'template-alt',
+        ]);
     });
 });

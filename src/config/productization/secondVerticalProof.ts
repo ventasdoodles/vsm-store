@@ -1,4 +1,4 @@
-import type { VerticalPackConfig } from './types';
+import { defineVerticalPack } from './verticalPackAuthoring';
 
 export interface SecondVerticalProofProduct {
     id: string;
@@ -10,7 +10,7 @@ export interface SecondVerticalProofProduct {
     attributeSummary: string[];
 }
 
-export const secondVerticalProofConfig = {
+export const secondVerticalProofConfig = defineVerticalPack({
     id: 'second-vertical-proof',
     label: 'Second Vertical Proof',
     description: 'Local-only proof pack for validating a non-Vape/420 vertical shape without runtime routes.',
@@ -126,7 +126,7 @@ export const secondVerticalProofConfig = {
         demoCategorySlugs: ['organizers', 'desk-tools'],
         fallbackImageKeys: ['proof-organizers', 'proof-desk-tools'],
     },
-} satisfies VerticalPackConfig;
+});
 
 export const secondVerticalProofProducts: SecondVerticalProofProduct[] = [
     {
