@@ -6,6 +6,7 @@ import { SITE_CONFIG } from '@/config/site';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
 import {
+    getVape420CategoryShowcaseFallbackCategories,
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
     getVape420SpecKeyNormalization,
@@ -18,7 +19,7 @@ import {
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
 
 const readProductizationImports = () =>
-    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts', 'sectionPage.ts', 'specs.ts']
+    ['index.ts', 'tenant.ts', 'types.ts', 'vape420VerticalPack.ts', 'categoryShowcase.ts', 'sectionPage.ts', 'specs.ts']
         .map((fileName) => readFileSync(join(productizationDir, fileName), 'utf8'))
         .flatMap((source) => source.split('\n').filter((line) => line.trim().startsWith('import ')))
         .join('\n');
@@ -119,6 +120,29 @@ describe('productization config boundary', () => {
             tag: 'Envíos Nacionales',
         });
         expect(NATIONAL_HOME_HERO_COPY).toEqual(vape420VerticalPackConfig.marketing.homeHero.primaryCopy);
+        expect(getVape420CategoryShowcaseFallbackCategories()).toBe(
+            vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories,
+        );
+        expect(vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: '1',
+                name: 'Líquidos',
+                slug: 'liquidos',
+                sectionSlug: 'vape',
+                iconName: 'Flame',
+                fallbackImagePath: '/images/storefront-fallbacks/category-liquidos.svg',
+                presetId: 'orange-red',
+            }),
+            expect.objectContaining({
+                id: '3',
+                name: 'Cannabis Premium',
+                slug: 'concentrados',
+                sectionSlug: '420',
+                iconName: 'Leaf',
+                fallbackImagePath: '/images/storefront-fallbacks/category-cannabis.svg',
+                presetId: 'green-emerald',
+            }),
+        ]));
     });
 
     it('does not import runtime, provider, payment, database, search, or Cesarin dependencies', () => {

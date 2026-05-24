@@ -1,5 +1,6 @@
 export type {
     CategoryTaxonomyHint,
+    CategoryShowcaseItemConfig,
     CommerceFeatureFlag,
     ProductAttributeSchemaConfig,
     ProductAttributeHint,
@@ -9,6 +10,7 @@ export type {
 } from './types';
 export { vsmStoreTenantConfig } from './tenant';
 export { vape420VerticalPackConfig } from './vape420VerticalPack';
+export { getVape420CategoryShowcaseFallbackCategories } from './categoryShowcase';
 export { getVape420SectionPageConfig } from './sectionPage';
 export type { SectionPageProductizationConfig } from './sectionPage';
 export {

@@ -1,4 +1,5 @@
 ﻿import { LucideIcon, Flame, Box, Leaf, Zap, Droplets, Sparkles, Wind, Gift, Ghost, Asterisk, Coffee, Flower2 } from 'lucide-react';
+import { getVape420CategoryShowcaseFallbackCategories } from '@/config/productization';
 import type { FeaturedCategory } from '@/services';
 
 /**
@@ -43,47 +44,15 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
 const storefrontFallbackImage = (path: string) =>
     typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
 
-const CATEGORY_LIQUIDS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-liquidos.svg');
-const CATEGORY_PODS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-pods.svg');
-const CATEGORY_CANNABIS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-cannabis.svg');
-const CATEGORY_ACCESSORIES_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-accesorios.svg');
-
-export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
-    {
-        id: '1',
-        name: 'Líquidos',
-        slug: 'liquidos',
-        section: 'vape',
-        iconName: 'Flame',
-        image: CATEGORY_LIQUIDS_FALLBACK_IMAGE,
-        presetId: 'orange-red',
-    },
-    {
-        id: '2',
-        name: 'Pods & Mods',
-        slug: 'mods',
-        section: 'vape',
-        iconName: 'Box',
-        image: CATEGORY_PODS_FALLBACK_IMAGE,
-        presetId: 'blue-purple',
-    },
-    {
-        id: '3',
-        name: 'Cannabis Premium',
-        slug: 'concentrados',
-        section: '420',
-        iconName: 'Leaf',
-        image: CATEGORY_CANNABIS_FALLBACK_IMAGE,
-        presetId: 'green-emerald',
-    },
-    {
-        id: '4',
-        name: 'Accesorios',
-        slug: 'accesorios-vape',
-        section: 'vape',
-        iconName: 'Zap',
-        image: CATEGORY_ACCESSORIES_FALLBACK_IMAGE,
-        presetId: 'yellow-orange',
-    },
-];
+export const FALLBACK_CATEGORIES: FeaturedCategory[] = getVape420CategoryShowcaseFallbackCategories().map(
+    (category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        section: category.sectionSlug as FeaturedCategory['section'],
+        iconName: category.iconName,
+        image: storefrontFallbackImage(category.fallbackImagePath),
+        presetId: category.presetId,
+    }),
+);
 

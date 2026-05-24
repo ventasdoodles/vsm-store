@@ -91,6 +91,16 @@ export interface ProductAttributeSchemaConfig {
     specKeyNormalization: Record<string, string>;
 }
 
+export interface CategoryShowcaseItemConfig {
+    id: string;
+    name: string;
+    slug: string;
+    sectionSlug: string;
+    iconName: string;
+    fallbackImagePath: string;
+    presetId: string;
+}
+
 export interface VerticalPackConfig {
     id: string;
     label: string;
@@ -105,6 +115,9 @@ export interface VerticalPackConfig {
     marketing: {
         homeHero: {
             primaryCopy: HomeHeroMarketingCopy;
+        };
+        categoryShowcase: {
+            fallbackCategories: CategoryShowcaseItemConfig[];
         };
     };
     fixtureMetadata: {
