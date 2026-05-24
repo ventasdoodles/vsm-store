@@ -6,6 +6,7 @@ import { SITE_CONFIG } from '@/config/site';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
 import {
+    assertValidVerticalPackContract,
     getVape420CategoryShowcaseFallbackCategories,
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
@@ -58,6 +59,7 @@ describe('productization config boundary', () => {
     });
 
     it('keeps Vape/420 taxonomy and specs in the vertical pack', () => {
+        expect(() => assertValidVerticalPackContract(vape420VerticalPackConfig)).not.toThrow();
         expect(vape420VerticalPackConfig.sections.map((section) => section.slug)).toEqual(['vape', '420']);
         expect(getVape420SectionPageConfig('vape')).toEqual(
             expect.objectContaining({
@@ -143,6 +145,18 @@ describe('productization config boundary', () => {
                 presetId: 'green-emerald',
             }),
         ]));
+        expect(vape420VerticalPackConfig.fixtureMetadata.demoCategorySlugs).toEqual([
+            'liquidos',
+            'mods',
+            'concentrados',
+            'accesorios-vape',
+        ]);
+        expect(vape420VerticalPackConfig.fixtureMetadata.fallbackImageKeys).toEqual([
+            'category-liquidos',
+            'category-pods',
+            'category-cannabis',
+            'category-accesorios',
+        ]);
     });
 
     it('does not import runtime, provider, payment, database, search, or Cesarin dependencies', () => {

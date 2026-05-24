@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { assertValidVerticalPackContract, summarizeVerticalPackContract } from '..';
 import {
     getSecondVerticalProofSections,
     secondVerticalProofConfig,
@@ -10,12 +11,29 @@ import type { VerticalPackConfig } from '../types';
 describe('second vertical proof config', () => {
     it('represents a non-Vape/420 vertical as static productization config', () => {
         const config: VerticalPackConfig = secondVerticalProofConfig;
+        const summary = summarizeVerticalPackContract(config);
 
         expect(config.id).toBe('second-vertical-proof');
         expect(config.sections.map((section) => section.slug)).toEqual(['demo-home', 'demo-studio']);
         expect(config.sections.map((section) => section.slug)).not.toContain('vape');
         expect(config.sections.map((section) => section.slug)).not.toContain('420');
         expect(getSecondVerticalProofSections()).toBe(config.sections);
+        expect(summary.sectionRoutePrefixes).toEqual([
+            '/__qa/second-vertical-proof/demo-home',
+            '/__qa/second-vertical-proof/demo-studio',
+        ]);
+    });
+
+    it('satisfies the shared vertical pack contract', () => {
+        expect(() => assertValidVerticalPackContract(secondVerticalProofConfig)).not.toThrow();
+        expect(secondVerticalProofConfig.fixtureMetadata.demoCategorySlugs).toEqual([
+            'organizers',
+            'desk-tools',
+        ]);
+        expect(secondVerticalProofConfig.fixtureMetadata.fallbackImageKeys).toEqual([
+            'proof-organizers',
+            'proof-desk-tools',
+        ]);
     });
 
     it('keeps proof products on string section slugs outside the production Section type', () => {
