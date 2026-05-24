@@ -66,6 +66,9 @@ const OffersPage = lazy(() => import('@/pages/OffersPage').then(m => ({ default:
 const ProductSurfaceFixture = import.meta.env.DEV
     ? lazy(() => import('@/pages/ProductSurfaceFixture').then(m => ({ default: m.ProductSurfaceFixture })))
     : null;
+const ProductGridStatesFixture = import.meta.env.DEV
+    ? lazy(() => import('@/pages/ProductGridStatesFixture').then(m => ({ default: m.ProductGridStatesFixture })))
+    : null;
 
 
 // ─── Páginas lazy (admin) ─────────────────────────────────────────────────────
@@ -109,6 +112,10 @@ export function App() {
 
     if (import.meta.env.DEV && pathname === '/__qa/product-surface' && ProductSurfaceFixture) {
         return <ProductSurfaceFixture />;
+    }
+
+    if (import.meta.env.DEV && pathname === '/__qa/product-grid-states' && ProductGridStatesFixture) {
+        return <ProductGridStatesFixture />;
     }
 
     return <StorefrontApp />;
