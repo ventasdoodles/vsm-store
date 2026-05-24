@@ -241,4 +241,11 @@ describe('CartSidebar transition clarity', () => {
             expect(navigateMock).toHaveBeenCalledWith('/vape/pod-compatible');
         });
     });
+
+    it('uses evidence-safe checkout trust copy in the footer', () => {
+        render(<CartSidebar />);
+
+        expect(screen.getByText('Revisión previa al pago')).toBeInTheDocument();
+        expect(screen.queryByText(/Checkout Seguro/i)).not.toBeInTheDocument();
+    });
 });
