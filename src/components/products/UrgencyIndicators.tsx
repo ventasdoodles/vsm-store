@@ -43,14 +43,14 @@ export const UrgencyIndicators = ({ stock, className }: UrgencyIndicatorsProps) 
                     <AlertTriangle className="w-5 h-5" />
                     <span className="font-bold tracking-wide">
                         {stock <= 3
-                            ? `Solo quedan ${stock} en stock`
-                            : `Ultimas ${stock} unidades disponibles`}
+                            ? `Stock limitado: ${stock} unidades`
+                            : `Disponibilidad limitada: ${stock} unidades`}
                     </span>
                 </motion.div>
             ) : (
                 <div className="vsm-status bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
                     <Check className="w-5 h-5" />
-                    <span className="font-bold tracking-wide">En stock y listo para enviar</span>
+                    <span className="font-bold tracking-wide">Disponible para envío</span>
                 </div>
             )}
         </motion.div>
