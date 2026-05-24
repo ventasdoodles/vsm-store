@@ -1,15 +1,6 @@
 name: GraQle Cloud Sync
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - '.orchestra/**'
-      - 'graqle.yaml'
-      - 'graqle.json'
-      - '.github/workflows/graqle-sync.yml'
   workflow_dispatch:
 
 permissions:
