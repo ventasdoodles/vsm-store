@@ -46,6 +46,8 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
             : useBestsellerProducts;
 
     const { data: products = [], isLoading } = useHook(section);
+    const theme = getIconInfo();
+    const railHref = section ? `/${section}` : '/buscar';
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -57,13 +59,13 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
         }
     };
 
-    const getIconInfo = () => {
+    function getIconInfo() {
         switch (type) {
             case 'featured': return { icon: <Sparkles className="h-6 w-6 text-white" />, gradient: 'from-amber-400 to-orange-500', shadow: 'shadow-amber-500/40' };
             case 'new': return { icon: <Flame className="h-6 w-6 text-white" />, gradient: 'from-vape-400 to-vape-600', shadow: 'shadow-vape-500/40' };
             case 'bestseller': return { icon: <TrendingUp className="h-6 w-6 text-white" />, gradient: 'from-emerald-400 to-teal-500', shadow: 'shadow-emerald-500/40' };
         }
-    };
+    }
 
     if (isLoading) {
         return (
@@ -93,9 +95,51 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
         );
     }
 
-    if (products.length === 0) return null;
+    if (products.length === 0) {
+        return (
+            <section className={cn('py-4 group/section', className)}>
+                <div className="mb-8 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 bg-gradient-to-br ${theme.gradient} rounded-2xl flex items-center justify-center shadow-lg ${theme.shadow}`}>
+                            {theme.icon}
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-black text-theme-primary tracking-tighter uppercase italic drop-shadow-sm">
+                            {title}
+                        </h2>
+                    </div>
 
-    const theme = getIconInfo();
+                    <Link
+                        to={railHref}
+                        className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
+                    >
+                        Ver todo
+                        <ArrowRight className="h-4 w-4" />
+                    </Link>
+                </div>
+
+                <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] px-6 py-8 sm:px-8 sm:py-10">
+                    <div className="mx-auto flex max-w-xl flex-col items-center text-center">
+                        <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${theme.gradient} shadow-lg ${theme.shadow}`}>
+                            {theme.icon}
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tighter">
+                            Catálogo en rotación
+                        </h3>
+                        <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-theme-secondary">
+                            Estamos actualizando esta selección. Revisa el resto del catálogo mientras cargamos nuevas piezas.
+                        </p>
+                        <Link
+                            to={railHref}
+                            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-primary px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition-all hover:scale-105"
+                        >
+                            Explorar catálogo
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section id={type === 'bestseller' ? 'mas-vendidos' : undefined} className={cn('py-4 group/section', className)}>
