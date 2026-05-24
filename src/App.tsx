@@ -69,6 +69,9 @@ const ProductSurfaceFixture = import.meta.env.DEV
 const ProductGridStatesFixture = import.meta.env.DEV
     ? lazy(() => import('@/pages/ProductGridStatesFixture').then(m => ({ default: m.ProductGridStatesFixture })))
     : null;
+const SecondVerticalProofFixture = import.meta.env.DEV
+    ? lazy(() => import('@/pages/SecondVerticalProofFixture').then(m => ({ default: m.SecondVerticalProofFixture })))
+    : null;
 
 
 // ─── Páginas lazy (admin) ─────────────────────────────────────────────────────
@@ -116,6 +119,10 @@ export function App() {
 
     if (import.meta.env.DEV && pathname === '/__qa/product-grid-states' && ProductGridStatesFixture) {
         return <ProductGridStatesFixture />;
+    }
+
+    if (import.meta.env.DEV && pathname === '/__qa/second-vertical-proof' && SecondVerticalProofFixture) {
+        return <SecondVerticalProofFixture />;
     }
 
     return <StorefrontApp />;
