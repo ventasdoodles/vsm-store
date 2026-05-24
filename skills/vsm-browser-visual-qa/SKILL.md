@@ -23,6 +23,16 @@ Use when the user asks to:
 
 Do not use this Skill to authorize browser QA when the current prompt forbids it or does not clearly permit it.
 
+## Operator Output Mode
+
+Default to compact operator output for LOW and MEDIUM risk visual QA.
+
+- Keep visual QA reports short and factual.
+- Avoid narrative unless the target is blocked, the lane is high-risk, or the prompt requests explicit evidence detail.
+- Use no more than 7 compact sections for local or bounded browser QA unless the prompt explicitly requests more.
+- Keep evidence classification, non-claims, residual risks, and stop conditions visible.
+- Use full reporting only when the browser QA lane is HIGH risk, blocked, or unresolved.
+
 ## Authorization Gate
 
 Before opening a browser, confirm the current prompt explicitly authorizes:
@@ -165,14 +175,10 @@ Use the prompt's required output format when provided. Otherwise use:
 
 1. PRE-STATE / TARGET
 2. AUTHORIZATION CHECK
-3. FILES / SURFACES READ
-4. URLS / VIEWPORTS
-5. SURFACES CHECKED
-6. OBSERVED VISUAL EVIDENCE
-7. SCREENSHOTS
-8. CLAIMS SUPPORTED
-9. NON-CLAIMS
-10. RESIDUAL RISKS
-11. GO / NO-GO
+3. URLS / VIEWPORTS
+4. OBSERVED VISUAL EVIDENCE
+5. SCREENSHOTS
+6. CLAIMS SUPPORTED
+7. NON-CLAIMS / RESIDUAL RISKS / GO / NO-GO
 
 Keep the report bounded to what was actually observed. Separate local, fixture, production, screenshot, authenticated, and live-smoke evidence.

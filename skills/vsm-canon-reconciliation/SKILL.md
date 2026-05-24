@@ -22,6 +22,16 @@ Use when the user asks to:
 
 Do not use this Skill to implement fixes, audit final acceptance, deploy, run live systems, validate runtime behavior, or canonize work without prior acceptance or explicit owner authorization.
 
+## Operator Output Mode
+
+Default to compact operator output for LOW and MEDIUM risk canon/doc work.
+
+- Keep the canon summary short and factual.
+- Avoid long narrative unless the prompt is blocked, conflicting, or explicitly high-risk.
+- Use no more than 7 compact sections for docs-only canon work unless the prompt explicitly requests more.
+- Keep accepted facts, non-claims, residual risks, and next action visible.
+- Use full reporting only when the canon lane is HIGH risk, rejected, or unresolved.
+
 ## Pre-State
 
 When a repo is involved, start with:
@@ -107,14 +117,12 @@ During canon reconciliation, do not:
 
 Use the prompt's required output format when provided. Otherwise use:
 
-1. PRE-STATE
-2. FILES READ
-3. FILES MODIFIED
-4. ACCEPTED FACTS CANONIZED
-5. NON-CLAIMS PRESERVED
-6. RESIDUAL RISKS PRESERVED
-7. VALIDATION PERFORMED
-8. COMMIT STATUS
-9. GO / NO-GO
+1. FILES MODIFIED
+2. FACTS CANONIZED
+3. NON-CLAIMS / RESIDUALS
+4. VALIDATION
+5. READY FOR COMMIT/PUSH
 
 Keep the reconciliation bounded to the accepted facts and authorized files. Do not inflate claims beyond the evidence accepted in the current lane.
+
+If the current prompt explicitly requests commit/push status, include it as a short inline trailer inside section 5. For HIGH-risk canon work, unresolved blockers, or conflicts, expand only as needed to keep phase separation and evidence clarity intact.

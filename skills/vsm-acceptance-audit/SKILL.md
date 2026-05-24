@@ -23,6 +23,16 @@ Use when the user asks to:
 
 Do not use this Skill to implement fixes, canonize, deploy, run live systems, or accept work done by the same actor when independence is required.
 
+## Operator Output Mode
+
+Default to compact operator output for LOW and MEDIUM risk audits.
+
+- Keep the verdict and evidence tight.
+- Avoid long explanations unless the audit is HIGH risk, `REJECT`, or blocked.
+- Use no more than 7 compact sections for LOW and MEDIUM risk audits unless the prompt explicitly asks for more.
+- Keep acceptance, non-claims, residual risks, and next action visible.
+- Use full reporting only when the audited lane is HIGH risk, rejected, or unresolved.
+
 ## Pre-State
 
 When a repo is involved, start with:
@@ -102,14 +112,14 @@ During acceptance audit, do not:
 
 Use the prompt's required output format when provided. Otherwise use:
 
-1. FILES / COMMITS / RUNS INSPECTED
-2. REPO STATE
-3. DIFF SCOPE CHECK
-4. VALIDATION CHECK
-5. CLAIMS ACCEPTED
-6. CLAIMS NOT ACCEPTED / NON-CLAIMS
-7. RESIDUAL RISKS
-8. FINAL VERDICT
-9. EXACT NEXT PROMPT FOR CANON IF ACCEPTED
+1. VERDICT
+2. DIFF SCOPE
+3. VALIDATION
+4. ACCEPTED CLAIMS
+5. NON-CLAIMS
+6. RESIDUAL RISKS
+7. NEXT ACTION
 
 Keep the audit bounded to the claim under review. Do not implement while auditing. Do not inflate claims beyond the evidence inspected in the current lane.
+
+If the current prompt explicitly requests an exact canon prompt after acceptance, append it only as a short separate trailer after section 7. For HIGH-risk lanes, unresolved blockers, or `REJECT`, expand only as needed to preserve evidence clarity and phase separation.

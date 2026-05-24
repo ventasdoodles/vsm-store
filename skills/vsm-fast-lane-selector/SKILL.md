@@ -24,6 +24,16 @@ Use when the user asks to:
 
 Do not use this Skill to implement, validate runtime behavior, run browser QA, audit final acceptance, canonize, deploy, operate live systems, inspect secrets, or touch DB/Supabase.
 
+## Operator Output Mode
+
+Default to operator output for LOW and MEDIUM risk lanes.
+
+- Keep the answer compact and decision-oriented.
+- Do not add narrative unless the prompt is blocked, high-risk, or conflicting.
+- Prefer at most 7 sections for LOW and MEDIUM lanes.
+- Use the exact required format requested by the prompt when one is provided.
+- Use FULL only when risk is HIGH, the verdict is `REJECT`, or a blocker remains unresolved.
+
 ## Pre-State
 
 When a repo is involved, start with:
@@ -98,9 +108,9 @@ Use `HIGH-RISK` for sensitive or production-adjacent work. Keep readiness, imple
 
 ## Reporting Modes
 
-Use `COMPACT` for low-risk docs/copy/config/CSS micro-lanes. Prefer 5-7 sections and short evidence statements.
+Use `COMPACT` for low-risk docs/copy/config/CSS micro-lanes. Prefer 5-7 sections and short evidence statements. This is the default operator output mode for LOW risk.
 
-Use `STANDARD` for medium-risk frontend/service/browser/local-validation lanes. Prefer 8-10 sections with claims, non-claims, and residual risks.
+Use `STANDARD` for medium-risk frontend/service/browser/local-validation lanes. Prefer 8-10 sections with claims, non-claims, and residual risks. This is the default operator output mode for MEDIUM risk.
 
 Use `FULL` for high-risk, production, DB/Supabase, auth/secrets, provider, payment, Product Search, Cesarin, deploy, or live-smoke work. Include explicit evidence, blockers, non-claims, residual risks, and phase gates.
 
