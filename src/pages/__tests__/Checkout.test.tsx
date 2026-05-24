@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Checkout } from '../Checkout';
 import { useCartStore } from '@/stores/cart.store';
 import type { Product } from '@/types/product';
+import { STORE_META_COPY } from '@/constants/storeMeta';
 
 const navigateMock = vi.fn();
 const warningMock = vi.fn();
@@ -34,7 +35,9 @@ vi.mock('@/components/cart/OpenRecoverableOrderNotice', () => ({
 }));
 
 vi.mock('@/components/seo/SEO', () => ({
-    SEO: () => null,
+    SEO: ({ title, description }: { title: string; description: string }) => (
+        <div data-testid="seo" data-title={title} data-description={description} />
+    ),
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -208,6 +211,21 @@ describe('Checkout page cart integrity display', () => {
         expect(screen.queryByText(/Total Final/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Envío Gratis Desbloqueado/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Meta \$500/i)).not.toBeInTheDocument();
+    });
+
+    it('uses the shared storefront metadata in checkout SEO', () => {
+        useCartStore.setState({
+            items: [{ product: makeProduct({ price: 199 }), quantity: 1, variant_id: null, variant_name: null }],
+        });
+
+        render(
+            <MemoryRouter>
+                <Checkout />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByTestId('seo')).toHaveAttribute('data-title', 'Finalizar Compra');
+        expect(screen.getByTestId('seo')).toHaveAttribute('data-description', STORE_META_COPY.checkout.seoDescription);
     });
 
     it('surfaces open-order recovery guidance when an authenticated payable order already exists', () => {

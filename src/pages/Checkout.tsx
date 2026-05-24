@@ -16,6 +16,7 @@ import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { useOpenRecoverableOrder } from '@/hooks/useOrders';
 import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 import { emitConversationConversionEvent, getCesarinSessionId } from '@/lib/conversion-measurement';
+import { STORE_META_COPY } from '@/constants/storeMeta';
 
 export function Checkout() {
     const navigate = useNavigate();
@@ -73,7 +74,7 @@ export function Checkout() {
 
     return (
         <div className="min-h-screen bg-theme-main pb-20 pt-20 md:pt-24 lg:pt-28">
-            <SEO title="Finalizar Compra" description="Completa tu pedido en VSM Store - Vape & Smoke Shop en Acapulco." />
+            <SEO title="Finalizar Compra" description={STORE_META_COPY.checkout.seoDescription} />
 
             <div className="container-vsm max-w-7xl mx-auto px-4">
                 <div className="flex flex-col lg:flex-row lg:gap-12 xl:gap-20">

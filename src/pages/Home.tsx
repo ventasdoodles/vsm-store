@@ -20,7 +20,7 @@ import { WheelInvitation } from '@/components/home/WheelInvitation';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 import { SmartBanner } from '@/components/home/ai/SmartBanner';
 import { useAuth } from '@/hooks/useAuth';
-import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
+import { STORE_META_COPY } from '@/constants/storeMeta';
 
 // Lazy-load heavier components
 const SocialProof = lazy(() => import('@/components/home/SocialProof').then(m => ({ default: m.SocialProof })));
@@ -169,11 +169,11 @@ export function Home() {
         <div className="min-h-screen pb-20 pt-0 bg-theme-primary transition-colors duration-300">
             <SEO
                 title="Inicio"
-                description={`${NATIONAL_HOME_HERO_COPY.title} ${NATIONAL_HOME_HERO_COPY.subtitle}. ${NATIONAL_HOME_HERO_COPY.description}`}
+                description={STORE_META_COPY.home.seoDescription}
             />
             <OrganizationJsonLd />
 
-            <h1 className="sr-only">VSM Store — vapes y 420 importados, enviados por DHL desde Acapulco</h1>
+            <h1 className="sr-only">{STORE_META_COPY.home.hiddenHeading}</h1>
 
             <div className="space-y-12 md:space-y-16">
                 <SectionErrorBoundary name="MegaHero">
