@@ -12,10 +12,12 @@ import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNeuralHero } from '@/hooks/useNeuralHero';
+import { getStorefrontHeroSliderFallbacks } from '@/config/storefrontSettingsFallback';
 import { MagneticButton } from '@/components/ui/MagneticButton';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { NATIONAL_HOME_HERO_COPY, normalizeHomeHeroSlide } from '@/constants/homeHero';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
+import type { HeroSlider } from '@/services';
 import type { PresetGradient } from '@/constants/slider';
 
 /** Preset por defecto cuando no hay selección en BD */
@@ -37,8 +39,6 @@ interface ActiveSlide {
 const storefrontFallbackImage = (path: string) =>
     typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
 
-const HERO_VAPE_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-vape.svg');
-const HERO_EXTRACTS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-extracts.svg');
 const HERO_GENERIC_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-generic.svg');
 
 export const NATIONAL_HERO_TITLE = NATIONAL_HOME_HERO_COPY.title;
@@ -46,30 +46,25 @@ export const NATIONAL_HERO_SUBTITLE = NATIONAL_HOME_HERO_COPY.subtitle;
 export const NATIONAL_HERO_DESCRIPTION = NATIONAL_HOME_HERO_COPY.description;
 export const NATIONAL_HERO_TAG = NATIONAL_HOME_HERO_COPY.tag;
 
-const FALLBACK_SLIDES: ActiveSlide[] = [
-    {
-        id: 'slide-1',
-        title: NATIONAL_HOME_HERO_COPY.title,
-        subtitle: NATIONAL_HOME_HERO_COPY.subtitle,
-        description: NATIONAL_HOME_HERO_COPY.description,
-        image: HERO_VAPE_FALLBACK_IMAGE,
-        ctaText: 'Ver Dispositivos',
-        ctaLink: '/vape/pods',
-        tag: NATIONAL_HOME_HERO_COPY.tag,
-        preset: PREMIUM_GRADIENTS[0] ?? DEFAULT_PRESET,
-    },
-    {
-        id: 'slide-2',
-        title: 'EXTRACTOS',
-        subtitle: 'PREMIUM',
-        description: 'La máxima pureza y potencia en cada gota. Calidad certificada de laboratorio.',
-        image: HERO_EXTRACTS_FALLBACK_IMAGE,
-        ctaText: 'Ver Extractos',
-        ctaLink: '/420/extractos',
-        tag: 'Exclusivo',
-        preset: PREMIUM_GRADIENTS[1] ?? DEFAULT_PRESET,
-    },
-];
+const mapHeroSliderToActiveSlide = (slider: HeroSlider): ActiveSlide => {
+    const preset = PREMIUM_GRADIENTS.find((p) => p.id === slider.bgGradientLight) ?? DEFAULT_PRESET;
+
+    return {
+        id: slider.id,
+        title: slider.title,
+        subtitle: slider.subtitle,
+        description: slider.description || '',
+        image: slider.image ? storefrontFallbackImage(slider.image) : HERO_GENERIC_FALLBACK_IMAGE,
+        ctaText: slider.ctaText,
+        ctaLink: slider.ctaLink,
+        tag: slider.tag || 'Destacado',
+        preset,
+    };
+};
+
+const FALLBACK_SLIDES: ActiveSlide[] = getStorefrontHeroSliderFallbacks()
+    .map(mapHeroSliderToActiveSlide)
+    .map(normalizeHomeHeroSlide);
 
 export const MegaHero = () => {
     const { data: settings } = useStoreSettings();
@@ -105,20 +100,7 @@ export const MegaHero = () => {
             ? settings.hero_sliders
                 .filter(s => s.active)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
-                .map(s => {
-                    const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight) ?? DEFAULT_PRESET;
-                    return {
-                        id: s.id,
-                        title: s.title,
-                        subtitle: s.subtitle,
-                        description: s.description || '',
-                        image: s.image || HERO_GENERIC_FALLBACK_IMAGE,
-                        ctaText: s.ctaText,
-                        ctaLink: s.ctaLink,
-                        tag: s.tag || 'Destacado',
-                        preset
-                    };
-                })
+                .map(mapHeroSliderToActiveSlide)
                 .map(normalizeHomeHeroSlide)
             : FALLBACK_SLIDES;
 

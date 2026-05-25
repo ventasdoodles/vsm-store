@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { SITE_CONFIG } from '@/config/site';
-import { getStorefrontSettingsFallback } from '../storefrontSettingsFallback';
+import { getStorefrontHeroSliderFallbacks, getStorefrontSettingsFallback } from '../storefrontSettingsFallback';
 
 describe('storefront settings fallback', () => {
     it('preserves the current DB-empty store settings fallback contract', () => {
@@ -47,6 +47,7 @@ describe('storefront settings fallback', () => {
     it('preserves the current fallback home slider routes and national copy', () => {
         const fallback = getStorefrontSettingsFallback();
 
+        expect(fallback.hero_sliders).toEqual(getStorefrontHeroSliderFallbacks());
         expect(fallback.hero_sliders).toEqual([
             expect.objectContaining({
                 id: '1',
@@ -54,6 +55,7 @@ describe('storefront settings fallback', () => {
                 subtitle: NATIONAL_HOME_HERO_COPY.subtitle,
                 description: NATIONAL_HOME_HERO_COPY.description,
                 tag: NATIONAL_HOME_HERO_COPY.tag,
+                image: '/images/storefront-fallbacks/hero-vape.svg',
                 ctaText: 'Compra Ahora',
                 ctaLink: '/vape',
                 active: true,
@@ -62,6 +64,7 @@ describe('storefront settings fallback', () => {
             expect.objectContaining({
                 id: '2',
                 title: 'Productos Premium 420',
+                image: '/images/storefront-fallbacks/hero-extracts.svg',
                 ctaText: 'Explorar 420',
                 ctaLink: '/420',
                 active: true,
@@ -70,6 +73,7 @@ describe('storefront settings fallback', () => {
             expect.objectContaining({
                 id: '3',
                 title: 'Más de 50 Sabores',
+                image: '/images/storefront-fallbacks/hero-generic.svg',
                 ctaText: 'Ver Líquidos',
                 ctaLink: '/vape/liquidos',
                 active: true,

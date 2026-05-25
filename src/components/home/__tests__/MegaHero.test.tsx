@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -79,7 +79,7 @@ describe('MegaHero national shipping copy', () => {
         expect(screen.queryByText(/Xalapa|envío gratis en/i)).not.toBeInTheDocument();
     });
 
-    it('uses national shipping copy for the local fallback hero', () => {
+    it('uses the centralized storefront settings fallback for the local home hero', () => {
         useStoreSettingsMock.mockReturnValue({ data: null });
 
         renderHero();
@@ -88,5 +88,13 @@ describe('MegaHero national shipping copy', () => {
         expect(screen.getByText('seleccionados')).toBeInTheDocument();
         expect(screen.getByText('Envíos Nacionales')).toBeInTheDocument();
         expect(screen.queryByText(/Xalapa|envío gratis en/i)).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Slide 2'));
+        expect(screen.getByText('Productos Premium 420')).toBeInTheDocument();
+        expect(screen.getByText('Explorar 420')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Slide 3'));
+        expect(screen.getByText('Más de 50 Sabores')).toBeInTheDocument();
+        expect(screen.getByText('Ver Líquidos')).toBeInTheDocument();
     });
 });
