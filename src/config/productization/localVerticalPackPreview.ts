@@ -45,6 +45,22 @@ export interface LocalVerticalPackPreviewViewModel {
     hasLocalProducts: boolean;
 }
 
+export interface LocalVerticalPackPreviewSectionProductGroup {
+    section: LocalVerticalPackPreviewSectionViewModel;
+    products: SecondVerticalProofProduct[];
+    productCount: number;
+    hasLocalProducts: boolean;
+}
+
+export interface LocalVerticalPackPreviewShellViewModel {
+    preview: LocalVerticalPackPreviewViewModel;
+    activeSection: LocalVerticalPackPreviewSectionViewModel | null;
+    activeSectionProducts: SecondVerticalProofProduct[];
+    activeSectionProductCount: number;
+    activeSectionHasLocalProducts: boolean;
+    sectionProductGroups: LocalVerticalPackPreviewSectionProductGroup[];
+}
+
 export interface LocalVerticalPackPreviewRouteManifestItem {
     sectionSlug: string;
     rootRoute: string;
@@ -139,6 +155,40 @@ export function buildLocalVerticalPackPreviewViewModel(
         products: preview.products,
         productsBySectionSlug,
         hasLocalProducts: preview.products.length > 0,
+    };
+}
+
+export function buildLocalVerticalPackPreviewShellViewModel(
+    preview: LocalVerticalPackPreview,
+    sectionRouteOrSlug: string | null | undefined,
+): LocalVerticalPackPreviewShellViewModel {
+    const previewViewModel = buildLocalVerticalPackPreviewViewModel(preview);
+    const activeSection =
+        resolveLocalVerticalPackPreviewSection(previewViewModel, sectionRouteOrSlug) ??
+        previewViewModel.sections[0] ??
+        null;
+    const sectionProductGroups = previewViewModel.sections.map((section) => {
+        const products = previewViewModel.productsBySectionSlug[section.slug] ?? [];
+
+        return {
+            section,
+            products,
+            productCount: products.length,
+            hasLocalProducts: products.length > 0,
+        };
+    });
+
+    return {
+        preview: previewViewModel,
+        activeSection,
+        activeSectionProducts: activeSection ? previewViewModel.productsBySectionSlug[activeSection.slug] ?? [] : [],
+        activeSectionProductCount: activeSection
+            ? previewViewModel.productsBySectionSlug[activeSection.slug]?.length ?? 0
+            : 0,
+        activeSectionHasLocalProducts: activeSection
+            ? (previewViewModel.productsBySectionSlug[activeSection.slug]?.length ?? 0) > 0
+            : false,
+        sectionProductGroups,
     };
 }
 

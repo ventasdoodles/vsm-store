@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
     buildLocalVerticalPackPreviewViewModel,
+    buildLocalVerticalPackPreviewShellViewModel,
     resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
     resolveLocalVerticalPackPreviewSection,
@@ -70,6 +71,14 @@ describe('localVerticalPackPreview', () => {
                 '/__qa/second-vertical-proof/demo-studio/example-slug',
             )?.slug,
         ).toBe('demo-studio');
+
+        const shellViewModel = buildLocalVerticalPackPreviewShellViewModel(preview!, 'demo-studio');
+
+        expect(shellViewModel.activeSection?.slug).toBe('demo-studio');
+        expect(shellViewModel.activeSectionProducts.map((product) => product.id)).toEqual(['proof-product-2']);
+        expect(shellViewModel.activeSectionProductCount).toBe(1);
+        expect(shellViewModel.activeSectionHasLocalProducts).toBe(true);
+        expect(shellViewModel.sectionProductGroups.map((group) => group.productCount)).toEqual([1, 1]);
     });
 
     it('resolves the dev-only Vape/420 preview by preview key', () => {
@@ -121,6 +130,14 @@ describe('localVerticalPackPreview', () => {
         expect(viewModel.productsBySectionSlug['420']).toEqual([]);
         expect(resolveLocalVerticalPackPreviewSection(viewModel, '/420/concentrados')?.slug).toBe('420');
         expect(resolveLocalVerticalPackPreviewSection(viewModel, 'unknown-section')).toBeNull();
+
+        const shellViewModel = buildLocalVerticalPackPreviewShellViewModel(preview!, '/420/concentrados');
+
+        expect(shellViewModel.activeSection?.slug).toBe('420');
+        expect(shellViewModel.activeSectionProducts).toEqual([]);
+        expect(shellViewModel.activeSectionProductCount).toBe(0);
+        expect(shellViewModel.activeSectionHasLocalProducts).toBe(false);
+        expect(shellViewModel.sectionProductGroups.map((group) => group.productCount)).toEqual([0, 0]);
     });
 
     it('matches nested proof routes under the same local route prefix', () => {

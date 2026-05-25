@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { vape420VerticalPackConfig } from '@/config/productization';
-import { secondVerticalProofConfig, secondVerticalProofProducts } from '@/config/productization/secondVerticalProof';
+import { secondVerticalProofConfig } from '@/config/productization/secondVerticalProof';
 import { SecondVerticalProofFixture } from '../SecondVerticalProofFixture';
 
 function renderFixture(pathname = '/__qa/second-vertical-proof') {
@@ -31,17 +31,19 @@ describe('SecondVerticalProofFixture', () => {
             expect(screen.getAllByText(section.routePrefix).length).toBeGreaterThanOrEqual(1);
             expect(screen.getAllByText(`${section.routePrefix}/:slug`).length).toBeGreaterThanOrEqual(1);
         }
-        expect(screen.getAllByText('Local products available')).toHaveLength(secondVerticalProofConfig.sections.length);
-
         const packIdentity = screen.getByRole('region', { name: 'Pack identity' });
         const packTaxonomy = screen.getByRole('region', { name: 'Pack taxonomy' });
         const packRouteManifest = screen.getByRole('region', { name: 'Pack route manifest' });
         const sectionSimulation = screen.getByRole('region', { name: 'Local section route simulation' });
+        const sectionOverview = screen.getByRole('region', { name: 'Section overview' });
 
         expect(packIdentity).toBeInTheDocument();
         expect(packTaxonomy).toBeInTheDocument();
         expect(packRouteManifest).toBeInTheDocument();
         expect(sectionSimulation).toBeInTheDocument();
+        expect(within(sectionOverview).getAllByText('Local products available')).toHaveLength(
+            secondVerticalProofConfig.sections.length,
+        );
         expect(within(packIdentity).getByText('Second Vertical Proof')).toBeInTheDocument();
         expect(within(packIdentity).getByText('Demo Families')).toBeInTheDocument();
         expect(within(packIdentity).getByText('Modular Organizer')).toBeInTheDocument();
@@ -58,13 +60,12 @@ describe('SecondVerticalProofFixture', () => {
         expect(within(packRouteManifest).getByText('Pattern: /__qa/second-vertical-proof/demo-home/:slug')).toBeInTheDocument();
 
         expect(screen.getByRole('region', { name: 'Proof categories' })).toBeInTheDocument();
-        expect(screen.getByRole('region', { name: 'Proof products' })).toBeInTheDocument();
+        expect(screen.getByRole('region', { name: 'Active section storefront' })).toBeInTheDocument();
 
-        for (const product of secondVerticalProofProducts) {
-            expect(screen.getByRole('heading', { name: product.name })).toBeInTheDocument();
-            expect(screen.getByText(product.shortDescription)).toBeInTheDocument();
-            expect(screen.getByText(product.priceLabel)).toBeInTheDocument();
-        }
+        expect(screen.getByRole('heading', { name: 'Modular Organizer' })).toBeInTheDocument();
+        expect(screen.getByText('Static fixture product mapped to the demo-home section.')).toBeInTheDocument();
+        expect(screen.getByText('$420.00')).toBeInTheDocument();
+        expect(screen.queryByRole('heading', { name: 'Desk Dock' })).not.toBeInTheDocument();
     });
 
     it('shows diagnostics for what the selected preview proves and does not prove', () => {
@@ -102,17 +103,17 @@ describe('SecondVerticalProofFixture', () => {
             expect(screen.getAllByText(section.routePrefix).length).toBeGreaterThanOrEqual(1);
             expect(screen.getAllByText(`${section.routePrefix}/:slug`).length).toBeGreaterThanOrEqual(1);
         }
-        expect(screen.getAllByText('No local products available')).toHaveLength(
-            vape420VerticalPackConfig.sections.length,
-        );
-
         const packRouteManifest = screen.getByRole('region', { name: 'Pack route manifest' });
         expect(within(packRouteManifest).getByText('Root: /vape')).toBeInTheDocument();
         expect(within(packRouteManifest).getByText('Pattern: /vape/:slug')).toBeInTheDocument();
         expect(within(packRouteManifest).getByText('Root: /420')).toBeInTheDocument();
         expect(within(packRouteManifest).getByText('Pattern: /420/:slug')).toBeInTheDocument();
 
-        expect(screen.getByText('No local product list available for this preview.')).toBeInTheDocument();
+        const storefront = screen.getByRole('region', { name: 'Active section storefront' });
+        expect(within(storefront).getByText('No local products available for this section.')).toBeInTheDocument();
+        expect(
+            within(storefront).getByText('The active section shell still renders from the selected preview model.'),
+        ).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Second vertical proof' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Vape/420 preview' })).toBeInTheDocument();
     });
@@ -127,6 +128,12 @@ describe('SecondVerticalProofFixture', () => {
         expect(within(sectionSimulation).getByText('Root route: /__qa/second-vertical-proof/demo-studio')).toBeInTheDocument();
         expect(within(sectionSimulation).getByText('Slug route: /__qa/second-vertical-proof/demo-studio/:slug')).toBeInTheDocument();
         expect(within(sectionSimulation).getByText('Local products: 1')).toBeInTheDocument();
+
+        const storefront = screen.getByRole('region', { name: 'Active section storefront' });
+        expect(within(storefront).getByRole('heading', { name: 'Desk Dock' })).toBeInTheDocument();
+        expect(within(storefront).getByText('Static fixture product mapped to the demo-studio section.')).toBeInTheDocument();
+        expect(within(storefront).getByText('$590.00')).toBeInTheDocument();
+        expect(within(storefront).queryByRole('heading', { name: 'Modular Organizer' })).not.toBeInTheDocument();
     });
 
     it('simulates section routes for the Vape/420 preview without local products', () => {
@@ -139,7 +146,8 @@ describe('SecondVerticalProofFixture', () => {
         expect(within(sectionSimulation).getByText('Root route: /420')).toBeInTheDocument();
         expect(within(sectionSimulation).getByText('Slug route: /420/:slug')).toBeInTheDocument();
         expect(within(sectionSimulation).getByText('Local products: 0')).toBeInTheDocument();
-        expect(screen.getByText('No local product list available for this preview.')).toBeInTheDocument();
+        const storefront = screen.getByRole('region', { name: 'Active section storefront' });
+        expect(within(storefront).getByText('No local products available for this section.')).toBeInTheDocument();
     });
 
     it('falls back to the default second vertical proof preview when the query is invalid', () => {
@@ -154,7 +162,8 @@ describe('SecondVerticalProofFixture', () => {
         expect(
             screen.getByText('Local preview selection from the dev-only QA surface'),
         ).toBeInTheDocument();
-        expect(screen.getAllByText('Local products available')).toHaveLength(
+        const sectionOverview = screen.getByRole('region', { name: 'Section overview' });
+        expect(within(sectionOverview).getAllByText('Local products available')).toHaveLength(
             secondVerticalProofConfig.sections.length,
         );
     });
@@ -167,6 +176,10 @@ describe('SecondVerticalProofFixture', () => {
                 name: secondVerticalProofConfig.marketing.homeHero.primaryCopy.title,
             }),
         ).toBeInTheDocument();
-        expect(screen.getByText('/__qa/second-vertical-proof/demo-home')).toBeInTheDocument();
+        expect(
+            within(screen.getByRole('region', { name: 'Local section route simulation' })).getAllByText(
+                /\/__qa\/second-vertical-proof\/demo-home/,
+            ),
+        ).toHaveLength(2);
     });
 });

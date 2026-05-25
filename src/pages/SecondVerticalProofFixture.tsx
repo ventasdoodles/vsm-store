@@ -2,10 +2,10 @@ import { Boxes, PackageCheck, Tags } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 import {
+    buildLocalVerticalPackPreviewShellViewModel,
     buildLocalVerticalPackPreviewViewModel,
     resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
-    resolveLocalVerticalPackPreviewSection,
 } from '@/config/productization';
 
 export function SecondVerticalProofFixture() {
@@ -20,10 +20,14 @@ export function SecondVerticalProofFixture() {
     const selectedSectionRouteOrSlug = new URLSearchParams(search).get('section');
     const preview = resolveLocalVerticalPackPreviewByKey(previewKey) ?? surfacePreview;
     const previewViewModel = buildLocalVerticalPackPreviewViewModel(preview);
-    const selectedSection =
-        resolveLocalVerticalPackPreviewSection(previewViewModel, selectedSectionRouteOrSlug) ??
-        previewViewModel.sections[0] ??
-        null;
+    const shellViewModel = buildLocalVerticalPackPreviewShellViewModel(preview, selectedSectionRouteOrSlug);
+    const {
+        activeSection,
+        activeSectionProducts,
+        activeSectionProductCount,
+        activeSectionHasLocalProducts,
+        sectionProductGroups,
+    } = shellViewModel;
 
     const previewSwitcherPath = pathname;
     const buildPreviewPath = (nextPreviewKey: string, nextSectionSlug?: string) => {
@@ -41,7 +45,6 @@ export function SecondVerticalProofFixture() {
         proves,
         doesNotProve,
         pack,
-        products,
         routeManifest,
         categoryTaxonomyHints,
         productAttributeHints,
@@ -103,35 +106,98 @@ export function SecondVerticalProofFixture() {
                             <Link
                                 key={section.slug}
                                 className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
-                                to={buildPreviewPath(previewViewModel.previewKey, section.slug)}
-                            >
-                                {section.shortLabel}
-                            </Link>
-                        ))}
+                            to={buildPreviewPath(previewViewModel.previewKey, section.slug)}
+                        >
+                            {section.shortLabel}
+                        </Link>
+                    ))}
                     </div>
-                    {selectedSection ? (
+                    {activeSection ? (
                         <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
                             <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
                                 Active simulated section
                             </p>
-                            <h3 className="mt-2 text-xl font-black text-white">{selectedSection.label}</h3>
-                            <p className="mt-1 text-sm text-theme-secondary">{selectedSection.description}</p>
+                            <h3 className="mt-2 text-xl font-black text-white">{activeSection.label}</h3>
+                            <p className="mt-1 text-sm text-theme-secondary">{activeSection.description}</p>
                             <dl className="mt-4 grid gap-2 text-xs text-theme-secondary sm:grid-cols-2">
                                 <div className="rounded-xl bg-white/[0.03] px-3 py-2">
-                                    Section slug: {selectedSection.slug}
+                                    Section slug: {activeSection.slug}
                                 </div>
                                 <div className="rounded-xl bg-white/[0.03] px-3 py-2">
-                                    Root route: {selectedSection.routePrefix}
+                                    Root route: {activeSection.routePrefix}
                                 </div>
                                 <div className="rounded-xl bg-white/[0.03] px-3 py-2">
-                                    Slug route: {selectedSection.slugRoutePattern}
+                                    Slug route: {activeSection.slugRoutePattern}
                                 </div>
                                 <div className="rounded-xl bg-white/[0.03] px-3 py-2">
-                                    Local products: {selectedSection.localProductCount}
+                                    Local products: {activeSection.localProductCount}
                                 </div>
                             </dl>
                         </article>
                     ) : null}
+                </section>
+
+                <section className="space-y-4" aria-label="Active section storefront">
+                    <div className="flex items-center gap-2">
+                        <Tags className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Active Section Storefront</h2>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                    Showing products for
+                                </p>
+                                <p className="mt-2 text-base font-black text-white">
+                                    {activeSection?.label ?? previewViewModel.previewLabel}
+                                </p>
+                                <p className="mt-1 text-sm text-theme-secondary">
+                                    {activeSection?.description ?? 'Local proof surface derived from the selected preview.'}
+                                </p>
+                            </div>
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                {activeSectionHasLocalProducts ? `${activeSectionProductCount} local products` : 'No local products'}
+                            </p>
+                        </div>
+
+                        <div className="mt-5 grid gap-4 md:grid-cols-2">
+                            {activeSectionProducts.map((product) => (
+                                <article
+                                    key={product.id}
+                                    className="rounded-2xl border border-white/10 bg-theme-secondary/20 p-5"
+                                >
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 className="text-base font-black text-white">{product.name}</h3>
+                                            <p className="mt-1 text-sm text-theme-secondary">
+                                                {product.shortDescription}
+                                            </p>
+                                        </div>
+                                        <p className="shrink-0 text-sm font-black text-cyan-300">
+                                            {product.priceLabel}
+                                        </p>
+                                    </div>
+                                    <dl className="mt-4 grid gap-2 text-xs text-theme-secondary">
+                                        {product.attributeSummary.map((attribute) => (
+                                            <div key={attribute} className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                                {attribute}
+                                            </div>
+                                        ))}
+                                    </dl>
+                                </article>
+                            ))}
+                            {!activeSectionHasLocalProducts ? (
+                                <article className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] p-5">
+                                    <p className="text-sm font-black text-white">
+                                        No local products available for this section.
+                                    </p>
+                                    <p className="mt-1 text-sm text-theme-secondary">
+                                        The active section shell still renders from the selected preview model.
+                                    </p>
+                                </article>
+                            ) : null}
+                        </div>
+                    </div>
                 </section>
 
                 <section className="space-y-4" aria-label="Preview diagnostics">
@@ -297,45 +363,39 @@ export function SecondVerticalProofFixture() {
                     </div>
                 </section>
 
-                <section className="space-y-4" aria-label="Proof products">
+                <section className="space-y-4" aria-label="Section overview">
                     <div className="flex items-center gap-2">
                         <Tags className="h-5 w-5 text-cyan-300" />
-                        <h2 className="text-lg font-black text-white">Proof Products</h2>
+                        <h2 className="text-lg font-black text-white">Section Overview</h2>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
-                        {products.map((product) => (
+                        {sectionProductGroups.map(({ section, productCount, hasLocalProducts }) => (
                             <article
-                                key={product.id}
-                                className="rounded-2xl border border-white/10 bg-theme-secondary/20 p-5"
+                                key={section.slug}
+                                className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
                             >
-                                <div className="flex items-start justify-between gap-4">
+                                <div className="mb-4 flex items-center gap-3">
+                                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300">
+                                        <PackageCheck className="h-5 w-5" />
+                                    </span>
                                     <div>
-                                        <h3 className="text-base font-black text-white">{product.name}</h3>
-                                        <p className="mt-1 text-sm text-theme-secondary">
-                                            {product.shortDescription}
+                                        <h3 className="text-lg font-black text-white">{section.label}</h3>
+                                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                            {section.slug}
+                                        </p>
+                                        <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-cyan-300">
+                                            {hasLocalProducts ? 'Local products available' : 'No local products available'}
                                         </p>
                                     </div>
-                                    <p className="shrink-0 text-sm font-black text-cyan-300">
-                                        {product.priceLabel}
-                                    </p>
                                 </div>
-                                <dl className="mt-4 grid gap-2 text-xs text-theme-secondary">
-                                    {product.attributeSummary.map((attribute) => (
-                                        <div key={attribute} className="rounded-xl bg-white/[0.03] px-3 py-2">
-                                            {attribute}
-                                        </div>
-                                    ))}
-                                </dl>
-                            </article>
-                        ))}
-                        {products.length === 0 ? (
-                            <article className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] p-5">
-                                <p className="text-sm font-black text-white">No local product list available for this preview.</p>
-                                <p className="mt-1 text-sm text-theme-secondary">
-                                    This preview only demonstrates selected pack state, route manifest, and taxonomy hints.
+                                <p className="text-sm text-theme-secondary">{section.description}</p>
+                                <p className="mt-3 text-xs text-theme-tertiary">{section.routePrefix}</p>
+                                <p className="mt-1 text-xs text-theme-tertiary">{section.slugRoutePattern}</p>
+                                <p className="mt-3 text-xs text-theme-tertiary">
+                                    Selected pack products in this section: {productCount}
                                 </p>
                             </article>
-                        ) : null}
+                        ))}
                     </div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
                         Preview selection is local/dev-only and currently {hasLocalProducts ? 'includes' : 'omits'} local products.
