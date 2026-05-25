@@ -9,6 +9,7 @@ import {
     assertValidVerticalPackContract,
     defineVerticalPack,
     getVape420CategoryShowcaseFallbackCategories,
+    getVape420SectionRouteManifest,
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
     getVape420SpecKeyNormalization,
@@ -30,6 +31,7 @@ const readProductizationImports = () =>
         'vape420VerticalPack.ts',
         'categoryShowcase.ts',
         'sectionPage.ts',
+        'routes.ts',
         'specs.ts',
         'verticalPackContract.ts',
         'verticalPackAuthoring.ts',
@@ -137,6 +139,21 @@ describe('productization config boundary', () => {
         expect(NATIONAL_HOME_HERO_COPY).toEqual(vape420VerticalPackConfig.marketing.homeHero.primaryCopy);
         expect(getVape420CategoryShowcaseFallbackCategories()).toBe(
             vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories,
+        );
+        expect(getVape420SectionRouteManifest()).toEqual([
+            {
+                sectionSlug: 'vape',
+                rootRoute: '/vape',
+                slugRoutePattern: '/vape/:slug',
+            },
+            {
+                sectionSlug: '420',
+                rootRoute: '/420',
+                slugRoutePattern: '/420/:slug',
+            },
+        ]);
+        expect(getVape420SectionRouteManifest().map((route) => route.rootRoute)).toEqual(
+            vape420VerticalPackConfig.sections.map((section) => section.routePrefix),
         );
         expect(vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories).toEqual(expect.arrayContaining([
             expect.objectContaining({

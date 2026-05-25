@@ -13,6 +13,8 @@ export { vape420VerticalPackConfig } from './vape420VerticalPack';
 export { getVape420CategoryShowcaseFallbackCategories } from './categoryShowcase';
 export { getVape420SectionPageConfig } from './sectionPage';
 export type { SectionPageProductizationConfig } from './sectionPage';
+export { getVape420SectionRouteManifest } from './routes';
+export type { VerticalPackSectionRouteManifestItem } from './routes';
 export {
     defineVerticalPack,
     VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,
