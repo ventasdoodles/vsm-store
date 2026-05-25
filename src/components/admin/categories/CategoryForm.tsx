@@ -14,6 +14,7 @@ import { slugify } from '@/lib/utils';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 import type { CategoryFormData } from '@/services/admin';
+import { buildAdminSectionCatalog } from '@/config/productization';
 
 interface CategoryFormProps {
     open: boolean;
@@ -25,11 +26,14 @@ interface CategoryFormProps {
     onClose: () => void;
 }
 
+const SECTION_CATALOG = buildAdminSectionCatalog();
+const DEFAULT_SECTION = SECTION_CATALOG.sections[0]?.slug ?? 'vape';
+
 /** Estado inicial vacio del formulario */
 const EMPTY: CategoryFormData = {
     name: '',
     slug: '',
-    section: 'vape',
+    section: DEFAULT_SECTION,
     parent_id: null,
     is_active: true,
     description: '',
@@ -183,8 +187,11 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                                 disabled={isChild}
                                 className={cn(SELECT_CLASS, isChild && 'cursor-not-allowed opacity-40')}
                             >
-                                <option value="vape">Vape</option>
-                                <option value="420">420</option>
+                                {SECTION_CATALOG.sections.map(section => (
+                                    <option key={section.slug} value={section.slug}>
+                                        {section.shortLabel}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>

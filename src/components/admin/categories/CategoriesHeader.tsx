@@ -9,6 +9,7 @@
 import { Plus, FolderTree, Layers, Flame, Grid3X3 } from 'lucide-react';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
+import { buildAdminSectionCatalog } from '@/config/productization';
 
 interface CategoriesHeaderProps {
     categories: Category[];
@@ -17,17 +18,21 @@ interface CategoriesHeaderProps {
     onNew: () => void;
 }
 
-/** Tabs de seccion */
-const SECTION_TABS: { label: string; value: Section | 'all'; color: string }[] = [
-    { label: 'Todas', value: 'all', color: 'text-white' },
-    { label: 'Vape', value: 'vape', color: 'text-violet-400' },
-    { label: '420', value: '420', color: 'text-emerald-400' },
-];
+const SECTION_CATALOG = buildAdminSectionCatalog();
 
 export function CategoriesHeader({ categories, sectionFilter, onSectionChange, onNew }: CategoriesHeaderProps) {
     const roots    = categories.filter(c => !c.parent_id);
     const children = categories.filter(c => !!c.parent_id);
     const popular  = categories.filter(c => c.is_popular);
+    const sectionTabs: { label: string; value: Section | 'all'; activeClassName: string; idleClassName: string }[] = [
+        { label: 'Todas', value: 'all', activeClassName: 'bg-white/10 text-white shadow-lg shadow-white/5 ring-1 ring-white/10', idleClassName: 'text-white/40 hover:text-white/70' },
+        ...SECTION_CATALOG.sections.map(section => ({
+            label: section.shortLabel,
+            value: section.slug,
+            activeClassName: section.selectedButtonClassName,
+            idleClassName: section.idleButtonClassName,
+        })),
+    ];
 
     return (
         <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
@@ -68,14 +73,18 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
 
                     {/* Section Filter Tabs */}
                     <div className="flex gap-1 rounded-[1rem] border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
-                        {SECTION_TABS.map(tab => (
+                        {sectionTabs.map(tab => (
                             <button
                                 key={tab.value}
                                 onClick={() => onSectionChange(tab.value)}
                                 className={`rounded-[0.75rem] px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${
-                                    sectionFilter === tab.value
-                                        ? 'bg-white/10 text-white shadow-lg shadow-white/5 ring-1 ring-white/10'
-                                        : 'text-white/40 hover:text-white/70'
+                                    tab.value === 'all'
+                                        ? sectionFilter === tab.value
+                                            ? 'bg-white/10 text-white shadow-lg shadow-white/5 ring-1 ring-white/10'
+                                            : 'text-white/40 hover:text-white/70'
+                                        : sectionFilter === tab.value
+                                            ? `${tab.activeClassName} shadow-lg shadow-white/5 ring-1 ring-white/10`
+                                            : `${tab.idleClassName} hover:text-white/70`
                                 }`}
                             >
                                 {tab.label}

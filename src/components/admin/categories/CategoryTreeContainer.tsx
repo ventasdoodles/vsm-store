@@ -9,6 +9,7 @@
 import { TreePine } from 'lucide-react';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
+import { getAdminSectionCatalogEntry } from '@/config/productization';
 import { CategoryTreeNode } from './CategoryTreeNode';
 import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 
@@ -38,6 +39,9 @@ export function CategoryTreeContainer({
     onToggleActive,
     isToggling,
 }: CategoryTreeContainerProps) {
+    const sectionFilterLabel =
+        sectionFilter === 'all' ? null : getAdminSectionCatalogEntry(sectionFilter)?.shortLabel ?? sectionFilter;
+
     return (
         <div className="relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-5 shadow-xl backdrop-blur-md">
             {/* Orbes ambientales sutiles */}
@@ -59,7 +63,11 @@ export function CategoryTreeContainer({
                     <AdminEmptyState
                         icon={TreePine}
                         title="No hay categorías"
-                        description={sectionFilter !== 'all' ? `No se encontraron categorías en la sección ${sectionFilter}` : 'Crea la primera categoría para empezar a organizar tu catálogo.'}
+                        description={
+                            sectionFilterLabel
+                                ? `No se encontraron categorías en la sección ${sectionFilterLabel}`
+                                : 'Crea la primera categoría para empezar a organizar tu catálogo.'
+                        }
                         className="py-20 border-0 bg-transparent"
                     />
                 ) : (
