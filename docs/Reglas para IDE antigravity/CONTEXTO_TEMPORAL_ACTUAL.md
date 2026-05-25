@@ -8,8 +8,8 @@
 - Proyecto: VSM Store.
 - Fecha del snapshot: 2026-05-24.
 - Estado de salida esperado: `main` limpio y alineado con `origin/main`.
-- Ultimo canon docs-only observado antes de esta reconciliacion: local vertical pack resolution preview `b502346`.
-- Ultimo resultado aceptado/canonizado: generalized local vertical preview model `1041613`, ACCEPT WITH RESIDUAL RISK.
+- Ultimo canon docs-only observado antes de esta reconciliacion: generalized local vertical preview model `931ebab`.
+- Ultimo resultado aceptado/canonizado: dev preview pack switcher `d6f4857`, ACCEPT WITH RESIDUAL RISK.
 - Rol de este archivo: memoria compacta de handoff, no historial completo ni fuente primaria de verdad.
 
 ## 2. Estado operativo
