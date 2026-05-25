@@ -1,5 +1,5 @@
-﻿/**
- * AdminHomeEditor â€” PÃ¡gina responsable de orquestar la ediciÃ³n del Home (CategorÃ­as Destacadas).
+/**
+ * AdminHomeEditor - Page responsible for orchestrating the Home editor (Featured Categories).
  *
  * @module AdminHomeEditor
  * @independent No depende de AdminSettings. Lee/escribe directamente a `store_settings.featured_categories`.
@@ -12,23 +12,17 @@ import { useCategories } from '@/hooks/useCategories';
 import { useNotification } from '@/hooks/useNotification';
 import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
-import { FALLBACK_CATEGORIES } from '@/constants/category-showcase';
+import {
+    applyHomeFeaturedCategorySelection,
+    buildHomeFeaturedCategories,
+    findMatchingHomeFeaturedCategoryId,
+    HOME_FEATURED_CATEGORY_SLOTS,
+    updateHomeFeaturedCategorySlot,
+} from '@/lib/domain/homeFeaturedCategories';
 
-// Subcomponentes del mÃ³dulo
+// Subcomponents for the module
 import { HomeEditorHeader } from '@/components/admin/home-editor/HomeEditorHeader';
 import { HomeEditorSlotCard } from '@/components/admin/home-editor/HomeEditorSlotCard';
-
-/** NÃºmero fijo de slots del grid de categorÃ­as en el Home */
-const SLOTS_COUNT = 4;
-
-/** Construye un array de 4 categorÃ­as completas, rellenando con fallbacks */
-function buildInitialCategories(dbCategories: FeaturedCategory[] | null | undefined): FeaturedCategory[] {
-    return Array.from({ length: SLOTS_COUNT }, (_, i) => {
-        const saved = dbCategories?.[i];
-        if (saved && saved.slug && saved.name) return saved;
-        return { ...FALLBACK_CATEGORIES[i]! };
-    });
-}
 
 export function AdminHomeEditor() {
     const { data: settings, isLoading } = useStoreSettings();
@@ -37,56 +31,41 @@ export function AdminHomeEditor() {
     const { success, error: notifyError } = useNotification();
 
     const [categories, setCategories] = useState<FeaturedCategory[]>(() =>
-        buildInitialCategories(null)
+        buildHomeFeaturedCategories(null),
     );
     const [isDirty, setIsDirty] = useState(false);
 
-    // Sincronizar con la BD cuando llegan los settings
+    // Sync with the DB when settings arrive
     useEffect(() => {
         if (settings?.featured_categories) {
-            setCategories(buildInitialCategories(settings.featured_categories));
+            setCategories(buildHomeFeaturedCategories(settings.featured_categories));
             setIsDirty(false);
         }
     }, [settings?.featured_categories]);
 
-    /** Actualiza un campo de un slot especÃ­fico */
+    /** Update a field for a specific slot */
     const updateSlot = useCallback((index: number, field: keyof FeaturedCategory, value: string) => {
-        setCategories(prev => {
-            const updated = [...prev];
-            updated[index] = { ...updated[index]!, [field]: value };
-            return updated;
-        });
+        setCategories((prev) => updateHomeFeaturedCategorySlot(prev, index, field, value));
         setIsDirty(true);
     }, []);
 
-    /** Al seleccionar una categorÃ­a del dropdown, auto-rellena slug, nombre, imagen y secciÃ³n */
+    /** When selecting a category from the dropdown, auto-fill slug, name, image, and section */
     const handleCategorySelect = useCallback((index: number, categoryId: string) => {
-        const matched: Category | undefined = storeCategories.find(c => c.id === categoryId);
+        const matched: Category | undefined = storeCategories.find((c) => c.id === categoryId);
         if (!matched) return;
 
-        setCategories(prev => {
-            const updated = [...prev];
-            const current = updated[index]!;
-            updated[index] = {
-                ...current,
-                slug: matched.slug,
-                name: matched.name,
-                section: (matched.section === 'vape' || matched.section === '420') ? matched.section : current.section,
-                ...(matched.image_url ? { image: matched.image_url } : {}),
-            };
-            return updated;
-        });
+        setCategories((prev) => applyHomeFeaturedCategorySelection(prev, index, matched));
         setIsDirty(true);
     }, [storeCategories]);
 
-    /** Guardar solo las categorÃ­as destacadas, sin tocar el resto de settings */
+    /** Save only featured categories, without touching the rest of settings */
     const handleSave = async () => {
         try {
             await updateMutation.mutateAsync({
                 featured_categories: categories,
                 id: 1,
             });
-            success('CategorÃ­as guardadas', 'Las categorÃ­as destacadas se actualizaron correctamente.');
+            success('Categorías guardadas', 'Las categorías destacadas se actualizaron correctamente.');
             setIsDirty(false);
         } catch (err: unknown) {
             const supaError = err as { message?: string; code?: string; details?: string };
@@ -95,23 +74,20 @@ export function AdminHomeEditor() {
             }
             notifyError(
                 'Error al guardar',
-                supaError?.message || 'No se pudieron guardar las categorÃ­as destacadas.',
+                supaError?.message || 'No se pudieron guardar las categorías destacadas.',
             );
         }
     };
 
-    /** Descartar cambios y volver al estado de la BD */
+    /** Discard changes and go back to the DB-backed state */
     const handleDiscard = () => {
-        setCategories(buildInitialCategories(settings?.featured_categories));
+        setCategories(buildHomeFeaturedCategories(settings?.featured_categories));
         setIsDirty(false);
     };
 
-    /** Encontrar el ID de la categorÃ­a que corresponde al slug+section actual de un slot */
+    /** Find the category ID that matches the current slug + section of a slot */
     const findMatchingCategoryId = (slot: FeaturedCategory): string => {
-        const match = storeCategories.find(
-            c => c.slug === slot.slug && c.section === slot.section
-        );
-        return match?.id ?? '';
+        return findMatchingHomeFeaturedCategoryId(slot, storeCategories);
     };
 
     if (isLoading) {
@@ -129,10 +105,10 @@ export function AdminHomeEditor() {
                 isPending={updateMutation.isPending}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
-                slotsCount={SLOTS_COUNT}
+                slotsCount={HOME_FEATURED_CATEGORY_SLOTS}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {categories.map((slot, index) => (
                     <HomeEditorSlotCard
                         key={slot.id}
@@ -148,4 +124,3 @@ export function AdminHomeEditor() {
         </div>
     );
 }
-
