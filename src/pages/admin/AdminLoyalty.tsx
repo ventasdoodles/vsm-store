@@ -1,9 +1,16 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useNotification } from '@/hooks/useNotification';
 import { Loader2, Save } from 'lucide-react';
 import type { LoyaltyConfig, LoyaltyTier } from '@/services';
 import { STORE_SETTINGS_ID } from '@/constants/app';
+import {
+    applyLoyaltyRuleChange,
+    buildAdminLoyaltyState,
+    buildLoyaltyConfigUpdatePayload,
+    buildLoyaltyTiersUpdatePayload,
+    toggleLoyaltyEnabled,
+} from '@/lib/domain/loyaltySettings';
 
 // Subcomponents
 import { LoyaltyHeader } from '@/components/admin/loyalty/LoyaltyHeader';
@@ -12,64 +19,46 @@ import { LoyaltySimulator } from '@/components/admin/loyalty/LoyaltySimulator';
 import { LoyaltyStats } from '@/components/admin/loyalty/LoyaltyStats';
 import { TierManagement } from '@/components/admin/loyalty/TierManagement';
 
-// ConfiguraciÃ³n por defecto si no existe
-const DEFAULT_LOYALTY: LoyaltyConfig = {
-    enable_loyalty: false,
-    points_per_currency: 1,
-    currency_per_point: 0.1,
-    min_points_to_redeem: 100,
-    max_points_per_order: 1000,
-    points_expiry_days: 365,
-};
-
-// Tiers iniciales de referencia (Super Mega Premium)
-const INITIAL_TIERS: LoyaltyTier[] = [
-    { id: 'bronze', name: 'Bronze', threshold: 0, multiplier: 1, color: '#cd7f32', benefits: ['Gana 10 puntos por cada $100', 'Acceso a cupones bÃ¡sicos'] },
-    { id: 'silver', name: 'Silver', threshold: 5000, multiplier: 1.2, color: '#c0c0c0', benefits: ['Multiplicador 1.2x', 'Descuento del 5%', 'EnvÃ­o gratis > $1,000'] },
-    { id: 'gold', name: 'Gold', threshold: 20000, multiplier: 1.5, color: '#ffd700', benefits: ['Multiplicador 1.5x', 'Descuento del 10%', 'EnvÃ­o gratis siempre'] },
-    { id: 'platinum', name: 'Platinum', threshold: 50000, multiplier: 2, color: '#e5e4e2', benefits: ['Multiplicador 2.0x', 'Descuento del 15%', 'AtenciÃ³n prioritaria 24/7'] },
-];
-
 export function AdminLoyalty() {
     const { data: settings, isLoading } = useStoreSettings();
     const updateMutation = useUpdateStoreSettings();
     const { success, error } = useNotification();
 
-    const [config, setConfig] = useState<LoyaltyConfig>(DEFAULT_LOYALTY);
-    const [tiersConfig, setTiersConfig] = useState<LoyaltyTier[]>(INITIAL_TIERS);
+    const initialState = buildAdminLoyaltyState(null);
+    const [config, setConfig] = useState<LoyaltyConfig>(initialState.config);
+    const [tiersConfig, setTiersConfig] = useState<LoyaltyTier[]>(initialState.tiersConfig);
     const [isDirty, setIsDirty] = useState(false);
 
     // Sincronizar estado local al cargar params de la BD
     useEffect(() => {
-        if (settings?.loyalty_config) {
-            setConfig(settings.loyalty_config);
-        }
-        if (settings?.loyalty_tiers_config && settings.loyalty_tiers_config.length > 0) {
-            setTiersConfig(settings.loyalty_tiers_config);
-        }
+        const nextState = buildAdminLoyaltyState(settings);
+        setConfig(nextState.config);
+        setTiersConfig(nextState.tiersConfig);
         setIsDirty(false);
     }, [settings]);
 
     // Handle updates inside individual rule cards
     const handleRuleChange = (key: keyof LoyaltyConfig, value: number) => {
-        setConfig(prev => ({ ...prev, [key]: value }));
+        setConfig((prev) => applyLoyaltyRuleChange(prev, key, value));
         setIsDirty(true);
     };
 
     // Handle toggling the entire system ON/OFF
     const handleToggleEnable = (val: boolean) => {
-        if (config.enable_loyalty === val) return;
-        setConfig(prev => ({ ...prev, enable_loyalty: val }));
-        setIsDirty(true);
+        setConfig((prev) => {
+            const next = toggleLoyaltyEnabled(prev, val);
+            if (next === prev) return prev;
+            setIsDirty(true);
+            return next;
+        });
     };
 
     const handleTiersSave = async (updatedTiers: LoyaltyTier[]) => {
         try {
-            await updateMutation.mutateAsync({
-                id: STORE_SETTINGS_ID,
-                loyalty_tiers_config: updatedTiers
-            });
-            success('Niveles actualizados', 'El programa de tiers dinÃ¡micos ha sido actualizado.');
+            await updateMutation.mutateAsync(
+                buildLoyaltyTiersUpdatePayload(updatedTiers, STORE_SETTINGS_ID),
+            );
+            success('Niveles actualizados', 'El programa de tiers dinámicos ha sido actualizado.');
         } catch (_err) {
             error('Error al guardar tiers', 'No se pudieron sincronizar los niveles.');
         }
@@ -78,20 +67,17 @@ export function AdminLoyalty() {
     // Save everything to the database
     const handleSave = async () => {
         try {
-            await updateMutation.mutateAsync({
-                id: STORE_SETTINGS_ID,
-                loyalty_config: config
-            });
+            await updateMutation.mutateAsync(buildLoyaltyConfigUpdatePayload(config, STORE_SETTINGS_ID));
             setIsDirty(false);
             success(
                 'Programa de Lealtad actualizado',
-                config.enable_loyalty ? 'Las nuevas reglas de V-Coins ya estÃ¡n activas en el checkout.' : 'El programa de lealtad ha sido pausado.'
+                config.enable_loyalty ? 'Las nuevas reglas de V-Coins ya están activas en el checkout.' : 'El programa de lealtad ha sido pausado.',
             );
         } catch (_err) {
             if (import.meta.env.DEV) {
                 console.error('Error saving loyalty config:', _err);
             }
-            error('Error al guardar', 'No se pudieron guardar los cambios. IntÃ©ntalo de nuevo.');
+            error('Error al guardar', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
         }
     };
 
@@ -114,7 +100,6 @@ export function AdminLoyalty() {
 
             {/* Content Area */}
             <div className="space-y-6 sm:space-y-8">
-
                 {/* Global Stats */}
                 <LoyaltyStats />
 
@@ -158,9 +143,6 @@ export function AdminLoyalty() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }
-
-
