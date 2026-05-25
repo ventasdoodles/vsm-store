@@ -7,6 +7,8 @@ export interface LocalVerticalPackPreview {
     previewKey: LocalVerticalPackPreviewKey;
     previewLabel: string;
     routePrefix: string;
+    proves: string[];
+    doesNotProve: string[];
     pack: VerticalPackConfig;
     routeManifest: LocalVerticalPackPreviewRouteManifestItem[];
     categoryTaxonomyHints: CategoryTaxonomyHint[];
@@ -37,6 +39,14 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
         previewKey: 'second-vertical-proof',
         previewLabel: 'Second Vertical Proof',
         routePrefix: '/__qa/second-vertical-proof',
+        proves: [
+            'Local preview selection from the dev-only QA surface',
+            'Selected pack identity, route manifest, taxonomy hints, and proof products render together',
+        ],
+        doesNotProve: [
+            'Production routing or generalized vertical switching',
+            'Runtime multi-tenant behavior, DB-backed portability, or production readiness',
+        ],
         pack: secondVerticalProofConfig,
         routeManifest: buildLocalVerticalPackRouteManifest(secondVerticalProofConfig),
         categoryTaxonomyHints: secondVerticalProofConfig.categoryTaxonomyHints,
@@ -48,6 +58,14 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
         previewKey: 'vape-420-preview',
         previewLabel: 'Vape/420 Preview',
         routePrefix: '/__qa/second-vertical-proof',
+        proves: [
+            'Local preview switching across multiple preview states',
+            'Selected Vape/420 pack identity, route manifest, taxonomy hints, and explicit empty-state rendering',
+        ],
+        doesNotProve: [
+            'Production routing or generalized vertical switching',
+            'Runtime multi-tenant behavior, DB-backed portability, or production readiness',
+        ],
         pack: vape420VerticalPackConfig,
         routeManifest: buildLocalVerticalPackRouteManifest(vape420VerticalPackConfig),
         categoryTaxonomyHints: vape420VerticalPackConfig.categoryTaxonomyHints,

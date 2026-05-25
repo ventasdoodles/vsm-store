@@ -60,6 +60,24 @@ describe('SecondVerticalProofFixture', () => {
         }
     });
 
+    it('shows diagnostics for what the selected preview proves and does not prove', () => {
+        renderFixture('/__qa/second-vertical-proof');
+
+        const diagnostics = screen.getByRole('region', { name: 'Preview diagnostics' });
+
+        expect(diagnostics).toBeInTheDocument();
+        expect(screen.getByText('What this proves')).toBeInTheDocument();
+        expect(screen.getByText('What this does not prove')).toBeInTheDocument();
+        expect(
+            within(diagnostics).getByText('Local preview selection from the dev-only QA surface'),
+        ).toBeInTheDocument();
+        expect(
+            within(diagnostics).getByText(
+                'Production routing or generalized vertical switching',
+            ),
+        ).toBeInTheDocument();
+    });
+
     it('switches to the Vape/420 preview pack via a local query param', () => {
         renderFixture('/__qa/second-vertical-proof?preview=vape-420-preview');
 
@@ -86,6 +104,20 @@ describe('SecondVerticalProofFixture', () => {
         expect(screen.getByText('No local product list available for this preview.')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Second vertical proof' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Vape/420 preview' })).toBeInTheDocument();
+    });
+
+    it('falls back to the default second vertical proof preview when the query is invalid', () => {
+        renderFixture('/__qa/second-vertical-proof?preview=unknown-preview');
+
+        expect(
+            screen.getByRole('heading', {
+                name: secondVerticalProofConfig.marketing.homeHero.primaryCopy.title,
+            }),
+        ).toBeInTheDocument();
+        expect(screen.getByText('Selected preview: Second Vertical Proof')).toBeInTheDocument();
+        expect(
+            screen.getByText('Local preview selection from the dev-only QA surface'),
+        ).toBeInTheDocument();
     });
 
     it('renders the same preview state for nested proof routes under the selected route prefix', () => {

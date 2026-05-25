@@ -14,6 +14,14 @@ describe('localVerticalPackPreview', () => {
         expect(preview?.previewLabel).toBe('Second Vertical Proof');
         expect(preview?.pack.id).toBe('second-vertical-proof');
         expect(preview?.routePrefix).toBe('/__qa/second-vertical-proof');
+        expect(preview?.proves).toEqual([
+            'Local preview selection from the dev-only QA surface',
+            'Selected pack identity, route manifest, taxonomy hints, and proof products render together',
+        ]);
+        expect(preview?.doesNotProve).toEqual([
+            'Production routing or generalized vertical switching',
+            'Runtime multi-tenant behavior, DB-backed portability, or production readiness',
+        ]);
         expect(preview?.routeManifest).toEqual([
             {
                 sectionSlug: 'demo-home',
@@ -49,6 +57,14 @@ describe('localVerticalPackPreview', () => {
         expect(preview?.previewKey).toBe('vape-420-preview');
         expect(preview?.previewLabel).toBe('Vape/420 Preview');
         expect(preview?.pack.id).toBe('vape-420');
+        expect(preview?.proves).toEqual([
+            'Local preview switching across multiple preview states',
+            'Selected Vape/420 pack identity, route manifest, taxonomy hints, and explicit empty-state rendering',
+        ]);
+        expect(preview?.doesNotProve).toEqual([
+            'Production routing or generalized vertical switching',
+            'Runtime multi-tenant behavior, DB-backed portability, or production readiness',
+        ]);
         expect(preview?.routeManifest).toEqual([
             {
                 sectionSlug: 'vape',

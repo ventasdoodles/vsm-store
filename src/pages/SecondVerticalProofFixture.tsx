@@ -20,6 +20,8 @@ export function SecondVerticalProofFixture() {
     const previewSwitcherPath = pathname;
 
     const {
+        proves,
+        doesNotProve,
         pack,
         products,
         routeManifest,
@@ -69,6 +71,39 @@ export function SecondVerticalProofFixture() {
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
                         Selected preview: {preview.previewLabel}
                     </p>
+                </section>
+
+                <section className="space-y-4" aria-label="Preview diagnostics">
+                    <div className="flex items-center gap-2">
+                        <Boxes className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Preview Diagnostics</h2>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                What this proves
+                            </p>
+                            <ul className="mt-3 grid gap-2 text-sm text-white">
+                                {proves.map((line) => (
+                                    <li key={line} className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                        {line}
+                                    </li>
+                                ))}
+                            </ul>
+                        </article>
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                What this does not prove
+                            </p>
+                            <ul className="mt-3 grid gap-2 text-sm text-white">
+                                {doesNotProve.map((line) => (
+                                    <li key={line} className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                        {line}
+                                    </li>
+                                ))}
+                            </ul>
+                        </article>
+                    </div>
                 </section>
 
                 <section className="space-y-4" aria-label="Pack identity">
