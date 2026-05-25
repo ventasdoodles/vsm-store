@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, Sparkles, EyeOff, Eye, Pencil, Trash2, Copy, Star } from 'lucide-react';
+import { getAdminSectionCatalogEntry } from '@/config/productization';
 import type { Testimonial } from '@/types/testimonial';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,8 @@ export function TestimonialAdminCard({
     onToggleFeatured,
     onToggleActive,
 }: TestimonialAdminCardProps) {
+    const section = t.section ? getAdminSectionCatalogEntry(t.section) : null;
+
     return (
         <div
             className={cn(
@@ -76,16 +79,14 @@ export function TestimonialAdminCard({
                         />
                     ))}
                 </div>
-                {t.section && (
+                {section && (
                     <span
                         className={cn(
                             'text-[10px] font-black uppercase tracking-[0.1em] px-2.5 py-1 rounded-md shadow-inner border border-white/5',
-                            t.section === 'vape'
-                                ? 'bg-vape-500/10 text-vape-400'
-                                : 'bg-herbal-500/10 text-herbal-400'
+                            section.badgeClassName
                         )}
                     >
-                        {t.section}
+                        {section.shortLabel}
                     </span>
                 )}
                 <span className="text-[10px] font-mono text-theme-secondary/40 ml-auto whitespace-nowrap bg-black/20 px-2 py-0.5 rounded-md">

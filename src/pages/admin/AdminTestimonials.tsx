@@ -93,9 +93,7 @@ export function AdminTestimonials() {
             ? (testimonials.reduce((s: number, t: Testimonial) => s + t.rating, 0) / total).toFixed(1)
             : '0';
         const sectionCounts = buildAdminSectionCounts(testimonials);
-        const vape = sectionCounts.vape ?? 0;
-        const herbal = sectionCounts['420'] ?? 0;
-        return { total, active, featured, avgRating, vape, herbal };
+        return { total, active, featured, avgRating, sectionCounts };
     }, [testimonials]);
 
     // Pagination Calculation
@@ -206,7 +204,7 @@ export function AdminTestimonials() {
                 }}
             />
 
-            <TestimonialsStats stats={stats} />
+            <TestimonialsStats stats={stats} sectionCounts={stats.sectionCounts} />
 
             {(isCreating || editingId) && (
                 <div className="animate-in fade-in slide-in-from-top-4 duration-300">

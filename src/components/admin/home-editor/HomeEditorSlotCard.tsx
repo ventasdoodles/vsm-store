@@ -1,14 +1,14 @@
-﻿import type { FeaturedCategory } from '@/services';
+import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
+import { buildAdminSectionCatalog, getAdminSectionCatalogEntry } from '@/config/productization';
 import { CATEGORY_GRADIENTS, CATEGORY_ICONS } from '@/constants/category-showcase';
 import { uploadSliderImage } from '@/services';
 
 interface HomeEditorSlotCardProps {
     slot: FeaturedCategory;
     index: number;
-    storeCategories: Category[];
-    selectedCategoryId: string;
+    storeCategories: Category[]; selectedCategoryId: string;
     onUpdateSlot: (index: number, field: keyof FeaturedCategory, value: string) => void;
     onCategorySelect: (index: number, categoryId: string) => void;
 }
@@ -22,6 +22,7 @@ export function HomeEditorSlotCard({
     onCategorySelect,
 }: HomeEditorSlotCardProps) {
     const IconComponent = CATEGORY_ICONS[slot.iconName] ?? CATEGORY_ICONS['Box']!;
+    const adminSectionCatalog = buildAdminSectionCatalog();
 
     return (
         <div className="p-5 rounded-xl border border-theme bg-theme-primary/50 relative">
@@ -42,9 +43,9 @@ export function HomeEditorSlotCard({
                         className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                     >
                         <option value="">â€” Elegir categorÃ­a existente â€”</option>
-                        {storeCategories.map(cat => (
+                        {storeCategories.map((cat) => (
                             <option key={cat.id} value={cat.id}>
-                                {cat.name} ({cat.section === '420' ? '420' : 'Vape'})
+                                {cat.name} ({getAdminSectionCatalogEntry(cat.section)?.shortLabel ?? cat.section})
                                 {cat.image_url ? ' ðŸ“·' : ''}
                             </option>
                         ))}
@@ -94,7 +95,7 @@ export function HomeEditorSlotCard({
                                 onChange={(e) => onUpdateSlot(index, 'iconName', e.target.value)}
                                 className="w-full rounded-lg border border-theme bg-theme-secondary pl-10 pr-3 py-2 text-theme-primary outline-none focus:border-vape-500 appearance-none"
                             >
-                                {Object.keys(CATEGORY_ICONS).map(iconKey => (
+                                {Object.keys(CATEGORY_ICONS).map((iconKey) => (
                                     <option key={iconKey} value={iconKey}>{iconKey}</option>
                                 ))}
                             </select>
@@ -114,8 +115,11 @@ export function HomeEditorSlotCard({
                             onChange={(e) => onUpdateSlot(index, 'section', e.target.value)}
                             className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         >
-                            <option value="vape">Vape</option>
-                            <option value="420">420</option>
+                            {adminSectionCatalog.sections.map((section) => (
+                                <option key={section.slug} value={section.slug}>
+                                    {section.shortLabel}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div>
@@ -155,4 +159,3 @@ export function HomeEditorSlotCard({
         </div>
     );
 }
-
