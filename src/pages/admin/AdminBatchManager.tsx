@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
+import {
     getAllProducts, 
     bulkUpdateProducts, 
     type ProductFormData 
@@ -13,19 +13,22 @@ import { SupplierOrderModal } from '@/components/admin/ui/SupplierOrderModal';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotification } from '@/hooks/useNotification';
-
-interface ProductRow extends Partial<ProductFormData> {
-    id: string;
-    isModified?: boolean;
-}
+import {
+    applyBatchProductFieldChange,
+    buildBatchProductRows,
+    buildBatchProductUpdatePayload,
+    countModifiedBatchRows,
+    resetBatchProductRows,
+    type ProductBatchRow,
+} from '@/lib/domain/adminBatchManager';
 
 export function AdminBatchManager() {
     const queryClient = useQueryClient();
     const { success, error: notifyError } = useNotification();
     const [search, setSearch] = useState('');
-    const [localProducts, setLocalProducts] = useState<ProductRow[]>([]);
+    const [localProducts, setLocalProducts] = useState<ProductBatchRow[]>([]);
     const [isDirty, setIsDirty] = useState(false);
-    const [selectedProductForOrder, setSelectedProductForOrder] = useState<ProductRow | null>(null);
+    const [selectedProductForOrder, setSelectedProductForOrder] = useState<ProductBatchRow | null>(null);
 
     const { data: products, isLoading } = useQuery({
         queryKey: ['admin', 'products', 'batch'],
@@ -34,7 +37,7 @@ export function AdminBatchManager() {
 
     React.useEffect(() => {
         if (products) {
-            setLocalProducts(products.map(p => ({ ...p, isModified: false })));
+            setLocalProducts(buildBatchProductRows(products));
         }
     }, [products]);
 
@@ -50,28 +53,14 @@ export function AdminBatchManager() {
         }
     });
 
-    const handleUpdateLocal = (id: string, field: keyof ProductRow, value: string | number | boolean) => {
-        setLocalProducts(prev => prev.map(p => {
-            if (p.id === id) {
-                return { ...p, [field]: value, isModified: true };
-            }
-            return p;
-        }));
+    const handleUpdateLocal = (id: string, field: keyof ProductBatchRow, value: string | number | boolean) => {
+        setLocalProducts(prev => applyBatchProductFieldChange(prev, id, field, value));
         setIsDirty(true);
     };
 
     const handleSave = () => {
-        const modified = localProducts.filter(p => p.isModified);
-        if (modified.length === 0) return;
-
-        const updates = modified.map(p => ({
-            id: p.id,
-            updates: {
-                price: Number(p.price),
-                stock: Number(p.stock),
-                is_active: p.is_active
-            }
-        }));
+        const updates = buildBatchProductUpdatePayload(localProducts);
+        if (updates.length === 0) return;
 
         mutation.mutate(updates);
     };
@@ -119,7 +108,7 @@ export function AdminBatchManager() {
                                 className="flex items-center gap-3"
                             >
                                 <button 
-                                    onClick={() => setLocalProducts(products || [])}
+                                    onClick={() => setLocalProducts(resetBatchProductRows(products || []))}
                                     className="p-3 rounded-2xl bg-white/5 text-white/40 hover:text-white transition-all border border-white/10"
                                     title="Descartar cambios"
                                 >
@@ -131,7 +120,7 @@ export function AdminBatchManager() {
                                     className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-vape-500 text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-vape-500/20 hover:bg-vape-400 transition-all disabled:opacity-50"
                                 >
                                     {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                                    Aplicar {localProducts.filter(p => p.isModified).length} cambios
+                                    Aplicar {countModifiedBatchRows(localProducts)} cambios
                                 </button>
                             </motion.div>
                         )}

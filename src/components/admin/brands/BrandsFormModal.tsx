@@ -2,6 +2,7 @@ import { Loader2, Save, X, ImageIcon } from 'lucide-react';
 import type { Brand } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
+import { normalizeBrandSortOrderInput } from '@/lib/domain/adminBrands';
 
 export type BrandFormData = Omit<Brand, 'id' | 'created_at' | 'updated_at'>;
 
@@ -104,7 +105,7 @@ export function BrandsFormModal({
                             <input
                                 type="number"
                                 value={form.sort_order}
-                                onChange={e => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })}
+                                onChange={e => setForm({ ...form, sort_order: normalizeBrandSortOrderInput(e.target.value) })}
                                 className="w-full bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-theme-primary focus:border-blue-500 outline-none focus:bg-theme-primary/[0.08] focus:ring-4 focus:ring-blue-500/10 transition-all shadow-inner block font-mono"
                             />
                         </div>

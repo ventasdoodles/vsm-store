@@ -5,20 +5,21 @@ import { useConfirm } from '@/hooks/useConfirm';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { useAdminBrands } from '@/hooks/admin/useAdminCatalog';
 import { uploadBrandLogo, type Brand } from '@/services/admin';
+import {
+    buildBrandCreateForm,
+    buildBrandDuplicateForm,
+    buildBrandEditForm,
+    buildBrandSubmitPayload,
+    buildEmptyBrandForm,
+    type BrandFormData,
+} from '@/lib/domain/adminBrands';
 
 // ─── Subcomponents ───
 import { BrandsHeader } from '@/components/admin/brands/BrandsHeader';
 import { BrandsStats } from '@/components/admin/brands/BrandsStats';
 import { BrandsFilters } from '@/components/admin/brands/BrandsFilters';
-import { BrandsFormModal, type BrandFormData } from '@/components/admin/brands/BrandsFormModal';
+import { BrandsFormModal } from '@/components/admin/brands/BrandsFormModal';
 import { BrandsGrid } from '@/components/admin/brands/BrandsGrid';
-
-const EMPTY_FORM: BrandFormData = {
-    name: '',
-    logo_url: '',
-    is_active: true,
-    sort_order: 0,
-};
 
 const PAGE_SIZE = 15;
 
@@ -42,7 +43,7 @@ export function AdminBrands() {
     // Form Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState<BrandFormData>(EMPTY_FORM);
+    const [form, setForm] = useState<BrandFormData>(buildEmptyBrandForm());
 
     // Filtering & Derived Data
     const filtered = useMemo(() => {
@@ -76,18 +77,10 @@ export function AdminBrands() {
     const handleOpenModal = (brand?: Brand) => {
         if (brand) {
             setEditingId(brand.id);
-            setForm({
-                name: brand.name,
-                logo_url: brand.logo_url || '',
-                is_active: brand.is_active,
-                sort_order: brand.sort_order,
-            });
+            setForm(buildBrandEditForm(brand));
         } else {
             setEditingId(null);
-            setForm({
-                ...EMPTY_FORM,
-                sort_order: brands.length > 0 ? Math.max(...brands.map(b => b.sort_order || 0)) + 10 : 0
-            });
+            setForm(buildBrandCreateForm(brands));
         }
         setIsModalOpen(true);
     };
@@ -95,16 +88,11 @@ export function AdminBrands() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingId(null);
-        setForm(EMPTY_FORM);
+        setForm(buildEmptyBrandForm());
     };
 
     const handleDuplicate = (b: Brand) => {
-        setForm({
-            name: `${b.name} (Copia)`,
-            logo_url: b.logo_url || '',
-            is_active: false,
-            sort_order: b.sort_order + 1,
-        });
+        setForm(buildBrandDuplicateForm(b));
         setEditingId(null);
         setIsModalOpen(true);
         info('Aviso', 'Marca duplicada. Modifica los detalles y guarda.');
@@ -134,10 +122,11 @@ export function AdminBrands() {
             return;
         }
 
+        const payload = buildBrandSubmitPayload(form);
         if (editingId) {
-            await updateBrand(editingId, form);
+            await updateBrand(editingId, payload);
         } else {
-            await createBrand(form);
+            await createBrand(payload);
         }
         handleCloseModal();
     };

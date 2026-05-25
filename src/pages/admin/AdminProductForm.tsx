@@ -13,41 +13,19 @@ import {
     type ProductFormData
 } from '@/services/admin';
 import type { Category } from '@/types/category';
-import type { Section, ProductStatus } from '@/types/constants';
+import type { ProductStatus } from '@/types/constants';
 import { ImageUploader } from '@/components/admin/ImageUploader';
-
-
 import { useNotification } from '@/hooks/useNotification';
-import { slugify } from '@/lib/utils';
-
-const INITIAL: ProductFormData = {
-    name: '',
-    slug: '',
-    description: '',
-    short_description: '',
-    price: 0,
-    compare_at_price: null,
-    stock: 0,
-    sku: '',
-    section: 'vape',
-    category_id: '',
-    tags: [],
-    status: 'active' as ProductStatus,
-    images: [],
-    cover_image: null,
-    is_featured: false,
-    is_featured_until: null,
-    is_new: false,
-    is_new_until: null,
-    is_bestseller: false,
-    is_bestseller_until: null,
-    is_active: true,
-    specs: {},
-    badges: [],
-    ai_sales_note: null,
-    ai_is_featured: false,
-    ai_exclude: false
-};
+import {
+    appendProductTag,
+    applyProductFormChange,
+    buildDefaultProductForm,
+    buildProductCategoriesForSection,
+    buildProductFormFromProduct,
+    buildProductSubmitPayload,
+    hasRequiredProductFields,
+    removeProductTag,
+} from '@/lib/domain/adminProductForm';
 
 const inputCls =
     'w-full rounded-xl border border-theme bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
@@ -58,7 +36,7 @@ export function AdminProductForm() {
     const { success, error: notifyError } = useNotification();
     const { id } = useParams<{ id: string }>();
     const isEditing = id && id !== 'new';
-    const [form, setForm] = useState<ProductFormData>(INITIAL);
+    const [form, setForm] = useState<ProductFormData>(buildDefaultProductForm());
     const [tagInput, setTagInput] = useState('');
     const [showTagSuggestions, setShowTagSuggestions] = useState(false);
 
@@ -88,34 +66,7 @@ export function AdminProductForm() {
     // Sync form with product data when loaded
     useEffect(() => {
         if (product) {
-            setForm({
-                name: product.name,
-                slug: product.slug,
-                description: product.description ?? '',
-                short_description: product.short_description ?? '',
-                price: product.price,
-                compare_at_price: product.compare_at_price,
-                stock: product.stock,
-                sku: product.sku ?? '',
-                section: product.section,
-                category_id: product.category_id,
-                tags: product.tags ?? [],
-                status: product.status,
-                images: product.images ?? [],
-                cover_image: product.cover_image ?? null,
-                is_featured: product.is_featured,
-                is_featured_until: product.is_featured_until ?? null,
-                is_new: product.is_new,
-                is_new_until: product.is_new_until ?? null,
-                is_bestseller: product.is_bestseller,
-                is_bestseller_until: product.is_bestseller_until ?? null,
-                is_active: product.is_active,
-                specs: product.specs ?? {},
-                badges: product.badges ?? [],
-                ai_sales_note: product.ai_sales_note ?? null,
-                ai_is_featured: product.ai_is_featured ?? false,
-                ai_exclude: product.ai_exclude ?? false,
-            });
+            setForm(buildProductFormFromProduct(product));
         }
     }, [product]);
 
@@ -136,43 +87,27 @@ export function AdminProductForm() {
     });
 
     // Ordenar jerárquicamente: padre primero, luego sus hijos inmediatamente después
-    const filteredCats = (() => {
-        const sectionCats = categories.filter((c: Category) => c.section === form.section);
-        const roots = sectionCats.filter((c: Category) => !c.parent_id);
-        const children = sectionCats.filter((c: Category) => !!c.parent_id);
-        const result: Category[] = [];
-        for (const root of roots) {
-            result.push(root);
-            result.push(...children.filter((c: Category) => c.parent_id === root.id));
-        }
-        return result;
-    })();
+    const filteredCats = buildProductCategoriesForSection(categories, form.section);
 
     // Sync form with product data when loaded
     // ... (existing useEffect)
 
     const set = <K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
-        setForm((prev) => {
-            const u = { ...prev, [key]: value };
-            if (key === 'name' && !isEditing) u.slug = slugify(value as string);
-            if (key === 'section') u.category_id = '';
-            return u;
-        });
+        setForm((prev) => applyProductFormChange(prev, key, value, { isEditing: !!isEditing }));
     };
 
     const addTag = () => {
-        const t = tagInput.trim().toLowerCase();
-        if (t && !form.tags.includes(t)) set('tags', [...form.tags, t]);
+        set('tags', appendProductTag(form.tags, tagInput));
         setTagInput('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name || !form.category_id || (form.price === undefined || form.price === null)) {
+        if (!hasRequiredProductFields(form)) {
             notifyError('Campos requeridos', 'Por favor completa el nombre, precio y categoría');
             return;
         }
-        mutation.mutate(form);
+        mutation.mutate(buildProductSubmitPayload(form));
     };
 
     if (loadingProduct) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-vape-400" /></div>;
@@ -229,7 +164,7 @@ export function AdminProductForm() {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Sección *</label>
                             <div className="flex gap-2">
-                                {(['vape', '420'] as Section[]).map((s) => (
+                                {(['vape', '420'] as const).map((s) => (
                                     <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-theme bg-theme-primary/60 text-theme-secondary')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
                                 ))}
                             </div>
@@ -349,7 +284,7 @@ export function AdminProductForm() {
                                     <button
                                         key={t}
                                         type="button"
-                                        onMouseDown={() => { set('tags', [...form.tags, t]); setTagInput(''); setShowTagSuggestions(false); }}
+                                        onMouseDown={() => { set('tags', appendProductTag(form.tags, t)); setTagInput(''); setShowTagSuggestions(false); }}
                                         className="flex w-full items-center px-3 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 first:rounded-t-xl last:rounded-b-xl"
                                     >
                                         {t}
@@ -358,7 +293,7 @@ export function AdminProductForm() {
                             </div>
                         )}
                     </div>
-                    {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<button type="button" onClick={() => set('tags', form.tags.filter((t) => t !== tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
+                    {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<button type="button" onClick={() => set('tags', removeProductTag(form.tags, tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
                 </section>
 
                 {/* Images */}

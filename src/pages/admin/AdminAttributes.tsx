@@ -16,8 +16,15 @@ import {
     getAllAttributes, createAttribute, updateAttribute, createAttributeValue,
     deleteAttribute, deleteAttributeValue, getAllCategories
 } from '@/services/admin';
-import type { Section } from '@/types/constants';
 import { cn } from '@/lib/utils';
+import {
+    buildAttributeUpdatePayload,
+    clearAttributeCategories,
+    normalizeAttributeTextInput,
+    toggleAttributeCategory,
+    toggleAttributeSection,
+    type AttributeUpdatePayload,
+} from '@/lib/domain/adminAttributes';
 
 export function AdminAttributes() {
     const queryClient = useQueryClient();
@@ -54,7 +61,7 @@ export function AdminAttributes() {
     });
 
     const updateAttrMutation = useMutation({
-        mutationFn: ({ id, updates }: { id: string, updates: { name?: string; is_variant_capable?: boolean; applicability?: { sections: Section[]; categories?: string[] } } }) => updateAttribute(id, updates),
+        mutationFn: ({ id, updates }: AttributeUpdatePayload) => updateAttribute(id, updates),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-attributes'] });
             notify.success('Atributo actualizado', 'La configuración se ha guardado.');
@@ -93,14 +100,16 @@ export function AdminAttributes() {
 
     const handleCreateAttr = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newAttrName.trim()) return;
-        createAttrMutation.mutate(newAttrName.trim());
+        const normalized = normalizeAttributeTextInput(newAttrName);
+        if (!normalized) return;
+        createAttrMutation.mutate(normalized);
     };
 
     const handleAddValue = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedAttrId || !newValue.trim()) return;
-        createValueMutation.mutate({ id: selectedAttrId, val: newValue.trim() });
+        const normalized = normalizeAttributeTextInput(newValue);
+        if (!selectedAttrId || !normalized) return;
+        createValueMutation.mutate({ id: selectedAttrId, val: normalized });
     };
 
     if (isLoading) {
@@ -248,10 +257,10 @@ export function AdminAttributes() {
                                                 type="checkbox"
                                                 className="sr-only peer"
                                                 checked={selectedAttribute.is_variant_capable}
-                                                onChange={(e) => updateAttrMutation.mutate({ 
-                                                    id: selectedAttribute.id, 
-                                                    updates: { is_variant_capable: e.target.checked } 
-                                                })}
+                                                onChange={(e) => updateAttrMutation.mutate(buildAttributeUpdatePayload(
+                                                    selectedAttribute.id,
+                                                    { is_variant_capable: e.target.checked },
+                                                ))}
                                             />
                                             <div className="h-5 w-9 rounded-full bg-white/10 transition-colors peer-checked:bg-violet-500/50 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
                                         </label>
@@ -259,20 +268,16 @@ export function AdminAttributes() {
                                     {/* Applicability Toggles (Sections) */}
                                     <div className="flex items-center gap-2 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
                                         <p className="text-[10px] font-black uppercase text-white/40 mr-2">Visible en:</p>
-                                        {(['vape', '420'] as Section[]).map(s => {
+                                        {(['vape', '420'] as const).map(s => {
                                             const isActive = selectedAttribute.applicability?.sections?.includes(s);
                                             return (
                                                 <button
                                                     key={s}
                                                     onClick={() => {
-                                                        const current = selectedAttribute.applicability?.sections || [];
-                                                        const next = isActive 
-                                                            ? current.filter(sec => sec !== s)
-                                                            : [...current, s];
-                                                        updateAttrMutation.mutate({
-                                                            id: selectedAttribute.id,
-                                                            updates: { applicability: { ...selectedAttribute.applicability, sections: next } }
-                                                        });
+                                                        updateAttrMutation.mutate(buildAttributeUpdatePayload(
+                                                            selectedAttribute.id,
+                                                            { applicability: toggleAttributeSection(selectedAttribute.applicability, s) },
+                                                        ));
                                                     }}
                                                     className={cn(
                                                         "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
@@ -303,14 +308,10 @@ export function AdminAttributes() {
                                                 <button
                                                     key={cat.id}
                                                     onClick={() => {
-                                                        const current = selectedAttribute.applicability?.categories || [];
-                                                        const next = isActive 
-                                                            ? current.filter(id => id !== cat.id)
-                                                            : [...current, cat.id];
-                                                        updateAttrMutation.mutate({
-                                                            id: selectedAttribute.id,
-                                                            updates: { applicability: { ...selectedAttribute.applicability, categories: next } }
-                                                        });
+                                                        updateAttrMutation.mutate(buildAttributeUpdatePayload(
+                                                            selectedAttribute.id,
+                                                            { applicability: toggleAttributeCategory(selectedAttribute.applicability, cat.id) },
+                                                        ));
                                                     }}
                                                     className={cn(
                                                         "px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-2",
@@ -330,10 +331,10 @@ export function AdminAttributes() {
                                         {((selectedAttribute.applicability?.categories || []).length > 0) && (
                                             <button
                                                 onClick={() => {
-                                                    updateAttrMutation.mutate({
-                                                        id: selectedAttribute.id,
-                                                        updates: { applicability: { ...selectedAttribute.applicability, categories: [] } }
-                                                    });
+                                                    updateAttrMutation.mutate(buildAttributeUpdatePayload(
+                                                        selectedAttribute.id,
+                                                        { applicability: clearAttributeCategories(selectedAttribute.applicability) },
+                                                    ));
                                                 }}
                                                 className="px-3 py-1.5 rounded-xl text-[10px] font-bold text-white/20 hover:text-red-400 transition-colors"
                                             >
