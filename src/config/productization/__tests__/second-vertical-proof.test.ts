@@ -49,4 +49,34 @@ describe('second vertical proof config', () => {
             }),
         );
     });
+
+    it('keeps proof products aligned with declared pack sections and category hints', () => {
+        const sectionSlugs = new Set(secondVerticalProofConfig.sections.map((section) => section.slug));
+        const categorySectionBySlug = new Map(
+            secondVerticalProofConfig.categoryTaxonomyHints.map((category) => [
+                category.slug,
+                category.sectionSlug,
+            ]),
+        );
+        const attributeHintKeys = new Set(
+            secondVerticalProofConfig.productAttributeHints.map(
+                (hint) => `${hint.sectionSlug}:${hint.categorySlug}`,
+            ),
+        );
+
+        for (const product of secondVerticalProofProducts) {
+            expect(sectionSlugs.has(product.sectionSlug)).toBe(true);
+            expect(categorySectionBySlug.get(product.categorySlug)).toBe(product.sectionSlug);
+            expect(attributeHintKeys.has(`${product.sectionSlug}:${product.categorySlug}`)).toBe(true);
+        }
+    });
+
+    it('keeps proof product fixtures aligned with fixture metadata', () => {
+        expect(secondVerticalProofProducts.map((product) => product.name)).toEqual(
+            secondVerticalProofConfig.fixtureMetadata.demoProductFamilies,
+        );
+        expect(secondVerticalProofProducts.map((product) => product.categorySlug)).toEqual(
+            secondVerticalProofConfig.fixtureMetadata.demoCategorySlugs,
+        );
+    });
 });
