@@ -13,6 +13,7 @@ import {
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
     getVape420SectionPresentationConfig,
+    getVape420ProductDetailPresentationConfig,
     getVape420ProductSurfacePresentationConfig,
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
@@ -135,6 +136,34 @@ describe('productization config boundary', () => {
                 categoryIconGlowClassName: 'bg-herbal-500',
                 categoryDotClassName: 'bg-herbal-500/20 group-hover:bg-herbal-400',
                 quickViewSelectedVariantClassName: 'border-herbal-500 bg-herbal-500/10 text-herbal-400',
+            }),
+        );
+        expect(getVape420ProductDetailPresentationConfig('vape')).toEqual(
+            expect.objectContaining({
+                isVape: true,
+                breadcrumbLinkHoverClassName: 'hover:text-vape-400',
+                actionSelectedVariantClassName: 'border-vape-500 bg-vape-500/10 text-vape-400',
+                actionPrimaryButtonClassName: 'bg-gradient-to-r from-vape-600 to-vape-500 text-white shadow-xl shadow-vape-500/30 ring-1 ring-vape-400/50',
+                stickyPriceAccentTextClassName: 'text-vape-400',
+                stickyActionButtonGradientClassName: 'from-vape-500 to-vape-600 shadow-vape-500/20',
+                frequentlyBoughtTogetherAccentClassName: 'bg-vape-500',
+                productInfoTagHoverClassName: 'hover:text-vape-400 hover:border-vape-400/50',
+                quickViewSelectedVariantClassName: 'border-vape-500 bg-vape-500/10 text-vape-400',
+                quickViewSelectedThumbnailClassName: 'border-vape-500 ring-4 ring-vape-500/20 shadow-lg shadow-vape-500/20',
+            }),
+        );
+        expect(getVape420ProductDetailPresentationConfig('420')).toEqual(
+            expect.objectContaining({
+                isVape: false,
+                breadcrumbLinkHoverClassName: 'hover:text-herbal-400',
+                actionSelectedVariantClassName: 'border-herbal-500 bg-herbal-500/10 text-herbal-400',
+                actionPrimaryButtonClassName: 'bg-gradient-to-r from-herbal-600 to-herbal-500 text-white shadow-xl shadow-herbal-500/30 ring-1 ring-herbal-400/50',
+                stickyPriceAccentTextClassName: 'text-herbal-400',
+                stickyActionButtonGradientClassName: 'from-herbal-500 to-herbal-600 shadow-herbal-500/20',
+                frequentlyBoughtTogetherAccentClassName: 'bg-herbal-500',
+                productInfoTagHoverClassName: 'hover:text-herbal-400 hover:border-herbal-400/50',
+                quickViewSelectedVariantClassName: 'border-herbal-500 bg-herbal-500/10 text-herbal-400',
+                quickViewSelectedThumbnailClassName: 'border-herbal-500 ring-4 ring-herbal-500/20 shadow-lg shadow-herbal-500/20',
             }),
         );
         expect(getVape420SectionPageConfig('420')).toEqual(

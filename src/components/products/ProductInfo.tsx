@@ -13,6 +13,7 @@ import type { Product } from '@/types/product';
 import { useInventoryOracle } from '@/hooks/useInventoryOracle';
 import { StockOracleBadge } from './StockOracleBadge';
 import { motion } from 'framer-motion';
+import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface ProductInfoProps {
     product: Product;
@@ -20,6 +21,7 @@ interface ProductInfoProps {
 
 export function ProductInfo({ product }: ProductInfoProps) {
     const { prediction, isLoading: isOracleLoading } = useInventoryOracle(product.id, product.stock);
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(product.section);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -142,7 +144,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                                 key={tag}
                                 className={cn(
                                     'vsm-tag border-theme bg-theme-secondary/5 text-theme-secondary text-[10px]',
-                                    product.section === 'vape' ? 'hover:text-vape-400 hover:border-vape-400/50' : 'hover:text-herbal-400 hover:border-herbal-400/50'
+                                    productDetailConfig.productInfoTagHoverClassName
                                 )}
                             >
                                 {tag}

@@ -6,6 +6,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { Product } from '@/types/product';
+import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface FrequentlyBoughtTogetherProps {
     currentProduct: Product;
@@ -19,6 +20,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     const { trigger: haptic } = useHaptic();
     const { success } = useNotification();
     const [isAdding, setIsAdding] = useState(false);
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(currentProduct.section);
 
     useEffect(() => {
         const loadRecommendations = async () => {
@@ -63,7 +65,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
         <div className="mt-16 sm:mt-24 pt-12 vsm-divider">
             <div className="space-y-8">
                 <div className="flex items-center gap-4">
-                    <div className={cn("h-10 w-1.5 rounded-full", currentProduct.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
+                    <div className={cn('h-10 w-1.5 rounded-full', productDetailConfig.frequentlyBoughtTogetherAccentClassName)} />
                     <h2 className="vsm-heading text-white">Comprados juntos habitualmente</h2>
                 </div>
                 <div className="mt-4 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">

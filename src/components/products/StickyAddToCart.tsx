@@ -8,6 +8,7 @@ import type { StorefrontProductPurchaseabilityView } from '@/lib/domain/products
 import { getVariantDisplayName } from '@/lib/domain/products';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
+import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface StickyAddToCartProps {
     product: Product;
@@ -26,7 +27,7 @@ export function StickyAddToCart({
     const { trigger } = useHaptic();
     const { warning } = useNotification();
     const [quantity, setQuantity] = useState(1);
-    const isVape = product.section === 'vape';
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(product.section);
     const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
 
     useEffect(() => {
@@ -83,7 +84,7 @@ export function StickyAddToCart({
                             {getVariantDisplayName(selectedVariant)}
                         </p>
                     )}
-                    <p className={cn('text-sm font-bold', isVape ? 'text-vape-400' : 'text-herbal-400')}>
+                    <p className={cn('text-sm font-bold', productDetailConfig.stickyPriceAccentTextClassName)}>
                         {formatPrice(product.price)}
                     </p>
                 </div>
@@ -123,7 +124,7 @@ export function StickyAddToCart({
                         purchaseability.canAddToCart
                             ? cn(
                                 'bg-gradient-to-r text-white shadow-lg',
-                                isVape ? 'from-vape-500 to-vape-600 shadow-vape-500/20' : 'from-herbal-500 to-herbal-600 shadow-herbal-500/20',
+                                productDetailConfig.stickyActionButtonGradientClassName,
                             )
                             : 'bg-theme-tertiary/20 text-theme-secondary border-theme-subtle',
                     )}

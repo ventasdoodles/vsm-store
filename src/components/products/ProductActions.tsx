@@ -17,13 +17,17 @@ import type { Product } from '@/types/product';
 import type { ProductVariant } from '@/types/variant';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
+import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface ProductActionsProps {
     product: Product;
 }
 
 export function ProductActions({ product }: ProductActionsProps) {
-    const isVape = product.section === 'vape';
+    const productDetailConfig = useMemo(
+        () => getVape420ProductDetailPresentationConfig(product.section),
+        [product.section],
+    );
 
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);
@@ -128,12 +132,10 @@ export function ProductActions({ product }: ProductActionsProps) {
                                         setSelectedVariant(variant);
                                     }}
                                     disabled={variantUnavailable}
-                                    className={cn(
-                                        'flex flex-col items-center justify-center rounded-xl py-3 px-4 border-2 transition-all text-center',
-                                        selectedVariant?.id === variant.id
-                                            ? isVape
-                                                ? 'border-vape-500 bg-vape-500/10 text-vape-400'
-                                                : 'border-herbal-500 bg-herbal-500/10 text-herbal-400'
+                                        className={cn(
+                                            'flex flex-col items-center justify-center rounded-xl py-3 px-4 border-2 transition-all text-center',
+                                            selectedVariant?.id === variant.id
+                                            ? productDetailConfig.actionSelectedVariantClassName
                                             : variantUnavailable
                                                 ? 'border-white/5 bg-white/[0.01] text-theme-secondary/35 cursor-not-allowed'
                                                 : 'border-white/5 bg-white/[0.02] text-theme-secondary hover:border-white/10',
@@ -223,9 +225,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/30'
                                 : !purchaseability.canAddToCart
                                     ? 'cursor-not-allowed bg-theme-tertiary/20 text-theme-secondary border border-theme-subtle'
-                                    : isVape
-                                        ? 'bg-gradient-to-r from-vape-600 to-vape-500 text-white shadow-xl shadow-vape-500/30 ring-1 ring-vape-400/50'
-                                        : 'bg-gradient-to-r from-herbal-600 to-herbal-500 text-white shadow-xl shadow-herbal-500/30 ring-1 ring-herbal-400/50',
+                                    : productDetailConfig.actionPrimaryButtonClassName,
                         )}
                     >
                         <AnimatePresence mode="wait">

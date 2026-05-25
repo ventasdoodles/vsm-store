@@ -16,7 +16,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
-import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
+import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface QuickViewModalProps {
     product: Product;
@@ -42,8 +42,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         () => getStorefrontProductPurchaseability(product, { selectedVariant }),
         [product, selectedVariant],
     );
-    const productSurfaceConfig = useMemo(
-        () => getVape420ProductSurfacePresentationConfig(product.section),
+    const productDetailConfig = useMemo(
+        () => getVape420ProductDetailPresentationConfig(product.section),
         [product.section],
     );
     const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
@@ -184,10 +184,10 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => setSelectedImage(idx)}
-                                                className={cn(
-                                                    'relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border transition-all duration-300',
+                                                    className={cn(
+                                                        'relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border transition-all duration-300',
                                                     selectedImage === idx
-                                                        ? productSurfaceConfig.quickViewSelectedThumbnailClassName
+                                                        ? productDetailConfig.quickViewSelectedThumbnailClassName
                                                         : 'border-white/10 hover:border-white/30 grayscale hover:grayscale-0',
                                                 )}
                                         >
@@ -275,7 +275,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                         className={cn(
                                                             'flex flex-col items-center justify-center rounded-xl py-3 px-4 border-2 transition-all text-center',
                                                             selectedVariant?.id === variant.id
-                                                                ? productSurfaceConfig.quickViewSelectedVariantClassName
+                                                                ? productDetailConfig.quickViewSelectedVariantClassName
                                                                 : variantUnavailable
                                                                     ? 'border-white/5 bg-white/[0.01] text-white/25 cursor-not-allowed'
                                                                     : 'border-white/5 bg-white/[0.02] text-white/60 hover:border-white/10',

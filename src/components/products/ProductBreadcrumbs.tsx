@@ -9,6 +9,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategoryById } from '@/hooks/useCategories';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 import type { Section } from '@/types/product';
 
 interface ProductBreadcrumbsProps {
@@ -19,8 +20,8 @@ interface ProductBreadcrumbsProps {
 }
 
 export function ProductBreadcrumbs({ section, productName, productSlug, categoryId }: ProductBreadcrumbsProps) {
-    const isVape = section === 'vape';
-    const sectionLabel = isVape ? 'Vape' : '420';
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(section);
+    const sectionLabel = productDetailConfig.isVape ? 'Vape' : '420';
     const { pathname } = useLocation();
 
     const { data: category } = useCategoryById(categoryId);
@@ -52,7 +53,7 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
                 to={`/${section}`}
                 className={cn(
                     'flex-shrink-0 transition-colors',
-                    isVape ? 'hover:text-vape-400' : 'hover:text-herbal-400'
+                    productDetailConfig.breadcrumbLinkHoverClassName
                 )}
             >
                 {sectionLabel}
@@ -64,7 +65,7 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
                         to={`/${section}/${category.slug}`}
                         className={cn(
                             'flex-shrink-0 transition-colors',
-                            isVape ? 'hover:text-vape-400' : 'hover:text-herbal-400'
+                            productDetailConfig.breadcrumbLinkHoverClassName
                         )}
                     >
                         {category.name}
