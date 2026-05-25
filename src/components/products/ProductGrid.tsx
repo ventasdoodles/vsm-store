@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { ProductCard } from './ProductCard';
+import { getVape420StorefrontRenderabilityConfig } from '@/config/productization';
 
 interface ProductGridProps {
     products: Product[];
@@ -18,11 +19,13 @@ interface ProductGridProps {
  * Grid responsive de productos con animaciones stagger, carga y estado vacío
  */
 export function ProductGrid({ products, isLoading = false, className, onClearFilter, emptyStateTitle, emptyStateSubtext }: ProductGridProps) {
+    const renderabilityConfig = getVape420StorefrontRenderabilityConfig();
+
     // Estado: cargando — skeleton shimmer
     if (isLoading) {
         return (
             <div className={cn('grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4', className)}>
-                {Array.from({ length: 8 }).map((_, i) => (
+                {Array.from({ length: renderabilityConfig.grid.loadingSkeletonCount }).map((_, i) => (
                     <div
                         key={i}
                         className="overflow-hidden rounded-2xl border border-theme bg-theme-secondary/30"
@@ -48,10 +51,10 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                     <PackageOpen className="h-12 w-12 text-theme-secondary" />
                 </div>
                 <p className="text-sm font-medium text-theme-secondary">
-                    {emptyStateTitle || 'No hay productos disponibles'}
+                    {emptyStateTitle || renderabilityConfig.grid.emptyStateTitle}
                 </p>
                 <p className="mt-1 text-xs text-theme-secondary">
-                    {emptyStateSubtext || 'Intenta con otra categoría o sección'}
+                    {emptyStateSubtext || renderabilityConfig.grid.emptyStateSubtext}
                 </p>
                 {onClearFilter ? (
                     <button
@@ -63,11 +66,11 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                     </button>
                 ) : (
                     <Link
-                        to="/buscar"
+                        to={renderabilityConfig.grid.emptyStateCtaHref}
                         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
                     >
                         <ShoppingBag className="h-4 w-4" />
-                        Explorar catálogo
+                        {renderabilityConfig.grid.emptyStateCtaLabel}
                     </Link>
                 )}
             </div>

@@ -61,7 +61,10 @@ describe('ProductRail render states', () => {
 
         expect(screen.getByText('Catálogo en rotación')).toBeInTheDocument();
         expect(screen.getByText(/Estamos actualizando esta selección/i)).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Explorar catálogo' })).toHaveAttribute('href', '/vape');
+
+        const exploreLinks = screen.getAllByRole('link', { name: 'Explorar catálogo' });
+        expect(exploreLinks).toHaveLength(2);
+        expect(exploreLinks.some((link) => link.getAttribute('href') === '/vape')).toBe(true);
     });
 
     it('renders product cards when products exist', () => {

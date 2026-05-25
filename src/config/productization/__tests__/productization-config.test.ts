@@ -15,6 +15,7 @@ import {
     getVape420SectionPresentationConfig,
     getVape420ProductDetailPresentationConfig,
     getVape420ProductSurfacePresentationConfig,
+    getVape420StorefrontRenderabilityConfig,
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
     getVape420PublicSectionRouteDeclarations,
@@ -164,6 +165,35 @@ describe('productization config boundary', () => {
                 productInfoTagHoverClassName: 'hover:text-herbal-400 hover:border-herbal-400/50',
                 quickViewSelectedVariantClassName: 'border-herbal-500 bg-herbal-500/10 text-herbal-400',
                 quickViewSelectedThumbnailClassName: 'border-herbal-500 ring-4 ring-herbal-500/20 shadow-lg shadow-herbal-500/20',
+            }),
+        );
+        expect(getVape420StorefrontRenderabilityConfig('vape')).toEqual(
+            expect.objectContaining({
+                rail: expect.objectContaining({
+                    loadingSkeletonCount: 4,
+                    emptyStateTitle: 'Catálogo en rotación',
+                    emptyStateDescription:
+                        'Estamos actualizando esta selección. Revisa el resto del catálogo mientras cargamos nuevas piezas.',
+                    emptyStateCtaLabel: 'Explorar catálogo',
+                    emptyStateCtaHref: '/vape',
+                }),
+                grid: expect.objectContaining({
+                    loadingSkeletonCount: 8,
+                    emptyStateTitle: 'No hay productos disponibles',
+                    emptyStateSubtext: 'Intenta con otra categoría o sección',
+                    emptyStateCtaLabel: 'Explorar catálogo',
+                    emptyStateCtaHref: '/buscar',
+                }),
+            }),
+        );
+        expect(getVape420StorefrontRenderabilityConfig()).toEqual(
+            expect.objectContaining({
+                rail: expect.objectContaining({
+                    emptyStateCtaHref: '/buscar',
+                }),
+                grid: expect.objectContaining({
+                    emptyStateCtaHref: '/buscar',
+                }),
             }),
         );
         expect(getVape420SectionPageConfig('420')).toEqual(

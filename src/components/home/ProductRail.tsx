@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useFeaturedProducts, useNewProducts, useBestsellerProducts } from '@/hooks/useProducts';
 import type { Section } from '@/types/constants';
+import { getVape420StorefrontRenderabilityConfig } from '@/config/productization';
 
 interface ProductRailProps {
     type: 'featured' | 'new' | 'bestseller';
@@ -37,6 +38,7 @@ const itemVariants = {
 
 export function ProductRail({ type, title, section, className }: ProductRailProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const renderabilityConfig = getVape420StorefrontRenderabilityConfig(section);
 
     // Select hook based on type
     const useHook = type === 'featured'
@@ -47,7 +49,6 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
     const { data: products = [], isLoading } = useHook(section);
     const theme = getIconInfo();
-    const railHref = section ? `/${section}` : '/buscar';
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -77,7 +78,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     </div>
                 </div>
                 <div className="flex gap-4 overflow-hidden px-4 sm:px-0">
-                    {[1, 2, 3, 4].map((i) => (
+                    {Array.from({ length: renderabilityConfig.rail.loadingSkeletonCount }).map((_, i) => (
                         <div key={i} className="min-w-[200px] h-72 sm:min-w-[240px] rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/5 overflow-hidden flex flex-col skeleton-shimmer">
                             <div className="aspect-square bg-white/5 w-full" />
                             <div className="p-6 flex-1 flex flex-col justify-end gap-3 bg-gradient-to-b from-transparent to-black/30">
@@ -109,10 +110,10 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     </div>
 
                     <Link
-                        to={railHref}
+                        to={renderabilityConfig.rail.emptyStateCtaHref}
                         className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
                     >
-                        Ver todo
+                        {renderabilityConfig.rail.emptyStateCtaLabel}
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                 </div>
@@ -123,16 +124,16 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                             {theme.icon}
                         </div>
                         <h3 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tighter">
-                            Catálogo en rotación
+                            {renderabilityConfig.rail.emptyStateTitle}
                         </h3>
                         <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-theme-secondary">
-                            Estamos actualizando esta selección. Revisa el resto del catálogo mientras cargamos nuevas piezas.
+                            {renderabilityConfig.rail.emptyStateDescription}
                         </p>
                         <Link
-                            to={railHref}
+                            to={renderabilityConfig.rail.emptyStateCtaHref}
                             className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-primary px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition-all hover:scale-105"
                         >
-                            Explorar catálogo
+                            {renderabilityConfig.rail.emptyStateCtaLabel}
                             <ArrowRight className="h-4 w-4" />
                         </Link>
                     </div>
@@ -160,10 +161,10 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 </div>
 
                 <Link
-                    to={section ? `/${section}` : '/buscar'}
+                    to={renderabilityConfig.rail.emptyStateCtaHref}
                     className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
                 >
-                    Ver todo
+                    {renderabilityConfig.rail.emptyStateCtaLabel}
                     <ArrowRight className="h-4 w-4" />
                 </Link>
             </motion.div>
@@ -210,13 +211,15 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     {/* Botón ver más dinámico (Mobile) */}
                     <div className="sm:hidden min-w-[150px] flex items-center justify-center snap-start pr-4">
                         <Link
-                            to={section ? `/${section}` : '/buscar'}
+                            to={renderabilityConfig.rail.emptyStateCtaHref}
                             className="flex flex-col items-center gap-3 text-theme-secondary hover:text-theme-primary transition-colors"
                         >
                             <div className="w-14 h-14 rounded-full bg-theme-secondary/20 flex items-center justify-center border border-theme/30 backdrop-blur-md">
                                 <ArrowRight className="w-6 h-6" />
                             </div>
-                            <span className="text-xs font-black uppercase tracking-widest">Ver todo</span>
+                            <span className="text-xs font-black uppercase tracking-widest">
+                                {renderabilityConfig.rail.emptyStateCtaLabel}
+                            </span>
                         </Link>
                     </div>
                 </motion.div>

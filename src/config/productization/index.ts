@@ -15,10 +15,16 @@ export { getVape420SectionPageConfig } from './sectionPage';
 export { getVape420SectionPresentationConfig } from './sectionPage';
 export { getVape420ProductSurfacePresentationConfig } from './productSurface';
 export { getVape420ProductDetailPresentationConfig } from './productDetail';
+export { getVape420StorefrontRenderabilityConfig } from './storefrontRenderability';
 export type { SectionPageProductizationConfig } from './sectionPage';
 export type { SectionPresentationProductizationConfig } from './sectionPage';
 export type { ProductSurfaceProductizationConfig } from './productSurface';
 export type { ProductDetailProductizationConfig } from './productDetail';
+export type {
+    StorefrontRenderabilityGridConfig,
+    StorefrontRenderabilityProductizationConfig,
+    StorefrontRenderabilityRailConfig,
+} from './storefrontRenderability';
 export { getVape420SectionRouteManifest } from './routes';
 export { getVape420PublicSectionRouteDeclarations } from './routes';
 export { resolveSectionFromRouteManifest } from './routes';
