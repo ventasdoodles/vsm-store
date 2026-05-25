@@ -42,6 +42,15 @@ export type { VerticalPackReadModel } from './verticalPackReadModel';
 export type { VerticalPackRouteManifestItem } from './verticalPackReadModel';
 export type { VerticalPackSectionReadModel } from './verticalPackReadModel';
 export type { VerticalPackSectionProductGroup } from './verticalPackReadModel';
+export {
+    assertValidVerticalPackReadModelContract,
+    getVerticalPackReadModelContractViolations,
+    summarizeVerticalPackReadModelContract,
+} from './verticalPackReadModelContract';
+export type {
+    VerticalPackReadModelContractSummary,
+    VerticalPackReadModelContractViolation,
+} from './verticalPackReadModelContract';
 export { resolveLocalVerticalPackPreviewByRoutePrefix } from './localVerticalPackPreview';
 export type { LocalVerticalPackPreview } from './localVerticalPackPreview';
 export type { LocalVerticalPackPreviewRouteManifestItem } from './localVerticalPackPreview';
