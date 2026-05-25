@@ -99,6 +99,12 @@ export function buildAdminSectionCatalog(
     };
 }
 
+export function getAdminDefaultSectionSlug(
+    pack: VerticalPackConfig = vape420VerticalPackConfig,
+): Section {
+    return buildAdminSectionCatalog(pack).sections[0]?.slug ?? 'vape';
+}
+
 export function getAdminSectionCatalogEntry(
     sectionSlug: Section,
     pack: VerticalPackConfig = vape420VerticalPackConfig,

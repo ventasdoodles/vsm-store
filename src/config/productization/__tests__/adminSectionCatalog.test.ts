@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
     buildAdminSectionCatalog,
     buildAdminSectionCounts,
+    getAdminDefaultSectionSlug,
     getAdminSectionCatalogEntry,
 } from '..';
 
@@ -28,6 +29,7 @@ describe('adminSectionCatalog', () => {
             slug: 'vape',
             shortLabel: 'Vape',
         });
+        expect(getAdminDefaultSectionSlug()).toBe('vape');
     });
 
     it('summarizes section counts for admin testimonials and similar surfaces', () => {

@@ -27,8 +27,12 @@ import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 import { ProductVariantsEditor } from './ProductVariantsEditor';
 import { z } from 'zod';
+import { buildAdminSectionCatalog, getAdminDefaultSectionSlug } from '@/config/productization';
 
 type EditorTab = 'comercial' | 'clasificacion' | 'configuracion' | 'inteligencia';
+const SECTION_CATALOG = buildAdminSectionCatalog();
+const DEFAULT_SECTION = getAdminDefaultSectionSlug();
+const SECTION_LABELS = SECTION_CATALOG.sections.map((section) => section.shortLabel);
 
 interface ProductEditorDrawerProps {
     product: Product | null;
@@ -51,7 +55,7 @@ const DEFAULT_FORM: Partial<ProductFormData> = {
     compare_at_price: null,
     stock: 0,
     sku: '',
-    section: 'vape',
+    section: DEFAULT_SECTION,
     category_id: '',
     tags: [],
     specs: {},
@@ -71,7 +75,7 @@ const ProductEditorSchema = z.object({
     price: z.coerce.number().min(0.01, 'El precio debe ser mayor a $0.'),
     stock: z.coerce.number().min(0, 'El stock no puede ser un valor negativo.'),
     category_id: z.string().min(1, 'Debes seleccionar una categoría.'),
-    section: z.string().min(1, 'Debes seleccionar una sección (Vape o 420).'),
+    section: z.string().min(1, `Debes seleccionar una sección (${SECTION_LABELS.join(' o ')}).`),
 });
 
 /** Glassmorphism input style constant */
@@ -259,7 +263,7 @@ export function ProductEditorDrawer({
 
             const result = await enrichProduct(
                 formData.name,
-                formData.section || 'vape',
+                formData.section || DEFAULT_SECTION,
                 currentCategory?.slug || '',
                 formData.specs || {},
                 formData.description || ''
@@ -418,9 +422,12 @@ export function ProductEditorDrawer({
                                     {/* Seccion */}
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
-                                        <select name="section" value={formData.section} onChange={handleChange} className={INPUT_CLS}>
-                                            <option value="vape">Vape (Nicotina/Hardware)</option>
-                                            <option value="420">420 (Cannabis/CBD/THC)</option>
+                                        <select name="section" value={formData.section || DEFAULT_SECTION} onChange={handleChange} className={INPUT_CLS}>
+                                            {SECTION_CATALOG.sections.map((section) => (
+                                                <option key={section.slug} value={section.slug}>
+                                                    {section.displayLabel}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     {/* Estado */}
@@ -435,7 +442,7 @@ export function ProductEditorDrawer({
                                     {/* Categoria */}
                                     <CategoryCascader
                                         categories={categories}
-                                        section={(formData.section ?? 'vape') as Section}
+                                        section={(formData.section ?? DEFAULT_SECTION) as Section}
                                         value={formData.category_id || ''}
                                         onChange={(id) => setFormData(prev => ({ ...prev, category_id: id }))}
                                     />
@@ -570,7 +577,7 @@ export function ProductEditorDrawer({
                                         existingVariants={formData.variants || []}
                                         basePrice={formData.price || 0}
                                         baseSku={formData.sku || null}
-                                        section={formData.section || 'vape'}
+                                        section={formData.section || DEFAULT_SECTION}
                                         categoryId={formData.category_id || ''}
                                         onChange={(variants) => setFormData(p => ({ ...p, variants: variants as unknown as ProductFormData['variants'] }))}
                                     />

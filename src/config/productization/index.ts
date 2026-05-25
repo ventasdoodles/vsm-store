@@ -22,6 +22,7 @@ export { getVape420ProductSurfacePresentationConfig } from './productSurface';
 export { getVape420ProductDetailPresentationConfig } from './productDetail';
 export { getVape420StorefrontRenderabilityConfig } from './storefrontRenderability';
 export { buildAdminSectionCatalog } from './adminSectionCatalog';
+export { getAdminDefaultSectionSlug } from './adminSectionCatalog';
 export { getAdminSectionCatalogEntry } from './adminSectionCatalog';
 export { buildAdminSectionCounts } from './adminSectionCatalog';
 export type { AdminSectionCatalog } from './adminSectionCatalog';

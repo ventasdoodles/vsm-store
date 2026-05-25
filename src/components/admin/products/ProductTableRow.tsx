@@ -12,9 +12,10 @@ import {
     Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight,
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';
+import { PRODUCT_FLAGS } from '@/constants/app';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { getAdminSectionCatalogEntry } from '@/config/productization';
 
 interface ProductTableRowProps {
     product: Product;
@@ -56,6 +57,10 @@ export function ProductTableRow({
     const isToggling = isTogglingId === product.id;
     const isDeleting = isDeletingId === product.id;
     const isSaving = isSavingId === product.id;
+    const sectionCatalogEntry = getAdminSectionCatalogEntry(product.section);
+    const sectionBadgeClassName = sectionCatalogEntry?.badgeClassName ?? 'bg-white/10 text-white/60 ring-white/20';
+    const sectionBadgeLabel = sectionCatalogEntry?.shortLabel ?? product.section;
+    const sectionHrefPrefix = sectionCatalogEntry?.routePrefix ?? `/${product.section}`;
 
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -119,11 +124,9 @@ export function ProductTableRow({
                         <p className="flex items-center gap-1.5 text-xs text-white/40">
                             <span className={cn(
                                 'inline-block rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
-                                product.section === SECTIONS.VAPE
-                                    ? 'bg-violet-500/15 text-violet-400'
-                                    : 'bg-emerald-500/15 text-emerald-400'
+                                sectionBadgeClassName
                             )}>
-                                {product.section}
+                                {sectionBadgeLabel}
                             </span>
                             {product.sku && <span className="font-mono text-white/25">{product.sku}</span>}
                         </p>
@@ -216,7 +219,7 @@ export function ProductTableRow({
             <td className="px-4 py-3">
                 <div className="flex items-center justify-end gap-0.5 sm:focus-within:opacity-100 transition-opacity">
                     <a
-                        href={`/${product.section}/${product.slug}`}
+                        href={`${sectionHrefPrefix}/${product.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-lg p-2.5 text-white/40 hover:bg-white/5 hover:text-white/70 transition-all"

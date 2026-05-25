@@ -7,7 +7,7 @@
  */
 import { Search, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SECTIONS } from '@/constants/app';
+import { buildAdminSectionCatalog } from '@/config/productization';
 import type { Section } from '@/types/constants';
 
 interface ProductsFilterProps {
@@ -21,11 +21,15 @@ interface ProductsFilterProps {
     onQuickFilterChange: (filter: 'low-stock' | 'no-image' | 'bestsellers' | '') => void;
 }
 
+const SECTION_CATALOG = buildAdminSectionCatalog();
+
 /** Tabs de seccion */
 const SECTION_TABS: { label: string; value: Section | '' }[] = [
     { label: 'Todos', value: '' },
-    { label: 'Vape', value: SECTIONS.VAPE },
-    { label: '420', value: SECTIONS.HERBAL },
+    ...SECTION_CATALOG.sections.map((section) => ({
+        label: section.shortLabel,
+        value: section.slug,
+    })),
 ];
 
 export function ProductsFilter({

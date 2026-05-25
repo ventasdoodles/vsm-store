@@ -1,6 +1,7 @@
 import type { Category } from '@/types/category';
 import type { Product, Section, ProductStatus } from '@/types/product';
 import type { ProductFormData } from '@/services/admin';
+import { getAdminDefaultSectionSlug } from '@/config/productization';
 import { slugify } from '@/lib/utils';
 
 export const DEFAULT_PRODUCT_FORM: ProductFormData = {
@@ -12,7 +13,7 @@ export const DEFAULT_PRODUCT_FORM: ProductFormData = {
     compare_at_price: null,
     stock: 0,
     sku: '',
-    section: 'vape',
+    section: getAdminDefaultSectionSlug(),
     category_id: '',
     tags: [],
     status: 'active' as ProductStatus,

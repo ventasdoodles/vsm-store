@@ -12,6 +12,7 @@ import {
     removeProductTag,
     DEFAULT_PRODUCT_FORM,
 } from '../adminProductForm';
+import { getAdminDefaultSectionSlug } from '@/config/productization';
 
 describe('adminProductForm', () => {
     it('builds a fresh default product form', () => {
@@ -23,6 +24,7 @@ describe('adminProductForm', () => {
         expect(form.images).not.toBe(DEFAULT_PRODUCT_FORM.images);
         expect(form.specs).not.toBe(DEFAULT_PRODUCT_FORM.specs);
         expect(form.badges).not.toBe(DEFAULT_PRODUCT_FORM.badges);
+        expect(form.section).toBe(getAdminDefaultSectionSlug());
     });
 
     it('hydrates product data into a form without losing optional values', () => {
