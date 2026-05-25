@@ -8,16 +8,20 @@ import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
 import type { HeroSlider } from '@/services';
 import { uploadSliderImage } from '@/services';
-import { PREMIUM_GRADIENTS } from '@/constants/slider';
+import {
+    buildNewHomeHeroSliderDraft,
+    deleteHomeHeroSliderById,
+    reorderHomeHeroSlider,
+    sortHomeHeroSlidersByOrder,
+    toggleHomeHeroSliderStatus,
+    upsertHomeHeroSlider,
+} from '@/lib/domain/homeHeroSliders';
 
 // â”€â”€â”€ Subcomponents â”€â”€â”€
 import { SlidersHeader } from '@/components/admin/sliders/SlidersHeader';
 import { SlidersList } from '@/components/admin/sliders/SlidersList';
 import { SliderFormModal } from '@/components/admin/sliders/SliderFormModal';
 import { Loader2 } from 'lucide-react';
-
-/** Gradiente por defecto para nuevos slides */
-const DEFAULT_GRADIENT = PREMIUM_GRADIENTS[0] ?? { id: 'default', bg: 'from-gray-900 to-black' };
 
 export function AdminHomeSliders() {
     const { data: settings, isLoading, refetch } = useStoreSettings();
@@ -32,28 +36,14 @@ export function AdminHomeSliders() {
     // Sincronizar estado local al cargar settings
     useEffect(() => {
         if (settings?.hero_sliders) {
-            const sorted = [...settings.hero_sliders].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-            setSliders(sorted);
+            setSliders(sortHomeHeroSlidersByOrder(settings.hero_sliders));
         }
     }, [settings]);
 
     // â”€â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     const handleCreateNew = () => {
-        setCurrentSlide({
-            id: '',
-            title: '',
-            subtitle: '',
-            description: '',
-            image: '',
-            tag: '',
-            ctaText: 'COMPRAR AHORA',
-            ctaLink: '/',
-            bgGradient: DEFAULT_GRADIENT.bg,
-            bgGradientLight: DEFAULT_GRADIENT.id,
-            active: true,
-            order: sliders.length,
-        });
+        setCurrentSlide(buildNewHomeHeroSliderDraft(sliders.length));
         setIsModalOpen(true);
     };
 
@@ -84,7 +74,7 @@ export function AdminHomeSliders() {
         });
         if (!isConfirmed) return;
         try {
-            const updated = sliders.filter(s => s.id !== id);
+            const updated = deleteHomeHeroSliderById(sliders, id);
             await persistSliders(updated);
             success('Slide eliminado', 'El slider se eliminÃ³ correctamente de la pantalla principal.');
         } catch (err) {
@@ -97,9 +87,7 @@ export function AdminHomeSliders() {
 
     const handleToggleStatus = async (slider: HeroSlider) => {
         try {
-            const updated = sliders.map(s =>
-                s.id === slider.id ? { ...s, active: !s.active } : s
-            );
+            const updated = toggleHomeHeroSliderStatus(sliders, slider.id);
             await persistSliders(updated);
             success(
                 slider.active ? 'Slide Ocultado' : 'Slide Activado',
@@ -114,26 +102,8 @@ export function AdminHomeSliders() {
     };
 
     const handleReorder = async (id: string, direction: 'up' | 'down') => {
-        const index = sliders.findIndex(s => s.id === id);
-        if (index === -1) return;
-        if (
-            (direction === 'up' && index === 0) ||
-            (direction === 'down' && index === sliders.length - 1)
-        ) return;
-
-        const newSliders = [...sliders];
-        const swapIndex = direction === 'up' ? index - 1 : index + 1;
-        const current = newSliders[index]!;
-        const swap = newSliders[swapIndex]!;
-
-        // Intercambiar valores de order
-        const currentOrder = current.order ?? index;
-        const swapOrder = swap.order ?? swapIndex;
-        newSliders[index] = { ...current, order: swapOrder };
-        newSliders[swapIndex] = { ...swap, order: currentOrder };
-
-        // Reordenar el array
-        newSliders.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const newSliders = reorderHomeHeroSlider(sliders, id, direction);
+        if (newSliders === sliders) return;
 
         try {
             setSliders(newSliders); // Optimistic UI
@@ -153,15 +123,7 @@ export function AdminHomeSliders() {
         if (!currentSlide) return;
 
         try {
-            let updated: HeroSlider[];
-
-            if (currentSlide.id) {
-                // Editar existente
-                updated = sliders.map(s => s.id === currentSlide.id ? currentSlide : s);
-            } else {
-                // Crear nuevo con ID generado
-                updated = [...sliders, { ...currentSlide, id: Date.now().toString() }];
-            }
+            const updated = upsertHomeHeroSlider(sliders, currentSlide);
 
             await persistSliders(updated);
             handleCloseModal();
