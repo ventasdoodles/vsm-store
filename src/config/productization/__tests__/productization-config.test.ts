@@ -14,6 +14,7 @@ import {
     getVape420SectionPageConfig,
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
+    getVape420PublicSectionRouteDeclarations,
     normalizeVape420SpecKey,
     resolveSectionFromRouteManifest,
     VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,
@@ -156,6 +157,28 @@ describe('productization config boundary', () => {
         expect(getVape420SectionRouteManifest().map((route) => route.rootRoute)).toEqual(
             vape420VerticalPackConfig.sections.map((section) => section.routePrefix),
         );
+        expect(getVape420PublicSectionRouteDeclarations()).toEqual([
+            {
+                sectionSlug: 'vape',
+                path: '/vape',
+                elementName: 'SectionPage',
+            },
+            {
+                sectionSlug: 'vape',
+                path: '/vape/:slug',
+                elementName: 'SectionSlugResolver',
+            },
+            {
+                sectionSlug: '420',
+                path: '/420',
+                elementName: 'SectionPage',
+            },
+            {
+                sectionSlug: '420',
+                path: '/420/:slug',
+                elementName: 'SectionSlugResolver',
+            },
+        ]);
         expect(resolveSectionFromRouteManifest('/vape')).toBe('vape');
         expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug')).toBe('vape');
         expect(resolveSectionFromRouteManifest('/420')).toBe('420');
