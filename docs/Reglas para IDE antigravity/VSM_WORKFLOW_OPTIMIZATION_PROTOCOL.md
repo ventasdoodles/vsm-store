@@ -44,6 +44,7 @@ Reglas del bloque:
 - lanes condicionales no son autorizacion ciega
 - si aparece drift, se detiene el bloque y se pide fresh readiness
 - high-risk lanes no entran en Execution Blocks
+- prompts exactos de implementation/canon deben requerir commit/push completion cuando esta autorizado y no bloqueado
 ```
 
 Una lane condicional sigue vigente solo si:
@@ -115,6 +116,20 @@ Codex debe:
 
 Codex no debe implementar en esta fase.
 
+Cuando Codex genere un prompt exacto para Antigravity en LOW/MEDIUM implementation o canon y commit/push no este prohibido, debe incluir:
+
+```text
+VALIDATION + COMMIT + PUSH REQUIRED
+DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES
+stage only authorized files
+commit with concise suggested message
+push to origin/main
+confirm final git status -sb
+confirm final git rev-list --left-right --count origin/main...HEAD
+```
+
+Stop conditions para no commitear/pushear: validation failure, unauthorized files, unsafe repo state/divergence, scope drift, forbidden surface, o prompt que prohibe commit/push.
+
 ### Output requerido recomendado
 
 ```text
@@ -160,6 +175,8 @@ Antigravity puede combinar en una sola pasada:
 7. Reportar evidencia.
 
 Esto sí es seguro porque sigue siendo ejecución, no aceptación final.
+
+Si el prompt autoriza commit/push y los checks pasan, Antigravity debe completar commit/push. `Ready for commit/push` no es estado terminal normal; solo aplica si hay blocker o el prompt prohibe commit/push.
 
 ### Output requerido recomendado
 
@@ -222,6 +239,8 @@ docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md
 ```
 
 No todos los archivos tienen que cambiar siempre. Solo los que correspondan al hito.
+
+Si el prompt autoriza commit/push y los checks docs/canon pasan, Antigravity debe completar commit/push. `Ready for commit/push` no es estado terminal normal; solo aplica si hay blocker o el prompt prohibe commit/push.
 
 Si el hito pertenece a un Execution Block, el cierre de canon debe incluir:
 

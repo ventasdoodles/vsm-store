@@ -70,6 +70,7 @@ Do not load historical audits, supplements, templates, or duplicate canon by def
 8. Verify the changed-file set before staging or committing when the current prompt authorizes those actions.
 9. Return `NO-GO / NEEDS SCOPING` when accepted state, allowed files, canon target, validation, risk, authority, or success condition are unclear.
 10. When a lane belongs to a pre-planned Execution Block, include a short next-lane recommendation based on repo state, residuals, and risk drift.
+11. When the current prompt authorizes docs/canon commit/push and docs-only checks pass, stage only authorized docs/canon files, commit with the requested or concise message, push to `origin/main`, and confirm final repo status and divergence. Do not end with `READY FOR COMMIT/PUSH` unless commit/push is explicitly prohibited or a blocker exists.
 
 ## Canon Rules
 
@@ -113,6 +114,7 @@ During canon reconciliation, do not:
 - perform independent final acceptance of implemented work;
 - self-accept high-risk work;
 - canonize without prior `ACCEPT`, `ACCEPT WITH RESIDUAL RISK`, or explicit owner authorization.
+- omit commit/push after successful docs-only checks when the current prompt requires it and no stop condition exists.
 
 ## Output Contract
 
@@ -122,7 +124,7 @@ Use the prompt's required output format when provided. Otherwise use:
 2. FACTS CANONIZED
 3. NON-CLAIMS / RESIDUALS
 4. VALIDATION
-5. READY FOR COMMIT/PUSH
+5. COMMIT / PUSH STATUS
 
 When the current lane belongs to a pre-planned Execution Block, append a short:
 

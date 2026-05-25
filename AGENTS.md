@@ -74,6 +74,7 @@ Required behavior:
 - Decide `GO` or `NO-GO`.
 - Produce the exact next prompt for the right actor when useful.
 - When authorized, produce a 3-4 lane Execution Block with explicit stop conditions, WIP=1, and one executable lane at a time.
+- For LOW/MEDIUM Antigravity implementation or canon prompts where commit/push is not explicitly prohibited, require validation, staging only authorized files, commit, push to `origin/main`, and final status/divergence confirmation. Include stop conditions for validation failure, unauthorized files, unsafe repo state/divergence, scope drift, forbidden surfaces, or explicit no-commit/no-push prompts.
 
 Do not implement, commit, push, deploy, run live smoke, inspect secrets, or touch DB/Supabase.
 
@@ -135,7 +136,7 @@ When Codex is asked to produce an Antigravity prompt, include:
 - required output format
 - success condition
 
-Keep prompts small. Include only context that changes the implementation decision. Preserve role separation and require independent acceptance afterward.
+Keep prompts small. Include only context that changes the implementation decision. Preserve role separation and require independent acceptance afterward. Do not generate prompts that normally end at "ready for commit/push" when commit/push is authorized and unblocked.
 
 ## VSM Browser / Visual QA Gate
 
@@ -199,4 +200,4 @@ git diff
 
 For code/test changes, choose targeted tests based on the touched surface and run `npm run typecheck` when scope or risk warrants it.
 
-Before commit/push lanes, verify staged and outgoing scope. Do not stage unrelated dirty files.
+Before commit/push lanes, verify staged and outgoing scope. Do not stage unrelated dirty files. If validation passes and the prompt requires commit/push, complete commit/push and verify final `main...origin/main` plus divergence `0 0`; report "ready for commit/push" only when blocked or explicitly prohibited.

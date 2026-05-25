@@ -60,6 +60,8 @@ Do not load historical audits, templates, supplements, or duplicate canon by def
 6. Produce an exact next prompt only when the scope is safe and clear.
 7. Preserve implementation, acceptance, canon, deploy, DB/Supabase, provider, browser QA, and live-smoke lanes as separate phases unless the current prompt explicitly authorizes a safe combination.
 8. When the prompt asks for an Execution Block, keep WIP=1, mark only Lane 1 executable now, keep Lanes 2 and 3 conditional, keep Lane 4 as reserve or stop-refresh, and require fresh readiness if repo/risk/scope drifts.
+9. When producing an exact Antigravity implementation or canon prompt for LOW/MEDIUM work and commit/push is not explicitly prohibited, include `VALIDATION + COMMIT + PUSH REQUIRED`, `DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES`, staging limited to authorized files, a concise commit message, `git push origin main`, final `git status -sb`, and final `git rev-list --left-right --count origin/main...HEAD`.
+10. Include stop conditions that block commit/push only for validation failure, unauthorized files, unsafe repo state or divergence, scope drift, forbidden surfaces, or an explicit prompt prohibition on commit/push.
 
 ## Risk Classification
 

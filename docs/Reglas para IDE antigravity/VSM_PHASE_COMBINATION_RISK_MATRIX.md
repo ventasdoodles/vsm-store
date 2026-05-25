@@ -40,7 +40,7 @@ La pregunta central:
 
 | Tipo de tarea | Skill-enabled execution allowed? | Regla |
 |---|---:|---|
-| Comentario/copy/doc menor | Si | Puede combinar readiness + implementation + local validation si el scope es claro. |
+| Comentario/copy/doc menor | Si | Puede combinar readiness + implementation + local validation si el scope es claro; si commit/push esta autorizado y no hay blocker, debe completarse. |
 | CSS simple/UI menor | Si, con cuidado | Puede ejecutar y validar localmente; browser QA solo si se autoriza. |
 | Componente frontend | Si | Implementation + local validation puede combinarse; acceptance separada si afecta comportamiento visible. |
 | Service/query | Si, con acceptance separada | No convertir pruebas locales en DB/Supabase o production proof. |
@@ -191,6 +191,8 @@ Antigravity puede hacer:
 
 siempre que el scope esté autorizado.
 
+Si commit/push esta autorizado y los checks pasan, no terminar en "ready for commit/push"; stagear solo archivos autorizados, commitear, pushear y confirmar `main...origin/main` con divergencia `0 0`.
+
 ---
 
 ### Sí: Codex acceptance + prompt de canon
@@ -217,6 +219,8 @@ Antigravity puede hacer:
 - push
 - recomendar continuar con la siguiente lane pre-planeada o parar por drift
 ```
+
+Si commit/push esta autorizado y los checks docs/canon pasan, no terminar en "ready for commit/push"; stagear solo docs/canon autorizados, commitear, pushear y confirmar `main...origin/main` con divergencia `0 0`.
 
 si existe aceptación previa.
 
@@ -341,6 +345,8 @@ Antigravity debe confirmar:
 - push normal, no force, salvo autorización explícita
 - post-push origin/main alineado
 ```
+
+Omitir commit/push solo si validation falla, aparecen archivos no autorizados, repo/divergencia es insegura, hay scope drift, aparece una forbidden surface, o el prompt prohibe commit/push.
 
 ---
 

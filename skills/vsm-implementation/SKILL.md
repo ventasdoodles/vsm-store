@@ -62,6 +62,7 @@ Do not load historical audits, templates, supplements, or duplicate canon by def
 9. Report files read, files modified, validations run, claims verified, non-claims, residual risks, and commit status.
 10. Return `NO-GO / NEEDS SCOPING` when scope, files, risk, validation, authority, or success condition are unclear.
 11. If the lane belongs to a pre-planned Execution Block, execute only the currently active lane and stop if repo state, risk, or scope drifts.
+12. When the current prompt authorizes commit/push and validation passes, stage only authorized files, commit with the requested or concise message, push to `origin/main`, and confirm final repo status and divergence. Do not end with `READY FOR COMMIT/PUSH` unless commit/push is explicitly prohibited or a blocker exists.
 
 ## Risk Classification
 
@@ -125,6 +126,7 @@ During implementation, do not:
 - reopen Product Search, Cesarin runtime, payment, checkout, deploy, DB, auth, or provider lanes by inference;
 - perform acceptance audit;
 - perform canon reconciliation unless explicitly authorized after acceptance or owner authorization.
+- omit commit/push after successful validation when the current prompt requires it and no stop condition exists.
 
 ## Output Contract
 

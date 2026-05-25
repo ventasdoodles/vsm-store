@@ -46,6 +46,8 @@ Success condition:
 
 STRICT MODE.
 IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES.
 DO NOT REDESIGN FROM ZERO.
 DO NOT OPEN NEW FRONTS.
 
@@ -68,6 +70,15 @@ C. ...
 
 Constraints:
 [lo que no debe tocar]
+
+Commit/push:
+- stage only authorized files
+- commit with concise message: [message]
+- push to origin/main
+- confirm final git status -sb
+- confirm final git rev-list --left-right --count origin/main...HEAD
+
+Stop before commit/push only if validation fails, unauthorized files appear, repo state/divergence is unsafe, scope drifts, a forbidden surface appears, or this prompt explicitly prohibits commit/push.
 
 Documentation rule:
 [si aplica]
@@ -123,7 +134,8 @@ Success condition:
 
 STRICT MODE.
 NO IMPLEMENTATION CHANGES.
-NO FURTHER VALIDATION.
+VALIDATION + COMMIT + PUSH REQUIRED.
+DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES.
 DOCUMENTATION + CANON RECONCILIATION ONLY.
 
 Authoritative current state:
@@ -133,6 +145,17 @@ Required actions:
 1. [doc 1]
 2. [doc 2]
 3. [otros docs si aplica]
+
+Commit/push:
+- validate docs/canon scope with git diff --name-only and git diff --check
+- stage only authorized docs/canon files
+- verify git diff --cached --name-only and git diff --cached --check
+- commit with concise message: [message]
+- push to origin/main
+- confirm final git status -sb
+- confirm final git rev-list --left-right --count origin/main...HEAD
+
+Stop before commit/push only if docs/canon scope checks fail, unauthorized files appear, repo state/divergence is unsafe, accepted facts drift, a forbidden surface appears, or this prompt explicitly prohibits commit/push.
 
 Required output format:
 1. FILES INSPECTED
@@ -181,6 +204,8 @@ Success condition:
 
 STRICT MODE.
 IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES.
 PATCH MODE.
 MICRO-FIX ONLY.
 
@@ -192,6 +217,15 @@ Mission objective:
 
 Constraints:
 [limites quirurgicos]
+
+Commit/push:
+- stage only authorized files
+- commit with concise message: [message]
+- push to origin/main
+- confirm final git status -sb
+- confirm final git rev-list --left-right --count origin/main...HEAD
+
+Stop before commit/push only if validation fails, unauthorized files appear, repo state/divergence is unsafe, scope drifts, a forbidden surface appears, or this prompt explicitly prohibits commit/push.
 
 Required output format:
 1. FILES INSPECTED
@@ -264,6 +298,7 @@ Block rules:
 - Lane 4 reserve / continuation / stop-refresh
 - stop and request fresh readiness if repo/risk/scope drifts
 - no high-risk lanes inside the block
+- exact Antigravity implementation prompts must include validation + commit + push completion unless commit/push is explicitly prohibited
 
 Per-lane requirements:
 - risk
@@ -286,6 +321,8 @@ Success condition:
 STRICT MODE.
 USE REPO PROCEDURE: skills/vsm-implementation/SKILL.md.
 IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES.
 DO NOT REDESIGN FROM ZERO.
 DO NOT OPEN NEW FRONTS.
 
@@ -303,6 +340,15 @@ Forbidden actions:
 
 Validation expectations:
 [comandos o evidencia local autorizada]
+
+Commit/push:
+- stage only authorized files
+- commit with concise message: [message]
+- push to origin/main
+- confirm final `git status -sb`
+- confirm final `git rev-list --left-right --count origin/main...HEAD`
+
+Stop before commit/push only if validation fails, unauthorized files appear, repo state/divergence is unsafe, scope drifts, a forbidden surface appears, or this prompt explicitly prohibits commit/push.
 
 Output:
 FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
@@ -357,6 +403,8 @@ For pre-planned execution blocks, also require a compact `NEXT PRE-PLANNED LANE 
 STRICT MODE.
 USE REPO PROCEDURE: skills/vsm-canon-reconciliation/SKILL.md.
 CANON / DOC RECONCILIATION ONLY.
+VALIDATION + COMMIT + PUSH REQUIRED.
+DO NOT RETURN "READY FOR COMMIT/PUSH" IF VALIDATION PASSES.
 NO SOURCE/RUNTIME/TEST CHANGES.
 
 Authoritative accepted state:
@@ -375,14 +423,25 @@ Validation expectations:
 - `git diff --name-only`
 - `git diff --check`
 - inspect diff for docs-only scope
+- `git diff --cached --name-only`
+- `git diff --cached --check`
 - preserve non-claims and residual risks
+
+Commit/push:
+- stage only authorized docs/canon files
+- commit with concise message: [message]
+- push to origin/main
+- confirm final `git status -sb`
+- confirm final `git rev-list --left-right --count origin/main...HEAD`
+
+Stop before commit/push only if docs/canon scope checks fail, unauthorized files appear, repo state/divergence is unsafe, accepted facts drift, a forbidden surface appears, or this prompt explicitly prohibits commit/push.
 
 Output:
 FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
 
 Success condition:
-[canon/doc diff reflects accepted facts only and does not authorize scope expansion]
+[canon/doc diff reflects accepted facts only, commit/push is complete, final repo is clean/aligned, and no scope expansion is authorized]
 
-If the current prompt explicitly requests commit/push status, include it as a short inline trailer inside section 5.
+If the current prompt explicitly prohibits commit/push or a blocker prevents it, report that blocker instead of claiming completion.
 
 For pre-planned execution blocks, include a short `NEXT LANE RECOMMENDATION` trailer when the accepted lane changes continuation risk.
