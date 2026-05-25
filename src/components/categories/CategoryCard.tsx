@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 
@@ -12,7 +13,7 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, section, className }: CategoryCardProps) {
-    const isVape = section === 'vape';
+    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(section);
 
     return (
         <Link
@@ -20,9 +21,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
             className={cn(
                 'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl border p-10 text-center glass-premium',
                 'transition-all duration-500 cursor-pointer spotlight-container',
-                isVape
-                    ? 'hover:shadow-[0_0_40px_rgba(139,92,246,0.15)] glow-vape-hover'
-                    : 'hover:shadow-[0_0_40px_rgba(34,197,94,0.15)] glow-herbal-hover',
+                productSurfaceConfig.categoryHoverShadowClassName,
                 'hover:-translate-y-2',
                 className
             )}
@@ -34,14 +33,12 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
             <div
                 className={cn(
                     'relative flex h-20 w-20 items-center justify-center rounded-xl transition-all duration-500 shadow-inner',
-                    isVape
-                        ? 'bg-vape-500/10 text-vape-400 group-hover:bg-vape-500/20 group-hover:scale-110'
-                        : 'bg-herbal-500/10 text-herbal-400 group-hover:bg-herbal-500/20 group-hover:scale-110'
+                    productSurfaceConfig.categoryIconContainerClassName
                 )}
             >
                 <div className={cn(
                     "absolute inset-0 blur-2xl opacity-0 group-hover:opacity-40 transition-opacity",
-                    isVape ? "bg-vape-500" : "bg-herbal-500"
+                    productSurfaceConfig.categoryIconGlowClassName
                 )} />
                 <FolderOpen className="relative z-10 h-10 w-10 drop-shadow-glow" />
             </div>
@@ -62,7 +59,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
             {/* Indicator Dot */}
             <div className={cn(
                 "h-1.5 w-1.5 rounded-full transition-all duration-500",
-                isVape ? "bg-vape-500/20 group-hover:bg-vape-400" : "bg-herbal-500/20 group-hover:bg-herbal-400"
+                productSurfaceConfig.categoryDotClassName
             )} />
         </Link>
     );

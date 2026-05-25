@@ -22,6 +22,7 @@ import { getProductBySlug } from '@/services';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
 import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
+import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
 
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 
@@ -67,6 +68,10 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
     const productHref = useMemo(() => `/${product.section}/${product.slug}`, [product.section, product.slug]);
     const purchaseability = useMemo(() => getStorefrontProductPurchaseability(product), [product]);
+    const productSurfaceConfig = useMemo(
+        () => getVape420ProductSurfacePresentationConfig(product.section),
+        [product.section],
+    );
     const requiresOptionSelection = purchaseability.requiresVariantSelection;
     const shouldShowImageDots = product.images?.length > 1;
     const showLowStockBadge = !compact && purchaseability.canAddToCart && purchaseability.maxQuantity <= 5 && purchaseability.maxQuantity > 0;
@@ -327,7 +332,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <div className="flex items-center justify-between gap-2">
                                     <span className={cn(
                                         "text-[9px] font-black uppercase tracking-[0.25em] px-2.5 py-1 rounded-full border",
-                                        product.section === 'vape' ? "bg-vape-500/10 text-vape-400 border-vape-500/20" : "bg-herbal-500/10 text-herbal-400 border-herbal-500/20"
+                                        productSurfaceConfig.productChipClassName
                                     )}>
                                         {product.section}
                                     </span>
@@ -348,7 +353,8 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </div>
 
                                 <h3 className={cn(
-                                    "font-black text-white leading-tight group-hover:text-vape-400 transition-colors line-clamp-2 tracking-tight",
+                                    "font-black text-white leading-tight transition-colors line-clamp-2 tracking-tight",
+                                    productSurfaceConfig.productTitleHoverClassName,
                                     compact ? "text-base" : "text-xl"
                                 )}>
                                     {product.name}

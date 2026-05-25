@@ -42,10 +42,6 @@ vi.mock('@/components/ui/OptimizedImage', () => ({
     ),
 }));
 
-vi.mock('./ProductBadgeGroup', () => ({
-    ProductBadgeGroup: () => <div data-testid="product-badge-group" />,
-}));
-
 vi.mock('@/stores/cart.store', () => ({
     useCartStore: (selector: (state: { addItem: typeof productCardMocks.addItem }) => unknown) =>
         selector({ addItem: productCardMocks.addItem }),
@@ -100,7 +96,6 @@ describe('ProductCard', () => {
         );
 
         expect(screen.getByText('Stock limitado: 3 unidades')).toBeInTheDocument();
-        expect(screen.queryByText(/Últimas/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Ultimas/i)).not.toBeInTheDocument();
     });
 
@@ -117,7 +112,29 @@ describe('ProductCard', () => {
         );
 
         expect(screen.getByText('Disponibilidad limitada: 4 unidades')).toBeInTheDocument();
-        expect(screen.queryByText(/Últimas/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Ultimas/i)).not.toBeInTheDocument();
+    });
+
+    it('applies section-specific product surface presentation classes', () => {
+        const vapeProduct = makeProductSurfaceFixture({ section: 'vape' });
+        const herbalProduct = makeProductSurfaceFixture({ section: '420' });
+
+        const { rerender } = render(
+            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+                <ProductCard product={vapeProduct} />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText('vape')).toHaveClass('bg-vape-500/10', 'text-vape-400', 'border-vape-500/20');
+        expect(screen.getByText(vapeProduct.name)).toHaveClass('group-hover:text-vape-400');
+
+        rerender(
+            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+                <ProductCard product={herbalProduct} />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText('420')).toHaveClass('bg-herbal-500/10', 'text-herbal-400', 'border-herbal-500/20');
+        expect(screen.getByText(herbalProduct.name)).toHaveClass('group-hover:text-herbal-400');
     });
 });

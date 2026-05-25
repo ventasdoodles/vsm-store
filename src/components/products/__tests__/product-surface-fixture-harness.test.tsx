@@ -101,6 +101,13 @@ describe('product surface local fixture harness', () => {
         expect(screen.getByText('$1,000.00')).toBeInTheDocument();
         expect(screen.getByText('-15%')).toBeInTheDocument();
         expect(screen.getByText('Cobertura por confirmar')).toBeInTheDocument();
+        expect(screen.getByText('$850.00')).toHaveClass('text-vape-400');
+    });
+
+    it('renders ProductPriceSection using herbal presentation classes for 420', () => {
+        render(<ProductPriceSection price={850} compareAtPrice={1000} section="420" />);
+
+        expect(screen.getByText('$850.00')).toHaveClass('text-herbal-400');
     });
 
     it('renders QuickViewModal with representative local product data without runtime products', () => {
@@ -119,6 +126,23 @@ describe('product surface local fixture harness', () => {
         expect(screen.getByRole('link', { name: /Ver detalles completos/i })).toHaveAttribute(
             'href',
             '/vape/producto-fixture-vape',
+        );
+        expect(screen.getByRole('button', { name: /Menta/i })).toHaveClass(
+            'border-vape-500',
+            'bg-vape-500/10',
+            'text-vape-400',
+        );
+    });
+
+    it('renders QuickViewModal with herbal presentation classes for section 420', () => {
+        const product = makeProductSurfaceFixture({ section: '420', slug: 'producto-fixture-420' });
+
+        renderQuickView(product);
+
+        expect(screen.getByRole('button', { name: /Menta/i })).toHaveClass(
+            'border-herbal-500',
+            'bg-herbal-500/10',
+            'text-herbal-400',
         );
     });
 

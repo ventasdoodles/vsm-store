@@ -13,6 +13,7 @@ import {
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
     getVape420SectionPresentationConfig,
+    getVape420ProductSurfacePresentationConfig,
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
     getVape420PublicSectionRouteDeclarations,
@@ -106,6 +107,34 @@ describe('productization config boundary', () => {
                 heroBlobClassName: 'bg-herbal-500',
                 sortActiveClassName: 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20',
                 sortHighlightClassName: 'bg-herbal-500/10 font-semibold text-herbal-400',
+            }),
+        );
+        expect(getVape420ProductSurfacePresentationConfig('vape')).toEqual(
+            expect.objectContaining({
+                isVape: true,
+                priceAccentTextClassName: 'text-vape-400',
+                badgeSurfaceClassName: 'bg-vape-500/15 text-vape-400 border-vape-500/30',
+                productChipClassName: 'bg-vape-500/10 text-vape-400 border-vape-500/20',
+                productTitleHoverClassName: 'group-hover:text-vape-400',
+                categoryHoverShadowClassName: 'hover:shadow-[0_0_40px_rgba(139,92,246,0.15)] glow-vape-hover',
+                categoryIconContainerClassName: 'bg-vape-500/10 text-vape-400 group-hover:bg-vape-500/20 group-hover:scale-110',
+                categoryIconGlowClassName: 'bg-vape-500',
+                categoryDotClassName: 'bg-vape-500/20 group-hover:bg-vape-400',
+                quickViewSelectedVariantClassName: 'border-vape-500 bg-vape-500/10 text-vape-400',
+            }),
+        );
+        expect(getVape420ProductSurfacePresentationConfig('420')).toEqual(
+            expect.objectContaining({
+                isVape: false,
+                priceAccentTextClassName: 'text-herbal-400',
+                badgeSurfaceClassName: 'bg-herbal-500/15 text-herbal-400 border-herbal-500/30',
+                productChipClassName: 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20',
+                productTitleHoverClassName: 'group-hover:text-herbal-400',
+                categoryHoverShadowClassName: 'hover:shadow-[0_0_40px_rgba(34,197,94,0.15)] glow-herbal-hover',
+                categoryIconContainerClassName: 'bg-herbal-500/10 text-herbal-400 group-hover:bg-herbal-500/20 group-hover:scale-110',
+                categoryIconGlowClassName: 'bg-herbal-500',
+                categoryDotClassName: 'bg-herbal-500/20 group-hover:bg-herbal-400',
+                quickViewSelectedVariantClassName: 'border-herbal-500 bg-herbal-500/10 text-herbal-400',
             }),
         );
         expect(getVape420SectionPageConfig('420')).toEqual(

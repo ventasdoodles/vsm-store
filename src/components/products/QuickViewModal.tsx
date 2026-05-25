@@ -16,6 +16,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
+import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
 
 interface QuickViewModalProps {
     product: Product;
@@ -40,6 +41,10 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const purchaseability = useMemo(
         () => getStorefrontProductPurchaseability(product, { selectedVariant }),
         [product, selectedVariant],
+    );
+    const productSurfaceConfig = useMemo(
+        () => getVape420ProductSurfacePresentationConfig(product.section),
+        [product.section],
     );
     const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
 
@@ -179,12 +184,12 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => setSelectedImage(idx)}
-                                            className={cn(
-                                                'relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border transition-all duration-300',
-                                                selectedImage === idx
-                                                    ? 'border-vape-500 ring-4 ring-vape-500/20 shadow-lg shadow-vape-500/20'
-                                                    : 'border-white/10 hover:border-white/30 grayscale hover:grayscale-0',
-                                            )}
+                                                className={cn(
+                                                    'relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border transition-all duration-300',
+                                                    selectedImage === idx
+                                                        ? productSurfaceConfig.quickViewSelectedThumbnailClassName
+                                                        : 'border-white/10 hover:border-white/30 grayscale hover:grayscale-0',
+                                                )}
                                         >
                                             <OptimizedImage
                                                 src={image}
@@ -270,9 +275,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                         className={cn(
                                                             'flex flex-col items-center justify-center rounded-xl py-3 px-4 border-2 transition-all text-center',
                                                             selectedVariant?.id === variant.id
-                                                                ? product.section === 'vape'
-                                                                    ? 'border-vape-500 bg-vape-500/10 text-vape-400'
-                                                                    : 'border-herbal-500 bg-herbal-500/10 text-herbal-400'
+                                                                ? productSurfaceConfig.quickViewSelectedVariantClassName
                                                                 : variantUnavailable
                                                                     ? 'border-white/5 bg-white/[0.01] text-white/25 cursor-not-allowed'
                                                                     : 'border-white/5 bg-white/[0.02] text-white/60 hover:border-white/10',

@@ -5,6 +5,7 @@
  * @independent Basado en las props del producto.
  */
 import { cn } from '@/lib/utils';
+import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
 import type { Product } from '@/types/product';
 
 interface ProductBadgeGroupProps {
@@ -12,7 +13,7 @@ interface ProductBadgeGroupProps {
 }
 
 export function ProductBadgeGroup({ product }: ProductBadgeGroupProps) {
-    const isVape = product.section === 'vape';
+    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(product.section);
 
     // 1. Validar vigencia de flags legados
     const now = new Date();
@@ -47,9 +48,7 @@ export function ProductBadgeGroup({ product }: ProductBadgeGroupProps) {
                     key={badge}
                     className={cn(
                         'vsm-pill backdrop-blur-sm shadow-sm transition-transform hover:scale-105',
-                        isVape
-                            ? 'bg-vape-500/15 text-vape-400 border-vape-500/30'
-                            : 'bg-herbal-500/15 text-herbal-400 border-herbal-500/30',
+                        productSurfaceConfig.badgeSurfaceClassName,
                         // Estilos específicos para badges críticos
                         badge === 'NUEVO' && 'bg-vape-500 text-white border-none font-black',
                         badge === 'HOT' && 'bg-herbal-500 text-white border-none font-black'

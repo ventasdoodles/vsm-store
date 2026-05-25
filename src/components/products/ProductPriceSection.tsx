@@ -7,6 +7,7 @@
 import { Truck } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Section } from '@/types/product';
+import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
 
 interface ProductPriceSectionProps {
     price: number;
@@ -15,7 +16,7 @@ interface ProductPriceSectionProps {
 }
 
 export function ProductPriceSection({ price, compareAtPrice, section }: ProductPriceSectionProps) {
-    const isVape = section === 'vape';
+    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(section);
     const hasDiscount = compareAtPrice && compareAtPrice > price;
 
     return (
@@ -25,7 +26,7 @@ export function ProductPriceSection({ price, compareAtPrice, section }: ProductP
                 <span
                     className={cn(
                         'vsm-price',
-                        isVape ? 'text-vape-400' : 'text-herbal-400'
+                        productSurfaceConfig.priceAccentTextClassName
                     )}
                 >
                     {formatPrice(price)}
