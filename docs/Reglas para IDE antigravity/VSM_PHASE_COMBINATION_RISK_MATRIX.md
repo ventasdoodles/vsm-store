@@ -53,6 +53,28 @@ La pregunta central:
 
 Una Skill nunca autoriza DB/Supabase, deploy, auth, secrets, payment/provider, Product Search, Cesarin runtime, production smoke o live smoke por si misma.
 
+## 2.3 Context-sensitive evidence ladder
+
+La combinacion de fases depende del contexto operativo.
+
+| Evidence step | Local | Pre-prod | Controlled live before daily customers | Production with daily customers |
+|---|---|---|---|---|
+| Local browser QA | Permitido si el target esta autorizado | Permitido | Solo si es parte de smoke controlado | Solo para verificar un fix minimo y con blast radius minimo |
+| Local auth/admin QA | Permitido con session existente o login manual autorizado | Permitido con cuenta de prueba | Solo con acceso controlado y evidencia de monitoreo | Solo con acceso minimo necesario |
+| Local/pre-prod reversible mutation | Permitido si es reversible y scoped | Permitido y preferido para dummy flow | Solo si el rollback es claro | Generalmente no, salvo hotfix controlado |
+| DB/Supabase read proof | Permitido como lectura observacional | Permitido | Solo si esta dentro del plan de smoke/control | Solo si el riesgo es minimo y no hay alternativa mas segura |
+| Dummy customer/order flow | Permitido | Permitido | Permitido como paso previo a live smoke | No sustituye pruebas reales de produccion |
+| Controlled live smoke | No aplica | No aplica | Permitido solo con autorizacion explicita | Solo en ventana controlada y con monitoreo |
+| Monitored rollout | No aplica | No aplica | Permitido para salida controlada antes de daily customers | Requiere disciplina de produccion, monitoreo y rollback |
+
+Regla de contexto:
+
+```text
+- local/pre-prod puede combinar lectura, browser, auth/admin y mutaciones reversibles cuando el prompt lo autoriza
+- controlled live before daily customers puede combinar smoke y rollout, pero no debe mezclarlo con cambios abiertos o experimentos amplios
+- production with daily customers requiere la menor superficie posible y un plan de rollback/monitoring mucho mas estricto
+```
+
 ## 2.2 Execution Block eligibility
 
 Un **Execution Block** de hasta 4 lanes solo aplica a trabajo LOW/MEDIUM relacionado.

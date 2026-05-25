@@ -39,6 +39,7 @@ Reglas del bloque:
 
 ```text
 - WIP = 1 lane activa a la vez
+- WIP = 1 significa un solo batch activo, no una sola micro-lane
 - acceptance audit independiente despues de cada implementation commit
 - canon/doc reconciliation solo despues de ACCEPT o ACCEPT WITH RESIDUAL RISK
 - lanes condicionales no son autorizacion ciega
@@ -56,6 +57,45 @@ Una lane condicional sigue vigente solo si:
 - no aparecen forbidden surfaces
 - scope y riesgo siguen en LOW o MEDIUM
 ```
+
+## 1.2 Evidence ladder
+
+La evidencia debe escalar por contexto, no por inercia.
+
+```text
+1. source/test
+2. local browser
+3. local auth/admin
+4. local/pre-prod reversible mutation
+5. DB/Supabase read proof
+6. dummy customer/order flow
+7. controlled live smoke
+8. monitored real-customer rollout
+```
+
+Regla de uso:
+
+```text
+- local y pre-prod pueden avanzar por la escalera con evidencias read-only o reversibles cuando el owner lo autoriza
+- controlled live before daily customers requiere rollout disciplinado, monitoreo y non-claims estrictos
+- production with daily customers requiere la postura mas conservadora: hotfix si el sistema necesita seguir vendiendo, fix correcto en ventana de baja trafico y observacion posterior
+- no subir de escalon por inferencia; cada escalon requiere evidencia propia
+```
+
+## 1.3 Practical provisioning and context-sensitive risk
+
+El entorno debe ser valido para el objetivo de la lane.
+
+```text
+- local/pre-prod QA may use dummy data, dummy customers, dummy orders, and reversible admin mutations when scoped
+- a valid env target is required; placeholder or broken targets do not count as provisioning
+- secrets should not be pasted or logged unnecessarily
+- delicate keys and secrets should be rotated before real rollout
+- local/pre-prod lanes can combine practical QA steps when the evidence remains reversible or read-only
+- production with daily customers should avoid broad experiments and favor minimal blast-radius fixes
+```
+
+La evidencia de browser, auth, DB, dummy flow o rollout debe declararse con non-claims explicitos; no convertir fixture, local o pre-prod evidence en production proof.
 
 ---
 

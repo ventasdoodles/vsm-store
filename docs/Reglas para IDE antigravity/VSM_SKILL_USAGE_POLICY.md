@@ -187,6 +187,13 @@ Debe imponer fase separada y autorizacion explicita para:
 
 No ejecuta high-risk work por si misma, no inspecciona secretos/sesion/storage por defecto y no convierte guidance en automated enforcement.
 
+### Practical real-system QA and controlled rollout guidance
+
+- `vsm-browser-visual-qa` puede usarse para evidence local/pre-prod browser cuando el prompt lo autoriza de forma explicita.
+- `vsm-high-risk-lane` sigue siendo la procedure correcta para auth, Supabase, deploy, provider, payment, Product Search, Cesarin runtime y live/high-risk scoping.
+- Este work-kit puede justificar en el futuro procedures separadas como `vsm-real-system-qa` y `vsm-controlled-rollout`, pero no se crean en este batch.
+- Las skills siguen siendo procedurales, no authoritarias; no expanden autorizacion por si mismas.
+
 ---
 
 ## 8. Universal Skill Rules

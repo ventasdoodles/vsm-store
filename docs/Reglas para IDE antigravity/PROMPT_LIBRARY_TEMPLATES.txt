@@ -315,6 +315,58 @@ Success condition:
 
 ---
 
+## G3. TEMPLATE - REAL-SYSTEM QA / CONTROLLED ROLLOUT READINESS
+[TITULO]
+
+STRICT MODE.
+USE REPO PROCEDURE: skills/vsm-readiness/SKILL.md.
+ROADMAP / READINESS ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[definir el primer paso de evidencia real-system o rollout controlado]
+
+Required evidence ladder:
+1. source/test
+2. local browser
+3. local auth/admin
+4. local/pre-prod reversible mutation
+5. DB/Supabase read proof
+6. dummy customer/order flow
+7. controlled live smoke
+8. monitored real-customer rollout
+
+Allowed actions:
+- [local browser/auth/admin/read-only checks as applicable]
+- [dummy data or reversible mutations when explicitly scoped]
+- [read-only DB/Supabase observation only if explicitly authorized]
+
+Forbidden actions:
+- [mutations outside scope]
+- [secret/token/session storage inspection]
+- [deploy/live smoke unless explicitly authorized]
+- [production customer claims]
+
+Required output format:
+1. ENVIRONMENT TARGET
+2. EVIDENCE LADDER
+3. ALLOWED ACTIONS
+4. FORBIDDEN ACTIONS
+5. PROOF CRITERIA
+6. NON-CLAIMS
+7. BEST NEXT MOVE
+8. EXACT NEXT PROMPT
+9. GO / NO-GO
+
+Success condition:
+[a bounded real-system QA or rollout-readiness next step that does not overclaim]
+
+---
+
 ## H. TEMPLATE - USE REPO PROCEDURE: skills/vsm-implementation/SKILL.md
 [TITULO]
 
