@@ -1,5 +1,8 @@
 import { LucideIcon, Flame, Box, Leaf, Zap, Droplets, Sparkles, Wind, Gift, Ghost, Asterisk, Coffee, Flower2 } from 'lucide-react';
-import { getVape420CategoryShowcaseFallbackCategories } from '@/config/productization/categoryShowcase';
+import {
+    getVape420CategoryShowcaseFallbackCategories,
+    getVape420CategoryShowcaseFallbackImageUrl,
+} from '@/config/productization/categoryShowcase';
 import type { FeaturedCategory } from '@/services';
 
 /**
@@ -48,9 +51,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = getVape420CategoryShowcas
         slug: category.slug,
         section: category.sectionSlug as FeaturedCategory['section'],
         iconName: category.iconName,
-        image: typeof window === 'undefined'
-            ? category.fallbackImagePath
-            : new URL(category.fallbackImagePath, window.location.origin).toString(),
+        image: getVape420CategoryShowcaseFallbackImageUrl(category.fallbackImagePath),
         presetId: category.presetId,
     }),
 );

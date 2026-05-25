@@ -60,6 +60,7 @@ describe('category showcase constants public surface', () => {
         const source = readSource();
 
         expect(source).toContain("from '@/config/productization/categoryShowcase'");
+        expect(source).toContain('getVape420CategoryShowcaseFallbackImageUrl');
         expect(source).not.toMatch(/from ['"]@\/config\/storefrontSettingsFallback['"]/);
     });
 });

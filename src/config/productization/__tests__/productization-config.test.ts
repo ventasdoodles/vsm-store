@@ -26,6 +26,7 @@ import {
     verticalPackAuthoringTemplate,
     vsmStoreTenantConfig,
 } from '..';
+import { getVape420CategoryShowcaseFallbackImageUrl } from '../categoryShowcase';
 
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
 
@@ -313,6 +314,9 @@ describe('productization config boundary', () => {
                 presetId: 'green-emerald',
             }),
         ]));
+        expect(getVape420CategoryShowcaseFallbackImageUrl('/images/storefront-fallbacks/category-liquidos.svg')).toBe(
+            new URL('/images/storefront-fallbacks/category-liquidos.svg', window.location.origin).toString(),
+        );
         expect(vape420VerticalPackConfig.fixtureMetadata.demoCategorySlugs).toEqual([
             'liquidos',
             'mods',

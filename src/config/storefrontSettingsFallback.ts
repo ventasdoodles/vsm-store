@@ -1,14 +1,14 @@
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { SITE_CONFIG } from '@/config/site';
-import { getVape420CategoryShowcaseFallbackCategories } from '@/config/productization/categoryShowcase';
+import {
+    getVape420CategoryShowcaseFallbackCategories,
+    getVape420CategoryShowcaseFallbackImageUrl,
+} from '@/config/productization/categoryShowcase';
 import type { StoreSettings } from '@/services';
 
 type StorefrontHeroSliderFallback = NonNullable<StoreSettings['hero_sliders']>[number];
 type StorefrontFeaturedCategoryFallback = NonNullable<StoreSettings['featured_categories']>[number];
-
-const storefrontFallbackImage = (path: string) =>
-    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
 
 const STORE_FRONT_HERO_SLIDER_FALLBACKS: StorefrontHeroSliderFallback[] = [
     {
@@ -62,7 +62,7 @@ const STORE_FRONT_FEATURED_CATEGORY_FALLBACKS: StorefrontFeaturedCategoryFallbac
         slug: category.slug,
         section: category.sectionSlug as StorefrontFeaturedCategoryFallback['section'],
         iconName: category.iconName,
-        image: storefrontFallbackImage(category.fallbackImagePath),
+        image: getVape420CategoryShowcaseFallbackImageUrl(category.fallbackImagePath),
         presetId: category.presetId,
     }),
 );
