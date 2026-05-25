@@ -6,10 +6,10 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store.
-- Fecha del snapshot: 2026-05-24.
+- Fecha del snapshot: 2026-05-25.
 - Estado de salida esperado: `main` limpio y alineado con `origin/main`.
 - Ultimo canon docs-only observado antes de esta reconciliacion: dev preview diagnostics panel `b3324ae`.
-- Ultimo resultado aceptado/canonizado: local storefront shell proof `7d97156`, ACCEPT WITH RESIDUAL RISK.
+- Ultimo resultado aceptado/canonizado: route manifest section resolver patch `39cda95`, ACCEPT WITH RESIDUAL RISK.
 - Rol de este archivo: memoria compacta de handoff, no historial completo ni fuente primaria de verdad.
 
 ## 2. Estado operativo
@@ -19,7 +19,7 @@
 - Skills VSM canonizadas son procedurales, no authoritativas: `vsm-readiness`, `vsm-acceptance-audit`, `vsm-canon-reconciliation`, `vsm-implementation`, `vsm-fast-lane-selector`, `vsm-browser-visual-qa` y `vsm-high-risk-lane`. En este work-kit son repo procedures bajo `skills/<nombre>/SKILL.md`; no asumir que estan instaladas como Codex runtime/global Skills salvo verificacion explicita del entorno.
 - Ciclo operativo compacto: readiness selecciona lane segura y prompt exacto; implementation ejecuta solo cambios autorizados y acotados; acceptance-audit acepta/rechaza preservando non-claims y residual risks; canon-reconciliation registra solo hechos aceptados en docs/canon autorizados.
 - El siguiente trabajo debe seleccionarse en una lane separada de readiness, implementation, validation/smoke, acceptance audit, canon reconciliation, deploy, DB/provider, visual QA o smoke.
-- El ultimo lane canonizado aqui es la proof de shell local driven by selected preview data: `buildLocalVerticalPackPreviewShellViewModel()` normaliza el preview seleccionado en seccion activa, grupos de productos de seccion y conteos activos; `SecondVerticalProofFixture` renderiza un panel storefront activo desde ese shell model; la seccion activa muestra productos locales por seccion o un empty state especifico cuando no hay productos; `?preview=...` y `?section=...` siguen siendo comportamiento de fixture local/dev-only; `resolveLocalVerticalPackPreviewSection()` sigue resolviendo slug, root route y nested route path. No es proof de routing produccion ni de switching vertical generalizado.
+- El ultimo lane canonizado aqui es la phase 1 production route/generalization boundary extraction: `resolveSectionFromRouteManifest()` es un boundary manifest-aware que preserva `/vape`, `/vape/:slug`, `/420`, `/420/:slug` y el fallback actual; `useSectionFromPath()` sigue binario en resultado mientras delega al helper; `SectionPage`, `CategoryPage` y `ProductDetail` siguen cubiertos por tests de contrato de seccion; `src/App.tsx` no cambio; no hubo expansion de rutas publicas. No es proof de routing produccion ni de switching vertical generalizado.
 
 ## 3. Lanes recientes cerrados / canonizados
 - Local vertical pack resolution preview `d2c3cda`: ACCEPT WITH RESIDUAL RISK as local/dev-only runtime preview evidence only. Accepted facts: `resolveLocalVerticalPackPreviewByRoutePrefix()` resolves the dev-only second vertical proof preview from route prefix `/__qa/second-vertical-proof`; `SecondVerticalProofFixture` now uses `useLocation()` plus that resolver and renders from selected preview pack state rather than purely hardcoded fixture state; focused tests cover resolver behavior and fixture rendering through `MemoryRouter`; changed files were exactly `src/config/productization/localVerticalPackPreview.ts`, `src/config/productization/index.ts`, `src/config/productization/__tests__/localVerticalPackPreview.test.ts`, `src/pages/SecondVerticalProofFixture.tsx`, and `src/pages/__tests__/SecondVerticalProofFixture.test.tsx`; accepted validation: `git diff --check` PASS, focused Vitest PASS (`2` files / `5` tests), and `npm run typecheck` PASS. Non-claims preserved: not production route generalization, not runtime multi-tenant proof, not production second-vertical readiness, not DB-backed portability proof, not browser fit proof, not deploy/live-smoke proof, not provider proof, not checkout proof, not Product Search proof, and not Cesarin proof. Residuals: the preview is keyed to a single dev route prefix and does not demonstrate generalized pack selection or any production runtime routing change.
