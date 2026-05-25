@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { secondVerticalProofConfig, secondVerticalProofProducts } from '@/config/productization/secondVerticalProof';
@@ -29,6 +29,25 @@ describe('SecondVerticalProofFixture', () => {
             expect(screen.getByText(section.description)).toBeInTheDocument();
             expect(screen.getByText(section.routePrefix)).toBeInTheDocument();
         }
+
+        const packIdentity = screen.getByRole('region', { name: 'Pack identity' });
+        const packTaxonomy = screen.getByRole('region', { name: 'Pack taxonomy' });
+        const packRouteManifest = screen.getByRole('region', { name: 'Pack route manifest' });
+
+        expect(packIdentity).toBeInTheDocument();
+        expect(packTaxonomy).toBeInTheDocument();
+        expect(packRouteManifest).toBeInTheDocument();
+        expect(within(packIdentity).getByText('Second Vertical Proof')).toBeInTheDocument();
+        expect(within(packIdentity).getByText('Demo Families')).toBeInTheDocument();
+        expect(within(packIdentity).getByText('Modular Organizer')).toBeInTheDocument();
+        expect(within(packTaxonomy).getByText('Category hint: Organizers / demo-home / organizers')).toBeInTheDocument();
+        expect(
+            within(packTaxonomy).getByText(
+                'Attribute hint: demo-home / organizers: Material, Capacity, Finish',
+            ),
+        ).toBeInTheDocument();
+        expect(within(packRouteManifest).getByText('Root: /__qa/second-vertical-proof/demo-home')).toBeInTheDocument();
+        expect(within(packRouteManifest).getByText('Pattern: /__qa/second-vertical-proof/demo-home/:slug')).toBeInTheDocument();
 
         expect(screen.getByRole('region', { name: 'Proof categories' })).toBeInTheDocument();
         expect(screen.getByRole('region', { name: 'Proof products' })).toBeInTheDocument();

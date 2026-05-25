@@ -13,7 +13,14 @@ export function SecondVerticalProofFixture() {
         return null;
     }
 
-    const { pack, products } = preview;
+    const {
+        pack,
+        products,
+        routeManifest,
+        categoryTaxonomyHints,
+        productAttributeHints,
+        demoProductFamilies,
+    } = preview;
     const sections = pack.sections;
     const categories = pack.marketing.categoryShowcase.fallbackCategories;
 
@@ -33,6 +40,34 @@ export function SecondVerticalProofFixture() {
                         </p>
                     </div>
                 </header>
+
+                <section className="space-y-4" aria-label="Pack identity">
+                    <div className="flex items-center gap-2">
+                        <PackageCheck className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Pack Identity</h2>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                Pack
+                            </p>
+                            <p className="mt-2 text-base font-black text-white">{pack.label}</p>
+                            <p className="mt-1 text-sm text-theme-secondary">{pack.id}</p>
+                        </article>
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                Demo Families
+                            </p>
+                            <div className="mt-2 grid gap-2">
+                                {demoProductFamilies.map((family) => (
+                                    <p key={family} className="rounded-xl bg-white/[0.03] px-3 py-2 text-sm text-white">
+                                        {family}
+                                    </p>
+                                ))}
+                            </div>
+                        </article>
+                    </div>
+                </section>
 
                 <div className="grid gap-4 md:grid-cols-2">
                     {sections.map((section) => (
@@ -72,6 +107,58 @@ export function SecondVerticalProofFixture() {
                                 <p className="mt-1 text-xs text-theme-tertiary">
                                     {category.sectionSlug} / {category.slug}
                                 </p>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="space-y-4" aria-label="Pack taxonomy">
+                    <div className="flex items-center gap-2">
+                        <Boxes className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Pack Taxonomy</h2>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                Category Hints
+                            </p>
+                            <div className="mt-3 grid gap-2">
+                                {categoryTaxonomyHints.map((hint) => (
+                                    <div key={hint.slug} className="rounded-xl bg-white/[0.03] px-3 py-2 text-sm">
+                                        Category hint: {hint.label} / {hint.sectionSlug} / {hint.slug}
+                                    </div>
+                                ))}
+                            </div>
+                        </article>
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                Attribute Hints
+                            </p>
+                            <div className="mt-3 grid gap-2">
+                                {productAttributeHints.map((hint) => (
+                                    <div
+                                        key={`${hint.sectionSlug}:${hint.categorySlug}`}
+                                        className="rounded-xl bg-white/[0.03] px-3 py-2 text-sm"
+                                    >
+                                        Attribute hint: {hint.sectionSlug} / {hint.categorySlug}: {hint.attributes.join(', ')}
+                                    </div>
+                                ))}
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section className="space-y-4" aria-label="Pack route manifest">
+                    <div className="flex items-center gap-2">
+                        <PackageCheck className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Pack Route Manifest</h2>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {routeManifest.map((route) => (
+                            <article key={route.sectionSlug} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                                <p className="text-sm font-black text-white">{route.sectionSlug}</p>
+                                <p className="mt-1 text-xs text-theme-tertiary">Root: {route.rootRoute}</p>
+                                <p className="mt-1 text-xs text-theme-tertiary">Pattern: {route.slugRoutePattern}</p>
                             </article>
                         ))}
                     </div>
