@@ -24,6 +24,7 @@ import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
 import { motion } from 'framer-motion';
 import { SocialProof } from '@/components/home/SocialProof';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
+import { getVape420SectionPresentationConfig } from '@/config/productization';
 
 export function ProductDetail() {
     const { slug } = useParams<{ slug: string }>();
@@ -65,6 +66,7 @@ export function ProductDetail() {
         );
     }
 
+    const productPresentationConfig = getVape420SectionPresentationConfig(product.section);
 
     return (
         <motion.div
@@ -85,7 +87,7 @@ export function ProductDetail() {
             {/* Background Aesthetic Blobs - Premium Look (Optimized) */}
             <div className={cn(
                 "absolute top-0 left-0 -z-10 h-[500px] w-[500px] rounded-full blur-[64px] animate-pulse-slow opacity-10",
-                product.section === 'vape' ? "bg-vape-500" : "bg-herbal-500"
+                productPresentationConfig.heroBlobClassName
             )} />
             <div className="absolute top-[20%] right-0 -z-10 h-[400px] w-[400px] rounded-full bg-theme-secondary/10 blur-[64px] animate-pulse-slow opacity-10" style={{ animationDelay: '2s' }} />
 

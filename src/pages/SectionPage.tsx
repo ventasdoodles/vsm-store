@@ -17,35 +17,14 @@ import { SEO } from '@/components/seo/SEO';
 import { SocialProof } from '@/components/home/SocialProof';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
-import { getVape420SectionPageConfig } from '@/config/productization';
-
-const SECTION_PRESENTATION_CONFIG = {
-    vape: {
-        icon: Flame,
-        gradient: 'from-vape-500/30 via-purple-500/10 to-transparent',
-        blob: 'bg-vape-500',
-        badge: 'text-vape-400 bg-vape-500/10 border-vape-500/20',
-        sortActive: 'bg-vape-500/10 text-vape-400 border-vape-500/20',
-        sortHighlight: 'bg-vape-500/10 font-semibold text-vape-400',
-    },
-    herbal: {
-        icon: Leaf,
-        gradient: 'from-herbal-500/30 via-emerald-500/10 to-transparent',
-        blob: 'bg-herbal-500',
-        badge: 'text-herbal-400 bg-herbal-500/10 border-herbal-500/20',
-        sortActive: 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20',
-        sortHighlight: 'bg-herbal-500/10 font-semibold text-herbal-400',
-    },
-} as const;
+import { getVape420SectionPageConfig, getVape420SectionPresentationConfig } from '@/config/productization';
 
 export function SectionPage() {
     const section = useSectionFromPath();
     const sectionConfig = getVape420SectionPageConfig(section);
-    const presentationConfig =
-        SECTION_PRESENTATION_CONFIG[sectionConfig.themeToken as keyof typeof SECTION_PRESENTATION_CONFIG] ??
-        SECTION_PRESENTATION_CONFIG.vape;
-    const cfg = { ...sectionConfig, ...presentationConfig };
-    const Icon = cfg.icon;
+    const sectionPresentationConfig = getVape420SectionPresentationConfig(section);
+    const Icon = sectionPresentationConfig.isVape ? Flame : Leaf;
+    const cfg = { ...sectionConfig, ...sectionPresentationConfig };
     const isVape = cfg.themeToken === 'vape';
 
     const [sort, setSort] = useState<SortKey>('relevance');
@@ -107,10 +86,10 @@ export function SectionPage() {
             {/* ═══ HERO BANNER ═══ */}
             <div className="relative overflow-hidden">
                 {/* Blobs decorativos */}
-                <div className={cn('absolute -top-20 -left-20 h-[400px] w-[400px] rounded-full blur-[100px] opacity-30', cfg.blob)} />
-                <div className={cn('absolute -bottom-20 -right-20 h-[300px] w-[300px] rounded-full blur-[80px] opacity-20', cfg.blob)} />
+                <div className={cn('absolute -top-20 -left-20 h-[400px] w-[400px] rounded-full blur-[100px] opacity-30', cfg.heroBlobClassName)} />
+                <div className={cn('absolute -bottom-20 -right-20 h-[300px] w-[300px] rounded-full blur-[80px] opacity-20', cfg.heroBlobClassName)} />
 
-                <div className={cn('relative bg-gradient-to-br py-12 sm:py-16', cfg.gradient)}>
+                <div className={cn('relative bg-gradient-to-br py-12 sm:py-16', cfg.heroGradientClassName)}>
                     <div className="container-vsm">
                         {/* Breadcrumbs */}
                         <div className="mb-6">
@@ -121,7 +100,7 @@ export function SectionPage() {
                         </div>
 
                         <div className="flex items-center gap-5">
-                            <div className={cn('p-4 rounded-2xl border', cfg.badge)}>
+                            <div className={cn('p-4 rounded-2xl border', cfg.heroBadgeClassName)}>
                                 <Icon className="h-10 w-10" />
                             </div>
                             <div>
@@ -163,25 +142,25 @@ export function SectionPage() {
                         <CategorySkeleton variant="chips" count={6} />
                     ) : rootCategories.length > 0 && (
                         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin snap-x">
-                            <button
-                                onClick={() => setActiveCategory(null)}
-                                className={cn(
-                                    'flex-shrink-0 snap-start rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all',
-                                    !activeCategory
-                                        ? cfg.sortActive
+                                    <button
+                                        onClick={() => setActiveCategory(null)}
+                                        className={cn(
+                                            'flex-shrink-0 snap-start rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all',
+                                        !activeCategory
+                                        ? cfg.sortActiveClassName
                                         : 'border-theme bg-theme-primary/60 text-theme-secondary hover:bg-theme-secondary/20'
-                                )}
-                            >
+                                    )}
+                                >
                                 Todos
                             </button>
                             {rootCategories.map(cat => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
-                                    className={cn(
-                                        'flex-shrink-0 snap-start rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all',
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+                                        className={cn(
+                                            'flex-shrink-0 snap-start rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all',
                                         activeCategory === cat.id
-                                            ? cfg.sortActive
+                                            ? cfg.sortActiveClassName
                                             : 'border-theme bg-theme-primary/60 text-theme-secondary hover:bg-theme-secondary/20'
                                     )}
                                 >
@@ -225,7 +204,7 @@ export function SectionPage() {
                             onClick={() => setSortOpen(o => !o)}
                             className={cn(
                                 'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
-                                sortOpen ? cfg.sortActive : 'border-theme bg-theme-primary/60 text-theme-secondary hover:border-theme-strong'
+                                sortOpen ? cfg.sortActiveClassName : 'border-theme bg-theme-primary/60 text-theme-secondary hover:border-theme-strong'
                             )}
                         >
                             <ArrowUpDown className="h-3.5 w-3.5" />
@@ -240,12 +219,12 @@ export function SectionPage() {
                                     <button
                                         key={opt.value}
                                         onClick={() => { setSort(opt.value); setSortOpen(false); }}
-                                        className={cn(
-                                            'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
-                                            sort === opt.value ? cfg.sortHighlight : 'text-theme-secondary hover:bg-theme-secondary/30'
-                                        )}
-                                    >
-                                        {opt.label}
+                                            className={cn(
+                                                'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
+                                            sort === opt.value ? cfg.sortHighlightClassName : 'text-theme-secondary hover:bg-theme-secondary/30'
+                                            )}
+                                        >
+                                            {opt.label}
                                     </button>
                                 ))}
                             </div>
@@ -262,7 +241,7 @@ export function SectionPage() {
                                             className={cn(
                                                 'w-full rounded-xl px-4 py-4 text-left text-sm font-medium transition-all',
                                                 sort === opt.value
-                                                    ? cn(cfg.sortActive, 'border')
+                                                    ? cn(cfg.sortActiveClassName, 'border')
                                                     : 'bg-theme-secondary/10 text-theme-secondary border border-transparent hover:bg-theme-secondary/20'
                                             )}
                                         >

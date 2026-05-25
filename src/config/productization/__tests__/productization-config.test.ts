@@ -12,6 +12,7 @@ import {
     getVape420SectionRouteManifest,
     getVape420SectionDefaultSpecs,
     getVape420SectionPageConfig,
+    getVape420SectionPresentationConfig,
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
     getVape420PublicSectionRouteDeclarations,
@@ -85,6 +86,26 @@ describe('productization config boundary', () => {
                 seoDescription: 'Explora toda nuestra colecci\u00f3n de vapeo: pods, l\u00edquidos, accesorios y m\u00e1s.',
                 routePrefix: '/vape',
                 themeToken: 'vape',
+            }),
+        );
+        expect(getVape420SectionPresentationConfig('vape')).toEqual(
+            expect.objectContaining({
+                title: 'Vape Collection',
+                subtitle: 'Pods, l\u00edquidos, accesorios y todo lo que necesitas para vapear.',
+                isVape: true,
+                heroBlobClassName: 'bg-vape-500',
+                sortActiveClassName: 'bg-vape-500/10 text-vape-400 border-vape-500/20',
+                sortHighlightClassName: 'bg-vape-500/10 font-semibold text-vape-400',
+            }),
+        );
+        expect(getVape420SectionPresentationConfig('420')).toEqual(
+            expect.objectContaining({
+                title: '420 Zone',
+                subtitle: 'Herbal, grinders, papel, accesorios y m\u00e1s para tu sesi\u00f3n perfecta.',
+                isVape: false,
+                heroBlobClassName: 'bg-herbal-500',
+                sortActiveClassName: 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20',
+                sortHighlightClassName: 'bg-herbal-500/10 font-semibold text-herbal-400',
             }),
         );
         expect(getVape420SectionPageConfig('420')).toEqual(

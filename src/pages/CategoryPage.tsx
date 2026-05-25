@@ -25,11 +25,12 @@ import { motion } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { FilterSidebar } from '@/components/products/FilterSidebar';
 import { getAvailableFilters, applyFilters, type FilterState } from '@/lib/product-filtering';
+import { getVape420SectionPresentationConfig } from '@/config/productization';
 
 export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
     const section = useSectionFromPath();
-    const isVape = section === 'vape';
+    const sectionPresentationConfig = getVape420SectionPresentationConfig(section);
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
     const [filtersOpen, setFiltersOpen] = useState(false);
@@ -228,15 +229,15 @@ export function CategoryPage() {
                 {/* Sort selector — solo en vistas de hoja (con productos) */}
                 {!hasChildren && !isLoading && products.length > 0 && (
                     <div className="relative" ref={sortRef}>
-                        <button
-                            onClick={() => setSortOpen(o => !o)}
-                            className={cn(
-                                'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
-                                sortOpen
-                                    ? cn('border-opacity-50 bg-opacity-10', isVape ? 'border-vape-500 bg-vape-500/10 text-vape-400' : 'border-herbal-500 bg-herbal-500/10 text-herbal-400')
+                            <button
+                                onClick={() => setSortOpen(o => !o)}
+                                className={cn(
+                                    'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
+                                    sortOpen
+                                    ? cn('border-opacity-50 bg-opacity-10', sectionPresentationConfig.sortActiveClassName)
                                     : 'border-theme bg-theme-primary/60 text-theme-secondary hover:border-theme-strong'
-                            )}
-                        >
+                                )}
+                            >
                             <ArrowUpDown className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline">{SORT_OPTIONS.find(o => o.value === sort)?.label}</span>
                             <span className="sm:hidden">Ordenar</span>
@@ -263,7 +264,7 @@ export function CategoryPage() {
                                         className={cn(
                                             'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
                                             sort === opt.value
-                                                ? cn('font-semibold', isVape ? 'bg-vape-500/10 text-vape-400' : 'bg-herbal-500/10 text-herbal-400')
+                                                ? cn('font-semibold', sectionPresentationConfig.sortHighlightClassName)
                                                 : 'text-theme-secondary hover:bg-theme-secondary/30'
                                         )}
                                     >
@@ -288,7 +289,7 @@ export function CategoryPage() {
                                             className={cn(
                                                 'w-full rounded-xl px-4 py-4 text-left text-sm font-medium transition-all',
                                                 sort === opt.value
-                                                    ? cn('border', isVape ? 'bg-vape-500/10 text-vape-400 border-vape-500/20' : 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20')
+                                                    ? cn('border', sectionPresentationConfig.sortActiveClassName)
                                                     : 'bg-theme-secondary/10 text-theme-secondary border border-transparent hover:bg-theme-secondary/20'
                                             )}
                                         >
