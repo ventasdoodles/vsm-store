@@ -12,20 +12,14 @@ function normalizeSource(source: string) {
 }
 
 describe('App route manifest alignment', () => {
-    it('keeps the public Vape/420 section routes aligned with the manifest-derived snapshot', () => {
+    it('wires the public Vape/420 section routes through the manifest-derived declarations', () => {
         const appSource = normalizeSource(readFileSync(appFilePath, 'utf8'));
 
-        const expectedRouteSnippets = getVape420PublicSectionRouteDeclarations().map(
-            ({ path, elementName }) => `<Route path="${path}" element={<${elementName} />} />`,
-        );
-
-        let previousIndex = -1;
-        for (const snippet of expectedRouteSnippets) {
-            const currentIndex = appSource.indexOf(snippet);
-
-            expect(currentIndex).toBeGreaterThan(previousIndex);
-            expect(currentIndex).toBeGreaterThanOrEqual(0);
-            previousIndex = currentIndex;
-        }
+        expect(appSource).toContain('getVape420PublicSectionRouteDeclarations()');
+        expect(appSource).toContain('publicSectionRouteDeclarations.map((route) =>');
+        expect(appSource).toContain("route.elementName === 'SectionPage'");
+        expect(appSource).toContain('<SectionSlugResolver />');
+        expect(appSource).toContain('<SectionPage />');
+        expect(getVape420PublicSectionRouteDeclarations()).toHaveLength(4);
     });
 });

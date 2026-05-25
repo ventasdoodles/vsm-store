@@ -19,6 +19,7 @@ import {
     PILOT_ACTIVATION_EVENT,
     resolveStorefrontAIExposure,
 } from '@/lib/pilot-activation';
+import { getVape420PublicSectionRouteDeclarations } from '@/config/productization';
 
 
 
@@ -98,6 +99,7 @@ const AdminAttributes = lazy(() => import('@/pages/admin/AdminAttributes').then(
 const AdminWheelGame  = lazy(() => import('@/pages/admin/AdminWheelGame').then(m => ({ default: m.AdminWheelGame })));
 const AdminBatchManager = lazy(() => import('@/pages/admin/AdminBatchManager').then(m => ({ default: m.AdminBatchManager })));
 const AdminCesarinOS = lazy(() => import('@/pages/admin/AdminCesarinOS').then(m => ({ default: m.AdminCesarinOS })));
+const publicSectionRouteDeclarations = getVape420PublicSectionRouteDeclarations();
 
 // Minimal loading fallback
 function PageLoader() {
@@ -342,10 +344,21 @@ function StorefrontApp() {
                                 <Route path="/privacy" element={<Privacy />} />
 
                                 <Route path="/contact" element={<Contact />} />
-                                <Route path="/vape" element={<SectionPage />} />
-                                <Route path="/vape/:slug" element={<SectionSlugResolver />} />
-                                <Route path="/420" element={<SectionPage />} />
-                                <Route path="/420/:slug" element={<SectionSlugResolver />} />
+                                {publicSectionRouteDeclarations.map((route) =>
+                                    route.elementName === 'SectionPage' ? (
+                                        <Route
+                                            key={route.path}
+                                            path={route.path}
+                                            element={<SectionPage />}
+                                        />
+                                    ) : (
+                                        <Route
+                                            key={route.path}
+                                            path={route.path}
+                                            element={<SectionSlugResolver />}
+                                        />
+                                    ),
+                                )}
                                 <Route path="/payment/success" element={<PaymentSuccess />} />
                                 <Route path="/payment/failure" element={<PaymentFailure />} />
                                 <Route path="/payment/pending" element={<PaymentPending />} />
