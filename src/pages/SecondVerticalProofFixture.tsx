@@ -5,6 +5,7 @@ import {
     buildLocalVerticalPackPreviewViewModel,
     resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
+    resolveLocalVerticalPackPreviewSection,
 } from '@/config/productization';
 
 export function SecondVerticalProofFixture() {
@@ -16,10 +17,24 @@ export function SecondVerticalProofFixture() {
     }
 
     const previewKey = new URLSearchParams(search).get('preview');
+    const selectedSectionRouteOrSlug = new URLSearchParams(search).get('section');
     const preview = resolveLocalVerticalPackPreviewByKey(previewKey) ?? surfacePreview;
     const previewViewModel = buildLocalVerticalPackPreviewViewModel(preview);
+    const selectedSection =
+        resolveLocalVerticalPackPreviewSection(previewViewModel, selectedSectionRouteOrSlug) ??
+        previewViewModel.sections[0] ??
+        null;
 
     const previewSwitcherPath = pathname;
+    const buildPreviewPath = (nextPreviewKey: string, nextSectionSlug?: string) => {
+        const nextSearchParams = new URLSearchParams({ preview: nextPreviewKey });
+
+        if (nextSectionSlug) {
+            nextSearchParams.set('section', nextSectionSlug);
+        }
+
+        return `${previewSwitcherPath}?${nextSearchParams.toString()}`;
+    };
 
     const {
         previewLabel,
@@ -62,13 +77,13 @@ export function SecondVerticalProofFixture() {
                     <div className="flex flex-wrap gap-3">
                         <Link
                             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
-                            to={`${previewSwitcherPath}?preview=second-vertical-proof`}
+                            to={buildPreviewPath('second-vertical-proof')}
                         >
                             Second vertical proof
                         </Link>
                         <Link
                             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
-                            to={`${previewSwitcherPath}?preview=vape-420-preview`}
+                            to={buildPreviewPath('vape-420-preview')}
                         >
                             Vape/420 preview
                         </Link>
@@ -76,6 +91,47 @@ export function SecondVerticalProofFixture() {
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
                         Selected preview: {previewLabel}
                     </p>
+                </section>
+
+                <section className="space-y-4" aria-label="Local section route simulation">
+                    <div className="flex items-center gap-2">
+                        <PackageCheck className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Local Section Route Simulation</h2>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                        {sections.map((section) => (
+                            <Link
+                                key={section.slug}
+                                className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
+                                to={buildPreviewPath(previewViewModel.previewKey, section.slug)}
+                            >
+                                {section.shortLabel}
+                            </Link>
+                        ))}
+                    </div>
+                    {selectedSection ? (
+                        <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                                Active simulated section
+                            </p>
+                            <h3 className="mt-2 text-xl font-black text-white">{selectedSection.label}</h3>
+                            <p className="mt-1 text-sm text-theme-secondary">{selectedSection.description}</p>
+                            <dl className="mt-4 grid gap-2 text-xs text-theme-secondary sm:grid-cols-2">
+                                <div className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                    Section slug: {selectedSection.slug}
+                                </div>
+                                <div className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                    Root route: {selectedSection.routePrefix}
+                                </div>
+                                <div className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                    Slug route: {selectedSection.slugRoutePattern}
+                                </div>
+                                <div className="rounded-xl bg-white/[0.03] px-3 py-2">
+                                    Local products: {selectedSection.localProductCount}
+                                </div>
+                            </dl>
+                        </article>
+                    ) : null}
                 </section>
 
                 <section className="space-y-4" aria-label="Preview diagnostics">

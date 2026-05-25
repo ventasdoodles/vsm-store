@@ -4,6 +4,7 @@ import {
     buildLocalVerticalPackPreviewViewModel,
     resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
+    resolveLocalVerticalPackPreviewSection,
 } from '../localVerticalPackPreview';
 
 describe('localVerticalPackPreview', () => {
@@ -55,12 +56,20 @@ describe('localVerticalPackPreview', () => {
         expect(viewModel.previewKey).toBe('second-vertical-proof');
         expect(viewModel.hasLocalProducts).toBe(true);
         expect(viewModel.sections.map((section) => section.hasLocalProducts)).toEqual([true, true]);
+        expect(viewModel.sections.map((section) => section.localProductCount)).toEqual([1, 1]);
         expect(viewModel.sections.map((section) => section.slugRoutePattern)).toEqual([
             '/__qa/second-vertical-proof/demo-home/:slug',
             '/__qa/second-vertical-proof/demo-studio/:slug',
         ]);
         expect(viewModel.productsBySectionSlug['demo-home']?.length).toBe(1);
         expect(viewModel.productsBySectionSlug['demo-studio']?.length).toBe(1);
+        expect(resolveLocalVerticalPackPreviewSection(viewModel, 'demo-home')?.label).toBe('Demo Home');
+        expect(
+            resolveLocalVerticalPackPreviewSection(
+                viewModel,
+                '/__qa/second-vertical-proof/demo-studio/example-slug',
+            )?.slug,
+        ).toBe('demo-studio');
     });
 
     it('resolves the dev-only Vape/420 preview by preview key', () => {
@@ -103,12 +112,15 @@ describe('localVerticalPackPreview', () => {
         expect(viewModel.previewKey).toBe('vape-420-preview');
         expect(viewModel.hasLocalProducts).toBe(false);
         expect(viewModel.sections.map((section) => section.hasLocalProducts)).toEqual([false, false]);
+        expect(viewModel.sections.map((section) => section.localProductCount)).toEqual([0, 0]);
         expect(viewModel.sections.map((section) => section.slugRoutePattern)).toEqual([
             '/vape/:slug',
             '/420/:slug',
         ]);
         expect(viewModel.productsBySectionSlug.vape).toEqual([]);
         expect(viewModel.productsBySectionSlug['420']).toEqual([]);
+        expect(resolveLocalVerticalPackPreviewSection(viewModel, '/420/concentrados')?.slug).toBe('420');
+        expect(resolveLocalVerticalPackPreviewSection(viewModel, 'unknown-section')).toBeNull();
     });
 
     it('matches nested proof routes under the same local route prefix', () => {

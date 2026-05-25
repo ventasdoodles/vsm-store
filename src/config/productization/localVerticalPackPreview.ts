@@ -25,6 +25,7 @@ export interface LocalVerticalPackPreviewSectionViewModel {
     description: string;
     slugRoutePattern: string;
     hasLocalProducts: boolean;
+    localProductCount: number;
 }
 
 export interface LocalVerticalPackPreviewViewModel {
@@ -121,6 +122,7 @@ export function buildLocalVerticalPackPreviewViewModel(
         doesNotProve: preview.doesNotProve,
         pack: preview.pack,
         sections: preview.pack.sections.map((section) => ({
+            ...section,
             slug: section.slug,
             label: section.label,
             shortLabel: section.shortLabel,
@@ -128,6 +130,7 @@ export function buildLocalVerticalPackPreviewViewModel(
             description: section.description,
             slugRoutePattern: `${section.routePrefix}/:slug`,
             hasLocalProducts: (productsBySectionSlug[section.slug] ?? []).length > 0,
+            localProductCount: productsBySectionSlug[section.slug]?.length ?? 0,
         })),
         routeManifest: preview.routeManifest,
         categoryTaxonomyHints: preview.categoryTaxonomyHints,
@@ -137,6 +140,24 @@ export function buildLocalVerticalPackPreviewViewModel(
         productsBySectionSlug,
         hasLocalProducts: preview.products.length > 0,
     };
+}
+
+export function resolveLocalVerticalPackPreviewSection(
+    viewModel: LocalVerticalPackPreviewViewModel,
+    sectionRouteOrSlug: string | null | undefined,
+): LocalVerticalPackPreviewSectionViewModel | null {
+    const normalizedSectionRouteOrSlug = sectionRouteOrSlug?.trim();
+
+    if (!normalizedSectionRouteOrSlug) {
+        return null;
+    }
+
+    return viewModel.sections.find(
+        (section) =>
+            normalizedSectionRouteOrSlug === section.slug ||
+            normalizedSectionRouteOrSlug === section.routePrefix ||
+            normalizedSectionRouteOrSlug.startsWith(`${section.routePrefix}/`),
+    ) ?? null;
 }
 
 export function resolveLocalVerticalPackPreviewByRoutePrefix(routePrefix: string): LocalVerticalPackPreview | null {

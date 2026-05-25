@@ -23,6 +23,7 @@ export type { LocalVerticalPackPreviewKey } from './localVerticalPackPreview';
 export { buildLocalVerticalPackPreviewViewModel } from './localVerticalPackPreview';
 export type { LocalVerticalPackPreviewViewModel } from './localVerticalPackPreview';
 export type { LocalVerticalPackPreviewSectionViewModel } from './localVerticalPackPreview';
+export { resolveLocalVerticalPackPreviewSection } from './localVerticalPackPreview';
 export {
     defineVerticalPack,
     VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,

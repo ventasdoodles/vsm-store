@@ -26,20 +26,22 @@ describe('SecondVerticalProofFixture', () => {
         expect(screen.getByText(secondVerticalProofConfig.marketing.homeHero.primaryCopy.description)).toBeInTheDocument();
 
         for (const section of secondVerticalProofConfig.sections) {
-            expect(screen.getByRole('heading', { name: section.label })).toBeInTheDocument();
-            expect(screen.getByText(section.description)).toBeInTheDocument();
-            expect(screen.getByText(section.routePrefix)).toBeInTheDocument();
-            expect(screen.getByText(`${section.routePrefix}/:slug`)).toBeInTheDocument();
+            expect(screen.getAllByRole('heading', { name: section.label }).length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(section.description).length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(section.routePrefix).length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(`${section.routePrefix}/:slug`).length).toBeGreaterThanOrEqual(1);
         }
         expect(screen.getAllByText('Local products available')).toHaveLength(secondVerticalProofConfig.sections.length);
 
         const packIdentity = screen.getByRole('region', { name: 'Pack identity' });
         const packTaxonomy = screen.getByRole('region', { name: 'Pack taxonomy' });
         const packRouteManifest = screen.getByRole('region', { name: 'Pack route manifest' });
+        const sectionSimulation = screen.getByRole('region', { name: 'Local section route simulation' });
 
         expect(packIdentity).toBeInTheDocument();
         expect(packTaxonomy).toBeInTheDocument();
         expect(packRouteManifest).toBeInTheDocument();
+        expect(sectionSimulation).toBeInTheDocument();
         expect(within(packIdentity).getByText('Second Vertical Proof')).toBeInTheDocument();
         expect(within(packIdentity).getByText('Demo Families')).toBeInTheDocument();
         expect(within(packIdentity).getByText('Modular Organizer')).toBeInTheDocument();
@@ -49,6 +51,9 @@ describe('SecondVerticalProofFixture', () => {
                 'Attribute hint: demo-home / organizers: Material, Capacity, Finish',
             ),
         ).toBeInTheDocument();
+        expect(within(sectionSimulation).getByRole('heading', { name: 'Demo Home' })).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Section slug: demo-home')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Local products: 1')).toBeInTheDocument();
         expect(within(packRouteManifest).getByText('Root: /__qa/second-vertical-proof/demo-home')).toBeInTheDocument();
         expect(within(packRouteManifest).getByText('Pattern: /__qa/second-vertical-proof/demo-home/:slug')).toBeInTheDocument();
 
@@ -92,10 +97,10 @@ describe('SecondVerticalProofFixture', () => {
         expect(screen.getByText('Selected preview: Vape/420 Preview')).toBeInTheDocument();
 
         for (const section of vape420VerticalPackConfig.sections) {
-            expect(screen.getByRole('heading', { name: section.label })).toBeInTheDocument();
-            expect(screen.getByText(section.description)).toBeInTheDocument();
-            expect(screen.getByText(section.routePrefix)).toBeInTheDocument();
-            expect(screen.getByText(`${section.routePrefix}/:slug`)).toBeInTheDocument();
+            expect(screen.getAllByRole('heading', { name: section.label }).length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(section.description).length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(section.routePrefix).length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(`${section.routePrefix}/:slug`).length).toBeGreaterThanOrEqual(1);
         }
         expect(screen.getAllByText('No local products available')).toHaveLength(
             vape420VerticalPackConfig.sections.length,
@@ -110,6 +115,31 @@ describe('SecondVerticalProofFixture', () => {
         expect(screen.getByText('No local product list available for this preview.')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Second vertical proof' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Vape/420 preview' })).toBeInTheDocument();
+    });
+
+    it('simulates selected section routes from the selected preview model', () => {
+        renderFixture('/__qa/second-vertical-proof?section=demo-studio');
+
+        const sectionSimulation = screen.getByRole('region', { name: 'Local section route simulation' });
+
+        expect(within(sectionSimulation).getByRole('heading', { name: 'Demo Studio' })).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Section slug: demo-studio')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Root route: /__qa/second-vertical-proof/demo-studio')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Slug route: /__qa/second-vertical-proof/demo-studio/:slug')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Local products: 1')).toBeInTheDocument();
+    });
+
+    it('simulates section routes for the Vape/420 preview without local products', () => {
+        renderFixture('/__qa/second-vertical-proof?preview=vape-420-preview&section=420');
+
+        const sectionSimulation = screen.getByRole('region', { name: 'Local section route simulation' });
+
+        expect(within(sectionSimulation).getByRole('heading', { name: '420 Zone' })).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Section slug: 420')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Root route: /420')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Slug route: /420/:slug')).toBeInTheDocument();
+        expect(within(sectionSimulation).getByText('Local products: 0')).toBeInTheDocument();
+        expect(screen.getByText('No local product list available for this preview.')).toBeInTheDocument();
     });
 
     it('falls back to the default second vertical proof preview when the query is invalid', () => {
