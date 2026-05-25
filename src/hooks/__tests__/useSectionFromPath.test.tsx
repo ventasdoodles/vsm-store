@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
-import { getVape420SectionRouteManifest } from '@/config/productization';
+import { getVape420SectionRouteManifest, resolveSectionFromRouteManifest } from '@/config/productization';
 import { useSectionFromPath } from '../useSectionFromPath';
 
 function renderUseSectionFromPath(initialPath: string) {
@@ -45,5 +45,16 @@ describe('useSectionFromPath', () => {
             { path: '/vape/manifest-test-slug', section: 'vape' },
             { path: '/420/manifest-test-slug', section: '420' },
         ]);
+    });
+
+    it('keeps the binary path resolver aligned with the route manifest helper', () => {
+        expect(resolveSectionFromRouteManifest('/vape')).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug')).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/420')).toBe('420');
+        expect(resolveSectionFromRouteManifest('/420/manifest-test-slug')).toBe('420');
+        expect(resolveSectionFromRouteManifest('/not-a-section')).toBe('vape');
+        expect(
+            renderUseSectionFromPath('/not-a-section').result.current,
+        ).toBe(resolveSectionFromRouteManifest('/not-a-section'));
     });
 });

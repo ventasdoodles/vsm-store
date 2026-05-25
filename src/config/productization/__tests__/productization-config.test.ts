@@ -15,6 +15,7 @@ import {
     getVape420SpecKeyNormalization,
     getVape420SuggestedSpecs,
     normalizeVape420SpecKey,
+    resolveSectionFromRouteManifest,
     VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,
     vape420VerticalPackConfig,
     verticalPackAuthoringTemplate,
@@ -155,6 +156,11 @@ describe('productization config boundary', () => {
         expect(getVape420SectionRouteManifest().map((route) => route.rootRoute)).toEqual(
             vape420VerticalPackConfig.sections.map((section) => section.routePrefix),
         );
+        expect(resolveSectionFromRouteManifest('/vape')).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug')).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/420')).toBe('420');
+        expect(resolveSectionFromRouteManifest('/420/manifest-test-slug')).toBe('420');
+        expect(resolveSectionFromRouteManifest('/unmatched-route')).toBe('vape');
         expect(vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories).toEqual(expect.arrayContaining([
             expect.objectContaining({
                 id: '1',

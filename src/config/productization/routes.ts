@@ -1,4 +1,5 @@
 import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import type { Section } from '@/types/constants';
 
 export interface VerticalPackSectionRouteManifestItem {
     sectionSlug: string;
@@ -12,3 +13,13 @@ export const getVape420SectionRouteManifest = (): VerticalPackSectionRouteManife
         rootRoute: section.routePrefix,
         slugRoutePattern: `${section.routePrefix}/:slug`,
     }));
+
+export function resolveSectionFromRouteManifest(
+    pathname: string,
+    routeManifest: VerticalPackSectionRouteManifestItem[] = getVape420SectionRouteManifest(),
+): Section {
+    const normalizedPathname = pathname.trim();
+    const matchedRoute = routeManifest.find((route) => normalizedPathname.startsWith(route.rootRoute));
+
+    return (matchedRoute?.sectionSlug as Section) ?? 'vape';
+}
