@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { vape420VerticalPackConfig } from '@/config/productization';
+import { getStorefrontFeaturedCategoryFallbacks, getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
 import { FALLBACK_CATEGORIES } from '../category-showcase';
 
 const fallbackUrl = (path: string) => new URL(path, window.location.origin).toString();
 
 describe('category showcase constants public surface', () => {
     it('keeps fallback categories backed by the Vape/420 vertical pack', () => {
+        expect(FALLBACK_CATEGORIES).toEqual(getStorefrontFeaturedCategoryFallbacks());
+        expect(getStorefrontSettingsFallback().featured_categories).toEqual(FALLBACK_CATEGORIES);
         expect(FALLBACK_CATEGORIES).toEqual([
             {
                 id: '1',

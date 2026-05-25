@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { SITE_CONFIG } from '@/config/site';
-import { getStorefrontHeroSliderFallbacks, getStorefrontSettingsFallback } from '../storefrontSettingsFallback';
+import {
+    getStorefrontFeaturedCategoryFallbacks,
+    getStorefrontHeroSliderFallbacks,
+    getStorefrontSettingsFallback,
+} from '../storefrontSettingsFallback';
+
+const fallbackUrl = (path: string) => new URL(path, window.location.origin).toString();
 
 describe('storefront settings fallback', () => {
     it('preserves the current DB-empty store settings fallback contract', () => {
@@ -78,6 +84,45 @@ describe('storefront settings fallback', () => {
                 ctaLink: '/vape/liquidos',
                 active: true,
                 order: 3,
+            }),
+        ]);
+        expect(fallback.featured_categories).toEqual(getStorefrontFeaturedCategoryFallbacks());
+        expect(fallback.featured_categories).toEqual([
+            expect.objectContaining({
+                id: '1',
+                name: 'L\u00edquidos',
+                slug: 'liquidos',
+                section: 'vape',
+                iconName: 'Flame',
+                image: fallbackUrl('/images/storefront-fallbacks/category-liquidos.svg'),
+                presetId: 'orange-red',
+            }),
+            expect.objectContaining({
+                id: '2',
+                name: 'Pods & Mods',
+                slug: 'mods',
+                section: 'vape',
+                iconName: 'Box',
+                image: fallbackUrl('/images/storefront-fallbacks/category-pods.svg'),
+                presetId: 'blue-purple',
+            }),
+            expect.objectContaining({
+                id: '3',
+                name: 'Cannabis Premium',
+                slug: 'concentrados',
+                section: '420',
+                iconName: 'Leaf',
+                image: fallbackUrl('/images/storefront-fallbacks/category-cannabis.svg'),
+                presetId: 'green-emerald',
+            }),
+            expect.objectContaining({
+                id: '4',
+                name: 'Accesorios',
+                slug: 'accesorios-vape',
+                section: 'vape',
+                iconName: 'Zap',
+                image: fallbackUrl('/images/storefront-fallbacks/category-accesorios.svg'),
+                presetId: 'yellow-orange',
             }),
         ]);
     });
