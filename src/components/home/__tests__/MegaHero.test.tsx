@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -5,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MegaHero } from '../MegaHero';
 
 const useStoreSettingsMock = vi.hoisted(() => vi.fn());
+const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'MegaHero.tsx'), 'utf8');
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy(
@@ -96,5 +100,14 @@ describe('MegaHero national shipping copy', () => {
         fireEvent.click(screen.getByLabelText('Slide 3'));
         expect(screen.getByText('Más de 50 Sabores')).toBeInTheDocument();
         expect(screen.getByText('Ver Líquidos')).toBeInTheDocument();
+    });
+
+    it('imports home hero fallback leaf data without depending on the store settings composer', () => {
+        const source = readSource();
+
+        expect(source).toContain("from '@/constants/homeHero'");
+        expect(source).toContain('getHomeHeroSliderFallbacks');
+        expect(source).toContain('getHomeHeroFallbackImageUrl');
+        expect(source).not.toMatch(/from ['"]@\/config\/storefrontSettingsFallback['"]/);
     });
 });

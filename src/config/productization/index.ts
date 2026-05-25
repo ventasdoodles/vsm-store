@@ -10,6 +10,11 @@ export type {
 } from './types';
 export { vsmStoreTenantConfig } from './tenant';
 export { vape420VerticalPackConfig } from './vape420VerticalPack';
+export {
+    getVape420HomeHeroFallbackImageUrl,
+    getVape420HomeHeroPrimaryCopy,
+    getVape420HomeHeroSliderFallbacks,
+} from './homeHero';
 export { getVape420CategoryShowcaseFallbackCategories } from './categoryShowcase';
 export { getVape420SectionPageConfig } from './sectionPage';
 export { getVape420SectionPresentationConfig } from './sectionPage';

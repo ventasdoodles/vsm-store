@@ -1,4 +1,8 @@
-import { vape420VerticalPackConfig } from '@/config/productization';
+import {
+    getVape420HomeHeroFallbackImageUrl,
+    getVape420HomeHeroPrimaryCopy,
+    getVape420HomeHeroSliderFallbacks,
+} from '@/config/productization/homeHero';
 import type { HomeHeroMarketingCopy } from '@/config/productization/types';
 
 export interface HomeHeroCopy extends HomeHeroMarketingCopy {
@@ -8,7 +12,9 @@ export interface HomeHeroCopy extends HomeHeroMarketingCopy {
     tag: string;
 }
 
-export const NATIONAL_HOME_HERO_COPY: HomeHeroCopy = vape420VerticalPackConfig.marketing.homeHero.primaryCopy;
+export const NATIONAL_HOME_HERO_COPY: HomeHeroCopy = getVape420HomeHeroPrimaryCopy();
+export const getHomeHeroSliderFallbacks = getVape420HomeHeroSliderFallbacks;
+export const getHomeHeroFallbackImageUrl = getVape420HomeHeroFallbackImageUrl;
 
 type HomeHeroSlideLike = Pick<HomeHeroCopy, 'title' | 'subtitle' | 'description' | 'tag'>;
 

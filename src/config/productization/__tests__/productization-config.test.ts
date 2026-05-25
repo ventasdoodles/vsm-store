@@ -27,6 +27,7 @@ import {
     vsmStoreTenantConfig,
 } from '..';
 import { getVape420CategoryShowcaseFallbackImageUrl } from '../categoryShowcase';
+import { getVape420HomeHeroFallbackImageUrl, getVape420HomeHeroSliderFallbacks } from '../homeHero';
 
 const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
 
@@ -36,6 +37,7 @@ const readProductizationImports = () =>
         'tenant.ts',
         'types.ts',
         'vape420VerticalPack.ts',
+        'homeHero.ts',
         'categoryShowcase.ts',
         'sectionPage.ts',
         'routes.ts',
@@ -249,6 +251,29 @@ describe('productization config boundary', () => {
             tag: 'Envíos Nacionales',
         });
         expect(NATIONAL_HOME_HERO_COPY).toEqual(vape420VerticalPackConfig.marketing.homeHero.primaryCopy);
+        expect(getVape420HomeHeroSliderFallbacks()).toEqual([
+            expect.objectContaining({
+                id: '1',
+                title: 'Vapes y 420',
+                image: '/images/storefront-fallbacks/hero-vape.svg',
+                ctaLink: '/vape',
+            }),
+            expect.objectContaining({
+                id: '2',
+                title: 'Productos Premium 420',
+                image: '/images/storefront-fallbacks/hero-extracts.svg',
+                ctaLink: '/420',
+            }),
+            expect.objectContaining({
+                id: '3',
+                title: 'Más de 50 Sabores',
+                image: '/images/storefront-fallbacks/hero-generic.svg',
+                ctaLink: '/vape/liquidos',
+            }),
+        ]);
+        expect(getVape420HomeHeroFallbackImageUrl('/images/storefront-fallbacks/hero-vape.svg')).toBe(
+            new URL('/images/storefront-fallbacks/hero-vape.svg', window.location.origin).toString(),
+        );
         expect(getVape420CategoryShowcaseFallbackCategories()).toBe(
             vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories,
         );

@@ -1,55 +1,16 @@
 import { STORE_SETTINGS_ID } from '@/constants/app';
-import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { SITE_CONFIG } from '@/config/site';
 import {
     getVape420CategoryShowcaseFallbackCategories,
     getVape420CategoryShowcaseFallbackImageUrl,
 } from '@/config/productization/categoryShowcase';
+import { getVape420HomeHeroSliderFallbacks } from '@/config/productization/homeHero';
 import type { StoreSettings } from '@/services';
 
 type StorefrontHeroSliderFallback = NonNullable<StoreSettings['hero_sliders']>[number];
 type StorefrontFeaturedCategoryFallback = NonNullable<StoreSettings['featured_categories']>[number];
 
-const STORE_FRONT_HERO_SLIDER_FALLBACKS: StorefrontHeroSliderFallback[] = [
-    {
-        id: '1',
-        title: NATIONAL_HOME_HERO_COPY.title,
-        subtitle: NATIONAL_HOME_HERO_COPY.subtitle,
-        description: NATIONAL_HOME_HERO_COPY.description,
-        tag: NATIONAL_HOME_HERO_COPY.tag,
-        image: '/images/storefront-fallbacks/hero-vape.svg',
-        ctaText: 'Compra Ahora',
-        ctaLink: '/vape',
-        bgGradient: 'from-violet-900 via-fuchsia-900 to-purple-900',
-        bgGradientLight: 'from-violet-500 via-fuchsia-500 to-purple-600',
-        active: true,
-        order: 1,
-    },
-    {
-        id: '2',
-        title: 'Productos Premium 420',
-        subtitle: 'La mejor selección de productos importados directamente para ti',
-        image: '/images/storefront-fallbacks/hero-extracts.svg',
-        ctaText: 'Explorar 420',
-        ctaLink: '/420',
-        bgGradient: 'from-emerald-900 via-green-900 to-teal-900',
-        bgGradientLight: 'from-emerald-500 via-green-500 to-teal-600',
-        active: true,
-        order: 2,
-    },
-    {
-        id: '3',
-        title: 'Más de 50 Sabores',
-        subtitle: 'Encuentra tu favorito entre nuestra amplia variedad de líquidos',
-        image: '/images/storefront-fallbacks/hero-generic.svg',
-        ctaText: 'Ver Líquidos',
-        ctaLink: '/vape/liquidos',
-        bgGradient: 'from-blue-900 via-indigo-900 to-slate-900',
-        bgGradientLight: 'from-blue-500 via-indigo-500 to-slate-600',
-        active: true,
-        order: 3,
-    },
-];
+const STORE_FRONT_HERO_SLIDER_FALLBACKS: StorefrontHeroSliderFallback[] = getVape420HomeHeroSliderFallbacks();
 
 export function getStorefrontHeroSliderFallbacks(): StorefrontHeroSliderFallback[] {
     return STORE_FRONT_HERO_SLIDER_FALLBACKS;

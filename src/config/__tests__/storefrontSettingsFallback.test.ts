@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { SITE_CONFIG } from '@/config/site';
+import { getVape420HomeHeroSliderFallbacks } from '@/config/productization/homeHero';
 import {
     getStorefrontFeaturedCategoryFallbacks,
     getStorefrontHeroSliderFallbacks,
@@ -58,6 +59,7 @@ describe('storefront settings fallback', () => {
         const fallback = getStorefrontSettingsFallback();
 
         expect(fallback.hero_sliders).toEqual(getStorefrontHeroSliderFallbacks());
+        expect(fallback.hero_sliders).toBe(getVape420HomeHeroSliderFallbacks());
         expect(fallback.hero_sliders).toEqual([
             expect.objectContaining({
                 id: '1',
@@ -136,6 +138,8 @@ describe('storefront settings fallback', () => {
 
         expect(source).toContain("from '@/config/productization/categoryShowcase'");
         expect(source).toContain('getVape420CategoryShowcaseFallbackImageUrl');
+        expect(source).toContain("from '@/config/productization/homeHero'");
         expect(source).not.toMatch(/from ['"]@\/config\/productization['"]/);
+        expect(source).not.toMatch(/from ['"]@\/constants\/homeHero['"]/);
     });
 });

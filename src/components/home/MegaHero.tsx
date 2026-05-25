@@ -12,10 +12,14 @@ import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNeuralHero } from '@/hooks/useNeuralHero';
-import { getStorefrontHeroSliderFallbacks } from '@/config/storefrontSettingsFallback';
 import { MagneticButton } from '@/components/ui/MagneticButton';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { NATIONAL_HOME_HERO_COPY, normalizeHomeHeroSlide } from '@/constants/homeHero';
+import {
+    getHomeHeroFallbackImageUrl,
+    getHomeHeroSliderFallbacks,
+    NATIONAL_HOME_HERO_COPY,
+    normalizeHomeHeroSlide,
+} from '@/constants/homeHero';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 import type { HeroSlider } from '@/services';
 import type { PresetGradient } from '@/constants/slider';
@@ -36,10 +40,7 @@ interface ActiveSlide {
     preset: PresetGradient;
 }
 
-const storefrontFallbackImage = (path: string) =>
-    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
-
-const HERO_GENERIC_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-generic.svg');
+const HERO_GENERIC_FALLBACK_IMAGE = getHomeHeroFallbackImageUrl('/images/storefront-fallbacks/hero-generic.svg');
 
 export const NATIONAL_HERO_TITLE = NATIONAL_HOME_HERO_COPY.title;
 export const NATIONAL_HERO_SUBTITLE = NATIONAL_HOME_HERO_COPY.subtitle;
@@ -54,7 +55,7 @@ const mapHeroSliderToActiveSlide = (slider: HeroSlider): ActiveSlide => {
         title: slider.title,
         subtitle: slider.subtitle,
         description: slider.description || '',
-        image: slider.image ? storefrontFallbackImage(slider.image) : HERO_GENERIC_FALLBACK_IMAGE,
+        image: slider.image ? getHomeHeroFallbackImageUrl(slider.image) : HERO_GENERIC_FALLBACK_IMAGE,
         ctaText: slider.ctaText,
         ctaLink: slider.ctaLink,
         tag: slider.tag || 'Destacado',
@@ -62,7 +63,7 @@ const mapHeroSliderToActiveSlide = (slider: HeroSlider): ActiveSlide => {
     };
 };
 
-const FALLBACK_SLIDES: ActiveSlide[] = getStorefrontHeroSliderFallbacks()
+const FALLBACK_SLIDES: ActiveSlide[] = getHomeHeroSliderFallbacks()
     .map(mapHeroSliderToActiveSlide)
     .map(normalizeHomeHeroSlide);
 
