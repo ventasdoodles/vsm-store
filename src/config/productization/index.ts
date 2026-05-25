@@ -21,8 +21,8 @@ export {
     buildStorefrontFeaturedCategoryFallbacks,
     buildStorefrontHeroSliderFallbacks,
 } from './storefrontFallbacks';
-export { getVape420SectionPageConfig } from './sectionPage';
-export { getVape420SectionPresentationConfig } from './sectionPage';
+export { getVape420SectionPageConfig } from './sectionPresentation';
+export { getVape420SectionPresentationConfig } from './sectionPresentation';
 export { getVape420ProductSurfacePresentationConfig } from './productSurface';
 export { getVape420ProductDetailPresentationConfig } from './productDetail';
 export { getVape420StorefrontRenderabilityConfig } from './storefrontRenderability';

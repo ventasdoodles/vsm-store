@@ -1,5 +1,5 @@
 import type { Section } from '@/types/constants';
-import { getVape420SectionPresentationConfig } from './sectionPage';
+import { getVape420SectionPresentationConfig } from './sectionPresentation';
 
 export interface ProductSurfaceProductizationConfig {
     slug: Section;

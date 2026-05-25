@@ -40,6 +40,7 @@ const readProductizationImports = () =>
         'vape420VerticalPack.ts',
         'homeHero.ts',
         'categoryShowcase.ts',
+        'sectionPresentation.ts',
         'sectionPage.ts',
         'routes.ts',
         'specs.ts',
