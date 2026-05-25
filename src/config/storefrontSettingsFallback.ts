@@ -2,30 +2,27 @@ import { STORE_SETTINGS_ID } from '@/constants/app';
 import { SITE_CONFIG } from '@/config/site';
 import {
     getVape420CategoryShowcaseFallbackCategories,
-    getVape420CategoryShowcaseFallbackImageUrl,
 } from '@/config/productization/categoryShowcase';
 import { getVape420HomeHeroSliderFallbacks } from '@/config/productization/homeHero';
+import {
+    buildStorefrontFeaturedCategoryFallbacks,
+    buildStorefrontHeroSliderFallbacks,
+} from '@/config/productization/storefrontFallbacks';
 import type { StoreSettings } from '@/services';
 
 type StorefrontHeroSliderFallback = NonNullable<StoreSettings['hero_sliders']>[number];
 type StorefrontFeaturedCategoryFallback = NonNullable<StoreSettings['featured_categories']>[number];
 
-const STORE_FRONT_HERO_SLIDER_FALLBACKS: StorefrontHeroSliderFallback[] = getVape420HomeHeroSliderFallbacks();
+const STORE_FRONT_HERO_SLIDER_FALLBACKS = buildStorefrontHeroSliderFallbacks(
+    getVape420HomeHeroSliderFallbacks(),
+);
 
 export function getStorefrontHeroSliderFallbacks(): StorefrontHeroSliderFallback[] {
     return STORE_FRONT_HERO_SLIDER_FALLBACKS;
 }
 
-const STORE_FRONT_FEATURED_CATEGORY_FALLBACKS: StorefrontFeaturedCategoryFallback[] = getVape420CategoryShowcaseFallbackCategories().map(
-    (category) => ({
-        id: category.id,
-        name: category.name,
-        slug: category.slug,
-        section: category.sectionSlug as StorefrontFeaturedCategoryFallback['section'],
-        iconName: category.iconName,
-        image: getVape420CategoryShowcaseFallbackImageUrl(category.fallbackImagePath),
-        presetId: category.presetId,
-    }),
+const STORE_FRONT_FEATURED_CATEGORY_FALLBACKS = buildStorefrontFeaturedCategoryFallbacks(
+    getVape420CategoryShowcaseFallbackCategories(),
 );
 
 export function getStorefrontFeaturedCategoryFallbacks(): StorefrontFeaturedCategoryFallback[] {

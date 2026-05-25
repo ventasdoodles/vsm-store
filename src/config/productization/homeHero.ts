@@ -1,4 +1,5 @@
 import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import { getStorefrontFallbackImageUrl } from './storefrontFallbacks';
 
 export interface HomeHeroSliderFallbackConfig {
     id: string;
@@ -62,5 +63,4 @@ export const getVape420HomeHeroPrimaryCopy = () =>
 export const getVape420HomeHeroSliderFallbacks = () =>
     VAPE420_HOME_HERO_SLIDER_FALLBACKS;
 
-export const getVape420HomeHeroFallbackImageUrl = (path: string) =>
-    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
+export const getVape420HomeHeroFallbackImageUrl = getStorefrontFallbackImageUrl;

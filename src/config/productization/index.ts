@@ -16,6 +16,11 @@ export {
     getVape420HomeHeroSliderFallbacks,
 } from './homeHero';
 export { getVape420CategoryShowcaseFallbackCategories } from './categoryShowcase';
+export {
+    getStorefrontFallbackImageUrl,
+    buildStorefrontFeaturedCategoryFallbacks,
+    buildStorefrontHeroSliderFallbacks,
+} from './storefrontFallbacks';
 export { getVape420SectionPageConfig } from './sectionPage';
 export { getVape420SectionPresentationConfig } from './sectionPage';
 export { getVape420ProductSurfacePresentationConfig } from './productSurface';
