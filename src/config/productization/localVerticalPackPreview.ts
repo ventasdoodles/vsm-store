@@ -1,6 +1,14 @@
 import { vape420VerticalPackConfig } from './vape420VerticalPack';
 import { secondVerticalProofConfig } from './secondVerticalProof';
 import { secondVerticalProofProducts, type SecondVerticalProofProduct } from './secondVerticalProofFixtures';
+import {
+    buildVerticalPackReadModel,
+    buildVerticalPackRouteManifest,
+    resolveVerticalPackSection,
+    type VerticalPackRouteManifestItem,
+    type VerticalPackSectionReadModel,
+    type VerticalPackSectionProductGroup,
+} from './verticalPackReadModel';
 import type { CategoryTaxonomyHint, ProductAttributeHint, VerticalPackConfig } from './types';
 
 export interface LocalVerticalPackPreview {
@@ -17,16 +25,7 @@ export interface LocalVerticalPackPreview {
     products: SecondVerticalProofProduct[];
 }
 
-export interface LocalVerticalPackPreviewSectionViewModel {
-    slug: string;
-    label: string;
-    shortLabel: string;
-    routePrefix: string;
-    description: string;
-    slugRoutePattern: string;
-    hasLocalProducts: boolean;
-    localProductCount: number;
-}
+export interface LocalVerticalPackPreviewSectionViewModel extends VerticalPackSectionReadModel {}
 
 export interface LocalVerticalPackPreviewViewModel {
     previewKey: LocalVerticalPackPreviewKey;
@@ -43,13 +42,7 @@ export interface LocalVerticalPackPreviewViewModel {
     products: SecondVerticalProofProduct[];
     productsBySectionSlug: Record<string, SecondVerticalProofProduct[]>;
     hasLocalProducts: boolean;
-}
-
-export interface LocalVerticalPackPreviewSectionProductGroup {
-    section: LocalVerticalPackPreviewSectionViewModel;
-    products: SecondVerticalProofProduct[];
-    productCount: number;
-    hasLocalProducts: boolean;
+    sectionProductGroups: VerticalPackSectionProductGroup<SecondVerticalProofProduct>[];
 }
 
 export interface LocalVerticalPackPreviewShellViewModel {
@@ -58,25 +51,12 @@ export interface LocalVerticalPackPreviewShellViewModel {
     activeSectionProducts: SecondVerticalProofProduct[];
     activeSectionProductCount: number;
     activeSectionHasLocalProducts: boolean;
-    sectionProductGroups: LocalVerticalPackPreviewSectionProductGroup[];
-}
-
-export interface LocalVerticalPackPreviewRouteManifestItem {
-    sectionSlug: string;
-    rootRoute: string;
-    slugRoutePattern: string;
+    sectionProductGroups: VerticalPackSectionProductGroup<SecondVerticalProofProduct>[];
 }
 
 export type LocalVerticalPackPreviewKey = 'second-vertical-proof' | 'vape-420-preview';
 
-const buildLocalVerticalPackRouteManifest = (
-    pack: VerticalPackConfig,
-): LocalVerticalPackPreviewRouteManifestItem[] =>
-    pack.sections.map((section) => ({
-        sectionSlug: section.slug,
-        rootRoute: section.routePrefix,
-        slugRoutePattern: `${section.routePrefix}/:slug`,
-    }));
+export type LocalVerticalPackPreviewRouteManifestItem = VerticalPackRouteManifestItem;
 
 const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
     {
@@ -92,7 +72,7 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
             'Runtime multi-tenant behavior, DB-backed portability, or production readiness',
         ],
         pack: secondVerticalProofConfig,
-        routeManifest: buildLocalVerticalPackRouteManifest(secondVerticalProofConfig),
+        routeManifest: buildVerticalPackRouteManifest(secondVerticalProofConfig),
         categoryTaxonomyHints: secondVerticalProofConfig.categoryTaxonomyHints,
         productAttributeHints: secondVerticalProofConfig.productAttributeHints,
         demoProductFamilies: secondVerticalProofConfig.fixtureMetadata.demoProductFamilies,
@@ -111,7 +91,7 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
             'Runtime multi-tenant behavior, DB-backed portability, or production readiness',
         ],
         pack: vape420VerticalPackConfig,
-        routeManifest: buildLocalVerticalPackRouteManifest(vape420VerticalPackConfig),
+        routeManifest: buildVerticalPackRouteManifest(vape420VerticalPackConfig),
         categoryTaxonomyHints: vape420VerticalPackConfig.categoryTaxonomyHints,
         productAttributeHints: vape420VerticalPackConfig.productAttributeHints,
         demoProductFamilies: vape420VerticalPackConfig.fixtureMetadata.demoProductFamilies,
@@ -122,13 +102,7 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
 export function buildLocalVerticalPackPreviewViewModel(
     preview: LocalVerticalPackPreview,
 ): LocalVerticalPackPreviewViewModel {
-    const productsBySectionSlug = preview.pack.sections.reduce<Record<string, SecondVerticalProofProduct[]>>(
-        (accumulator, section) => {
-            accumulator[section.slug] = preview.products.filter((product) => product.sectionSlug === section.slug);
-            return accumulator;
-        },
-        {},
-    );
+    const readModel = buildVerticalPackReadModel(preview.pack, preview.products);
 
     return {
         previewKey: preview.previewKey,
@@ -137,24 +111,15 @@ export function buildLocalVerticalPackPreviewViewModel(
         proves: preview.proves,
         doesNotProve: preview.doesNotProve,
         pack: preview.pack,
-        sections: preview.pack.sections.map((section) => ({
-            ...section,
-            slug: section.slug,
-            label: section.label,
-            shortLabel: section.shortLabel,
-            routePrefix: section.routePrefix,
-            description: section.description,
-            slugRoutePattern: `${section.routePrefix}/:slug`,
-            hasLocalProducts: (productsBySectionSlug[section.slug] ?? []).length > 0,
-            localProductCount: productsBySectionSlug[section.slug]?.length ?? 0,
-        })),
-        routeManifest: preview.routeManifest,
+        sections: readModel.sections,
+        routeManifest: readModel.routeManifest,
         categoryTaxonomyHints: preview.categoryTaxonomyHints,
         productAttributeHints: preview.productAttributeHints,
         demoProductFamilies: preview.demoProductFamilies,
         products: preview.products,
-        productsBySectionSlug,
-        hasLocalProducts: preview.products.length > 0,
+        productsBySectionSlug: readModel.productsBySectionSlug,
+        hasLocalProducts: readModel.hasLocalProducts,
+        sectionProductGroups: readModel.sectionProductGroups,
     };
 }
 
@@ -167,16 +132,6 @@ export function buildLocalVerticalPackPreviewShellViewModel(
         resolveLocalVerticalPackPreviewSection(previewViewModel, sectionRouteOrSlug) ??
         previewViewModel.sections[0] ??
         null;
-    const sectionProductGroups = previewViewModel.sections.map((section) => {
-        const products = previewViewModel.productsBySectionSlug[section.slug] ?? [];
-
-        return {
-            section,
-            products,
-            productCount: products.length,
-            hasLocalProducts: products.length > 0,
-        };
-    });
 
     return {
         preview: previewViewModel,
@@ -188,7 +143,7 @@ export function buildLocalVerticalPackPreviewShellViewModel(
         activeSectionHasLocalProducts: activeSection
             ? (previewViewModel.productsBySectionSlug[activeSection.slug]?.length ?? 0) > 0
             : false,
-        sectionProductGroups,
+        sectionProductGroups: previewViewModel.sectionProductGroups,
     };
 }
 
@@ -196,18 +151,7 @@ export function resolveLocalVerticalPackPreviewSection(
     viewModel: LocalVerticalPackPreviewViewModel,
     sectionRouteOrSlug: string | null | undefined,
 ): LocalVerticalPackPreviewSectionViewModel | null {
-    const normalizedSectionRouteOrSlug = sectionRouteOrSlug?.trim();
-
-    if (!normalizedSectionRouteOrSlug) {
-        return null;
-    }
-
-    return viewModel.sections.find(
-        (section) =>
-            normalizedSectionRouteOrSlug === section.slug ||
-            normalizedSectionRouteOrSlug === section.routePrefix ||
-            normalizedSectionRouteOrSlug.startsWith(`${section.routePrefix}/`),
-    ) ?? null;
+    return resolveVerticalPackSection(viewModel.sections, sectionRouteOrSlug);
 }
 
 export function resolveLocalVerticalPackPreviewByRoutePrefix(routePrefix: string): LocalVerticalPackPreview | null {

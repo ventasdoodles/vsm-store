@@ -58,6 +58,7 @@ describe('localVerticalPackPreview', () => {
         expect(viewModel.hasLocalProducts).toBe(true);
         expect(viewModel.sections.map((section) => section.hasLocalProducts)).toEqual([true, true]);
         expect(viewModel.sections.map((section) => section.localProductCount)).toEqual([1, 1]);
+        expect(viewModel.sectionProductGroups.map((group) => group.productCount)).toEqual([1, 1]);
         expect(viewModel.sections.map((section) => section.slugRoutePattern)).toEqual([
             '/__qa/second-vertical-proof/demo-home/:slug',
             '/__qa/second-vertical-proof/demo-studio/:slug',
@@ -122,6 +123,7 @@ describe('localVerticalPackPreview', () => {
         expect(viewModel.hasLocalProducts).toBe(false);
         expect(viewModel.sections.map((section) => section.hasLocalProducts)).toEqual([false, false]);
         expect(viewModel.sections.map((section) => section.localProductCount)).toEqual([0, 0]);
+        expect(viewModel.sectionProductGroups.map((group) => group.productCount)).toEqual([0, 0]);
         expect(viewModel.sections.map((section) => section.slugRoutePattern)).toEqual([
             '/vape/:slug',
             '/420/:slug',

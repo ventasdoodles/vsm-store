@@ -6,6 +6,7 @@ import { SITE_CONFIG } from '@/config/site';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { STORE_META_COPY } from '@/constants/storeMeta';
 import {
+    buildVerticalPackRouteManifest,
     assertValidVerticalPackContract,
     defineVerticalPack,
     getVape420CategoryShowcaseFallbackCategories,
@@ -84,6 +85,7 @@ describe('productization config boundary', () => {
 
     it('keeps Vape/420 taxonomy and specs in the vertical pack', () => {
         expect(() => assertValidVerticalPackContract(vape420VerticalPackConfig)).not.toThrow();
+        expect(getVape420SectionRouteManifest()).toEqual(buildVerticalPackRouteManifest(vape420VerticalPackConfig));
         expect(vape420VerticalPackConfig.sections.map((section) => section.slug)).toEqual(['vape', '420']);
         expect(getVape420SectionPageConfig('vape')).toEqual(
             expect.objectContaining({
