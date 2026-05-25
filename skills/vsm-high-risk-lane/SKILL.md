@@ -25,6 +25,10 @@ Use when the user asks to scope, plan, or prepare work involving any HIGH-risk s
 
 Do not use this Skill to run the high-risk action. Use it to classify, bound, phase, and produce the next exact prompt only when the lane is explicitly authorized and safe to advance.
 
+Local or pre-prod environments do not make these surfaces low-risk. If the prompt involves auth, Supabase, deploy, provider, payment, Product Search, Cesarin runtime, or any live/live-adjacent boundary, keep using this skill even when the target is dummy data or a reversible mutation.
+
+If the prompt is only local/pre-prod browser or admin QA with no high-risk surface, prefer `skills/vsm-real-system-qa/SKILL.md` instead. If the prompt is for controlled live smoke or monitored rollout, prefer `skills/vsm-controlled-rollout/SKILL.md` or this skill depending on the exact boundary.
+
 ## Operator Output Mode
 
 Default to full operator output for HIGH-risk lanes.
@@ -97,6 +101,21 @@ Classify as `HIGH` if any of these are in scope:
 - provider/Gemini calls, model diagnostics, quotas, embeddings, or live API behavior;
 - production smoke/live smoke;
 - browser work against authenticated or production surfaces with private data risk.
+
+Risk is still HIGH when the work is local or pre-prod but the prompt authorizes or requires:
+
+- auth/session handling;
+- Supabase reads or writes;
+- provider or external API calls;
+- live or controlled-live smoke;
+- payment or checkout semantics;
+- Product Search, Cesarin runtime, or PII-adjacent flows.
+
+Treat local/pre-prod dummy or reversible actions as scoped evidence, not as a downgrade to LOW risk.
+
+Treat controlled live before daily customers as a distinct high-risk phase with explicit monitoring and rollback.
+
+Treat production with daily customers as the highest caution context. Prefer minimal, bounded, rollback-ready changes and avoid exploratory work.
 
 Local source/test changes around these surfaces remain HIGH unless the prompt explicitly narrows them and no live/system interaction occurs. A high-risk lane procedure never makes the work low-risk.
 

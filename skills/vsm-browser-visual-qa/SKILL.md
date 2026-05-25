@@ -23,6 +23,14 @@ Use when the user asks to:
 
 Do not use this Skill to authorize browser QA when the current prompt forbids it or does not clearly permit it.
 
+For practical local or pre-prod QA, this skill may be used when the prompt explicitly authorizes:
+
+- a local browser session against the current app or admin surfaces;
+- a user-present manual login through the normal UI;
+- existing authenticated browser state that the prompt allows using;
+- dummy data, seeded data, or reversible local/pre-prod mutations;
+- screenshot or DOM evidence of the exact routes named by the prompt.
+
 ## Operator Output Mode
 
 Default to compact operator output for LOW and MEDIUM risk visual QA.
@@ -96,13 +104,15 @@ Do not convert one evidence type into another. Local fixture evidence is not pro
 2. Confirm no forbidden high-risk surface is required.
 3. Start or use the authorized target only. For local Vite, use process-local dummy public env placeholders only when authorized; do not write `.env`.
 4. Navigate to the exact target URL/path. Avoid broad browsing or guessed route sweeps unless explicitly authorized.
-5. Wait for the page or target surface to load.
-6. Check expected visible content, nonblank state, key UI surfaces, target interactions, and viewport-specific behavior.
-7. Check for obvious overlap, clipping, hidden critical content, horizontal overflow, broken layout, or modal/scroll issues.
-8. Use only authorized viewports. Common local visual QA viewports are desktop `1280x720` and mobile `390x844` when specified.
-9. Capture screenshots only when required or when screenshot proof is part of the success condition.
-10. Stop on login, MFA, missing authorization, native-host/plugin blockers, secret exposure risk, unexpected data exposure, or target data absence.
-11. Report evidence classification, claims supported, non-claims, and residual risks.
+5. If the prompt allows manual login and the user is present, use the normal UI only; do not inspect secrets or storage.
+6. Wait for the page or target surface to load.
+7. Check expected visible content, nonblank state, key UI surfaces, target interactions, and viewport-specific behavior.
+8. Check for obvious overlap, clipping, hidden critical content, horizontal overflow, broken layout, or modal/scroll issues.
+9. Use only authorized viewports. Common local visual QA viewports are desktop `1280x720` and mobile `390x844` when specified.
+10. Capture screenshots only when required or when screenshot proof is part of the success condition.
+11. If the prompt authorizes a dummy or reversible local/pre-prod mutation, keep it inside that boundary and document the rollback path.
+12. Stop on login, MFA, missing authorization, native-host/plugin blockers, secret exposure risk, unexpected data exposure, or target data absence.
+13. Report evidence classification, claims supported, non-claims, and residual risks.
 
 ## Screenshot Policy
 

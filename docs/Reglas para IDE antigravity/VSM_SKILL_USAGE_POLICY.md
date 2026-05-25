@@ -189,9 +189,10 @@ No ejecuta high-risk work por si misma, no inspecciona secretos/sesion/storage p
 
 ### Practical real-system QA and controlled rollout guidance
 
-- `vsm-browser-visual-qa` puede usarse para evidence local/pre-prod browser cuando el prompt lo autoriza de forma explicita.
+- `vsm-real-system-qa` puede usarse para evidence practica local, pre-prod y read-only live cuando el prompt lo autoriza de forma explicita.
+- `vsm-controlled-rollout` puede usarse para controlled live smoke, gating y monitored stabilization cuando el prompt ya autoriza ese paso.
+- `vsm-browser-visual-qa` sigue siendo la procedure para browser visual QA, incluyendo sesiones locales, pre-prod o authenticated existentes cuando el prompt lo autoriza.
 - `vsm-high-risk-lane` sigue siendo la procedure correcta para auth, Supabase, deploy, provider, payment, Product Search, Cesarin runtime y live/high-risk scoping.
-- Este work-kit puede justificar en el futuro procedures separadas como `vsm-real-system-qa` y `vsm-controlled-rollout`, pero no se crean en este batch.
 - Las skills siguen siendo procedurales, no authoritarias; no expanden autorizacion por si mismas.
 
 ---

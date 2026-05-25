@@ -497,3 +497,74 @@ Success condition:
 If the current prompt explicitly prohibits commit/push or a blocker prevents it, report that blocker instead of claiming completion.
 
 For pre-planned execution blocks, include a short `NEXT LANE RECOMMENDATION` trailer when the accepted lane changes continuation risk.
+
+---
+
+## K. TEMPLATE - USE REPO PROCEDURE: skills/vsm-real-system-qa/SKILL.md
+[TITULO]
+
+STRICT MODE.
+USE REPO PROCEDURE: skills/vsm-real-system-qa/SKILL.md.
+REAL-SYSTEM QA ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[probar evidencia real-system concreta sin sobreclaim]
+
+Scope:
+[rutas, flows, ambiente, dummy data, read-only DB, local/pre-prod reversible mutation si aplica]
+
+Forbidden actions:
+[secret/token/session inspection, deploy, production mutation, provider calls, acceptance, canonization, other forbidden surfaces]
+
+Evidence expectations:
+- explicit environment target
+- explicit evidence ladder
+- local/pre-prod evidence vs live evidence separated
+- dummy/reversible actions only when authorized
+- secret hygiene and rollback discipline
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+[evidence bounded, claims precise, blockers explicit]
+
+---
+
+## L. TEMPLATE - USE REPO PROCEDURE: skills/vsm-controlled-rollout/SKILL.md
+[TITULO]
+
+STRICT MODE.
+USE REPO PROCEDURE: skills/vsm-controlled-rollout/SKILL.md.
+CONTROLLED ROLLOUT ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[definir o ejecutar un rollout controlado y monitored stabilization]
+
+Scope:
+[release set, environment, observation window, rollback boundary]
+
+Forbidden actions:
+[secret/token/session inspection, uncontrolled rollout, production mutation outside scope, provider calls, other forbidden surfaces]
+
+Evidence expectations:
+- rollout gate
+- observation window
+- rollback readiness
+- clear distinction between pre-prod, controlled live before daily customers, and production with daily customers
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+[rollout proof is bounded, monitored, and non-claim preserving]
