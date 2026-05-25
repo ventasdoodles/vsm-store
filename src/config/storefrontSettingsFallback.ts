@@ -1,7 +1,7 @@
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
 import { SITE_CONFIG } from '@/config/site';
-import { getVape420CategoryShowcaseFallbackCategories } from '@/config/productization';
+import { getVape420CategoryShowcaseFallbackCategories } from '@/config/productization/categoryShowcase';
 import type { StoreSettings } from '@/services';
 
 type StorefrontHeroSliderFallback = NonNullable<StoreSettings['hero_sliders']>[number];

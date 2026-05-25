@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
@@ -9,6 +12,7 @@ import {
 } from '../storefrontSettingsFallback';
 
 const fallbackUrl = (path: string) => new URL(path, window.location.origin).toString();
+const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'storefrontSettingsFallback.ts'), 'utf8');
 
 describe('storefront settings fallback', () => {
     it('preserves the current DB-empty store settings fallback contract', () => {
@@ -125,5 +129,12 @@ describe('storefront settings fallback', () => {
                 presetId: 'yellow-orange',
             }),
         ]);
+    });
+
+    it('imports the shared category fallback leaf directly instead of the productization barrel', () => {
+        const source = readSource();
+
+        expect(source).toContain("from '@/config/productization/categoryShowcase'");
+        expect(source).not.toMatch(/from ['"]@\/config\/productization['"]/);
     });
 });

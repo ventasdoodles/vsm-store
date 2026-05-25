@@ -1,9 +1,13 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { vape420VerticalPackConfig } from '@/config/productization';
 import { getStorefrontFeaturedCategoryFallbacks, getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
 import { FALLBACK_CATEGORIES } from '../category-showcase';
 
 const fallbackUrl = (path: string) => new URL(path, window.location.origin).toString();
+const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'category-showcase.ts'), 'utf8');
 
 describe('category showcase constants public surface', () => {
     it('keeps fallback categories backed by the Vape/420 vertical pack', () => {
@@ -50,5 +54,12 @@ describe('category showcase constants public surface', () => {
         expect(vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories.map((category) => category.slug)).toEqual(
             FALLBACK_CATEGORIES.map((category) => category.slug),
         );
+    });
+
+    it('imports the shared category fallback leaf directly instead of the storefront settings helper', () => {
+        const source = readSource();
+
+        expect(source).toContain("from '@/config/productization/categoryShowcase'");
+        expect(source).not.toMatch(/from ['"]@\/config\/storefrontSettingsFallback['"]/);
     });
 });

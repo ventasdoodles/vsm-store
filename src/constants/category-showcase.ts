@@ -1,5 +1,5 @@
 import { LucideIcon, Flame, Box, Leaf, Zap, Droplets, Sparkles, Wind, Gift, Ghost, Asterisk, Coffee, Flower2 } from 'lucide-react';
-import { getStorefrontFeaturedCategoryFallbacks } from '@/config/storefrontSettingsFallback';
+import { getVape420CategoryShowcaseFallbackCategories } from '@/config/productization/categoryShowcase';
 import type { FeaturedCategory } from '@/services';
 
 /**
@@ -41,4 +41,16 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
     Flower2,
 };
 
-export const FALLBACK_CATEGORIES: FeaturedCategory[] = getStorefrontFeaturedCategoryFallbacks();
+export const FALLBACK_CATEGORIES: FeaturedCategory[] = getVape420CategoryShowcaseFallbackCategories().map(
+    (category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        section: category.sectionSlug as FeaturedCategory['section'],
+        iconName: category.iconName,
+        image: typeof window === 'undefined'
+            ? category.fallbackImagePath
+            : new URL(category.fallbackImagePath, window.location.origin).toString(),
+        presetId: category.presetId,
+    }),
+);
