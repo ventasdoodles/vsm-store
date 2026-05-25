@@ -17,6 +17,33 @@ export interface LocalVerticalPackPreview {
     products: SecondVerticalProofProduct[];
 }
 
+export interface LocalVerticalPackPreviewSectionViewModel {
+    slug: string;
+    label: string;
+    shortLabel: string;
+    routePrefix: string;
+    description: string;
+    slugRoutePattern: string;
+    hasLocalProducts: boolean;
+}
+
+export interface LocalVerticalPackPreviewViewModel {
+    previewKey: LocalVerticalPackPreviewKey;
+    previewLabel: string;
+    routePrefix: string;
+    proves: string[];
+    doesNotProve: string[];
+    pack: VerticalPackConfig;
+    sections: LocalVerticalPackPreviewSectionViewModel[];
+    routeManifest: LocalVerticalPackPreviewRouteManifestItem[];
+    categoryTaxonomyHints: CategoryTaxonomyHint[];
+    productAttributeHints: ProductAttributeHint[];
+    demoProductFamilies: string[];
+    products: SecondVerticalProofProduct[];
+    productsBySectionSlug: Record<string, SecondVerticalProofProduct[]>;
+    hasLocalProducts: boolean;
+}
+
 export interface LocalVerticalPackPreviewRouteManifestItem {
     sectionSlug: string;
     rootRoute: string;
@@ -74,6 +101,43 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
         products: [],
     },
 ];
+
+export function buildLocalVerticalPackPreviewViewModel(
+    preview: LocalVerticalPackPreview,
+): LocalVerticalPackPreviewViewModel {
+    const productsBySectionSlug = preview.pack.sections.reduce<Record<string, SecondVerticalProofProduct[]>>(
+        (accumulator, section) => {
+            accumulator[section.slug] = preview.products.filter((product) => product.sectionSlug === section.slug);
+            return accumulator;
+        },
+        {},
+    );
+
+    return {
+        previewKey: preview.previewKey,
+        previewLabel: preview.previewLabel,
+        routePrefix: preview.routePrefix,
+        proves: preview.proves,
+        doesNotProve: preview.doesNotProve,
+        pack: preview.pack,
+        sections: preview.pack.sections.map((section) => ({
+            slug: section.slug,
+            label: section.label,
+            shortLabel: section.shortLabel,
+            routePrefix: section.routePrefix,
+            description: section.description,
+            slugRoutePattern: `${section.routePrefix}/:slug`,
+            hasLocalProducts: (productsBySectionSlug[section.slug] ?? []).length > 0,
+        })),
+        routeManifest: preview.routeManifest,
+        categoryTaxonomyHints: preview.categoryTaxonomyHints,
+        productAttributeHints: preview.productAttributeHints,
+        demoProductFamilies: preview.demoProductFamilies,
+        products: preview.products,
+        productsBySectionSlug,
+        hasLocalProducts: preview.products.length > 0,
+    };
+}
 
 export function resolveLocalVerticalPackPreviewByRoutePrefix(routePrefix: string): LocalVerticalPackPreview | null {
     const normalizedRoutePrefix = routePrefix.trim();

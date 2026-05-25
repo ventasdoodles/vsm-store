@@ -29,7 +29,9 @@ describe('SecondVerticalProofFixture', () => {
             expect(screen.getByRole('heading', { name: section.label })).toBeInTheDocument();
             expect(screen.getByText(section.description)).toBeInTheDocument();
             expect(screen.getByText(section.routePrefix)).toBeInTheDocument();
+            expect(screen.getByText(`${section.routePrefix}/:slug`)).toBeInTheDocument();
         }
+        expect(screen.getAllByText('Local products available')).toHaveLength(secondVerticalProofConfig.sections.length);
 
         const packIdentity = screen.getByRole('region', { name: 'Pack identity' });
         const packTaxonomy = screen.getByRole('region', { name: 'Pack taxonomy' });
@@ -93,7 +95,11 @@ describe('SecondVerticalProofFixture', () => {
             expect(screen.getByRole('heading', { name: section.label })).toBeInTheDocument();
             expect(screen.getByText(section.description)).toBeInTheDocument();
             expect(screen.getByText(section.routePrefix)).toBeInTheDocument();
+            expect(screen.getByText(`${section.routePrefix}/:slug`)).toBeInTheDocument();
         }
+        expect(screen.getAllByText('No local products available')).toHaveLength(
+            vape420VerticalPackConfig.sections.length,
+        );
 
         const packRouteManifest = screen.getByRole('region', { name: 'Pack route manifest' });
         expect(within(packRouteManifest).getByText('Root: /vape')).toBeInTheDocument();
@@ -118,6 +124,9 @@ describe('SecondVerticalProofFixture', () => {
         expect(
             screen.getByText('Local preview selection from the dev-only QA surface'),
         ).toBeInTheDocument();
+        expect(screen.getAllByText('Local products available')).toHaveLength(
+            secondVerticalProofConfig.sections.length,
+        );
     });
 
     it('renders the same preview state for nested proof routes under the selected route prefix', () => {

@@ -20,6 +20,9 @@ export type { LocalVerticalPackPreview } from './localVerticalPackPreview';
 export type { LocalVerticalPackPreviewRouteManifestItem } from './localVerticalPackPreview';
 export { resolveLocalVerticalPackPreviewByKey } from './localVerticalPackPreview';
 export type { LocalVerticalPackPreviewKey } from './localVerticalPackPreview';
+export { buildLocalVerticalPackPreviewViewModel } from './localVerticalPackPreview';
+export type { LocalVerticalPackPreviewViewModel } from './localVerticalPackPreview';
+export type { LocalVerticalPackPreviewSectionViewModel } from './localVerticalPackPreview';
 export {
     defineVerticalPack,
     VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,

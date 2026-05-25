@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+    buildLocalVerticalPackPreviewViewModel,
     resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
 } from '../localVerticalPackPreview';
@@ -48,6 +49,18 @@ describe('localVerticalPackPreview', () => {
             'demo-home',
             'demo-studio',
         ]);
+
+        const viewModel = buildLocalVerticalPackPreviewViewModel(preview!);
+
+        expect(viewModel.previewKey).toBe('second-vertical-proof');
+        expect(viewModel.hasLocalProducts).toBe(true);
+        expect(viewModel.sections.map((section) => section.hasLocalProducts)).toEqual([true, true]);
+        expect(viewModel.sections.map((section) => section.slugRoutePattern)).toEqual([
+            '/__qa/second-vertical-proof/demo-home/:slug',
+            '/__qa/second-vertical-proof/demo-studio/:slug',
+        ]);
+        expect(viewModel.productsBySectionSlug['demo-home']?.length).toBe(1);
+        expect(viewModel.productsBySectionSlug['demo-studio']?.length).toBe(1);
     });
 
     it('resolves the dev-only Vape/420 preview by preview key', () => {
@@ -84,6 +97,18 @@ describe('localVerticalPackPreview', () => {
             'Vape Pen 22mm',
         ]);
         expect(preview?.products).toEqual([]);
+
+        const viewModel = buildLocalVerticalPackPreviewViewModel(preview!);
+
+        expect(viewModel.previewKey).toBe('vape-420-preview');
+        expect(viewModel.hasLocalProducts).toBe(false);
+        expect(viewModel.sections.map((section) => section.hasLocalProducts)).toEqual([false, false]);
+        expect(viewModel.sections.map((section) => section.slugRoutePattern)).toEqual([
+            '/vape/:slug',
+            '/420/:slug',
+        ]);
+        expect(viewModel.productsBySectionSlug.vape).toEqual([]);
+        expect(viewModel.productsBySectionSlug['420']).toEqual([]);
     });
 
     it('matches nested proof routes under the same local route prefix', () => {

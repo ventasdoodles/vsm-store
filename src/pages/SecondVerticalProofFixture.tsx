@@ -2,6 +2,7 @@ import { Boxes, PackageCheck, Tags } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 import {
+    buildLocalVerticalPackPreviewViewModel,
     resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
 } from '@/config/productization';
@@ -16,10 +17,12 @@ export function SecondVerticalProofFixture() {
 
     const previewKey = new URLSearchParams(search).get('preview');
     const preview = resolveLocalVerticalPackPreviewByKey(previewKey) ?? surfacePreview;
+    const previewViewModel = buildLocalVerticalPackPreviewViewModel(preview);
 
     const previewSwitcherPath = pathname;
 
     const {
+        previewLabel,
         proves,
         doesNotProve,
         pack,
@@ -28,8 +31,10 @@ export function SecondVerticalProofFixture() {
         categoryTaxonomyHints,
         productAttributeHints,
         demoProductFamilies,
-    } = preview;
-    const sections = pack.sections;
+        sections,
+        hasLocalProducts,
+        productsBySectionSlug,
+    } = previewViewModel;
     const categories = pack.marketing.categoryShowcase.fallbackCategories;
 
     return (
@@ -69,7 +74,7 @@ export function SecondVerticalProofFixture() {
                         </Link>
                     </div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
-                        Selected preview: {preview.previewLabel}
+                        Selected preview: {previewLabel}
                     </p>
                 </section>
 
@@ -149,10 +154,17 @@ export function SecondVerticalProofFixture() {
                                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
                                         {section.slug}
                                     </p>
+                                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-cyan-300">
+                                        {section.hasLocalProducts ? 'Local products available' : 'No local products available'}
+                                    </p>
                                 </div>
                             </div>
                             <p className="text-sm text-theme-secondary">{section.description}</p>
                             <p className="mt-3 text-xs text-theme-tertiary">{section.routePrefix}</p>
+                            <p className="mt-1 text-xs text-theme-tertiary">{section.slugRoutePattern}</p>
+                            <p className="mt-3 text-xs text-theme-tertiary">
+                                Selected pack products in this section: {productsBySectionSlug[section.slug]?.length ?? 0}
+                            </p>
                         </article>
                     ))}
                 </div>
@@ -269,6 +281,9 @@ export function SecondVerticalProofFixture() {
                             </article>
                         ) : null}
                     </div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                        Preview selection is local/dev-only and currently {hasLocalProducts ? 'includes' : 'omits'} local products.
+                    </p>
                 </section>
             </section>
         </main>
