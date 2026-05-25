@@ -15,6 +15,8 @@ export { getVape420SectionPageConfig } from './sectionPage';
 export type { SectionPageProductizationConfig } from './sectionPage';
 export { getVape420SectionRouteManifest } from './routes';
 export type { VerticalPackSectionRouteManifestItem } from './routes';
+export { resolveLocalVerticalPackPreviewByRoutePrefix } from './localVerticalPackPreview';
+export type { LocalVerticalPackPreview } from './localVerticalPackPreview';
 export {
     defineVerticalPack,
     VERTICAL_PACK_AUTHORING_REQUIRED_FIELDS,

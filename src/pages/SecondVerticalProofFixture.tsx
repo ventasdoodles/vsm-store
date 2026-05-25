@@ -1,14 +1,21 @@
 import { Boxes, PackageCheck, Tags } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 import {
-    getSecondVerticalProofSections,
-    secondVerticalProofConfig,
-    secondVerticalProofProducts,
-} from '@/config/productization/secondVerticalProof';
+    resolveLocalVerticalPackPreviewByRoutePrefix,
+} from '@/config/productization';
 
 export function SecondVerticalProofFixture() {
-    const sections = getSecondVerticalProofSections();
-    const categories = secondVerticalProofConfig.marketing.categoryShowcase.fallbackCategories;
+    const { pathname } = useLocation();
+    const preview = resolveLocalVerticalPackPreviewByRoutePrefix(pathname);
+
+    if (!preview) {
+        return null;
+    }
+
+    const { pack, products } = preview;
+    const sections = pack.sections;
+    const categories = pack.marketing.categoryShowcase.fallbackCategories;
 
     return (
         <main className="min-h-screen bg-theme-primary px-4 py-10 text-white sm:px-6 lg:px-10">
@@ -19,10 +26,10 @@ export function SecondVerticalProofFixture() {
                     </p>
                     <div className="max-w-3xl space-y-2">
                         <h1 className="text-3xl font-black leading-tight md:text-4xl">
-                            {secondVerticalProofConfig.marketing.homeHero.primaryCopy.title}
+                            {pack.marketing.homeHero.primaryCopy.title}
                         </h1>
                         <p className="text-sm text-theme-secondary">
-                            {secondVerticalProofConfig.marketing.homeHero.primaryCopy.description}
+                            {pack.marketing.homeHero.primaryCopy.description}
                         </p>
                     </div>
                 </header>
@@ -76,7 +83,7 @@ export function SecondVerticalProofFixture() {
                         <h2 className="text-lg font-black text-white">Proof Products</h2>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
-                        {secondVerticalProofProducts.map((product) => (
+                        {products.map((product) => (
                             <article
                                 key={product.id}
                                 className="rounded-2xl border border-white/10 bg-theme-secondary/20 p-5"
