@@ -111,10 +111,10 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
                     <Link
                         to={renderabilityConfig.rail.emptyStateCtaHref}
-                        className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
+                        className={renderabilityConfig.rail.emptyStateDesktopActionClassName}
                     >
                         {renderabilityConfig.rail.emptyStateCtaLabel}
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className={renderabilityConfig.rail.emptyStateDesktopActionIconClassName} />
                     </Link>
                 </div>
 
@@ -162,10 +162,10 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
                 <Link
                     to={renderabilityConfig.rail.emptyStateCtaHref}
-                    className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
+                    className={renderabilityConfig.rail.emptyStateDesktopActionClassName}
                 >
                     {renderabilityConfig.rail.emptyStateCtaLabel}
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className={renderabilityConfig.rail.emptyStateDesktopActionIconClassName} />
                 </Link>
             </motion.div>
 
@@ -212,10 +212,10 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     <div className="sm:hidden min-w-[150px] flex items-center justify-center snap-start pr-4">
                         <Link
                             to={renderabilityConfig.rail.emptyStateCtaHref}
-                            className="flex flex-col items-center gap-3 text-theme-secondary hover:text-theme-primary transition-colors"
+                            className={renderabilityConfig.rail.emptyStateMobileActionClassName}
                         >
                             <div className="w-14 h-14 rounded-full bg-theme-secondary/20 flex items-center justify-center border border-theme/30 backdrop-blur-md">
-                                <ArrowRight className="w-6 h-6" />
+                                <ArrowRight className={renderabilityConfig.rail.emptyStateMobileActionIconClassName} />
                             </div>
                             <span className="text-xs font-black uppercase tracking-widest">
                                 {renderabilityConfig.rail.emptyStateCtaLabel}

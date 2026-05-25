@@ -54,22 +54,22 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                     {emptyStateTitle || renderabilityConfig.grid.emptyStateTitle}
                 </p>
                 <p className="mt-1 text-xs text-theme-secondary">
-                    {emptyStateSubtext || renderabilityConfig.grid.emptyStateSubtext}
+                {emptyStateSubtext || renderabilityConfig.grid.emptyStateSubtext}
                 </p>
                 {onClearFilter ? (
                     <button
                         onClick={onClearFilter}
-                        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
+                        className={renderabilityConfig.grid.emptyStateActionClassName}
                     >
-                        <RotateCcw className="h-4 w-4" />
+                        <RotateCcw className={renderabilityConfig.grid.emptyStateActionIconClassName} />
                         Limpiar filtro
                     </button>
                 ) : (
                     <Link
                         to={renderabilityConfig.grid.emptyStateCtaHref}
-                        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
+                        className={renderabilityConfig.grid.emptyStateActionClassName}
                     >
-                        <ShoppingBag className="h-4 w-4" />
+                        <ShoppingBag className={renderabilityConfig.grid.emptyStateActionIconClassName} />
                         {renderabilityConfig.grid.emptyStateCtaLabel}
                     </Link>
                 )}

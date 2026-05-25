@@ -65,6 +65,8 @@ describe('ProductRail render states', () => {
         const exploreLinks = screen.getAllByRole('link', { name: 'Explorar catálogo' });
         expect(exploreLinks).toHaveLength(2);
         expect(exploreLinks.some((link) => link.getAttribute('href') === '/vape')).toBe(true);
+        expect(exploreLinks.some((link) => link.className.includes('rounded-full'))).toBe(true);
+        expect(exploreLinks.some((link) => link.className.includes('inline-flex'))).toBe(true);
     });
 
     it('renders product cards when products exist', () => {

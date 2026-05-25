@@ -40,6 +40,7 @@ const readProductizationImports = () =>
         'vape420VerticalPack.ts',
         'homeHero.ts',
         'categoryShowcase.ts',
+        'storefrontRenderability.ts',
         'sectionPresentation.ts',
         'sectionPage.ts',
         'routes.ts',
@@ -182,6 +183,12 @@ describe('productization config boundary', () => {
                         'Estamos actualizando esta selección. Revisa el resto del catálogo mientras cargamos nuevas piezas.',
                     emptyStateCtaLabel: 'Explorar catálogo',
                     emptyStateCtaHref: '/vape',
+                    emptyStateDesktopActionClassName:
+                        'hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105',
+                    emptyStateDesktopActionIconClassName: 'h-4 w-4',
+                    emptyStateMobileActionClassName:
+                        'flex flex-col items-center gap-3 text-theme-secondary hover:text-theme-primary transition-colors',
+                    emptyStateMobileActionIconClassName: 'w-6 h-6',
                 }),
                 grid: expect.objectContaining({
                     loadingSkeletonCount: 8,
@@ -189,6 +196,9 @@ describe('productization config boundary', () => {
                     emptyStateSubtext: 'Intenta con otra categoría o sección',
                     emptyStateCtaLabel: 'Explorar catálogo',
                     emptyStateCtaHref: '/buscar',
+                    emptyStateActionClassName:
+                        'mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5',
+                    emptyStateActionIconClassName: 'h-4 w-4',
                 }),
             }),
         );

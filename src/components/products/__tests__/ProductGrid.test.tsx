@@ -70,7 +70,17 @@ describe('ProductGrid render states', () => {
         expect(screen.getByRole('status')).toBeInTheDocument();
         expect(screen.getByText('Catálogo en rotación')).toBeInTheDocument();
         expect(screen.getByText('Estamos actualizando esta selección.')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Explorar catálogo' })).toHaveAttribute('href', '/buscar');
+
+        const link = screen.getByRole('link', { name: 'Explorar catálogo' });
+        expect(link).toHaveAttribute('href', '/buscar');
+        expect(link).toHaveClass(
+            'mt-6',
+            'inline-flex',
+            'items-center',
+            'gap-2',
+            'rounded-xl',
+            'bg-vape-500',
+        );
     });
 
     it('renders product cards when products exist', () => {
