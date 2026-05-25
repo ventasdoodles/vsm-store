@@ -1,8 +1,11 @@
+import { vape420VerticalPackConfig } from './vape420VerticalPack';
 import { secondVerticalProofConfig } from './secondVerticalProof';
 import { secondVerticalProofProducts, type SecondVerticalProofProduct } from './secondVerticalProofFixtures';
 import type { CategoryTaxonomyHint, ProductAttributeHint, VerticalPackConfig } from './types';
 
 export interface LocalVerticalPackPreview {
+    previewKey: LocalVerticalPackPreviewKey;
+    previewLabel: string;
     routePrefix: string;
     pack: VerticalPackConfig;
     routeManifest: LocalVerticalPackPreviewRouteManifestItem[];
@@ -18,6 +21,8 @@ export interface LocalVerticalPackPreviewRouteManifestItem {
     slugRoutePattern: string;
 }
 
+export type LocalVerticalPackPreviewKey = 'second-vertical-proof' | 'vape-420-preview';
+
 const buildLocalVerticalPackRouteManifest = (
     pack: VerticalPackConfig,
 ): LocalVerticalPackPreviewRouteManifestItem[] =>
@@ -29,6 +34,8 @@ const buildLocalVerticalPackRouteManifest = (
 
 const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
     {
+        previewKey: 'second-vertical-proof',
+        previewLabel: 'Second Vertical Proof',
         routePrefix: '/__qa/second-vertical-proof',
         pack: secondVerticalProofConfig,
         routeManifest: buildLocalVerticalPackRouteManifest(secondVerticalProofConfig),
@@ -36,6 +43,17 @@ const LOCAL_VERTICAL_PACK_PREVIEWS: LocalVerticalPackPreview[] = [
         productAttributeHints: secondVerticalProofConfig.productAttributeHints,
         demoProductFamilies: secondVerticalProofConfig.fixtureMetadata.demoProductFamilies,
         products: secondVerticalProofProducts,
+    },
+    {
+        previewKey: 'vape-420-preview',
+        previewLabel: 'Vape/420 Preview',
+        routePrefix: '/__qa/second-vertical-proof',
+        pack: vape420VerticalPackConfig,
+        routeManifest: buildLocalVerticalPackRouteManifest(vape420VerticalPackConfig),
+        categoryTaxonomyHints: vape420VerticalPackConfig.categoryTaxonomyHints,
+        productAttributeHints: vape420VerticalPackConfig.productAttributeHints,
+        demoProductFamilies: vape420VerticalPackConfig.fixtureMetadata.demoProductFamilies,
+        products: [],
     },
 ];
 
@@ -46,11 +64,21 @@ export function resolveLocalVerticalPackPreviewByRoutePrefix(routePrefix: string
         return null;
     }
 
-    return (
-        LOCAL_VERTICAL_PACK_PREVIEWS.find(
-            (preview) =>
-                normalizedRoutePrefix === preview.routePrefix ||
-                normalizedRoutePrefix.startsWith(`${preview.routePrefix}/`),
-        ) ?? null
-    );
+    return LOCAL_VERTICAL_PACK_PREVIEWS.find(
+        (preview) =>
+            normalizedRoutePrefix === preview.routePrefix ||
+            normalizedRoutePrefix.startsWith(`${preview.routePrefix}/`),
+    ) ?? null;
+}
+
+export function resolveLocalVerticalPackPreviewByKey(
+    previewKey: string | null | undefined,
+): LocalVerticalPackPreview | null {
+    const normalizedPreviewKey = previewKey?.trim();
+
+    if (!normalizedPreviewKey) {
+        return null;
+    }
+
+    return LOCAL_VERTICAL_PACK_PREVIEWS.find((preview) => preview.previewKey === normalizedPreviewKey) ?? null;
 }

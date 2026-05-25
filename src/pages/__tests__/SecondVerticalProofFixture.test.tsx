@@ -2,6 +2,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { vape420VerticalPackConfig } from '@/config/productization';
 import { secondVerticalProofConfig, secondVerticalProofProducts } from '@/config/productization/secondVerticalProof';
 import { SecondVerticalProofFixture } from '../SecondVerticalProofFixture';
 
@@ -57,6 +58,34 @@ describe('SecondVerticalProofFixture', () => {
             expect(screen.getByText(product.shortDescription)).toBeInTheDocument();
             expect(screen.getByText(product.priceLabel)).toBeInTheDocument();
         }
+    });
+
+    it('switches to the Vape/420 preview pack via a local query param', () => {
+        renderFixture('/__qa/second-vertical-proof?preview=vape-420-preview');
+
+        expect(
+            screen.getByRole('heading', {
+                name: vape420VerticalPackConfig.marketing.homeHero.primaryCopy.title,
+            }),
+        ).toBeInTheDocument();
+        expect(screen.getByText(vape420VerticalPackConfig.marketing.homeHero.primaryCopy.description)).toBeInTheDocument();
+        expect(screen.getByText('Selected preview: Vape/420 Preview')).toBeInTheDocument();
+
+        for (const section of vape420VerticalPackConfig.sections) {
+            expect(screen.getByRole('heading', { name: section.label })).toBeInTheDocument();
+            expect(screen.getByText(section.description)).toBeInTheDocument();
+            expect(screen.getByText(section.routePrefix)).toBeInTheDocument();
+        }
+
+        const packRouteManifest = screen.getByRole('region', { name: 'Pack route manifest' });
+        expect(within(packRouteManifest).getByText('Root: /vape')).toBeInTheDocument();
+        expect(within(packRouteManifest).getByText('Pattern: /vape/:slug')).toBeInTheDocument();
+        expect(within(packRouteManifest).getByText('Root: /420')).toBeInTheDocument();
+        expect(within(packRouteManifest).getByText('Pattern: /420/:slug')).toBeInTheDocument();
+
+        expect(screen.getByText('No local product list available for this preview.')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Second vertical proof' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Vape/420 preview' })).toBeInTheDocument();
     });
 
     it('renders the same preview state for nested proof routes under the selected route prefix', () => {

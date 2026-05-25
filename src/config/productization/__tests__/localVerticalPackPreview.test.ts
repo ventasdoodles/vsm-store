@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveLocalVerticalPackPreviewByRoutePrefix } from '../localVerticalPackPreview';
+import {
+    resolveLocalVerticalPackPreviewByKey,
+    resolveLocalVerticalPackPreviewByRoutePrefix,
+} from '../localVerticalPackPreview';
 
 describe('localVerticalPackPreview', () => {
     it('resolves the dev-only second vertical proof preview from a route prefix', () => {
         const preview = resolveLocalVerticalPackPreviewByRoutePrefix('/__qa/second-vertical-proof');
 
         expect(preview).not.toBeNull();
+        expect(preview?.previewKey).toBe('second-vertical-proof');
+        expect(preview?.previewLabel).toBe('Second Vertical Proof');
         expect(preview?.pack.id).toBe('second-vertical-proof');
         expect(preview?.routePrefix).toBe('/__qa/second-vertical-proof');
         expect(preview?.routeManifest).toEqual([
@@ -37,6 +42,34 @@ describe('localVerticalPackPreview', () => {
         ]);
     });
 
+    it('resolves the dev-only Vape/420 preview by preview key', () => {
+        const preview = resolveLocalVerticalPackPreviewByKey('vape-420-preview');
+
+        expect(preview).not.toBeNull();
+        expect(preview?.previewKey).toBe('vape-420-preview');
+        expect(preview?.previewLabel).toBe('Vape/420 Preview');
+        expect(preview?.pack.id).toBe('vape-420');
+        expect(preview?.routeManifest).toEqual([
+            {
+                sectionSlug: 'vape',
+                rootRoute: '/vape',
+                slugRoutePattern: '/vape/:slug',
+            },
+            {
+                sectionSlug: '420',
+                rootRoute: '/420',
+                slugRoutePattern: '/420/:slug',
+            },
+        ]);
+        expect(preview?.demoProductFamilies).toEqual([
+            'Caliburn',
+            'Nova Pod',
+            'Mango Ice',
+            'Vape Pen 22mm',
+        ]);
+        expect(preview?.products).toEqual([]);
+    });
+
     it('matches nested proof routes under the same local route prefix', () => {
         const preview = resolveLocalVerticalPackPreviewByRoutePrefix('/__qa/second-vertical-proof/demo-home');
 
@@ -46,5 +79,7 @@ describe('localVerticalPackPreview', () => {
     it('returns null for unrelated route prefixes', () => {
         expect(resolveLocalVerticalPackPreviewByRoutePrefix('/vape')).toBeNull();
         expect(resolveLocalVerticalPackPreviewByRoutePrefix('')).toBeNull();
+        expect(resolveLocalVerticalPackPreviewByKey('')).toBeNull();
+        expect(resolveLocalVerticalPackPreviewByKey('unknown')).toBeNull();
     });
 });

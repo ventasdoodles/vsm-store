@@ -1,17 +1,23 @@
 import { Boxes, PackageCheck, Tags } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import {
+    resolveLocalVerticalPackPreviewByKey,
     resolveLocalVerticalPackPreviewByRoutePrefix,
 } from '@/config/productization';
 
 export function SecondVerticalProofFixture() {
-    const { pathname } = useLocation();
-    const preview = resolveLocalVerticalPackPreviewByRoutePrefix(pathname);
+    const { pathname, search } = useLocation();
+    const surfacePreview = resolveLocalVerticalPackPreviewByRoutePrefix(pathname);
 
-    if (!preview) {
+    if (!surfacePreview) {
         return null;
     }
+
+    const previewKey = new URLSearchParams(search).get('preview');
+    const preview = resolveLocalVerticalPackPreviewByKey(previewKey) ?? surfacePreview;
+
+    const previewSwitcherPath = pathname;
 
     const {
         pack,
@@ -40,6 +46,30 @@ export function SecondVerticalProofFixture() {
                         </p>
                     </div>
                 </header>
+
+                <section className="space-y-4" aria-label="Preview switcher">
+                    <div className="flex items-center gap-2">
+                        <PackageCheck className="h-5 w-5 text-cyan-300" />
+                        <h2 className="text-lg font-black text-white">Preview Switcher</h2>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                        <Link
+                            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
+                            to={`${previewSwitcherPath}?preview=second-vertical-proof`}
+                        >
+                            Second vertical proof
+                        </Link>
+                        <Link
+                            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
+                            to={`${previewSwitcherPath}?preview=vape-420-preview`}
+                        >
+                            Vape/420 preview
+                        </Link>
+                    </div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-theme-tertiary">
+                        Selected preview: {preview.previewLabel}
+                    </p>
+                </section>
 
                 <section className="space-y-4" aria-label="Pack identity">
                     <div className="flex items-center gap-2">
@@ -195,6 +225,14 @@ export function SecondVerticalProofFixture() {
                                 </dl>
                             </article>
                         ))}
+                        {products.length === 0 ? (
+                            <article className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] p-5">
+                                <p className="text-sm font-black text-white">No local product list available for this preview.</p>
+                                <p className="mt-1 text-sm text-theme-secondary">
+                                    This preview only demonstrates selected pack state, route manifest, and taxonomy hints.
+                                </p>
+                            </article>
+                        ) : null}
                     </div>
                 </section>
             </section>
