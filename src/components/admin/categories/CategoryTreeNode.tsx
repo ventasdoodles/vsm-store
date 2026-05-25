@@ -20,6 +20,8 @@ import {
     ImageOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { buildAdminSectionCatalog } from '@/config/productization';
+import type { Section } from '@/types/constants';
 import type { Category } from '@/types/category';
 
 interface CategoryTreeNodeProps {
@@ -36,11 +38,11 @@ interface CategoryTreeNodeProps {
 /** Indent en px por nivel de profundidad */
 const LEVEL_INDENT = 28;
 
-/** Color de la guia vertical por seccion */
-const GUIDE_COLOR: Record<string, string> = {
-    vape: 'from-violet-500/30 to-violet-500/0',
-    '420': 'from-emerald-500/30 to-emerald-500/0',
-};
+const adminSectionCatalog = buildAdminSectionCatalog();
+
+function getSectionPresentation(sectionSlug: Section) {
+    return adminSectionCatalog.bySlug[sectionSlug];
+}
 
 export function CategoryTreeNode({
     category,
@@ -55,6 +57,7 @@ export function CategoryTreeNode({
     const children = allCategories.filter(c => c.parent_id === category.id);
     const hasChildren = children.length > 0;
     const [expanded, setExpanded] = useState(true);
+    const sectionPresentation = getSectionPresentation(category.section);
 
     const isRoot = !category.parent_id;
 
@@ -108,7 +111,7 @@ export function CategoryTreeNode({
                             {/* Glow ring on hover */}
                             <div className={cn(
                                 'pointer-events-none absolute inset-0 rounded-xl opacity-0 ring-2 transition-opacity group-hover:opacity-100',
-                                category.section === 'vape' ? 'ring-violet-500/30' : 'ring-emerald-500/30',
+                                sectionPresentation.ringClassName,
                             )} />
                         </>
                     ) : (
@@ -135,12 +138,10 @@ export function CategoryTreeNode({
                         </span>
                         {/* Section badge — solo en raiz */}
                         {isRoot && (
-                            <span className={cn(
-                                'flex-shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider ring-1 ring-inset',
-                                category.section === 'vape'
-                                    ? 'bg-violet-500/10 text-violet-400 ring-violet-500/20'
-                                    : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20',
-                            )}>
+                        <span className={cn(
+                            'flex-shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider ring-1 ring-inset',
+                                sectionPresentation.badgeClassName,
+                        )}>
                                 {category.section}
                             </span>
                         )}
@@ -210,7 +211,7 @@ export function CategoryTreeNode({
                 <div className="relative mt-1 space-y-1">
                     {/* Vertical gradient guide line */}
                     <div
-                        className={`absolute top-0 h-full w-px bg-gradient-to-b ${GUIDE_COLOR[category.section] ?? GUIDE_COLOR['vape']}`}
+                        className={`absolute top-0 h-full w-px bg-gradient-to-b ${sectionPresentation.guideClassName}`}
                         style={{ left: `${level * LEVEL_INDENT + 18}px` }}
                     />
                     {children.map(child => (

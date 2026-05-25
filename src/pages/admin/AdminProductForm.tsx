@@ -26,6 +26,9 @@ import {
     hasRequiredProductFields,
     removeProductTag,
 } from '@/lib/domain/adminProductForm';
+import { buildAdminSectionCatalog } from '@/config/productization';
+
+const adminSectionCatalog = buildAdminSectionCatalog();
 
 const inputCls =
     'w-full rounded-xl border border-theme bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
@@ -164,8 +167,20 @@ export function AdminProductForm() {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Sección *</label>
                             <div className="flex gap-2">
-                                {(['vape', '420'] as const).map((s) => (
-                                    <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-theme bg-theme-primary/60 text-theme-secondary')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
+                                {adminSectionCatalog.sections.map((section) => (
+                                    <button
+                                        key={section.slug}
+                                        type="button"
+                                        onClick={() => set('section', section.slug)}
+                                        className={cn(
+                                            'flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors',
+                                            form.section === section.slug
+                                                ? section.selectedButtonClassName
+                                                : section.idleButtonClassName,
+                                        )}
+                                    >
+                                        {section.displayLabel}
+                                    </button>
                                 ))}
                             </div>
                         </div>

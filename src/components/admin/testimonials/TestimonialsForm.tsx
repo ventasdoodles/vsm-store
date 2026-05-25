@@ -1,6 +1,9 @@
 import { Loader2, Save, X, Star } from 'lucide-react';
 import type { TestimonialFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
+import { buildAdminSectionCatalog } from '@/config/productization';
+
+const adminSectionCatalog = buildAdminSectionCatalog();
 
 interface TestimonialsFormProps {
     form: TestimonialFormData;
@@ -125,8 +128,11 @@ export function TestimonialsForm({
                         className="appearance-none w-full bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-theme-primary focus:border-accent-primary outline-none focus:bg-theme-primary/[0.08] focus:ring-4 focus:ring-accent-primary/10 transition-all shadow-inner"
                     >
                         <option value="">🌐 General (ambas secciones)</option>
-                        <option value="vape">🌬️ Sólo Vape</option>
-                        <option value="420">🌿 Sólo 420</option>
+                        {adminSectionCatalog.sections.map((section) => (
+                            <option key={section.slug} value={section.slug}>
+                                {section.formLabel}
+                            </option>
+                        ))}
                     </select>
                     <div className="absolute right-5 bottom-5 pointer-events-none">
                         <svg className="w-5 h-5 text-theme-secondary/80 group-focus-within:text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>

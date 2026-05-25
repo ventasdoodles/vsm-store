@@ -14,6 +14,7 @@ import { TestimonialsStats } from '@/components/admin/testimonials/TestimonialsS
 import { TestimonialsFilters } from '@/components/admin/testimonials/TestimonialsFilters';
 import { TestimonialsForm } from '@/components/admin/testimonials/TestimonialsForm';
 import { TestimonialsGrid } from '@/components/admin/testimonials/TestimonialsGrid';
+import { buildAdminSectionCounts } from '@/config/productization';
 
 const EMPTY_FORM: TestimonialFormData = {
     customer_name: '',
@@ -91,8 +92,9 @@ export function AdminTestimonials() {
         const avgRating = total > 0
             ? (testimonials.reduce((s: number, t: Testimonial) => s + t.rating, 0) / total).toFixed(1)
             : '0';
-        const vape = testimonials.filter((t: Testimonial) => t.section === 'vape').length;
-        const herbal = testimonials.filter((t: Testimonial) => t.section === '420').length;
+        const sectionCounts = buildAdminSectionCounts(testimonials);
+        const vape = sectionCounts.vape ?? 0;
+        const herbal = sectionCounts['420'] ?? 0;
         return { total, active, featured, avgRating, vape, herbal };
     }, [testimonials]);
 

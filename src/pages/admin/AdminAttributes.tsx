@@ -25,6 +25,9 @@ import {
     toggleAttributeSection,
     type AttributeUpdatePayload,
 } from '@/lib/domain/adminAttributes';
+import { buildAdminSectionCatalog } from '@/config/productization';
+
+const adminSectionCatalog = buildAdminSectionCatalog();
 
 export function AdminAttributes() {
     const queryClient = useQueryClient();
@@ -268,25 +271,25 @@ export function AdminAttributes() {
                                     {/* Applicability Toggles (Sections) */}
                                     <div className="flex items-center gap-2 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
                                         <p className="text-[10px] font-black uppercase text-white/40 mr-2">Visible en:</p>
-                                        {(['vape', '420'] as const).map(s => {
-                                            const isActive = selectedAttribute.applicability?.sections?.includes(s);
+                                        {adminSectionCatalog.sections.map((section) => {
+                                            const isActive = selectedAttribute.applicability?.sections?.includes(section.slug);
                                             return (
                                                 <button
-                                                    key={s}
+                                                    key={section.slug}
                                                     onClick={() => {
                                                         updateAttrMutation.mutate(buildAttributeUpdatePayload(
                                                             selectedAttribute.id,
-                                                            { applicability: toggleAttributeSection(selectedAttribute.applicability, s) },
+                                                            { applicability: toggleAttributeSection(selectedAttribute.applicability, section.slug) },
                                                         ));
                                                     }}
                                                     className={cn(
                                                         "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                                                         isActive 
-                                                            ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" 
-                                                            : "bg-white/5 text-white/20 hover:text-white/40"
+                                                            ? section.selectedButtonClassName
+                                                            : section.idleButtonClassName
                                                     )}
                                                 >
-                                                    {s}
+                                                    {section.shortLabel}
                                                 </button>
                                             );
                                         })}
