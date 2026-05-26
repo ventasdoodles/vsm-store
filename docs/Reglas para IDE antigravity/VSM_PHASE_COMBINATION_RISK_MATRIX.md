@@ -75,6 +75,14 @@ Regla de contexto:
 - production with daily customers requiere la menor superficie posible y un plan de rollback/monitoring mucho mas estricto
 ```
 
+Nota de observabilidad:
+
+```text
+- para order observability, leer por order_id primero y usar customer_id/email/timestamp como cross-check
+- order_number solo complementa la prueba; si aparece una fila historica con el mismo order_number, la prueba queda ambigua
+- para admin/customer identity resolution en local/pre-prod, seguir el checklist: `docs/Reglas para IDE antigravity/LOCAL_QA_IDENTITY_AND_ORDER_OBSERVABILITY_CHECKLIST.md`
+```
+
 ## 2.2 Execution Block eligibility
 
 Un **Execution Block** de hasta 4 lanes solo aplica a trabajo LOW/MEDIUM relacionado.

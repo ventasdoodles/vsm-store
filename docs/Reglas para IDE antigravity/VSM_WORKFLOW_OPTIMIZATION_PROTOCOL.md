@@ -93,6 +93,9 @@ El entorno debe ser valido para el objetivo de la lane.
 - delicate keys and secrets should be rotated before real rollout
 - local/pre-prod lanes can combine practical QA steps when the evidence remains reversible or read-only
 - production with daily customers should avoid broad experiments and favor minimal blast-radius fixes
+- for local/pre-prod admin and order observability, use `docs/Reglas para IDE antigravity/LOCAL_QA_IDENTITY_AND_ORDER_OBSERVABILITY_CHECKLIST.md`
+- order proof must be anchored on `order_id` first; `order_number` is only a supporting label and can collide with historical rows
+- if safe identity resolution is unavailable without secret/session inspection, stop and require owner-provided admin QA credential/provisioning
 ```
 
 La evidencia de browser, auth, DB, dummy flow o rollout debe declararse con non-claims explicitos; no convertir fixture, local o pre-prod evidence en production proof.

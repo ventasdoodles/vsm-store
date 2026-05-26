@@ -568,3 +568,44 @@ FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
 
 Success condition:
 [rollout proof is bounded, monitored, and non-claim preserving]
+
+---
+
+## M. TEMPLATE - LOCAL QA IDENTITY + ORDER OBSERVABILITY
+[TITULO]
+
+STRICT MODE.
+ROADMAP / READINESS ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado resumido y solo lo necesario]
+
+Mission objective:
+[definir o aplicar un checklist de identidad y observabilidad para admin/customer/order proof]
+
+Required scope:
+- order_id-first proof
+- customer_id/email/timestamp cross-check
+- admin_users lookup/provisioning boundaries
+- duplicate order_number warning
+- leftover dummy data policy
+- fallback when identity cannot be resolved safely
+
+Constraints:
+[lo que no debe tocar]
+
+Required output format:
+1. CURRENT STATE
+2. BLOCKER SUMMARY
+3. SAFE OPTIONS CONSIDERED
+4. SELECTED BEST NEXT PATH
+5. RISK CLASSIFICATION
+6. EXACT NEXT PROMPT
+7. STOP CONDITIONS
+8. NON-CLAIMS TO PRESERVE
+9. GO / NO-GO
+
+Success condition:
+[un metodo repetible que evite QA ciega y ancle la prueba en order_id]

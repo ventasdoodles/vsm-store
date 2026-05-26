@@ -169,6 +169,17 @@ Debe distinguir:
 
 No puede inspeccionar cookies, localStorage, session storage, auth headers, passwords, tokens, env values o secrets salvo autorizacion explicita.
 
+### vsm-real-system-qa
+
+Uso para evidence practica local, pre-prod y read-only live cuando el prompt lo autoriza de forma explicita.
+
+Para lanes de identidad y observabilidad de pedidos, seguir el checklist `docs/Reglas para IDE antigravity/LOCAL_QA_IDENTITY_AND_ORDER_OBSERVABILITY_CHECKLIST.md`:
+
+- anclar la prueba en `order_id`;
+- usar `customer_id`, email y timestamps como cross-check;
+- tratar `order_number` como etiqueta auxiliar, no como prueba unica;
+- detenerse si la identidad no se puede resolver sin inspeccionar secretos o sesion.
+
 ### vsm-high-risk-lane
 
 Uso para readiness/scoping de superficies sensibles.
@@ -186,6 +197,8 @@ Debe imponer fase separada y autorizacion explicita para:
 - provider/Gemini calls.
 
 No ejecuta high-risk work por si misma, no inspecciona secretos/sesion/storage por defecto y no convierte guidance en automated enforcement.
+
+Para admin/customer/order observability, si la prueba depende de identity resolution, DB read proof o admin_users provisioning, seguir primero el checklist local QA y solo avanzar con autorizacion explicita.
 
 ### Practical real-system QA and controlled rollout guidance
 
