@@ -6,7 +6,7 @@ export const SECTIONS = {
     CANNABIS: '420',
 } as const;
 
-export type Section = typeof SECTIONS[keyof typeof SECTIONS];
+export type Section = string;
 
 export const PRODUCT_STATUS = {
     ACTIVE: 'active',

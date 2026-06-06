@@ -10,6 +10,7 @@ export type {
 } from './types';
 export { vsmStoreTenantConfig } from './tenant';
 export { vape420VerticalPackConfig } from './vape420VerticalPack';
+export { activeVerticalPackConfig } from './active';
 export {
     getVape420HomeHeroFallbackImageUrl,
     getVape420HomeHeroPrimaryCopy,

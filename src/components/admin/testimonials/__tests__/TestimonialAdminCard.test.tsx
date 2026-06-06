@@ -35,7 +35,7 @@ describe('TestimonialAdminCard', () => {
         ['420' as const],
     ])('renders the shared catalog badge for section %s', (section) => {
         const testimonial = makeTestimonial(section);
-        const catalogEntry = catalog.bySlug[section];
+        const catalogEntry = catalog.bySlug[section]!;
 
         render(
             <TestimonialAdminCard

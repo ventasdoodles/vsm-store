@@ -1,6 +1,6 @@
 import type { Section } from '@/types/constants';
 import type { VerticalPackConfig, VerticalSectionConfig } from './types';
-import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import { activeVerticalPackConfig } from './active';
 
 export interface AdminSectionCatalogEntry extends VerticalSectionConfig {
     slug: Section;
@@ -86,7 +86,7 @@ function buildAdminSectionEntry(section: VerticalSectionConfig): AdminSectionCat
 }
 
 export function buildAdminSectionCatalog(
-    pack: VerticalPackConfig = vape420VerticalPackConfig,
+    pack: VerticalPackConfig = activeVerticalPackConfig,
 ): AdminSectionCatalog {
     const sections = pack.sections.map(buildAdminSectionEntry);
 
@@ -100,21 +100,21 @@ export function buildAdminSectionCatalog(
 }
 
 export function getAdminDefaultSectionSlug(
-    pack: VerticalPackConfig = vape420VerticalPackConfig,
+    pack: VerticalPackConfig = activeVerticalPackConfig,
 ): Section {
     return buildAdminSectionCatalog(pack).sections[0]?.slug ?? 'vape';
 }
 
 export function getAdminSectionCatalogEntry(
     sectionSlug: Section,
-    pack: VerticalPackConfig = vape420VerticalPackConfig,
+    pack: VerticalPackConfig = activeVerticalPackConfig,
 ): AdminSectionCatalogEntry | null {
     return buildAdminSectionCatalog(pack).bySlug[sectionSlug] ?? null;
 }
 
 export function buildAdminSectionCounts<T extends { section?: string | null }>(
     items: readonly T[],
-    pack: VerticalPackConfig = vape420VerticalPackConfig,
+    pack: VerticalPackConfig = activeVerticalPackConfig,
 ): Record<Section, number> {
     const catalog = buildAdminSectionCatalog(pack);
     const counts = catalog.sections.reduce<Record<Section, number>>((accumulator, section) => {

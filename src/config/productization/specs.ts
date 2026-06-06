@@ -1,14 +1,14 @@
 import type { Section } from '@/types/product';
-import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import { activeVerticalPackConfig } from './active';
 
 export const getVape420SuggestedSpecs = (): Record<string, string[]> =>
-    vape420VerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug;
+    activeVerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug;
 
 export const getVape420SectionDefaultSpecs = (): Record<Section, string[]> =>
-    vape420VerticalPackConfig.attributeSchema.defaultSpecsBySectionSlug as Record<Section, string[]>;
+    activeVerticalPackConfig.attributeSchema.defaultSpecsBySectionSlug as Record<Section, string[]>;
 
 export const getVape420SpecKeyNormalization = (): Record<string, string> =>
-    vape420VerticalPackConfig.attributeSchema.specKeyNormalization;
+    activeVerticalPackConfig.attributeSchema.specKeyNormalization;
 
 export const normalizeVape420SpecKey = (key: string): string => {
     const cleanKey = key.toLowerCase().trim().replace(/[:=]$/, '');

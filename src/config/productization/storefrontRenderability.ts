@@ -1,4 +1,5 @@
 import type { Section } from '@/types/constants';
+import { activeVerticalPackConfig } from './active';
 
 export interface StorefrontRenderabilityRailConfig {
     loadingSkeletonCount: number;
@@ -32,6 +33,23 @@ export const getVape420StorefrontRenderabilityConfig = (
 ): StorefrontRenderabilityProductizationConfig => {
     const sectionHref = section ? `/${section}` : '/buscar';
 
+    let themeToken = 'vape';
+    if (section) {
+        const found = activeVerticalPackConfig.sections.find((s) => s.slug === section);
+        if (found) {
+            themeToken = found.themeToken;
+        }
+    } else {
+        themeToken = activeVerticalPackConfig.sections[0]?.themeToken || 'vape';
+    }
+
+    let actionButtonClass = 'mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-700 hover:-translate-y-0.5';
+    if (themeToken === 'vape') {
+        actionButtonClass = 'mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5';
+    } else if (themeToken === 'herbal' || themeToken === '420') {
+        actionButtonClass = 'mt-6 inline-flex items-center gap-2 rounded-xl bg-herbal-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-herbal-500/20 transition-all hover:bg-herbal-600 hover:-translate-y-0.5';
+    }
+
     return {
         rail: {
             loadingSkeletonCount: 4,
@@ -53,8 +71,7 @@ export const getVape420StorefrontRenderabilityConfig = (
             emptyStateSubtext: 'Intenta con otra categoría o sección',
             emptyStateCtaLabel: 'Explorar catálogo',
             emptyStateCtaHref: '/buscar',
-            emptyStateActionClassName:
-                'mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5',
+            emptyStateActionClassName: actionButtonClass,
             emptyStateActionIconClassName: 'h-4 w-4',
         },
     };

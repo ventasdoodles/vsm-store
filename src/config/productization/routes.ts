@@ -1,4 +1,4 @@
-import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import { activeVerticalPackConfig } from './active';
 import { buildVerticalPackRouteManifest, type VerticalPackRouteManifestItem } from './verticalPackReadModel';
 import type { Section } from '@/types/constants';
 
@@ -11,7 +11,7 @@ export interface VerticalPackPublicSectionRouteDeclaration {
 }
 
 export const getVape420SectionRouteManifest = (): VerticalPackRouteManifestItem[] =>
-    buildVerticalPackRouteManifest(vape420VerticalPackConfig);
+    buildVerticalPackRouteManifest(activeVerticalPackConfig);
 
 export const getVape420PublicSectionRouteDeclarations = (): VerticalPackPublicSectionRouteDeclaration[] =>
     getVape420SectionRouteManifest().flatMap((route) => [
@@ -34,5 +34,5 @@ export function resolveSectionFromRouteManifest(
     const normalizedPathname = pathname.trim();
     const matchedRoute = routeManifest.find((route) => normalizedPathname.startsWith(route.rootRoute));
 
-    return (matchedRoute?.sectionSlug as Section) ?? 'vape';
+    return (matchedRoute?.sectionSlug as Section) ?? (activeVerticalPackConfig.sections[0]?.slug || 'vape');
 }

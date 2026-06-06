@@ -1,42 +1,62 @@
 import type { Section } from '@/types/constants';
 import type { VerticalSectionConfig } from './types';
-import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import { activeVerticalPackConfig } from './active';
 import type {
     SectionPageProductizationConfig,
     SectionPresentationProductizationConfig,
 } from './sectionPage';
 
+const getThemeClasses = (themeToken: string) => {
+    if (themeToken === 'vape') {
+        return {
+            heroGradient: 'from-vape-500/30 via-purple-500/10 to-transparent',
+            heroBlob: 'bg-vape-500',
+            heroBadge: 'text-vape-400 bg-vape-500/10 border-vape-500/20',
+            sortActive: 'bg-vape-500/10 text-vape-400 border-vape-500/20',
+            sortHighlight: 'bg-vape-500/10 font-semibold text-vape-400',
+        };
+    } else if (themeToken === 'herbal' || themeToken === '420') {
+        return {
+            heroGradient: 'from-herbal-500/30 via-emerald-500/10 to-transparent',
+            heroBlob: 'bg-herbal-500',
+            heroBadge: 'text-herbal-400 bg-herbal-500/10 border-herbal-500/20',
+            sortActive: 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20',
+            sortHighlight: 'bg-herbal-500/10 font-semibold text-herbal-400',
+        };
+    } else {
+        // Fallback for other verticals
+        return {
+            heroGradient: 'from-indigo-500/30 via-sky-500/10 to-transparent',
+            heroBlob: 'bg-indigo-500',
+            heroBadge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+            sortActive: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+            sortHighlight: 'bg-indigo-500/10 font-semibold text-indigo-400',
+        };
+    }
+};
+
 const buildSectionPresentationConfig = (
     section: VerticalSectionConfig,
-): SectionPresentationProductizationConfig => ({
-    slug: section.slug as Section,
-    title: section.label,
-    subtitle: section.description,
-    seoDescription: section.seoDescription,
-    routePrefix: section.routePrefix,
-    themeToken: section.themeToken,
-    isVape: section.themeToken === 'vape',
-    heroGradientClassName:
-        section.themeToken === 'vape'
-            ? 'from-vape-500/30 via-purple-500/10 to-transparent'
-            : 'from-herbal-500/30 via-emerald-500/10 to-transparent',
-    heroBlobClassName: section.themeToken === 'vape' ? 'bg-vape-500' : 'bg-herbal-500',
-    heroBadgeClassName:
-        section.themeToken === 'vape'
-            ? 'text-vape-400 bg-vape-500/10 border-vape-500/20'
-            : 'text-herbal-400 bg-herbal-500/10 border-herbal-500/20',
-    sortActiveClassName:
-        section.themeToken === 'vape'
-            ? 'bg-vape-500/10 text-vape-400 border-vape-500/20'
-            : 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20',
-    sortHighlightClassName:
-        section.themeToken === 'vape'
-            ? 'bg-vape-500/10 font-semibold text-vape-400'
-            : 'bg-herbal-500/10 font-semibold text-herbal-400',
-});
+): SectionPresentationProductizationConfig => {
+    const theme = getThemeClasses(section.themeToken);
+    return {
+        slug: section.slug as Section,
+        title: section.label,
+        subtitle: section.description,
+        seoDescription: section.seoDescription,
+        routePrefix: section.routePrefix,
+        themeToken: section.themeToken,
+        isVape: section.themeToken === 'vape',
+        heroGradientClassName: theme.heroGradient,
+        heroBlobClassName: theme.heroBlob,
+        heroBadgeClassName: theme.heroBadge,
+        sortActiveClassName: theme.sortActive,
+        sortHighlightClassName: theme.sortHighlight,
+    };
+};
 
 const sectionPresentationBySlug = new Map(
-    vape420VerticalPackConfig.sections.map(
+    activeVerticalPackConfig.sections.map(
         (section): readonly [Section, SectionPresentationProductizationConfig] => [
             section.slug as Section,
             buildSectionPresentationConfig(section),
@@ -50,7 +70,7 @@ export const getVape420SectionPresentationConfig = (
     const section = sectionPresentationBySlug.get(slug);
 
     if (!section) {
-        throw new Error(`Missing Vape/420 section presentation config for "${slug}"`);
+        throw new Error(`Missing section presentation config for "${slug}"`);
     }
 
     return section;

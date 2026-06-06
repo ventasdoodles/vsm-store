@@ -70,7 +70,7 @@ export const internalResolvedProductSchema = z.object({
   slug: z.string(),
   // section is the canonical storefront route prefix — required for PDP navigation.
   // Optional for backward compat with edge-function fallback paths that may not supply it.
-  section: z.enum(['vape', '420']).optional(),
+  section: z.string().optional(),
   name: z.string(),
   display_price: z.string(),
   sku: z.string().optional(),
@@ -115,7 +115,7 @@ export const storefrontAttachmentProductRefSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   slug: z.string(),
-  section: z.enum(['vape', '420']),
+  section: z.string(),
 });
 
 export const storefrontAttachmentOfferSchema = z.object({

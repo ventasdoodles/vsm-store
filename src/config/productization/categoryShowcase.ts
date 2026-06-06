@@ -1,7 +1,7 @@
-import { vape420VerticalPackConfig } from './vape420VerticalPack';
+import { activeVerticalPackConfig } from './active';
 import { getStorefrontFallbackImageUrl } from './storefrontFallbacks';
 
 export const getVape420CategoryShowcaseFallbackCategories = () =>
-    vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories;
+    activeVerticalPackConfig.marketing.categoryShowcase.fallbackCategories;
 
 export const getVape420CategoryShowcaseFallbackImageUrl = getStorefrontFallbackImageUrl;

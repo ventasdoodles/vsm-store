@@ -11,7 +11,7 @@ type ProductRef = {
   id: string;
   name: string;
   slug: string;
-  section: 'vape' | '420';
+  section: string;
 };
 
 type KittingSignals = Pick<

@@ -48,7 +48,7 @@ import type { Product } from '@/types/product';
 type ProductSearchRow = {
   id: string;
   slug: string | null;
-  section: 'vape' | '420' | null;
+  section: string | null;
   name: string;
   price: number;
   stock: number;

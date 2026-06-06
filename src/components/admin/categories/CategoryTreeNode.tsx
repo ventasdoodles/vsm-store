@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: CategoryTreeNode ───
  * // Arquitectura: Dumb Component (Visual + Recursion)
  * // Proposito principal: Fila premium del arbol de categorias con glassmorphism,
@@ -57,7 +57,11 @@ export function CategoryTreeNode({
     const children = allCategories.filter(c => c.parent_id === category.id);
     const hasChildren = children.length > 0;
     const [expanded, setExpanded] = useState(true);
-    const sectionPresentation = getSectionPresentation(category.section);
+    const sectionPresentation = getSectionPresentation(category.section) ?? {
+        ringClassName: 'ring-white/20',
+        badgeClassName: 'bg-white/10 text-white/60 ring-white/20',
+        guideClassName: 'from-white/20 to-white/0',
+    };
 
     const isRoot = !category.parent_id;
 
