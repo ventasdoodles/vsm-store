@@ -8,10 +8,10 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 > Detailed audit evidence lives in `docs/audits/` and pre-split snapshots live in `docs/archive/`.
 
 ## Current Phase & Reliability
-- Phase: 3.2C CLOSED - Pilot Readiness Gate PASS.
-- Status: OPERATIONAL under the accepted controlled rollout posture.
-- Storefront and Cesarin OS/admin coding fronts remain closed unless a new authorized prompt selects one.
-- The accepted reliability/harness lanes are regression evidence, not authorization to broaden production claims.
+- Phase: 4.1 PRODUCTIZATION - Launch Blockers Resolved.
+- Status: OPERATIONAL.
+- 13 critical launch blockers affecting CSP, CI/CD deploy coverage, domain consistency, SEO, WhatsApp placeholders, vendor splitting, and repo hygiene were successfully corrected, tested, and pushed to origin/main.
+- Storefront and Cesarin OS/admin coding fronts are updated under the authorized productization lane. The changes were validated via complete typecheck, 914 tests passing, and a successful production build.
 
 ## Current Cesarin Knowledge / Customer-Intelligence Truth
 - `customer_intelligence_no_write_v1` exists as a local/tested no-write smoke-readiness contract for authenticated `concierge_chat` knowledge handoff.
