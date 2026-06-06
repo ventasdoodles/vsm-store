@@ -25,17 +25,47 @@ jobs:
         with:
           version: latest
 
-      - name: Deploy knowledge-ingestor
-        run: supabase functions deploy knowledge-ingestor --project-ref $PROJECT_ID
+      - name: Deploy bundle-intelligence
+        run: supabase functions deploy bundle-intelligence --project-ref $PROJECT_ID
 
-      - name: Deploy customer-intelligence
-        run: supabase functions deploy customer-intelligence --project-ref $PROJECT_ID
+      - name: Deploy cesarin-qa-judge
+        run: supabase functions deploy cesarin-qa-judge --project-ref $PROJECT_ID
+
+      - name: Deploy checkout-submit
+        run: supabase functions deploy checkout-submit --project-ref $PROJECT_ID
 
       - name: Deploy create-payment
         run: supabase functions deploy create-payment --project-ref $PROJECT_ID
 
+      - name: Deploy customer-intelligence
+        run: supabase functions deploy customer-intelligence --project-ref $PROJECT_ID
+
+      - name: Deploy customer-narrative
+        run: supabase functions deploy customer-narrative --project-ref $PROJECT_ID
+
+      - name: Deploy dashboard-intelligence
+        run: supabase functions deploy dashboard-intelligence --project-ref $PROJECT_ID
+
+      - name: Deploy embeddings-processor
+        run: supabase functions deploy embeddings-processor --project-ref $PROJECT_ID
+
+      - name: Deploy inventory-oracle
+        run: supabase functions deploy inventory-oracle --project-ref $PROJECT_ID
+
+      - name: Deploy knowledge-ingestor
+        run: supabase functions deploy knowledge-ingestor --project-ref $PROJECT_ID
+
+      - name: Deploy loyalty-intelligence
+        run: supabase functions deploy loyalty-intelligence --project-ref $PROJECT_ID
+
       - name: Deploy mercadopago-webhook
         run: supabase functions deploy mercadopago-webhook --project-ref $PROJECT_ID --no-verify-jwt
 
-      # We can add other functions here if needed, or use a script to deploy all.
-      # For now, we explicitly deploy the new one.
+      - name: Deploy product-intelligence
+        run: supabase functions deploy product-intelligence --project-ref $PROJECT_ID
+
+      - name: Deploy track-shipment
+        run: supabase functions deploy track-shipment --project-ref $PROJECT_ID
+
+      - name: Deploy voice-intelligence
+        run: supabase functions deploy voice-intelligence --project-ref $PROJECT_ID

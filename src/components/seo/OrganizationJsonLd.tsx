@@ -6,8 +6,8 @@ export function OrganizationJsonLd() {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: SITE_CONFIG.name,
-        url: typeof window !== 'undefined' ? window.location.origin : 'https://vsmstore.com',
-        logo: typeof window !== 'undefined' ? `${window.location.origin}${SITE_CONFIG.logo}` : `https://vsmstore.com${SITE_CONFIG.logo}`,
+        url: typeof window !== 'undefined' ? window.location.origin : SITE_CONFIG.canonicalUrl,
+        logo: typeof window !== 'undefined' ? `${window.location.origin}${SITE_CONFIG.logo}` : `${SITE_CONFIG.canonicalUrl}${SITE_CONFIG.logo}`,
         sameAs: [
             SITE_CONFIG.social.instagram,
             SITE_CONFIG.social.whatsapp,

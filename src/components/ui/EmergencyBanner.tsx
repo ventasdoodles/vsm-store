@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, MessageCircle } from 'lucide-react';
 import { useSafety } from '@/contexts/SafetyContext';
+import { SITE_CONFIG } from '@/config/site';
 
 /**
  * EmergencyBanner
@@ -29,7 +30,7 @@ export const EmergencyBanner: React.FC = () => {
                             </span>
                         </div>
                         <a 
-                            href="https://wa.me/521234567890" 
+                            href={`https://wa.me/${SITE_CONFIG.whatsapp.number}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-4 py-1.5 bg-white text-red-600 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors shadow-lg"

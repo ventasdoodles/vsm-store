@@ -12,6 +12,7 @@ export const SITE_CONFIG = {
     name: vsmStoreTenantConfig.displayName,
     description: vsmStoreTenantConfig.description,
     logo: vsmStoreTenantConfig.brand.logoPath,
+    canonicalUrl: vsmStoreTenantConfig.canonicalUrl,
 
     // WhatsApp
     whatsapp: {

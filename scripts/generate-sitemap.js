@@ -6,7 +6,9 @@ import { fileURLToPath } from 'url';
 
 
 // Load environment variables
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,7 +18,7 @@ const projectRoot = path.resolve(__dirname, '..');
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
-const DOMAIN = 'https://vsm-store.pages.dev'; // Adjust if custom domain exists
+const DOMAIN = 'https://vsmstore.com'; // Adjust if custom domain exists
 
 // Codex Cloud can resolve some providers poorly over IPv6; prefer IPv4 when available.
 dns.setDefaultResultOrder('ipv4first');

@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { SITE_CONFIG } from '@/config/site';
 
 interface BreadcrumbItem {
     name: string;
@@ -12,7 +13,7 @@ interface BreadcrumbJsonLdProps {
 export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
     if (!items || items.length === 0) return null;
 
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://vsmstore.com';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : SITE_CONFIG.canonicalUrl;
 
     const jsonLd = {
         '@context': 'https://schema.org',

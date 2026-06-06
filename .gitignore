@@ -7,34 +7,6 @@ dist/
 # Environment variables
 .env
 .env.local
-.env.*.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-npm-debug.log*
-build_log*.txt
-
-# TypeScript
-*.tsbuildinfo
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Environment variables
-.env
-.env.local
 .env.test
 .env.*.local
 
@@ -67,3 +39,7 @@ graqle.json
 
 # Local Supabase CLI metadata
 supabase/.branches/
+
+# QA scripts
+qa-*.js
+qa-*.ts

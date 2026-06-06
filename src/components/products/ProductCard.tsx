@@ -23,6 +23,7 @@ import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
 import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
+import { SITE_CONFIG } from '@/config/site';
 
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 
@@ -76,7 +77,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const shouldShowImageDots = product.images?.length > 1;
     const showLowStockBadge = !compact && purchaseability.canAddToCart && purchaseability.maxQuantity <= 5 && purchaseability.maxQuantity > 0;
     const whatsappUrl = useMemo(
-        () => `https://wa.me/521234567890?text=Hola, me interesa ${product.name}`,
+        () => `https://wa.me/${SITE_CONFIG.whatsapp.number}?text=Hola, me interesa ${product.name}`,
         [product.name]
     );
 

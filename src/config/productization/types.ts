@@ -20,6 +20,7 @@ export interface TenantConfig {
     displayName: string;
     description: string;
     locale: string;
+    canonicalUrl: string;
     currency: {
         code: string;
         symbol: string;

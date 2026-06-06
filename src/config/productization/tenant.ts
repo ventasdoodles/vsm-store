@@ -5,6 +5,7 @@ export const vsmStoreTenantConfig = {
     displayName: 'VSM Store',
     description: 'Tu tienda de vape y productos 420',
     locale: 'es-MX',
+    canonicalUrl: 'https://vsmstore.com',
     currency: {
         code: 'MXN',
         symbol: '$',

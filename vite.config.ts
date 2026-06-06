@@ -35,7 +35,6 @@ export default defineConfig({
     },
 
     rollupOptions: {
-      /*
       output: {
         // Vendor splitting: cada lib en su propio chunk cacheable
         // Si se actualiza solo el app code, los vendor chunks no se re-descargan
@@ -65,7 +64,6 @@ export default defineConfig({
           }
         },
       },
-      */
     },
   },
 })
