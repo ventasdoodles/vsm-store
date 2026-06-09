@@ -35,6 +35,8 @@ if ([string]::IsNullOrWhiteSpace($geminiApiKey)) {
   exit 1
 }
 
+$anthropicApiKey = Get-FirstEnvironmentValue -Name 'ANTHROPIC_API_KEY'
+
 $previousErrorActionPreference = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
 $statusOutput = & npx supabase status -o env 2>&1
@@ -75,6 +77,7 @@ if ([string]::IsNullOrWhiteSpace($serviceRoleKey)) { $missing += 'SUPABASE_SERVI
 
 if ($missing.Count -gt 0) {
   Write-Host "GEMINI_API_KEY: $(ConvertTo-YesNo -Value $true)"
+  Write-Host "ANTHROPIC_API_KEY: $(ConvertTo-YesNo -Value (-not [string]::IsNullOrWhiteSpace($anthropicApiKey)))"
   Write-Host "SUPABASE_URL: $(ConvertTo-YesNo -Value $true)"
   Write-Host "SUPABASE_ANON_KEY: $(ConvertTo-YesNo -Value (-not [string]::IsNullOrWhiteSpace($anonKey)))"
   Write-Host "SUPABASE_SERVICE_ROLE_KEY: $(ConvertTo-YesNo -Value (-not [string]::IsNullOrWhiteSpace($serviceRoleKey)))"
@@ -84,13 +87,19 @@ if ($missing.Count -gt 0) {
   exit 1
 }
 
-$content = @(
+$contentArray = @(
   "GEMINI_API_KEY=$geminiApiKey",
   "SUPABASE_URL=$localSupabaseUrl",
   "SUPABASE_SERVICE_ROLE_KEY=$serviceRoleKey",
   "VITE_SUPABASE_URL=$localSupabaseUrl",
   "VITE_SUPABASE_ANON_KEY=$anonKey"
-) -join "`n"
+)
+
+if (-not [string]::IsNullOrWhiteSpace($anthropicApiKey)) {
+  $contentArray += "ANTHROPIC_API_KEY=$anthropicApiKey"
+}
+
+$content = $contentArray -join "`n"
 $content = "$content`n"
 
 [System.IO.File]::WriteAllText($outputPath, $content, [System.Text.UTF8Encoding]::new($false))
