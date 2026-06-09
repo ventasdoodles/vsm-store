@@ -28,7 +28,7 @@ import {
     geminiGenerateContent,
     geminiStreamGenerateContent,
     getGeminiRuntimePolicy,
-} from '../_shared/gemini-api.ts'
+} from '../../_shared/gemini-api.ts'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, buildCesarinNonHollowFallbackText, compactCesarinResponseText } from '../persona.ts'
 import { buildDegradedPolicyInquiryFallback } from '../policy-degraded-fallback.ts'
