@@ -24,6 +24,9 @@
 
 ## Current Repository Baseline
 
+## JWT Custom Claims RBAC Infra
+- JWT Custom Claims RBAC infra `98fc99f feat(auth): jwt custom claims for admin rbac` is ACCEPT WITH RESIDUAL RISK as a high-risk DB/Auth infra lane. Accepted facts: Added a Supabase migration (`20260609000000_jwt_custom_claims_rbac.sql`) that implements a trigger on `admin_users` to inject an `app_metadata.role` claim into `auth.users` upon insert/update/delete. A helper function `is_admin()` was added for future RLS use. The React frontend (`admin-auth.service.ts`, `AdminGuard.tsx`, etc.) was refactored to optimistically check the JWT `user.app_metadata.role` before falling back to the `admin_users` table query. Validation: typecheck green, 914 tests green. Non-claims: existing RLS policies across 33+ migrations were NOT touched and still use the sub-select approach. No live DB verification of the trigger execution. Residual risk: A trigger failure on `admin_users` could break admin assignments; requires live environment verification.
+
 ## Admin/Storefront Bundle Separation
 - Admin/Storefront bundle separation `9694b8e refactor(arch): separate admin bundle from storefront entry point` is ACCEPT as a low-risk architectural refactoring lane. Accepted facts: The monolithic `App.tsx` entry point was split. All admin routes, the `AdminGuard`, `AdminLayout`, and admin lazy page imports were moved to a new isolated `AdminApp.tsx` bundle. `App.tsx` now evaluates `pathname.startsWith('/admin')` to lazily load the entire admin bundle. Storefront users will no longer download admin route declarations or components. Validation: typecheck green, 914 tests green. Non-claims: no production build chunk inspection to verify Vite splitting, no live deployment proof. Residuals: none, local testing confirms routes remain functional.
 
