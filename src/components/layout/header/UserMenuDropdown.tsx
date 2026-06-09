@@ -29,7 +29,7 @@ export function UserMenuDropdown() {
 
     useEffect(() => {
         if (user) {
-            checkIsAdmin(user.id).then(res => setIsAdmin(res)).catch(() => setIsAdmin(false));
+            checkIsAdmin(user).then(res => setIsAdmin(res)).catch(() => setIsAdmin(false));
         } else {
             setIsAdmin(false);
         }

@@ -47,7 +47,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
         setDebugInfo(`Verificando admin para: ${user.id.slice(0, 8)}...`);
         if (import.meta.env.DEV) console.log('[AdminGuard] Checking admin for user:', user.id);
 
-        checkIsAdmin(user.id)
+        checkIsAdmin(user)
             .then((result) => {
                 if (import.meta.env.DEV) console.log('[AdminGuard] checkIsAdmin result:', result);
                 setIsAdmin(result);

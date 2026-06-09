@@ -74,7 +74,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
     useEffect(() => {
         if (user) {
-            checkIsAdmin(user.id).then(res => setIsAdmin(res)).catch(() => setIsAdmin(false));
+            checkIsAdmin(user).then(res => setIsAdmin(res)).catch(() => setIsAdmin(false));
         } else {
             setIsAdmin(false);
         }
