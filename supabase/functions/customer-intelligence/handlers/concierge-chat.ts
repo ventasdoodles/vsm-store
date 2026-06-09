@@ -26,6 +26,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
     geminiEmbedText,
     geminiGenerateContent,
+    geminiStreamGenerateContent,
     getGeminiRuntimePolicy,
 } from '../_shared/gemini-api.ts'
 
@@ -1363,417 +1364,280 @@ export async function handleConciergeChat(
                 && toolCalls.length === 0
                 && Boolean(analystConversationalPrefix);
 
-            // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” SOMMELIER CALL WITH FALLBACK â•â•â•
+            
+            // ═══ HARDENING 2: GEMINI RESILIENCE — SOMMELIER CALL WITH STREAMING SUPPORT ═══
+            const isStreamingRequest = body.stream === true;
+            
             let sommelierResult: any = {};
             let sommelierResponse: Response | null = null;
             let sommelier_gemini_error: string | null = null;
             let rawText = '';
             const sommelier_fallback_on_error = 'A ver, ahi si se me cruzaron los cables. Dame un momento y vuelveme a tirar la pregunta.';
 
-            if (!shouldShortCircuitClarification) {
-                const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
-                if (audio) {
-                    parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
-                }
-                parts.push({ text: sommelierPrompt });
+            const postProcessAndTelemetry = async (
+                localRawText: string,
+                localSommelierResponse: Response | null,
+                localSommelierResult: any,
+                localSommelierGeminiError: string | null,
+                shouldShortCircuitClarification: boolean
+            ) => {
+                const sommelierDiag = shouldShortCircuitClarification
+                    ? {
+                        http_status: 'skipped',
+                        candidates_count: 0,
+                        finish_reason: 'SKIPPED_CLARIFICATION',
+                        safety_ratings: [],
+                        raw_text_length: 0,
+                        raw_text_preview: '',
+                        prompt_feedback: null,
+                        gemini_error: null,
+                        using_fallback: false
+                    }
+                    : {
+                        http_status: localSommelierResponse?.status || 'no_response',
+                        candidates_count: localSommelierResult?.candidates?.length || 0,
+                        finish_reason: localSommelierResult?.candidates?.[0]?.finishReason || 'NONE',
+                        safety_ratings: localSommelierResult?.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
+                        raw_text_length: localRawText.length,
+                        raw_text_preview: localRawText.slice(0, 300),
+                        prompt_feedback: localSommelierResult?.promptFeedback || null,
+                        gemini_error: localSommelierGeminiError,
+                        using_fallback: !!localSommelierGeminiError
+                    };
+                console.warn(`[Sommelier] DIAG:`, JSON.stringify(sommelierDiag));
 
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s sommelier timeout (includes audio processing)
-
-                    sommelierResponse = await geminiGenerateContent({
-                        apiKey: _GEMINI_API_KEY,
-                        model: CONCIERGE_SOMMELIER_MODEL,
-                        body: {
-                            contents: [{ parts }],
-                            generationConfig: { temperature: 0.2 },
-                            safetySettings: SAFETY_SETTINGS,
-                        },
-                        signal: controller.signal,
+                let aiData: any = {};
+                if (shouldShortCircuitClarification) {
+                    const clarificationText = buildClarificationFirstFallbackText({
+                        text: analystConversationalPrefix,
+                        query: query || '',
+                        primaryIntent: turnProfile.primary_intent,
+                        currentTurnDecision: turnProfile.current_turn_decision,
+                        catalogGateReason: catalogGate.reason,
+                        toolCallCount: toolCalls.length,
+                        hasProductSurfaces: catalogGate.is_open,
                     });
 
-                    clearTimeout(timeoutId);
-
-                    // Handle degradation gracefully
-                    if (sommelierResponse.status === 429) {
-                        console.warn('[Sommelier] Rate limited (429): using fallback');
-                        sommelier_gemini_error = 'Sommelier rate limit (429)';
-                    } else if (sommelierResponse.status >= 500) {
-                        console.warn(`[Sommelier] Server error (${sommelierResponse.status}): using fallback`);
-                        sommelier_gemini_error = `Sommelier server error (${sommelierResponse.status})`;
-                    } else if (!sommelierResponse.ok) {
-                        sommelierResult = await sommelierResponse.json();
-                        console.error(`[Sommelier] HTTP ${sommelierResponse.status}:`, JSON.stringify(sommelierResult).slice(0, 300));
-                        sommelier_gemini_error = sommelierResult.error?.message || `HTTP ${sommelierResponse.status}`;
-                    } else {
-                        sommelierResult = await sommelierResponse.json();
-                        rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                        const sommelierUsage = buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, sommelierResult.usageMetadata);
-                        console.warn(`[Sommelier] HTTP ${sommelierResponse.status}, text length: ${rawText.length}`);
-                        if (sommelierUsage) {
-                            console.warn('[Sommelier Tokens]', JSON.stringify(sommelierUsage));
-                        }
-                    }
-                } catch (e: any) {
-                    if (e.name === 'AbortError') {
-                        console.warn('[Sommelier] Request timeout (>25s): using fallback');
-                        sommelier_gemini_error = 'Sommelier timeout';
-                    } else {
-                        console.error(`[Sommelier] Fetch error: ${e.message}`);
-                        sommelier_gemini_error = e.message;
-                    }
-                }
-            }
-
-            // Parse Sommelier or use fallback
-            const sommelierDiag = shouldShortCircuitClarification
-                ? {
-                    http_status: 'skipped',
-                    candidates_count: 0,
-                    finish_reason: 'SKIPPED_CLARIFICATION',
-                    safety_ratings: [],
-                    raw_text_length: 0,
-                    raw_text_preview: '',
-                    prompt_feedback: null,
-                    gemini_error: null,
-                    using_fallback: false
-                }
-                : {
-                    http_status: sommelierResponse?.status || 'no_response',
-                    candidates_count: sommelierResult.candidates?.length || 0,
-                    finish_reason: sommelierResult.candidates?.[0]?.finishReason || 'NONE',
-                    safety_ratings: sommelierResult.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
-                    raw_text_length: rawText.length,
-                    raw_text_preview: rawText.slice(0, 300),
-                    prompt_feedback: sommelierResult.promptFeedback || null,
-                    gemini_error: sommelier_gemini_error,
-                    using_fallback: !!sommelier_gemini_error
-                };
-            console.warn(`[Sommelier] DIAG:`, JSON.stringify(sommelierDiag));
-
-            let aiData: any = {};
-            if (shouldShortCircuitClarification) {
-                const clarificationText = buildClarificationFirstFallbackText({
-                    text: analystConversationalPrefix,
-                    query: query || '',
-                    primaryIntent: turnProfile.primary_intent,
-                    currentTurnDecision: turnProfile.current_turn_decision,
-                    catalogGateReason: catalogGate.reason,
-                    toolCallCount: toolCalls.length,
-                    hasProductSurfaces: catalogGate.is_open,
-                });
-
-                aiData = {
-                    text: clarificationText,
-                    intent: analystReport.intent || 'support',
-                    fallback_reason: 'ANALYST_CLARIFICATION',
-                    products: [],
-                    routed_capsule: null,
-                    conversational_prefix: null
-                };
-            } else if (sommelier_gemini_error) {
-                // Gemini degraded: keep bounded policy turns useful before falling back to the generic degraded line
-                console.warn(`[Sommelier] Using fallback due to: ${sommelier_gemini_error}`);
-                const degradedPolicyFallback = intent === 'POLICY_INQUIRY' && !catalogGate.is_open
-                    ? buildDegradedPolicyInquiryFallback({
-                        query: query || '',
-                        policyOutput: knowledgeOutput,
-                        policyMatchCount: knowledgeMatchCount,
-                    })
-                    : null;
-                aiData = {
-                    text: compactCesarinResponseText(degradedPolicyFallback?.text || sommelier_fallback_on_error)
-                        || degradedPolicyFallback?.text
-                        || sommelier_fallback_on_error,
-                    intent: analystReport.intent || 'support',
-                    fallback_reason: 'GEMINI_DEGRADED',
-                    products: [],
-                    routed_capsule: null
-                };
-            } else {
-                try {
-                    // Parse Sommelier JSON: clean markdown code blocks, then parse
-                    const cleanSommelierJson = rawText.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '').trim();
-                    if (!cleanSommelierJson) {
-                        throw new Error('Sommelier response is empty after cleanup');
-                    }
-
-                    aiData = JSON.parse(cleanSommelierJson);
-
-                    // Validate Sommelier contract: must have 'text' field (required, non-empty)
-                    if (!aiData || typeof aiData !== 'object') {
-                        throw new Error('Sommelier response is not a JSON object');
-                    }
-
-                    // Text extraction with fallback chain: text â†’ message â†’ response â†’ respuesta â†’ answer â†’ reply
-                    let responseText = aiData.text;
-                    if (!responseText || typeof responseText !== 'string' || responseText.trim() === '') {
-                        responseText = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
-                    }
-
-                    // If still empty after all fallbacks, this violates the contract
-                    if (!responseText || responseText.trim() === '') {
-                        throw new Error('Sommelier response missing required "text" field and all fallback fields empty');
-                    }
-
-                    const compactedResponseText = compactCesarinResponseText(responseText.trim());
-                    aiData.text = compactedResponseText || responseText.trim();
-                    if (typeof aiData.conversational_prefix === 'string') {
-                        const compactedPrefix = compactCesarinResponseText(aiData.conversational_prefix);
-                        aiData.conversational_prefix = compactedPrefix || null;
-                    }
-                    console.warn(`[Sommelier] Contract valid: parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${aiData.text.length}`);
-                } catch (_e) {
-                    console.error("[Sommelier] JSON parse error:", (_e as any).message, "Raw:", rawText.slice(0, 200));
                     aiData = {
-                        text: compactCesarinResponseText(sommelier_fallback_on_error) || sommelier_fallback_on_error,
+                        text: clarificationText,
                         intent: analystReport.intent || 'support',
-                        fallback_reason: 'JSON_PARSE_ERROR'
+                        fallback_reason: 'ANALYST_CLARIFICATION',
+                        products: [],
+                        routed_capsule: null,
+                        conversational_prefix: null
+                    };
+                } else if (localSommelierGeminiError) {
+                    console.warn(`[Sommelier] Using fallback due to: ${localSommelierGeminiError}`);
+                    const degradedPolicyFallback = intent === 'POLICY_INQUIRY' && !catalogGate.is_open
+                        ? buildDegradedPolicyInquiryFallback({
+                            query: query || '',
+                            policyOutput: knowledgeOutput,
+                            policyMatchCount: knowledgeMatchCount,
+                        })
+                        : null;
+                    aiData = {
+                        text: compactCesarinResponseText(degradedPolicyFallback?.text || sommelier_fallback_on_error)
+                            || degradedPolicyFallback?.text
+                            || sommelier_fallback_on_error,
+                        intent: analystReport.intent || 'support',
+                        fallback_reason: 'GEMINI_DEGRADED',
+                        products: [],
+                        routed_capsule: null
+                    };
+                } else {
+                    try {
+                        const cleanSommelierJson = localRawText.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '').trim();
+                        if (!cleanSommelierJson) throw new Error('Sommelier response is empty after cleanup');
+                        aiData = JSON.parse(cleanSommelierJson);
+                        if (!aiData || typeof aiData !== 'object') throw new Error('Sommelier response is not a JSON object');
+
+                        let responseText = aiData.text;
+                        if (!responseText || typeof responseText !== 'string' || responseText.trim() === '') {
+                            responseText = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
+                        }
+                        if (!responseText || responseText.trim() === '') throw new Error('Sommelier response missing required "text" field and all fallback fields empty');
+
+                        const compactedResponseText = compactCesarinResponseText(responseText.trim());
+                        aiData.text = compactedResponseText || responseText.trim();
+                        if (typeof aiData.conversational_prefix === 'string') {
+                            const compactedPrefix = compactCesarinResponseText(aiData.conversational_prefix);
+                            aiData.conversational_prefix = compactedPrefix || null;
+                        }
+                        console.warn(`[Sommelier] Contract valid: parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${aiData.text.length}`);
+                    } catch (_e: any) {
+                        console.error("[Sommelier] JSON parse error:", _e.message, "Raw:", localRawText.slice(0, 200));
+                        aiData = {
+                            text: compactCesarinResponseText(sommelier_fallback_on_error) || sommelier_fallback_on_error,
+                            intent: analystReport.intent || 'support',
+                            fallback_reason: 'JSON_PARSE_ERROR'
+                        };
+                    }
+                }
+
+                if (aiData.intent === 'whatsapp' && !aiData.action) {
+                    const helpMessage = encodeURIComponent(`Hola, vengo del chat de Cesarin y necesito ayuda con esto: ${query || 'consulta de tienda'}`);
+                    aiData.action = {
+                        label: 'Seguir por WhatsApp',
+                        url: `https://wa.me/${whatsappNumber}?text=${helpMessage}`,
+                        type: 'whatsapp'
                     };
                 }
-            }
 
-            // â”€â”€ Business Telemetry Computation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            if (aiData.intent === 'whatsapp' && !aiData.action) {
-                const helpMessage = encodeURIComponent(`Hola, vengo del chat de Cesarin y necesito ayuda con esto: ${query || 'consulta de tienda'}`);
-                aiData.action = {
-                    label: 'Seguir por WhatsApp',
-                    url: `https://wa.me/${whatsappNumber}?text=${helpMessage}`,
-                    type: 'whatsapp'
-                };
-            }
-
-            if (shouldSuppressCesarinConversationalPrefix({
-                prefix: aiData.conversational_prefix,
-                text: aiData.text,
-                primaryIntent: turnProfile.primary_intent,
-                currentTurnDecision: turnProfile.current_turn_decision,
-                hasPublicSourceContext: Boolean(publicSourceContext),
-            })) {
-                aiData.conversational_prefix = null;
-            }
-
-            if (
-                !aiData.conversational_prefix
-                && analystConversationalPrefix
-                && !shouldSuppressCesarinConversationalPrefix({
-                    prefix: analystConversationalPrefix,
+                if (shouldSuppressCesarinConversationalPrefix({
+                    prefix: aiData.conversational_prefix,
                     text: aiData.text,
                     primaryIntent: turnProfile.primary_intent,
                     currentTurnDecision: turnProfile.current_turn_decision,
                     hasPublicSourceContext: Boolean(publicSourceContext),
-                })
-            ) {
-                aiData.conversational_prefix = analystConversationalPrefix;
-            }
-
-            if (!catalogGate.is_open) {
-                aiData.products = [];
-                aiData.recommended_products = [];
-                aiData.resolved_products = [];
-                aiData.next_step_view = null;
-                if (aiData.capsule_contract && typeof aiData.capsule_contract === 'object') {
-                    aiData.capsule_contract = {
-                        ...aiData.capsule_contract,
-                        resolved_products: [],
-                        next_step_view: null,
-                        catalog_gate: guardrailTelemetry.catalog_gate,
-                        turn_analysis: guardrailTelemetry.turn_profile,
-                    };
+                })) {
+                    aiData.conversational_prefix = null;
                 }
-            }
 
-            if (typeof aiData.text === 'string' && aiData.text.trim().length > 0) {
-                aiData.text = shapeCesarinResponseText({
-                    text: aiData.text,
-                    primaryIntent: turnProfile.primary_intent,
-                    currentTurnDecision: turnProfile.current_turn_decision,
-                    hasProductSurfaces: catalogGate.is_open && (
-                        (Array.isArray(aiData.products) && aiData.products.length > 0)
-                        || (Array.isArray(aiData.recommended_products) && aiData.recommended_products.length > 0)
-                        || (Array.isArray(aiData.resolved_products) && aiData.resolved_products.length > 0)
-                    ),
-                    hasNextStep: Boolean(aiData.next_step_view),
-                    actionType: aiData.action?.type ?? null,
-                });
-            }
+                if (!aiData.conversational_prefix && analystConversationalPrefix && !shouldSuppressCesarinConversationalPrefix({
+                        prefix: analystConversationalPrefix,
+                        text: aiData.text,
+                        primaryIntent: turnProfile.primary_intent,
+                        currentTurnDecision: turnProfile.current_turn_decision,
+                        hasPublicSourceContext: Boolean(publicSourceContext),
+                    })) {
+                    aiData.conversational_prefix = analystConversationalPrefix;
+                }
 
-            if (publicSourceContext) {
-                aiData.source_context = publicSourceContext;
-            }
+                if (!catalogGate.is_open) {
+                    aiData.products = [];
+                    aiData.recommended_products = [];
+                    aiData.resolved_products = [];
+                    aiData.next_step_view = null;
+                    if (aiData.capsule_contract && typeof aiData.capsule_contract === 'object') {
+                        aiData.capsule_contract = { ...aiData.capsule_contract, resolved_products: [], next_step_view: null, catalog_gate: guardrailTelemetry.catalog_gate, turn_analysis: guardrailTelemetry.turn_profile };
+                    }
+                }
 
-            const knowledgeChunksCount = toolResults
-                .filter(r => r.name === 'knowledge_rag_foundation' || r.name === 'get_store_policy')
-                .reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);
+                if (typeof aiData.text === 'string' && aiData.text.trim().length > 0) {
+                    aiData.text = shapeCesarinResponseText({
+                        text: aiData.text,
+                        primaryIntent: turnProfile.primary_intent,
+                        currentTurnDecision: turnProfile.current_turn_decision,
+                        hasProductSurfaces: catalogGate.is_open && (
+                            (Array.isArray(aiData.products) && aiData.products.length > 0) || (Array.isArray(aiData.recommended_products) && aiData.recommended_products.length > 0) || (Array.isArray(aiData.resolved_products) && aiData.resolved_products.length > 0)
+                        ),
+                        hasNextStep: Boolean(aiData.next_step_view),
+                        actionType: aiData.action?.type ?? null,
+                    });
+                }
 
-            // semantic_match_success: true if either products or knowledge returned real matches
-            const productSearchResult = toolResults.find(r => r.name === 'search_products');
-            const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
-            const knowledgeMatchCountForTelemetry  = (knowledgeResult as any)?.metadata?.chunks_found || 0;
-            const semanticMatchSuccess = productMatchCount > 0 || knowledgeMatchCount > 0
-                || toolResults.some(r => r.name === 'storefront_compatibility_check' && r.status === 'success')
-                || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
-                || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
-                || toolResults.some(r => r.name === 'get_inventory_outlook' && r.status === 'success')
-                || toolResults.some(r => r.name === 'public_web_search' && r.status === 'success')
-                || toolResults.some(r => r.name === 'public_url_context' && r.status === 'success');
+                if (publicSourceContext) aiData.source_context = publicSourceContext;
 
-            // fallback_used: true if Sommelier generated a fallback (no knowledge/products found)
-            const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontrÃ©'));
+                const knowledgeChunksCount = toolResults.filter(r => r.name === 'knowledge_rag_foundation' || r.name === 'get_store_policy').reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);
+                const productSearchResult = toolResults.find(r => r.name === 'search_products');
+                const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
+                const knowledgeMatchCountForTelemetry  = (knowledgeResult as any)?.metadata?.chunks_found || 0;
+                const semanticMatchSuccess = productMatchCount > 0 || knowledgeMatchCount > 0
+                    || toolResults.some(r => r.name === 'storefront_compatibility_check' && r.status === 'success')
+                    || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
+                    || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
+                    || toolResults.some(r => r.name === 'get_inventory_outlook' && r.status === 'success')
+                    || toolResults.some(r => r.name === 'public_web_search' && r.status === 'success')
+                    || toolResults.some(r => r.name === 'public_url_context' && r.status === 'success');
 
-            // product_card_count: number of product cards recommended by Sommelier
-            const productCardCount = Array.isArray(aiData.products) ? aiData.products.length
-                : Array.isArray(aiData.recommended_products) ? aiData.recommended_products.length
-                : productMatchCount > 0 ? productMatchCount : 0;
+                const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontré'));
+                const productCardCount = Array.isArray(aiData.products) ? aiData.products.length : Array.isArray(aiData.recommended_products) ? aiData.recommended_products.length : productMatchCount > 0 ? productMatchCount : 0;
+                const cartActionDetected = toolCalls.some(c => c.name === 'cart_operator');
 
-            // cart_action_detected: true if cart_operator was invoked
-            const cartActionDetected = toolCalls.some(c => c.name === 'cart_operator');
+                const escalationRequested = aiData.intent === 'whatsapp' || aiData.action?.type === 'whatsapp' || /hablar con (un |una )?(humano|persona|asesor|agente)/i.test(query || '');
+                const zeroNow = intent === 'PRODUCT_SEARCH' && productCardCount === 0;
+                const priorZeroSignal = Array.isArray(history) && history.some((h: { role: string; content: string }) => h.role === 'assistant' && /no encontr[eé]|no tenemos|no está disponible|sin resultados|agotado/i.test(h.content));
+                const zeroResultsPersistence = zeroNow && priorZeroSignal;
+                const isConversationalIntent = intent === 'CHIT_CHAT' || isGreeting || aiData.fallback_reason === 'GREETING' || aiData.fallback_reason === 'CHIT_CHAT';
+                const fallbackEmpty = fallbackUsed && productCardCount === 0 && !isConversationalIntent;
+                const frustrationDetected = escalationRequested || zeroResultsPersistence || fallbackEmpty;
 
-            // â”€â”€ frustration_detected: MVP 3-signal heuristic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            // Signal 1: Escalation â€” user explicitly asks for human/WhatsApp
-            const escalationRequested = aiData.intent === 'whatsapp'
-                || aiData.action?.type === 'whatsapp'
-                || /hablar con (un |una )?(humano|persona|asesor|agente)/i.test(query || '');
-
-            // Signal 2: Zero-results persistence â€” current search returned 0 AND
-            //   a recent assistant message in history already apologised for no results
-            const zeroNow = intent === 'PRODUCT_SEARCH' && productCardCount === 0;
-            const priorZeroSignal = Array.isArray(history) && history.some(
-                (h: { role: string; content: string }) =>
-                    h.role === 'assistant' &&
-                    /no encontr[eÃ©]|no tenemos|no estÃ¡ disponible|sin resultados|agotado/i.test(h.content)
-            );
-            const zeroResultsPersistence = zeroNow && priorZeroSignal;
-
-            // Signal 3: Fallback + empty â€” fallback route fired AND zero product cards
-            //   Exclude greetings/chit-chat: these are intentionally zero-card, zero-tool responses
-            const isConversationalIntent = intent === 'CHIT_CHAT' || isGreeting
-                || aiData.fallback_reason === 'GREETING' || aiData.fallback_reason === 'CHIT_CHAT';
-            const fallbackEmpty = fallbackUsed && productCardCount === 0 && !isConversationalIntent;
-
-            const frustrationDetected = escalationRequested || zeroResultsPersistence || fallbackEmpty;
-
-            aiData.debug = {
-                // Observability: Model + Config
-                sommelier_model: CONCIERGE_SOMMELIER_MODEL,
-                analyst_model: CONCIERGE_ANALYST_MODEL,
-                sommelier_temperature: 0.2,
-                sommelier_http_status: sommelierResponse?.status || 500,
-                sommelier_routed_capsule: aiData.routed_capsule || null,
-                sommelier_fallback_reason: aiData.fallback_reason || null,
-                sommelier_diag: sommelierDiag,
-                // Standard debug fields
-                detected_intent: analystReport.intent,
-                intent: aiData.intent || analystReport.intent, // Sommelier intent preferred; fallback to Analyst intent if missing
-                sommelier_intent: aiData.intent || 'MISSING',
-                requires_client_capsule: !!aiData.requires_client_capsule,
-                tool_calls: toolCalls, // [CANONICAL]
-                tool_calls_requested: toolCalls.length,
-                tools_executed: toolResults.filter(r => r.status === 'success').map(r => r.name),
-                knowledge_chunks_count: knowledgeChunksCount,
-                memory_trace: memoryTrace,
-                latency_ms: Date.now() - startTools,
-                gemini_api_error: geminiError,
-                raw_analyst_report: analystReport,
-                should_close_session: analystReport.should_close_session || aiData.should_close_session || false,
-                analyst_report: {
-                    intent: analystReport.intent,
-                    turn_decision: analystReport.turn_decision || null,
-                    doubts: analystReport.doubts,
-                    customer_dna: analystReport.customer_dna,
-                    tool_calls_requested: toolCalls.length,
-                    tool_results: toolResults.map(r => ({ 
-                        name: r.name, 
-                        status: r.status, 
-                        latency: r.latency_ms,
-                        summary: r.summary,
-                        args: r.args
-                    })),
-                    total_tool_latency: totalToolLatency,
-                    shared_embedding_used: !!sharedEmbedding,
-                    capability_box: capabilityPlan.capabilityBox,
-                    primary_capability: capabilityPlan.primaryCapability,
-                },
-                sommelier_report: {
-                    rules_applied: aiRules?.map((r: { content: string }) => r.content).slice(0, 3) || [],
-                    tone_correction: true,
-                    creative_layer: "Active"
-                },
-                runtime_truth: {
-                    analyst_model: CONCIERGE_ANALYST_MODEL,
+                aiData.debug = {
                     sommelier_model: CONCIERGE_SOMMELIER_MODEL,
-                    ...getGeminiRuntimePolicy(),
-                    project_ref: 'cvvlorbiwtuhkxolhfie',
-                    correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
-                }
-            };
-
-            // â”€â”€ Memory Persistence (Non-blocking â€” unchanged) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            if (aiData.text) {
-                aiData.text = compactCesarinResponseText(aiData.text) || aiData.text;
-                await persistStorefrontCustomerMemoryIfPossible();
-            }
-
-            // TEXT GUARANTEE: Ensure aiData always has a text field before returning
-            if (!aiData.text && !aiData.message) {
-                console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
-                aiData.text = compactCesarinResponseText(aiData.response || '') || buildCesarinNonHollowFallbackText({
-                    query: query || '',
-                    reason: sommelier_gemini_error || geminiError || 'empty_model_response',
-                });
-                aiData.intent = analystReport.intent || 'support';
-            }
-
-            if (typeof aiData.text === 'string') {
-                aiData.text = guardClarificationFirstFinalText({
-                    text: aiData.text,
-                    query: query || '',
-                    primaryIntent: guardrailTelemetry.turn_profile.primary_intent,
-                    currentTurnDecision: guardrailTelemetry.turn_profile.current_turn_decision,
-                    catalogGateReason: guardrailTelemetry.catalog_gate.reason,
-                    catalogGateOpen: guardrailTelemetry.catalog_gate.is_open,
-                    toolCallCount: toolCalls.length,
-                    productCardCount,
-                    hasProductSurfaces: Boolean(
-                        (Array.isArray(aiData.products) && aiData.products.length > 0)
-                        || (Array.isArray(aiData.recommended_products) && aiData.recommended_products.length > 0)
-                        || (Array.isArray(aiData.resolved_products) && aiData.resolved_products.length > 0)
-                    ),
-                });
-            }
-
-            // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€
-            // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
-            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, KIT_ASSEMBLY, BUDGET_RESCUE, CHECKOUT_READINESS, WARRANTY_SUPPORT, LOYALTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, COMPATIBILITY_CHECK, OUT_OF_DOMAIN)
-            // were handled before reaching Sommelier. All others (INVENTORY_OUTLOOK, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
-            const preRoutedIntents = ['PRODUCT_SEARCH', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'CHECKOUT_READINESS', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'COMPATIBILITY_CHECK', 'OUT_OF_DOMAIN'];
-            const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
-            const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
-            const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);
-
-            if (!aiData.requires_client_capsule) {
-                const analyticsPayload = {
-                    query: query,
-                    response_text: aiData.text ?? null,
+                    analyst_model: CONCIERGE_ANALYST_MODEL,
+                    sommelier_temperature: 0.2,
+                    sommelier_http_status: localSommelierResponse?.status || 500,
+                    sommelier_routed_capsule: aiData.routed_capsule || null,
+                    sommelier_fallback_reason: aiData.fallback_reason || null,
+                    sommelier_diag: sommelierDiag,
                     detected_intent: analystReport.intent,
-                    frustration_detected: frustrationDetected,
-                    primary_intent: guardrailTelemetry.turn_profile.primary_intent,
-                    current_turn_decision: guardrailTelemetry.turn_profile.current_turn_decision,
-                    turn_focus: guardrailTelemetry.turn_profile.turn_focus,
-                    catalog_gate_open: guardrailTelemetry.catalog_gate.is_open,
-                    catalog_gate_reason: guardrailTelemetry.catalog_gate.reason,
-                    next_step_family: telemetryNextStep.next_step_family,
-                    assist_action_present: telemetryNextStep.assist_action_present,
-                    source_context_present: Boolean(publicSourceContext),
-                    retrieval_source: telemetryRetrievalSource,
-                    recommended_product_ids: Array.isArray(aiData.products)
-                        ? aiData.products.map((p: any) => p.id).filter(Boolean)
-                        : [],
-                ai_logic_debug: {
-                    ...aiData.debug,
-                    turn_profile: guardrailTelemetry.turn_profile,
-                    // Cognitive Integrity: routing path distinguishes pre-routed vs fallback-handled
-                    routing_path: routingPath,
+                    intent: aiData.intent || analystReport.intent,
+                    sommelier_intent: aiData.intent || 'MISSING',
+                    requires_client_capsule: !!aiData.requires_client_capsule,
+                    tool_calls: toolCalls,
+                    tool_calls_requested: toolCalls.length,
+                    tools_executed: toolResults.filter(r => r.status === 'success').map(r => r.name),
+                    knowledge_chunks_count: knowledgeChunksCount,
+                    memory_trace: memoryTrace,
+                    latency_ms: Date.now() - startTools,
+                    gemini_api_error: geminiError,
+                    raw_analyst_report: analystReport,
+                    should_close_session: analystReport.should_close_session || aiData.should_close_session || false,
+                    analyst_report: {
+                        intent: analystReport.intent,
+                        turn_decision: analystReport.turn_decision || null,
+                        doubts: analystReport.doubts,
+                        customer_dna: analystReport.customer_dna,
+                        tool_calls_requested: toolCalls.length,
+                        tool_results: toolResults.map(r => ({ name: r.name, status: r.status, latency: r.latency_ms, summary: r.summary, args: r.args })),
+                        total_tool_latency: totalToolLatency,
+                        shared_embedding_used: !!sharedEmbedding,
+                        capability_box: capabilityPlan.capabilityBox,
+                        primary_capability: capabilityPlan.primaryCapability,
+                    },
+                    sommelier_report: {
+                        rules_applied: aiRules?.map((r: { content: string }) => r.content).slice(0, 3) || [],
+                        tone_correction: true,
+                        creative_layer: "Active"
+                    },
+                    runtime_truth: {
+                        analyst_model: CONCIERGE_ANALYST_MODEL,
+                        sommelier_model: CONCIERGE_SOMMELIER_MODEL,
+                        ...getGeminiRuntimePolicy(),
+                        project_ref: 'cvvlorbiwtuhkxolhfie',
+                        correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                    }
+                };
+
+                if (aiData.text) {
+                    aiData.text = compactCesarinResponseText(aiData.text) || aiData.text;
+                    await persistStorefrontCustomerMemoryIfPossible();
+                }
+
+                if (!aiData.text && !aiData.message) {
+                    console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback.');
+                    aiData.text = compactCesarinResponseText(aiData.response || '') || buildCesarinNonHollowFallbackText({
+                        query: query || '',
+                        reason: localSommelierGeminiError || geminiError || 'empty_model_response',
+                    });
+                    aiData.intent = analystReport.intent || 'support';
+                }
+
+                if (typeof aiData.text === 'string') {
+                    aiData.text = guardClarificationFirstFinalText({
+                        text: aiData.text,
+                        query: query || '',
+                        primaryIntent: guardrailTelemetry.turn_profile.primary_intent,
+                        currentTurnDecision: guardrailTelemetry.turn_profile.current_turn_decision,
+                        catalogGateReason: guardrailTelemetry.catalog_gate.reason,
+                        catalogGateOpen: guardrailTelemetry.catalog_gate.is_open,
+                        toolCallCount: toolCalls.length,
+                        productCardCount,
+                        hasProductSurfaces: Boolean((Array.isArray(aiData.products) && aiData.products.length > 0) || (Array.isArray(aiData.recommended_products) && aiData.recommended_products.length > 0) || (Array.isArray(aiData.resolved_products) && aiData.resolved_products.length > 0)),
+                    });
+                }
+
+                const preRoutedIntents = ['PRODUCT_SEARCH', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'CHECKOUT_READINESS', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'COMPATIBILITY_CHECK', 'OUT_OF_DOMAIN'];
+                const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
+                const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
+                const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);
+
+                if (!aiData.requires_client_capsule) {
+                    const analyticsPayload = {
+                        query: query,
+                        response_text: aiData.text ?? null,
+                        detected_intent: analystReport.intent,
+                        frustration_detected: frustrationDetected,
                         primary_intent: guardrailTelemetry.turn_profile.primary_intent,
                         current_turn_decision: guardrailTelemetry.turn_profile.current_turn_decision,
                         turn_focus: guardrailTelemetry.turn_profile.turn_focus,
@@ -1783,119 +1647,192 @@ export async function handleConciergeChat(
                         assist_action_present: telemetryNextStep.assist_action_present,
                         source_context_present: Boolean(publicSourceContext),
                         retrieval_source: telemetryRetrievalSource,
-                        // Business KPIs persisted to ai_analytics
-                        semantic_match_success: semanticMatchSuccess,
-                        fallback_used: fallbackUsed,
-                        product_card_count: productCardCount,
-                        cart_action_detected: cartActionDetected,
-                        frustration_detected: frustrationDetected,
-                        frustration_signals: {
-                            escalation: escalationRequested,
-                            zero_results_persistence: zeroResultsPersistence,
-                            fallback_empty: fallbackEmpty
-                        },
-                        product_match_count: productMatchCount,
-                        policy_match_count: knowledgeMatchCountForTelemetry,
-                        // Token usage observability for cost analysis
-                        token_usage: {
-                            analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata),
-                            sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, sommelierResult?.usageMetadata),
-                        },
-                    }
-                };
-                const suppressEdgeAnalytics = shouldSuppressCustomerIntelligenceWrite(noWriteSmoke, 'ai_analytics');
-                const { data: analyticsData, error: analyticsErr } = suppressEdgeAnalytics
-                    ? { data: null, error: null }
-                    : await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();
-                if (analyticsErr) {
-                    console.error('[Analytics] Insert failed:', analyticsErr.message);
-                } else if (suppressEdgeAnalytics) {
-                    console.warn('[Analytics] Suppressed by customer-intelligence no-write smoke contract');
-                } else {
-                    console.warn(`[Analytics] Persisted â€” intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
-                }
-                // Truthful ownership: only claim edge-logged if insert actually succeeded
-                const edgeTelemetryLogged = !analyticsErr && !suppressEdgeAnalytics;
-                aiData.server_telemetry_logged = edgeTelemetryLogged;
-                if (noWriteSmoke) {
-                    aiData.no_write_smoke = noWriteSmoke;
-                }
-                aiData.telemetry_contract = buildTelemetryContract({
-                    owner: 'edge',
-                    edgeLogged: edgeTelemetryLogged,
-                    reason: edgeTelemetryLogged ? 'edge_logged' : 'edge_insert_failed',
-                });
+                        recommended_product_ids: Array.isArray(aiData.products) ? aiData.products.map((p: any) => p.id).filter(Boolean) : [],
+                        ai_logic_debug: {
+                            ...aiData.debug,
+                            turn_profile: guardrailTelemetry.turn_profile,
+                            routing_path: routingPath,
+                            primary_intent: guardrailTelemetry.turn_profile.primary_intent,
+                            current_turn_decision: guardrailTelemetry.turn_profile.current_turn_decision,
+                            turn_focus: guardrailTelemetry.turn_profile.turn_focus,
+                            catalog_gate_open: guardrailTelemetry.catalog_gate.is_open,
+                            catalog_gate_reason: guardrailTelemetry.catalog_gate.reason,
+                            next_step_family: telemetryNextStep.next_step_family,
+                            assist_action_present: telemetryNextStep.assist_action_present,
+                            source_context_present: Boolean(publicSourceContext),
+                            retrieval_source: telemetryRetrievalSource,
+                            semantic_match_success: semanticMatchSuccess,
+                            fallback_used: fallbackUsed,
+                            product_card_count: productCardCount,
+                            cart_action_detected: cartActionDetected,
+                            frustration_detected: frustrationDetected,
+                            frustration_signals: { escalation: escalationRequested, zero_results_persistence: zeroResultsPersistence, fallback_empty: fallbackEmpty },
+                            product_match_count: productMatchCount,
+                            policy_match_count: knowledgeMatchCountForTelemetry,
+                            token_usage: {
+                                analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata),
+                                sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, localSommelierResult?.usageMetadata),
+                            },
+                        }
+                    };
+                    const suppressEdgeAnalytics = shouldSuppressCustomerIntelligenceWrite(noWriteSmoke, 'ai_analytics');
+                    const { data: analyticsData, error: analyticsErr } = suppressEdgeAnalytics ? { data: null, error: null } : await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();
+                    
+                    const edgeTelemetryLogged = !analyticsErr && !suppressEdgeAnalytics;
+                    aiData.server_telemetry_logged = edgeTelemetryLogged;
+                    if (noWriteSmoke) aiData.no_write_smoke = noWriteSmoke;
+                    aiData.telemetry_contract = buildTelemetryContract({ owner: 'edge', edgeLogged: edgeTelemetryLogged, reason: edgeTelemetryLogged ? 'edge_logged' : 'edge_insert_failed' });
 
-                // â•â•â• HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) â•â•â•
-                // Trigger background evaluation for risky turns without blocking user response
-                const qaJudgeEnabled = Deno.env.get('DISABLE_QA_JUDGE') !== 'true'
-                    && !shouldSuppressCustomerIntelligenceCall(noWriteSmoke, 'cesarin-qa-judge');
-                const shouldEvaluate = qaJudgeEnabled && (frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0));
-                if (shouldEvaluate && analyticsData?.id) {
-                    // Non-blocking: fire-and-forget via fetch with no await
-                    (async () => {
-                        try {
-                            const judgePayload = {
-                                action: 'evaluate_turn',
-                                analytics_id: analyticsData.id,
-                                turn_data: {
-                                    query: query,
-                                    response_text: aiData.text,
-                                    intent: analystReport.intent,
-                                    frustration_detected: frustrationDetected,
-                                    zero_results: intent === 'PRODUCT_SEARCH' && productCardCount === 0,
-                                    product_count: productCardCount,
-                                    metadata: {
-                                        sommelier_model: CONCIERGE_SOMMELIER_MODEL,
-                                        timestamp: new Date().toISOString()
+                    const qaJudgeEnabled = Deno.env.get('DISABLE_QA_JUDGE') !== 'true' && !shouldSuppressCustomerIntelligenceCall(noWriteSmoke, 'cesarin-qa-judge');
+                    const shouldEvaluate = qaJudgeEnabled && (frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0));
+                    if (shouldEvaluate && analyticsData?.id) {
+                        (async () => {
+                            try {
+                                const judgePayload = { action: 'evaluate_turn', analytics_id: analyticsData.id, turn_data: { query: query, response_text: aiData.text, intent: analystReport.intent, frustration_detected: frustrationDetected, zero_results: intent === 'PRODUCT_SEARCH' && productCardCount === 0, product_count: productCardCount, metadata: { sommelier_model: CONCIERGE_SOMMELIER_MODEL, timestamp: new Date().toISOString() } } };
+                                const jc = new AbortController();
+                                const jt = setTimeout(() => jc.abort(), 5000);
+                                await fetch(`${_SUPABASE_URL}/functions/v1/cesarin-qa-judge`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_SUPABASE_SERVICE_ROLE_KEY}` }, body: JSON.stringify(judgePayload), signal: jc.signal });
+                                clearTimeout(jt);
+                            } catch (e: any) {}
+                        })();
+                    }
+                } else {
+                    aiData.server_telemetry_logged = false;
+                    aiData.telemetry_contract = buildTelemetryContract({ owner: 'client', edgeLogged: false, reason: 'capsule_handoff' });
+                }
+
+                aiData.turn_profile = guardrailTelemetry.turn_profile;
+                aiData.catalog_gate = guardrailTelemetry.catalog_gate;
+                
+                return aiData;
+            };
+
+            const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
+            if (audio) parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
+            parts.push({ text: sommelierPrompt });
+
+            const geminiOptions = {
+                apiKey: _GEMINI_API_KEY,
+                model: CONCIERGE_SOMMELIER_MODEL,
+                body: { contents: [{ parts }], generationConfig: { temperature: 0.2 }, safetySettings: SAFETY_SETTINGS }
+            };
+
+            if (isStreamingRequest) {
+                // ═══ STREAMING PATH ═══
+                const { readable, writable } = new TransformStream();
+                const writer = writable.getWriter();
+                const encoder = new TextEncoder();
+                
+                (async () => {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 25000);
+                        
+                        let streamRes: Response;
+                        if (!shouldShortCircuitClarification) {
+                            streamRes = await geminiStreamGenerateContent({ ...geminiOptions, signal: controller.signal });
+                        } else {
+                            streamRes = new Response('');
+                        }
+                        clearTimeout(timeoutId);
+
+                        if (!streamRes.ok && !shouldShortCircuitClarification) {
+                            sommelier_gemini_error = `Stream Error: ${streamRes.status}`;
+                            const aiData = await postProcessAndTelemetry('', streamRes, {}, sommelier_gemini_error, shouldShortCircuitClarification);
+                            await writer.write(encoder.encode(`event: metadata\ndata: ${JSON.stringify(aiData)}\n\n`));
+                            await writer.close();
+                            return;
+                        }
+
+                        let accumulatedString = '';
+                        let lastSentIndex = 0;
+                        let sommelierJsonObj: any = {};
+
+                        if (!shouldShortCircuitClarification && streamRes.body) {
+                            const reader = streamRes.body.getReader();
+                            const decoder = new TextDecoder();
+                            while (true) {
+                                const { value, done } = await reader.read();
+                                if (done) break;
+                                const chunkStr = decoder.decode(value, { stream: true });
+                                const lines = chunkStr.split('\n');
+                                for (const line of lines) {
+                                    if (line.startsWith('data: ') && line.trim() !== 'data: [DONE]') {
+                                        try {
+                                            const dataStr = line.slice(6).trim();
+                                            const json = JSON.parse(dataStr);
+                                            sommelierJsonObj = json;
+                                            const textChunk = json.candidates?.[0]?.content?.parts?.[0]?.text;
+                                            if (textChunk) {
+                                                accumulatedString += textChunk;
+                                                const textMatch = accumulatedString.match(/"text"\s*:\s*"([^]*?)(?:"(?:\s*,|\s*}|$)|$)/);
+                                                if (textMatch) {
+                                                    const currentText = textMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                                                    const newText = currentText.slice(lastSentIndex);
+                                                    if (newText.length > 0) {
+                                                        await writer.write(encoder.encode(`event: text\ndata: ${JSON.stringify(newText)}\n\n`));
+                                                        lastSentIndex = currentText.length;
+                                                    }
+                                                }
+                                            }
+                                        } catch (e) {}
                                     }
                                 }
-                            };
-
-                            // Best-effort: 5s timeout, no retry
-                            const jc = new AbortController();
-                            const jt = setTimeout(() => jc.abort(), 5000);
-
-                            const judgeRes = await fetch(
-                                `${_SUPABASE_URL}/functions/v1/cesarin-qa-judge`,
-                                {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': `Bearer ${_SUPABASE_SERVICE_ROLE_KEY}`
-                                    },
-                                    body: JSON.stringify(judgePayload),
-                                    signal: jc.signal
-                                }
-                            );
-
-                            clearTimeout(jt);
-
-                            if (!judgeRes.ok) {
-                                console.warn(`[QA Judge] Background eval returned ${judgeRes.status} (non-critical)`);
-                            } else {
-                                console.warn('[QA Judge] Background evaluation queued');
                             }
-                        } catch (e: any) {
-                            // Silently log: Judge failure must not impact user response
-                            console.warn(`[QA Judge] Background eval error (non-blocking): ${e.message}`);
                         }
-                    })();
-                }
+
+                        const aiData = await postProcessAndTelemetry(
+                            accumulatedString, 
+                            streamRes, 
+                            sommelierJsonObj, 
+                            sommelier_gemini_error, 
+                            shouldShortCircuitClarification
+                        );
+                        
+                        if (aiData.text && aiData.text.length > lastSentIndex) {
+                            const newText = aiData.text.slice(lastSentIndex);
+                            await writer.write(encoder.encode(`event: text\ndata: ${JSON.stringify(newText)}\n\n`));
+                        }
+
+                        const finalMetadata = { ...aiData };
+                        delete finalMetadata.text;
+                        await writer.write(encoder.encode(`event: metadata\ndata: ${JSON.stringify(finalMetadata)}\n\n`));
+                        await writer.close();
+                    } catch (err: any) {
+                        await writer.abort(err);
+                    }
+                })();
+
+                return new Response(readable, { headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' } });
             } else {
-                // Capsule path: client owns telemetry, do not suppress client fallback logging
-                aiData.server_telemetry_logged = false;
-                aiData.telemetry_contract = buildTelemetryContract({
-                    owner: 'client',
-                    edgeLogged: false,
-                    reason: 'capsule_handoff',
-                });
+                // ═══ LEGACY SYNCHRONOUS PATH (BACKWARD COMPATIBLE) ═══
+                if (!shouldShortCircuitClarification) {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 25000);
+                        sommelierResponse = await geminiGenerateContent({ ...geminiOptions, signal: controller.signal });
+                        clearTimeout(timeoutId);
+
+                        if (sommelierResponse.status === 429) {
+                            sommelier_gemini_error = 'Sommelier rate limit (429)';
+                        } else if (sommelierResponse.status >= 500) {
+                            sommelier_gemini_error = `Sommelier server error (${sommelierResponse.status})`;
+                        } else if (!sommelierResponse.ok) {
+                            sommelierResult = await sommelierResponse.json();
+                            sommelier_gemini_error = sommelierResult.error?.message || `HTTP ${sommelierResponse.status}`;
+                        } else {
+                            sommelierResult = await sommelierResponse.json();
+                            rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                        }
+                    } catch (e: any) {
+                        sommelier_gemini_error = e.name === 'AbortError' ? 'Sommelier timeout' : e.message;
+                    }
+                }
+
+                const aiData = await postProcessAndTelemetry(rawText, sommelierResponse, sommelierResult, sommelier_gemini_error, shouldShortCircuitClarification);
+                return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
 
-            aiData.turn_profile = guardrailTelemetry.turn_profile;
-            aiData.catalog_gate = guardrailTelemetry.catalog_gate;
-
-            return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
         

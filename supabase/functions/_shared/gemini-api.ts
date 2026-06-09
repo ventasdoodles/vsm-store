@@ -10,7 +10,7 @@ type GeminiJsonValue =
   | GeminiJsonValue[]
   | { [key: string]: GeminiJsonValue };
 
-function buildGeminiApiUrl(model: string, action: 'generateContent' | 'embedContent'): string {
+function buildGeminiApiUrl(model: string, action: 'generateContent' | 'embedContent' | 'streamGenerateContent'): string {
   return `https://generativelanguage.googleapis.com/${GEMINI_API_VERSION}/models/${model}:${action}`;
 }
 
@@ -117,6 +117,23 @@ export async function geminiGenerateContent(input: {
     body: JSON.stringify(input.body),
     signal: input.signal,
   }, `generateContent (${input.model})`);
+}
+
+export async function geminiStreamGenerateContent(input: {
+  apiKey: string;
+  model: string;
+  body: Record<string, GeminiJsonValue>;
+  signal?: AbortSignal;
+}): Promise<Response> {
+  return fetchWithRetry(buildGeminiApiUrl(input.model, 'streamGenerateContent') + '?alt=sse', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': input.apiKey,
+    },
+    body: JSON.stringify(input.body),
+    signal: input.signal,
+  }, `streamGenerateContent (${input.model})`);
 }
 
 export async function geminiGenerateContentJson<T>(input: {

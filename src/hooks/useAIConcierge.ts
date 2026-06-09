@@ -395,32 +395,40 @@ export function useAIConcierge() {
                     }, AI_CONCIERGE_SLOW_RESPONSE_MS);
                 });
 
+                
+                let streamTextBuffer = '';
+                const assistantMessageId = (Date.now() + 1).toString();
+
                 const executeRequest = async () => {
+
                     const history = [...messagesRef.current.slice(-5), userMsg].map((message) => ({
                         role: message.role,
                         content: message.content,
                     }));
 
-                    if (noWriteSmoke) {
-                        return await conciergeService.chat(
-                            requestContent,
-                            history,
-                            profile || undefined,
-                            audio,
-                            undefined,
-                            cesarinSessionIdRef.current,
-                            { noWriteSmoke: true },
-                        );
-                    }
+                    const onChunk = (text: string) => {
+                        streamTextBuffer += text;
+                        setMessages(prev => {
+                            const clone = [...prev];
+                            const lastIndex = clone.findIndex(m => m.id === assistantMessageId);
+                            if (lastIndex !== -1) {
+                                clone[lastIndex] = { ...clone[lastIndex], content: streamTextBuffer, isStreaming: true } as any;
+                            } else {
+                                clone.push({
+                                    id: assistantMessageId,
+                                    role: 'assistant',
+                                    content: streamTextBuffer,
+                                    timestamp: new Date(),
+                                    isStreaming: true,
+                                } as any);
+                            }
+                            return clone;
+                        });
+                    };
 
-                    return await conciergeService.chat(
-                        requestContent,
-                        history,
-                        profile || undefined,
-                        audio,
-                        undefined,
-                        cesarinSessionIdRef.current,
-                    );
+                    const baseArgs: any[] = [requestContent, history, profile || undefined, audio, undefined, cesarinSessionIdRef.current];
+                    const options = noWriteSmoke ? { noWriteSmoke: true, onChunk } : { onChunk };
+                    return await conciergeService.chat(...baseArgs as [any, any, any, any, any, any], options);
                 };
 
                 void slowResponsePromise;
@@ -473,7 +481,15 @@ export function useAIConcierge() {
                     convertCartOperatorToAdvisoryCta(assistantMsg);
                 }
 
-                setMessages((prev) => [...prev, assistantMsg]);
+                setMessages((prev) => {
+                    const clone = [...prev];
+                    const lastIndex = clone.findIndex(m => m.id === assistantMessageId);
+                    if (lastIndex !== -1) {
+                        clone[lastIndex] = assistantMsg;
+                        return clone;
+                    }
+                    return [...prev, assistantMsg];
+                });
 
                 const nextStepView = assistantMsg.capsule_contract?.next_step_view ?? null;
                 if (catalogGate.is_open && !nextStepView && shouldOfferCesarinApproximateRecovery(

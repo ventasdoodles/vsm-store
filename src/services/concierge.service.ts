@@ -708,7 +708,7 @@ export const conciergeService = {
         audio?: string,
         mimeType?: string,
         cesarinSessionId?: string | null,
-        options?: { noWriteSmoke?: boolean },
+        options?: { noWriteSmoke?: boolean; onChunk?: (text: string) => void },
     ): Promise<{
         message: string;
         suggestedProducts?: (Product | InternalResolvedProduct)[];
@@ -722,25 +722,89 @@ export const conciergeService = {
         const invokeStart = Date.now();
         const effectiveTelemetrySessionId = cesarinSessionId ?? null;
         try {
-            const { data, error } = await supabase.functions.invoke('customer-intelligence', {
-                body: { 
-                    action: 'concierge_chat', 
-                    query,
-                    history,
-                    audio,
-                    mimeType,
-                    cesarin_session_id: effectiveTelemetrySessionId,
-                    customerContext: customerProfile ? {
-                        id: customerProfile.id,
-                        name: customerProfile.full_name,
-                        preferences: customerProfile.ai_preferences,
-                        ia_context: customerProfile.ia_context,
-                        last_interactions: customerProfile.last_interactions
-                    } : null,
-                    is_pilot: isPilotActive(),
-                    ...(options?.noWriteSmoke ? buildCustomerIntelligenceNoWriteSmokeRequestFields() : {}),
-                }
+            const token = (await supabase.auth.getSession()).data.session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY;
+            const requestBody = { 
+                action: 'concierge_chat', 
+                query,
+                history,
+                audio,
+                mimeType,
+                cesarin_session_id: effectiveTelemetrySessionId,
+                customerContext: customerProfile ? {
+                    id: customerProfile.id,
+                    name: customerProfile.full_name,
+                    preferences: customerProfile.ai_preferences,
+                    ia_context: customerProfile.ia_context,
+                    last_interactions: customerProfile.last_interactions
+                } : null,
+                is_pilot: isPilotActive(),
+                stream: !!options?.onChunk,
+                ...(options?.noWriteSmoke ? buildCustomerIntelligenceNoWriteSmokeRequestFields() : {}),
+            };
+
+            const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-intelligence`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(requestBody)
             });
+
+            if (!res.ok) {
+                const errText = await res.text().catch(() => 'Unknown error');
+                throw new Error(`HTTP error! status: ${res.status} body: ${errText}`);
+            }
+
+            let data: any = null;
+            if (options?.onChunk && res.headers.get('Content-Type')?.includes('text/event-stream')) {
+                const reader = res.body?.getReader();
+                const decoder = new TextDecoder();
+                let finalMetadata = null;
+
+                if (reader) {
+                    let buffer = '';
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop() || '';
+
+                        for (let i = 0; i < lines.length; i++) {
+                            const line = lines[i];
+                            if (line?.startsWith('event: text')) {
+                                const dataLine = lines[i+1];
+                                if (dataLine && dataLine.startsWith('data: ')) {
+                                    try {
+                                        const newText = JSON.parse(dataLine.slice(6));
+                                        options.onChunk(newText);
+                                    } catch (e) {}
+                                }
+                            } else if (line?.startsWith('event: metadata')) {
+                                const dataLine = lines[i+1];
+                                if (dataLine && dataLine.startsWith('data: ')) {
+                                    try {
+                                        finalMetadata = JSON.parse(dataLine.slice(6));
+                                    } catch (e) {}
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (finalMetadata) {
+                    data = finalMetadata;
+                } else {
+                    throw new Error('Stream finished without metadata');
+                }
+            } else {
+                data = await res.json();
+            }
+
+            // Note: The rest of the function maps 'data' to the response format.
+            const error = null;
 
             if (error) {
                 throw attachCustomerIntelligenceNoWriteSmokeMetadata(error, data?.no_write_smoke);
