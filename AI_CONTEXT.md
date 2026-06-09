@@ -24,6 +24,9 @@
 
 ## Current Repository Baseline
 
+## Cesarin Strict Schema Enforcement (Structured Outputs)
+- Cesarin Strict Schema Enforcement `6f8e973` is ACCEPT as a high-value stability lane. Accepted facts: The `concierge-chat.ts` Analyst invocation was refactored to eliminate regex-based JSON parsing (`rawAnalystText.match(/\{[\s\S]*\}/)`). The Analyst now uses `invokeGeminiTextModel` (routed through the LLM Gateway) and relies natively on `responseMimeType: "application/json"` to guarantee structured JSON output from Gemini. This eliminates silent fallback degradations caused by LLM markdown wrapping hallucinations. Validation: `typecheck` passed cleanly. Non-claims: The Sommelier generation was not migrated to Strict JSON Schema because its streaming frontend parser currently relies on a custom regex chunk extractor.
+
 ## Cesarin LLM Provider Abstraction Gateway (Adapter Pattern)
 - Cesarin LLM Gateway `43032ef feat(ai): implement llm gateway for primary/secondary fallback strategy` is ACCEPT as a high-value reliability lane. Accepted facts: The `_shared/gemini-api.ts` direct dependency was abstracted. A new `customer-intelligence/shared/llm-gateway.ts` file was created, introducing a fallback strategy (`invokeLLMWithFallback`). `gemini-utils.ts` was refactored to use this gateway under the hood, parsing `ANTHROPIC_API_KEY` from the environment if available. The primary model remains Gemini (`gemini-2.5-pro` / `flash`), but any 429 Rate Limit or 500 error will safely cascade to `claude-3-5-sonnet-20241022` if configured. Validation: `typecheck` passed cleanly across the project. Non-claims: Streaming (`geminiStreamGenerateContent`) remains natively bound to Gemini; it does not currently fallback to Anthropic's SSE. No live 429 injection tests were performed against Supabase edge. Residual risk: If Anthropic key is present but invalid, the secondary fallback might delay the user's error message.
 

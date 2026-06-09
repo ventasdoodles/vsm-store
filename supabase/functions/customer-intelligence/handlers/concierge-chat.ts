@@ -464,17 +464,12 @@ export async function handleConciergeChat(
             if (rawAnalystText) {
                 try {
                     // Structured output (response_schema) guarantees valid JSON from Gemini.
-                    // Direct parse is the primary path; regex fallback retained for resilience.
                     let parsed: any = null;
                     try {
                         parsed = JSON.parse(rawAnalystText);
-                    } catch {
-                        const jsonMatch = rawAnalystText.match(/\{[\s\S]*\}/);
-                        if (jsonMatch) {
-                            parsed = JSON.parse(jsonMatch[0]);
-                        } else {
-                            throw new Error('No valid JSON found in response');
-                        }
+                    } catch (e: any) {
+                        console.error(`[Analyst] Strict JSON parsing failed: ${e.message}. Falling back.`);
+                        throw new Error('Native JSON parsing failed');
                     }
 
                     // Validate Analyst contract
