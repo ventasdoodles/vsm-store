@@ -1,4 +1,4 @@
-import { geminiGenerateContent } from '../../_shared/gemini-api.ts';
+import { invokeLLMWithFallback, LLMProviderConfig } from './llm-gateway.ts';
 
 export async function invokeGeminiTextModel(
     apiKey: string,
@@ -6,16 +6,23 @@ export async function invokeGeminiTextModel(
     body: Record<string, unknown>,
     errorContext: string,
 ): Promise<any> {
-    const response = await geminiGenerateContent({
-        apiKey,
-        model,
-        body,
-    });
+    const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
 
-    const result = await response.json();
-    if (!response.ok) {
-        throw new Error(result?.error?.message || errorContext);
+    const providers: LLMProviderConfig[] = [
+        {
+            name: 'gemini',
+            apiKey: apiKey,
+            model: model,
+        }
+    ];
+
+    if (anthropicKey) {
+        providers.push({
+            name: 'anthropic',
+            apiKey: anthropicKey,
+            model: 'claude-3-5-sonnet-20241022', // Standard secondary model
+        });
     }
 
-    return result;
+    return await invokeLLMWithFallback(providers, body, errorContext);
 }
