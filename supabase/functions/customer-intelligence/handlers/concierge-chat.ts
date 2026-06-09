@@ -1351,7 +1351,7 @@ export async function handleConciergeChat(
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
                 
                 ${RESPONSE_SHAPE_RULES}
-                ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
+                ${RESPONSE_FORMAT_RULES.replace('NUMBER', '521234567890')}
             `;
 
             const shouldShortCircuitClarification =

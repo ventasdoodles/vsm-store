@@ -18,9 +18,9 @@ serve(async (req) => {
         return new Response('ok', { headers: corsHeaders })
     }
 
-    const _GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    const _SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const _SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const _GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyDummyKeyForLocalEnvironmentFixVsm123";
+    const _SUPABASE_URL = Deno.env.get('SUPABASE_URL') || Deno.env.get('VSM_SUPABASE_URL') || "http://127.0.0.1:54321";
+    const _SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('VSM_SERVICE_ROLE_KEY') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU";
     let noWriteSmokeForError: CustomerIntelligenceNoWriteSmokeMetadata | null = null;
 
     console.warn(`[customer-intelligence] Action: ${req.method} URL: ${req.url}`)
