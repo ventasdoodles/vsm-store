@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { buildAdminSectionCatalog } from '@/config/productization';
 import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
 
 vi.mock('@/components/admin/products/ImageUploader', () => ({
     ImageUploader: () => <div data-testid="image-uploader" />,
@@ -15,7 +16,8 @@ vi.mock('@/services', () => ({
 
 import { HomeEditorSlotCard } from '../HomeEditorSlotCard';
 
-const catalog = buildAdminSectionCatalog();
+const config = getStorefrontSettingsFallback().vertical_pack_config!;
+const catalog = buildAdminSectionCatalog(config);
 const defaultSection = (catalog.sections[0]?.slug ?? 'vape') as FeaturedCategory['section'];
 const vapeSection = catalog.sections[0]!;
 const herbalSection = catalog.sections[1]!;

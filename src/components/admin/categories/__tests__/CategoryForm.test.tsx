@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { Category } from '@/types/category';
 import { CategoryForm } from '../CategoryForm';
+import { VerticalPackContext } from '@/contexts/VerticalPackContext';
+import { vape420VerticalPackConfig } from '@/config/productization';
 
 const baseCategory: Category = {
     id: 'root-420',
@@ -24,15 +26,17 @@ describe('CategoryForm', () => {
         const onClose = vi.fn();
 
         render(
-            <CategoryForm
-                open
-                editing={null}
-                parentCategory={null}
-                allCategories={[]}
-                isSaving={false}
-                onSave={onSave}
-                onClose={onClose}
-            />,
+            <VerticalPackContext.Provider value={{ config: vape420VerticalPackConfig, isLoading: false }}>
+                <CategoryForm
+                    open
+                    editing={null}
+                    parentCategory={null}
+                    allCategories={[]}
+                    isSaving={false}
+                    onSave={onSave}
+                    onClose={onClose}
+                />
+            </VerticalPackContext.Provider>
         );
 
         const sectionSelect = screen.getAllByRole('combobox')[0]! as HTMLSelectElement;
@@ -47,15 +51,17 @@ describe('CategoryForm', () => {
         const onClose = vi.fn();
 
         render(
-            <CategoryForm
-                open
-                editing={null}
-                parentCategory={baseCategory}
-                allCategories={[baseCategory]}
-                isSaving={false}
-                onSave={onSave}
-                onClose={onClose}
-            />,
+            <VerticalPackContext.Provider value={{ config: vape420VerticalPackConfig, isLoading: false }}>
+                <CategoryForm
+                    open
+                    editing={null}
+                    parentCategory={baseCategory}
+                    allCategories={[baseCategory]}
+                    isSaving={false}
+                    onSave={onSave}
+                    onClose={onClose}
+                />
+            </VerticalPackContext.Provider>
         );
 
         const sectionSelect = screen.getAllByRole('combobox')[0]! as HTMLSelectElement;

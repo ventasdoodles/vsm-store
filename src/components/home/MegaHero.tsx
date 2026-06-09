@@ -12,12 +12,12 @@ import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNeuralHero } from '@/hooks/useNeuralHero';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import { MagneticButton } from '@/components/ui/MagneticButton';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import {
     getHomeHeroFallbackImageUrl,
     getHomeHeroSliderFallbacks,
-    NATIONAL_HOME_HERO_COPY,
     normalizeHomeHeroSlide,
 } from '@/constants/homeHero';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
@@ -42,11 +42,6 @@ interface ActiveSlide {
 
 const HERO_GENERIC_FALLBACK_IMAGE = getHomeHeroFallbackImageUrl('/images/storefront-fallbacks/hero-generic.svg');
 
-export const NATIONAL_HERO_TITLE = NATIONAL_HOME_HERO_COPY.title;
-export const NATIONAL_HERO_SUBTITLE = NATIONAL_HOME_HERO_COPY.subtitle;
-export const NATIONAL_HERO_DESCRIPTION = NATIONAL_HOME_HERO_COPY.description;
-export const NATIONAL_HERO_TAG = NATIONAL_HOME_HERO_COPY.tag;
-
 const mapHeroSliderToActiveSlide = (slider: HeroSlider): ActiveSlide => {
     const preset = PREMIUM_GRADIENTS.find((p) => p.id === slider.bgGradientLight) ?? DEFAULT_PRESET;
 
@@ -63,13 +58,10 @@ const mapHeroSliderToActiveSlide = (slider: HeroSlider): ActiveSlide => {
     };
 };
 
-const FALLBACK_SLIDES: ActiveSlide[] = getHomeHeroSliderFallbacks()
-    .map(mapHeroSliderToActiveSlide)
-    .map(normalizeHomeHeroSlide);
-
 export const MegaHero = () => {
     const { data: settings } = useStoreSettings();
     const { personalizedSlide } = useNeuralHero();
+    const { config } = useActiveVerticalPack();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -97,19 +89,25 @@ export const MegaHero = () => {
 
     /** Mapeo de slides desde settings o fallback local */
     const activeSlides = useMemo(() => {
+        if (!config) return [];
+
+        const FALLBACK_SLIDES: ActiveSlide[] = getHomeHeroSliderFallbacks(config)
+            .map(mapHeroSliderToActiveSlide)
+            .map(slide => normalizeHomeHeroSlide(slide, config));
+
         const slides = settings?.hero_sliders && settings.hero_sliders.length > 0
             ? settings.hero_sliders
                 .filter(s => s.active)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map(mapHeroSliderToActiveSlide)
-                .map(normalizeHomeHeroSlide)
+                .map(slide => normalizeHomeHeroSlide(slide, config))
             : FALLBACK_SLIDES;
 
         if (personalizedSlide) {
-            return [normalizeHomeHeroSlide(personalizedSlide), ...slides];
+            return [normalizeHomeHeroSlide(personalizedSlide, config), ...slides];
         }
         return slides;
-    }, [settings?.hero_sliders, personalizedSlide]);
+    }, [settings?.hero_sliders, personalizedSlide, config]);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev + 1) % activeSlides.length);

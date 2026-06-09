@@ -10,8 +10,9 @@ import { ChevronRight } from 'lucide-react';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { CATEGORY_GRADIENTS_MAP, CATEGORY_ICONS, FALLBACK_CATEGORIES, CATEGORY_GRADIENTS } from '@/constants/category-showcase';
+import { CATEGORY_GRADIENTS_MAP, CATEGORY_ICONS, getFallbackCategories, CATEGORY_GRADIENTS } from '@/constants/category-showcase';
 import type { FeaturedCategory } from '@/services';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -148,19 +149,22 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
 
 export const CategoryShowcase = () => {
     const { data: settings } = useStoreSettings();
+    const { config } = useActiveVerticalPack();
 
     // Obtener las 4 categorías configuradas, rellenando slots vacíos con fallbacks
     const displayCategories = useMemo(() => {
+        if (!config) return [];
+        const fallbacks = getFallbackCategories(config);
         const saved = settings?.featured_categories;
-        if (!saved || saved.length === 0) return FALLBACK_CATEGORIES.map(normalizeFeaturedCategory);
+        if (!saved || saved.length === 0) return fallbacks.map(normalizeFeaturedCategory);
 
         // Siempre devolver exactamente 4 slots, usando fallback si alguno falta
         return Array.from({ length: 4 }, (_, i) => {
             const cat = saved[i];
-            const category = (cat && cat.slug && cat.name) ? cat : FALLBACK_CATEGORIES[i]!;
+            const category = (cat && cat.slug && cat.name) ? cat : fallbacks[i]!;
             return normalizeFeaturedCategory(category);
         });
-    }, [settings?.featured_categories]);
+    }, [settings?.featured_categories, config]);
 
     return (
         <section className="space-y-8">
@@ -185,7 +189,7 @@ export const CategoryShowcase = () => {
                 viewport={{ once: true, margin: '-10%' }}
                 className="grid grid-cols-2 lg:grid-cols-4 gap-6"
             >
-                {displayCategories.map((category, index) => (
+                {displayCategories.map((category: FeaturedCategory, index: number) => (
                     <CategoryCard key={`${category.id}-${index}`} category={category} />
                 ))}
             </motion.div>

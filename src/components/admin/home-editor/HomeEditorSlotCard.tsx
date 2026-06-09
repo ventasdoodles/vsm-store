@@ -4,6 +4,8 @@ import { ImageUploader } from '@/components/admin/products/ImageUploader';
 import { buildAdminSectionCatalog, getAdminSectionCatalogEntry } from '@/config/productization';
 import { CATEGORY_GRADIENTS, CATEGORY_ICONS } from '@/constants/category-showcase';
 import { uploadSliderImage } from '@/services';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface HomeEditorSlotCardProps {
     slot: FeaturedCategory;
@@ -21,8 +23,9 @@ export function HomeEditorSlotCard({
     onUpdateSlot,
     onCategorySelect,
 }: HomeEditorSlotCardProps) {
+    const { config } = useActiveVerticalPack();
     const IconComponent = CATEGORY_ICONS[slot.iconName] ?? CATEGORY_ICONS['Box']!;
-    const adminSectionCatalog = buildAdminSectionCatalog();
+    const adminSectionCatalog = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
 
     return (
         <div className="p-5 rounded-xl border border-theme bg-theme-primary/50 relative">
@@ -45,7 +48,7 @@ export function HomeEditorSlotCard({
                         <option value="">â€” Elegir categorÃ­a existente â€”</option>
                         {storeCategories.map((cat) => (
                             <option key={cat.id} value={cat.id}>
-                                {cat.name} ({getAdminSectionCatalogEntry(cat.section)?.shortLabel ?? cat.section})
+                                {cat.name} ({config ? getAdminSectionCatalogEntry(cat.section as any, config)?.shortLabel : cat.section})
                                 {cat.image_url ? ' ðŸ“·' : ''}
                             </option>
                         ))}
@@ -115,7 +118,7 @@ export function HomeEditorSlotCard({
                             onChange={(e) => onUpdateSlot(index, 'section', e.target.value)}
                             className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         >
-                            {adminSectionCatalog.sections.map((section) => (
+                            {adminSectionCatalog?.sections.map((section) => (
                                 <option key={section.slug} value={section.slug}>
                                     {section.shortLabel}
                                 </option>

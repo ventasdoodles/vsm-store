@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 import { buildAdminSectionCatalog } from '@/config/productization';
-
-const adminSectionCatalog = buildAdminSectionCatalog();
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface FiltersProps {
     search: string;
@@ -16,6 +16,9 @@ export function TestimonialsFilters({
     filterSection,
     onFilterSectionChange,
 }: FiltersProps) {
+    const { config } = useActiveVerticalPack();
+    const adminSectionCatalog = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
+
     return (
         <div className="flex flex-col sm:flex-row gap-4 py-2">
             <div className="relative flex-1 group">
@@ -36,7 +39,7 @@ export function TestimonialsFilters({
                     className="appearance-none w-full sm:w-64 bg-theme-primary/10 border border-white/10 rounded-2xl px-5 py-3.5 text-theme-primary focus:border-accent-primary focus:bg-theme-primary/20 focus:ring-4 focus:ring-accent-primary/10 outline-none transition-all font-medium whitespace-nowrap overflow-hidden text-ellipsis shadow-inner"
                 >
                     <option value="all">🌐 Todas las secciones</option>
-                    {adminSectionCatalog.sections.map((section) => (
+                    {adminSectionCatalog?.sections.map((section) => (
                         <option key={section.slug} value={section.slug}>
                             {section.filterLabel}
                         </option>

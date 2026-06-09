@@ -2,7 +2,8 @@ import { createElement, forwardRef, type PropsWithChildren, type ReactNode } fro
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { getAdminSectionCatalogEntry } from '@/config/productization';
+import { getAdminSectionCatalogEntry, vape420VerticalPackConfig } from '@/config/productization';
+import { VerticalPackContext } from '@/contexts/VerticalPackContext';
 import type { Product } from '@/types/product';
 import { ProductTableRow } from '../ProductTableRow';
 
@@ -75,11 +76,12 @@ describe('ProductTableRow', () => {
         ['420' as const],
     ])('uses the shared catalog metadata for section %s', (section) => {
         const product = makeProduct(section);
-        const catalogEntry = getAdminSectionCatalogEntry(section);
+        const catalogEntry = getAdminSectionCatalogEntry(section, vape420VerticalPackConfig);
 
         render(
-            <table>
-                <tbody>
+            <VerticalPackContext.Provider value={{ config: vape420VerticalPackConfig, isLoading: false }}>
+                <table>
+                    <tbody>
                     <ProductTableRow
                         product={product}
                         onToggle={vi.fn()}
@@ -90,8 +92,9 @@ describe('ProductTableRow', () => {
                         isSelected={false}
                         onSelect={vi.fn()}
                     />
-                </tbody>
-            </table>,
+                    </tbody>
+                </table>
+            </VerticalPackContext.Provider>,
         );
 
         expect(screen.getByText(catalogEntry?.shortLabel ?? section)).toHaveClass(

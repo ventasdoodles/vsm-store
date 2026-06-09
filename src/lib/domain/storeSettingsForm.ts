@@ -22,6 +22,7 @@ export const DEFAULT_STORE_SETTINGS_FORM: SettingsFormData = {
     bank_account_info: '',
     payment_methods: { transfer: true, mercadopago: false, cash: false },
     loyalty_config: DEFAULT_LOYALTY_SETTINGS,
+    vertical_pack_config: '{}',
 };
 
 type ChangeTarget = {
@@ -40,6 +41,7 @@ const TOP_LEVEL_FIELDS = new Set<keyof SettingsFormData>([
     'location_city',
     'location_map_url',
     'bank_account_info',
+    'vertical_pack_config',
 ]);
 
 const DEFAULT_SOCIAL_LINKS = DEFAULT_STORE_SETTINGS_FORM.social_links;
@@ -93,15 +95,25 @@ export function buildStoreSettingsFormData(
             cash: settings.payment_methods?.cash ?? DEFAULT_PAYMENT_METHODS.cash,
         },
         loyalty_config: normalizeLoyaltyConfig(settings.loyalty_config),
+        vertical_pack_config: settings.vertical_pack_config ? JSON.stringify(settings.vertical_pack_config, null, 2) : '{}',
     };
 }
 
 export function buildStoreSettingsUpdatePayload(
     formData: SettingsFormData,
     settingsId: number,
-): SettingsFormData & { id: number } {
+): any { // We return any to accommodate JSON parsing, or Omit<SettingsFormData, 'vertical_pack_config'> & { vertical_pack_config: any }
+    let parsedConfig = {};
+    try {
+        parsedConfig = JSON.parse(formData.vertical_pack_config || '{}');
+    } catch (e) {
+        // Fallback to empty if invalid JSON
+        parsedConfig = {};
+    }
+
     return {
         ...formData,
+        vertical_pack_config: parsedConfig,
         id: settingsId,
     };
 }

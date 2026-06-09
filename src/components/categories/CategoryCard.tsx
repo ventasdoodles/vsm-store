@@ -6,6 +6,8 @@ import { getVape420ProductSurfacePresentationConfig } from '@/config/productizat
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 interface CategoryCardProps {
     category: Category;
     section: Section;
@@ -13,7 +15,10 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, section, className }: CategoryCardProps) {
-    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(section);
+    const { config } = useActiveVerticalPack();
+    const productSurfaceConfig = config ? getVape420ProductSurfacePresentationConfig(config, section) : null;
+
+    if (!productSurfaceConfig) return null;
 
     return (
         <Link

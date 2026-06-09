@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Category } from '@/types/category';
 import type { Product } from '@/types/product';
+import { vape420VerticalPackConfig } from '@/config/productization';
 import {
     appendProductTag,
     applyProductFormChange,
@@ -10,21 +11,21 @@ import {
     buildProductSubmitPayload,
     hasRequiredProductFields,
     removeProductTag,
-    DEFAULT_PRODUCT_FORM,
 } from '../adminProductForm';
 import { getAdminDefaultSectionSlug } from '@/config/productization';
 
 describe('adminProductForm', () => {
     it('builds a fresh default product form', () => {
-        const form = buildDefaultProductForm();
+        const form = buildDefaultProductForm(vape420VerticalPackConfig);
+        const defaultForm = buildDefaultProductForm(vape420VerticalPackConfig);
 
-        expect(form).toEqual(DEFAULT_PRODUCT_FORM);
-        expect(form).not.toBe(DEFAULT_PRODUCT_FORM);
-        expect(form.tags).not.toBe(DEFAULT_PRODUCT_FORM.tags);
-        expect(form.images).not.toBe(DEFAULT_PRODUCT_FORM.images);
-        expect(form.specs).not.toBe(DEFAULT_PRODUCT_FORM.specs);
-        expect(form.badges).not.toBe(DEFAULT_PRODUCT_FORM.badges);
-        expect(form.section).toBe(getAdminDefaultSectionSlug());
+        expect(form).toEqual(defaultForm);
+        expect(form).not.toBe(defaultForm);
+        expect(form.tags).not.toBe(defaultForm.tags);
+        expect(form.images).not.toBe(defaultForm.images);
+        expect(form.specs).not.toBe(defaultForm.specs);
+        expect(form.badges).not.toBe(defaultForm.badges);
+        expect(form.section).toBe(getAdminDefaultSectionSlug(vape420VerticalPackConfig));
     });
 
     it('hydrates product data into a form without losing optional values', () => {
@@ -81,7 +82,7 @@ describe('adminProductForm', () => {
     });
 
     it('applies form changes immutably and preserves the current slug/category behavior', () => {
-        const base = buildDefaultProductForm();
+        const base = buildDefaultProductForm(vape420VerticalPackConfig);
         const named = applyProductFormChange(base, 'name', 'Fresh Mango', { isEditing: false });
         const sectionChanged = applyProductFormChange(named, 'section', '420');
 
@@ -115,7 +116,7 @@ describe('adminProductForm', () => {
     });
 
     it('builds a normalized submit payload and validates required fields', () => {
-        const form = buildDefaultProductForm();
+        const form = buildDefaultProductForm(vape420VerticalPackConfig);
         const payload = buildProductSubmitPayload({
             ...form,
             name: 'Demo',

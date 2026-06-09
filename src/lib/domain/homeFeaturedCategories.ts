@@ -1,20 +1,25 @@
-import { FALLBACK_CATEGORIES } from '@/constants/category-showcase';
+import { getFallbackCategories } from '@/constants/category-showcase';
 import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
+import type { VerticalPackConfig } from '@/config/productization/types';
 
 export const HOME_FEATURED_CATEGORY_SLOTS = 4;
 
-function getFallbackHomeFeaturedCategory(index: number): FeaturedCategory {
-    return { ...FALLBACK_CATEGORIES[index]! };
+function getFallbackHomeFeaturedCategory(config: VerticalPackConfig | null | undefined, index: number): FeaturedCategory {
+    // If no config is provided, we can fallback to an empty or default object, 
+    // but typically config should be present.
+    const fallbacks = config ? getFallbackCategories(config) : [];
+    return { ...(fallbacks[index] || { id: String(index), name: '', slug: '', section: 'vape', sort_order: index }) } as FeaturedCategory;
 }
 
 export function buildHomeFeaturedCategories(
+    config: VerticalPackConfig | null | undefined,
     dbCategories: FeaturedCategory[] | null | undefined,
 ): FeaturedCategory[] {
     return Array.from({ length: HOME_FEATURED_CATEGORY_SLOTS }, (_, index) => {
         const saved = dbCategories?.[index];
         if (saved && saved.slug && saved.name) return saved;
-        return getFallbackHomeFeaturedCategory(index);
+        return getFallbackHomeFeaturedCategory(config, index);
     });
 }
 

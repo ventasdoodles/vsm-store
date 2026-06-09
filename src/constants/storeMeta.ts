@@ -1,14 +1,18 @@
-import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
+import { getNationalHomeHeroCopy } from '@/constants/homeHero';
 import { vsmStoreTenantConfig } from '@/config/productization';
+import type { VerticalPackConfig } from '@/config/productization/types';
 
-const sharedHomeMetaDescription = `${NATIONAL_HOME_HERO_COPY.title} ${NATIONAL_HOME_HERO_COPY.subtitle}. ${NATIONAL_HOME_HERO_COPY.description}`;
+export const getStoreMetaCopy = (config: VerticalPackConfig) => {
+    const copy = getNationalHomeHeroCopy(config);
+    const sharedHomeMetaDescription = `${copy.title} ${copy.subtitle}. ${copy.description}`;
 
-export const STORE_META_COPY = {
-    home: {
-        hiddenHeading: `${vsmStoreTenantConfig.displayName} — ${NATIONAL_HOME_HERO_COPY.title.toLowerCase()} importados, enviados por DHL`,
-        seoDescription: sharedHomeMetaDescription,
-    },
-    checkout: {
-        seoDescription: sharedHomeMetaDescription,
-    },
-} as const;
+    return {
+        home: {
+            hiddenHeading: `${vsmStoreTenantConfig.displayName} — ${copy.title.toLowerCase()} importados, enviados por DHL`,
+            seoDescription: sharedHomeMetaDescription,
+        },
+        checkout: {
+            seoDescription: sharedHomeMetaDescription,
+        },
+    } as const;
+};

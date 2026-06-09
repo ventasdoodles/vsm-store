@@ -1,5 +1,5 @@
-import { activeVerticalPackConfig } from './active';
 import { buildVerticalPackRouteManifest, type VerticalPackRouteManifestItem } from './verticalPackReadModel';
+import type { VerticalPackConfig } from './types';
 import type { Section } from '@/types/constants';
 
 export type VerticalPackSectionRouteManifestItem = VerticalPackRouteManifestItem;
@@ -10,11 +10,11 @@ export interface VerticalPackPublicSectionRouteDeclaration {
     elementName: 'SectionPage' | 'SectionSlugResolver';
 }
 
-export const getVape420SectionRouteManifest = (): VerticalPackRouteManifestItem[] =>
-    buildVerticalPackRouteManifest(activeVerticalPackConfig);
+export const getVape420SectionRouteManifest = (config: VerticalPackConfig): VerticalPackRouteManifestItem[] =>
+    buildVerticalPackRouteManifest(config);
 
-export const getVape420PublicSectionRouteDeclarations = (): VerticalPackPublicSectionRouteDeclaration[] =>
-    getVape420SectionRouteManifest().flatMap((route) => [
+export const getVape420PublicSectionRouteDeclarations = (config: VerticalPackConfig): VerticalPackPublicSectionRouteDeclaration[] =>
+    getVape420SectionRouteManifest(config).flatMap((route) => [
         {
             sectionSlug: route.sectionSlug as Section,
             path: route.rootRoute,
@@ -29,10 +29,11 @@ export const getVape420PublicSectionRouteDeclarations = (): VerticalPackPublicSe
 
 export function resolveSectionFromRouteManifest(
     pathname: string,
-    routeManifest: VerticalPackRouteManifestItem[] = getVape420SectionRouteManifest(),
+    config: VerticalPackConfig,
+    routeManifest: VerticalPackRouteManifestItem[] = getVape420SectionRouteManifest(config),
 ): Section {
     const normalizedPathname = pathname.trim();
     const matchedRoute = routeManifest.find((route) => normalizedPathname.startsWith(route.rootRoute));
 
-    return (matchedRoute?.sectionSlug as Section) ?? (activeVerticalPackConfig.sections[0]?.slug || 'vape');
+    return (matchedRoute?.sectionSlug as Section) ?? (config.sections[0]?.slug || 'vape');
 }

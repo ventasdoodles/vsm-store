@@ -21,8 +21,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildAdminSectionCatalog } from '@/config/productization';
-import type { Section } from '@/types/constants';
 import type { Category } from '@/types/category';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface CategoryTreeNodeProps {
     category: Category;
@@ -38,11 +39,7 @@ interface CategoryTreeNodeProps {
 /** Indent en px por nivel de profundidad */
 const LEVEL_INDENT = 28;
 
-const adminSectionCatalog = buildAdminSectionCatalog();
 
-function getSectionPresentation(sectionSlug: Section) {
-    return adminSectionCatalog.bySlug[sectionSlug];
-}
 
 export function CategoryTreeNode({
     category,
@@ -54,10 +51,13 @@ export function CategoryTreeNode({
     onToggleActive,
     isToggling,
 }: CategoryTreeNodeProps) {
+    const { config } = useActiveVerticalPack();
+    const adminSectionCatalog = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
+
     const children = allCategories.filter(c => c.parent_id === category.id);
     const hasChildren = children.length > 0;
     const [expanded, setExpanded] = useState(true);
-    const sectionPresentation = getSectionPresentation(category.section) ?? {
+    const sectionPresentation = (adminSectionCatalog ? adminSectionCatalog.bySlug[category.section] : null) ?? {
         ringClassName: 'ring-white/20',
         badgeClassName: 'bg-white/10 text-white/60 ring-white/20',
         guideClassName: 'from-white/20 to-white/0',

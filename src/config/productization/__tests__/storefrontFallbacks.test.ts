@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { vape420VerticalPackConfig } from '../vape420VerticalPack';
 import { getVape420CategoryShowcaseFallbackCategories } from '../categoryShowcase';
 import { getVape420HomeHeroSliderFallbacks } from '../homeHero';
 import {
@@ -11,7 +12,7 @@ const fallbackUrl = (path: string) => new URL(path, window.location.origin).toSt
 
 describe('storefront fallbacks helper', () => {
     it('keeps hero slider fallback normalization centralized', () => {
-        expect(buildStorefrontHeroSliderFallbacks(getVape420HomeHeroSliderFallbacks())).toEqual([
+        expect(buildStorefrontHeroSliderFallbacks(getVape420HomeHeroSliderFallbacks(vape420VerticalPackConfig))).toEqual([
             {
                 id: '1',
                 title: 'Vapes y 420',
@@ -54,7 +55,7 @@ describe('storefront fallbacks helper', () => {
     });
 
     it('keeps featured category fallback normalization centralized', () => {
-        expect(buildStorefrontFeaturedCategoryFallbacks(getVape420CategoryShowcaseFallbackCategories())).toEqual([
+        expect(buildStorefrontFeaturedCategoryFallbacks(getVape420CategoryShowcaseFallbackCategories(vape420VerticalPackConfig))).toEqual([
             {
                 id: '1',
                 name: 'Líquidos',

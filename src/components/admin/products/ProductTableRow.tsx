@@ -16,6 +16,7 @@ import { PRODUCT_FLAGS } from '@/constants/app';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { getAdminSectionCatalogEntry } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 interface ProductTableRowProps {
     product: Product;
@@ -57,7 +58,8 @@ export function ProductTableRow({
     const isToggling = isTogglingId === product.id;
     const isDeleting = isDeletingId === product.id;
     const isSaving = isSavingId === product.id;
-    const sectionCatalogEntry = getAdminSectionCatalogEntry(product.section);
+    const { config } = useActiveVerticalPack();
+    const sectionCatalogEntry = config && product.section ? getAdminSectionCatalogEntry(product.section as any, config) : null;
     const sectionBadgeClassName = sectionCatalogEntry?.badgeClassName ?? 'bg-white/10 text-white/60 ring-white/20';
     const sectionBadgeLabel = sectionCatalogEntry?.shortLabel ?? product.section;
     const sectionHrefPrefix = sectionCatalogEntry?.routePrefix ?? `/${product.section}`;

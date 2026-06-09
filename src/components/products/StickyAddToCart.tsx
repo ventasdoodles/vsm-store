@@ -17,17 +17,21 @@ interface StickyAddToCartProps {
     purchaseability: StorefrontProductPurchaseabilityView;
 }
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 export function StickyAddToCart({
     product,
     isVisible,
     selectedVariant,
     purchaseability,
 }: StickyAddToCartProps) {
+    const { config } = useActiveVerticalPack();
+    if (!config) return null;
     const addItem = useCartStore((s) => s.addItem);
     const { trigger } = useHaptic();
     const { warning } = useNotification();
     const [quantity, setQuantity] = useState(1);
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(product.section);
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, product.section);
     const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
 
     useEffect(() => {

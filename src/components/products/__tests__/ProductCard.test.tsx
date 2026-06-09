@@ -125,7 +125,7 @@ describe('ProductCard', () => {
             </MemoryRouter>,
         );
 
-        expect(screen.getByText('vape')).toHaveClass('bg-vape-500/10', 'text-vape-400', 'border-vape-500/20');
+        expect(screen.getAllByText('vape')[0]).toHaveClass('bg-vape-500/10', 'text-vape-400', 'border-vape-500/20');
         expect(screen.getByText(vapeProduct.name)).toHaveClass('group-hover:text-vape-400');
 
         rerender(
@@ -134,7 +134,7 @@ describe('ProductCard', () => {
             </MemoryRouter>,
         );
 
-        expect(screen.getByText('420')).toHaveClass('bg-herbal-500/10', 'text-herbal-400', 'border-herbal-500/20');
+        expect(screen.getAllByText('420')[0]).toHaveClass('bg-herbal-500/10', 'text-herbal-400', 'border-herbal-500/20');
         expect(screen.getByText(herbalProduct.name)).toHaveClass('group-hover:text-herbal-400');
     });
 });

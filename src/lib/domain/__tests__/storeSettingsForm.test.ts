@@ -108,6 +108,7 @@ describe('storeSettingsForm', () => {
 
         expect(payload).toMatchObject({
             ...DEFAULT_STORE_SETTINGS_FORM,
+            vertical_pack_config: {},
             id: 1,
         });
     });

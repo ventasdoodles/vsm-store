@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SectionPage } from '../SectionPage';
 import { getVape420SectionPageConfig } from '@/config/productization';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
 import type { Category } from '@/types/category';
 import type { Product } from '@/types/product';
 import type { Section } from '@/types/constants';
@@ -133,7 +134,8 @@ describe('SectionPage visible states', () => {
     });
 
     it('renders vape section title/copy and SEO metadata', () => {
-        const productizedSection = getVape420SectionPageConfig('vape');
+        const config = getStorefrontSettingsFallback().vertical_pack_config!;
+        const productizedSection = getVape420SectionPageConfig(config, 'vape');
 
         render(<SectionPage />);
 
@@ -199,7 +201,8 @@ describe('SectionPage visible states', () => {
     });
 
     it('renders 420 section copy and SEO metadata', () => {
-        const productizedSection = getVape420SectionPageConfig('420');
+        const config = getStorefrontSettingsFallback().vertical_pack_config!;
+        const productizedSection = getVape420SectionPageConfig(config, '420');
         useSectionFromPathMock.mockReturnValue('420');
         useProductsMock.mockReturnValue({
             data: [makeProduct({ id: 'herbal-product', name: 'Herbal Kit', section: '420' })],

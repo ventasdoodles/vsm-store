@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { vape420VerticalPackConfig } from '../vape420VerticalPack';
 import {
     getVape420SectionPageConfig,
     getVape420SectionPresentationConfig,
@@ -6,7 +7,7 @@ import {
 
 describe('section presentation productization', () => {
     it('keeps section page config derived from the shared vertical pack', () => {
-        expect(getVape420SectionPageConfig('vape')).toEqual(
+        expect(getVape420SectionPageConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 slug: 'vape',
                 title: 'Vape Collection',
@@ -17,7 +18,7 @@ describe('section presentation productization', () => {
             }),
         );
 
-        expect(getVape420SectionPageConfig('420')).toEqual(
+        expect(getVape420SectionPageConfig(vape420VerticalPackConfig, '420')).toEqual(
             expect.objectContaining({
                 slug: '420',
                 title: '420 Zone',
@@ -30,7 +31,7 @@ describe('section presentation productization', () => {
     });
 
     it('keeps section presentation config derived from the shared vertical pack', () => {
-        expect(getVape420SectionPresentationConfig('vape')).toEqual(
+        expect(getVape420SectionPresentationConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 slug: 'vape',
                 isVape: true,
@@ -42,7 +43,7 @@ describe('section presentation productization', () => {
             }),
         );
 
-        expect(getVape420SectionPresentationConfig('420')).toEqual(
+        expect(getVape420SectionPresentationConfig(vape420VerticalPackConfig, '420')).toEqual(
             expect.objectContaining({
                 slug: '420',
                 isVape: false,

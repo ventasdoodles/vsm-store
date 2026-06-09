@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: CategoryForm ───
  * // Arquitectura: Dumb Component (Visual + Form State)
  * // Proposito principal: Panel lateral deslizante glassmorphism para crear/editar categorias.
@@ -15,6 +15,8 @@ import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 import type { CategoryFormData } from '@/services/admin';
 import { buildAdminSectionCatalog } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface CategoryFormProps {
     open: boolean;
@@ -26,8 +28,7 @@ interface CategoryFormProps {
     onClose: () => void;
 }
 
-const SECTION_CATALOG = buildAdminSectionCatalog();
-const DEFAULT_SECTION = SECTION_CATALOG.sections[0]?.slug ?? 'vape';
+const DEFAULT_SECTION = 'vape';
 
 /** Estado inicial vacio del formulario */
 const EMPTY: CategoryFormData = {
@@ -36,6 +37,7 @@ const EMPTY: CategoryFormData = {
     section: DEFAULT_SECTION,
     parent_id: null,
     is_active: true,
+
     description: '',
     image_url: null,
     is_popular: false,
@@ -50,6 +52,9 @@ const SELECT_CLASS =
     'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:bg-white/[0.07] [&>option]:bg-gray-900 [&>option]:text-white';
 
 export function CategoryForm({ open, editing, parentCategory, allCategories, isSaving, onSave, onClose }: CategoryFormProps) {
+    const { config } = useActiveVerticalPack();
+    const SECTION_CATALOG = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
+
     const [form, setForm] = useState<CategoryFormData>(EMPTY);
 
     useEffect(() => {
@@ -187,7 +192,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                                 disabled={isChild}
                                 className={cn(SELECT_CLASS, isChild && 'cursor-not-allowed opacity-40')}
                             >
-                                {SECTION_CATALOG.sections.map(section => (
+                                {SECTION_CATALOG?.sections.map(section => (
                                     <option key={section.slug} value={section.slug}>
                                         {section.shortLabel}
                                     </option>

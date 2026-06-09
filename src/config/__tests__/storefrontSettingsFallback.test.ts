@@ -3,9 +3,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { STORE_SETTINGS_ID } from '@/constants/app';
-import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
+import { getNationalHomeHeroCopy } from '@/constants/homeHero';
+import { getStorefrontSettingsFallback } from '../storefrontSettingsFallback';
+
+const NATIONAL_HOME_HERO_COPY = getNationalHomeHeroCopy(getStorefrontSettingsFallback().vertical_pack_config!);
 import { SITE_CONFIG } from '@/config/site';
-import { getStorefrontFeaturedCategoryFallbacks, getStorefrontHeroSliderFallbacks, getStorefrontSettingsFallback } from '../storefrontSettingsFallback';
+import { getStorefrontFeaturedCategoryFallbacks, getStorefrontHeroSliderFallbacks } from '../storefrontSettingsFallback';
 
 const fallbackUrl = (path: string) => new URL(path, window.location.origin).toString();
 const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'storefrontSettingsFallback.ts'), 'utf8');

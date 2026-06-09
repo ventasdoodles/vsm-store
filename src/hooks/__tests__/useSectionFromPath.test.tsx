@@ -3,20 +3,29 @@ import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
-import { getVape420SectionRouteManifest, resolveSectionFromRouteManifest } from '@/config/productization';
+import { getVape420SectionRouteManifest, resolveSectionFromRouteManifest, vape420VerticalPackConfig } from '@/config/productization';
 import { useSectionFromPath } from '../useSectionFromPath';
+import { VerticalPackProvider } from '@/contexts/VerticalPackContext';
+
+import { vi } from 'vitest';
+
+vi.mock('@/hooks/useStoreSettings', () => ({
+    useStoreSettings: () => ({ data: { vertical_pack_config: vape420VerticalPackConfig }, isLoading: false })
+}));
 
 function renderUseSectionFromPath(initialPath: string) {
     const wrapper = ({ children }: { children: ReactNode }) => (
-        <MemoryRouter initialEntries={[initialPath]}>{children}</MemoryRouter>
+        <VerticalPackProvider>
+            <MemoryRouter initialEntries={[initialPath]}>{children}</MemoryRouter>
+        </VerticalPackProvider>
     );
 
-    return renderHook(() => useSectionFromPath(), { wrapper });
+    return renderHook(() => useSectionFromPath(vape420VerticalPackConfig), { wrapper });
 }
 
 describe('useSectionFromPath', () => {
     it('keeps current root routes aligned with the static productization route manifest', () => {
-        const routeManifest = getVape420SectionRouteManifest();
+        const routeManifest = getVape420SectionRouteManifest(vape420VerticalPackConfig);
 
         expect(
             routeManifest.map((route) => ({
@@ -30,7 +39,7 @@ describe('useSectionFromPath', () => {
     });
 
     it('keeps current slug routes aligned with the static productization route manifest', () => {
-        const routeManifest = getVape420SectionRouteManifest();
+        const routeManifest = getVape420SectionRouteManifest(vape420VerticalPackConfig);
 
         expect(
             routeManifest.map((route) => {
@@ -48,13 +57,13 @@ describe('useSectionFromPath', () => {
     });
 
     it('keeps the binary path resolver aligned with the route manifest helper', () => {
-        expect(resolveSectionFromRouteManifest('/vape')).toBe('vape');
-        expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug')).toBe('vape');
-        expect(resolveSectionFromRouteManifest('/420')).toBe('420');
-        expect(resolveSectionFromRouteManifest('/420/manifest-test-slug')).toBe('420');
-        expect(resolveSectionFromRouteManifest('/not-a-section')).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/vape', vape420VerticalPackConfig)).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug', vape420VerticalPackConfig)).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/420', vape420VerticalPackConfig)).toBe('420');
+        expect(resolveSectionFromRouteManifest('/420/manifest-test-slug', vape420VerticalPackConfig)).toBe('420');
+        expect(resolveSectionFromRouteManifest('/not-a-section', vape420VerticalPackConfig)).toBe('vape');
         expect(
             renderUseSectionFromPath('/not-a-section').result.current,
-        ).toBe(resolveSectionFromRouteManifest('/not-a-section'));
+        ).toBe(resolveSectionFromRouteManifest('/not-a-section', vape420VerticalPackConfig));
     });
 });

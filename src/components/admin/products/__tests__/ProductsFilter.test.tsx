@@ -1,13 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { vape420VerticalPackConfig } from '@/config/productization';
 import { buildAdminSectionCatalog } from '@/config/productization';
 import { ProductsFilter } from '../ProductsFilter';
 
 describe('ProductsFilter', () => {
     it('renders shared section tabs from the admin section catalog', () => {
         const onSectionChange = vi.fn();
-        const catalog = buildAdminSectionCatalog();
+        const catalog = buildAdminSectionCatalog(vape420VerticalPackConfig);
 
         const { rerender } = render(
             <ProductsFilter

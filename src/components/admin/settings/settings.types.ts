@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // â”€â”€â”€ TIPOS: Settings Module â”€â”€â”€
  * // Arquitectura: Shared Types
  * // Proposito principal: Interfaces tipadas compartidas por todos los Lego components del modulo
@@ -29,6 +29,7 @@ export interface SettingsFormData {
         cash: boolean;
     };
     loyalty_config: LoyaltyConfig;
+    vertical_pack_config: string;
 }
 
 /** Handler generico para inputs del formulario */

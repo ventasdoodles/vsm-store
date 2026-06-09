@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { ProductCard } from './ProductCard';
 import { getVape420StorefrontRenderabilityConfig } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 interface ProductGridProps {
     products: Product[];
@@ -19,13 +20,16 @@ interface ProductGridProps {
  * Grid responsive de productos con animaciones stagger, carga y estado vacío
  */
 export function ProductGrid({ products, isLoading = false, className, onClearFilter, emptyStateTitle, emptyStateSubtext }: ProductGridProps) {
-    const renderabilityConfig = getVape420StorefrontRenderabilityConfig();
+    const { config } = useActiveVerticalPack();
+    const renderabilityConfig = config 
+        ? getVape420StorefrontRenderabilityConfig(config)
+        : null;
 
     // Estado: cargando — skeleton shimmer
-    if (isLoading) {
+    if (isLoading || !renderabilityConfig) {
         return (
             <div className={cn('grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4', className)}>
-                {Array.from({ length: renderabilityConfig.grid.loadingSkeletonCount }).map((_, i) => (
+                {Array.from({ length: renderabilityConfig?.grid.loadingSkeletonCount ?? 8 }).map((_, i) => (
                     <div
                         key={i}
                         className="overflow-hidden rounded-2xl border border-theme bg-theme-secondary/30"

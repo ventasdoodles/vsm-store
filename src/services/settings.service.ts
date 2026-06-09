@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import type { VerticalPackConfig } from '@/config/productization/types';
 
 export interface HeroSlider {
     id: string;
@@ -86,6 +87,7 @@ export interface StoreSettings {
     flash_deals_end: string | null;  // ISO timestamp — hora de fin de ofertas flash
     is_ai_assistant_enabled: boolean;
     pilot_runbook_status: PilotRunbookItem[] | null;
+    vertical_pack_config: VerticalPackConfig | null;
 }
 
 export async function uploadSliderImage(file: File): Promise<string> {
@@ -109,7 +111,7 @@ export async function uploadSliderImage(file: File): Promise<string> {
 export async function getStoreSettings() {
     const { data, error } = await supabase
         .from('store_settings')
-        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end, is_ai_assistant_enabled, pilot_runbook_status')
+        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end, is_ai_assistant_enabled, pilot_runbook_status, vertical_pack_config')
         .eq('id', 1)
         .single();
 
@@ -130,7 +132,7 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
         .from('store_settings')
         .update(payload)
         .eq('id', 1)
-        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end, is_ai_assistant_enabled, pilot_runbook_status')
+        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end, is_ai_assistant_enabled, pilot_runbook_status, vertical_pack_config')
         .single();
 
     if (error) throw error;

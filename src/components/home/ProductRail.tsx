@@ -16,6 +16,8 @@ import { useFeaturedProducts, useNewProducts, useBestsellerProducts } from '@/ho
 import type { Section } from '@/types/constants';
 import { getVape420StorefrontRenderabilityConfig } from '@/config/productization';
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 interface ProductRailProps {
     type: 'featured' | 'new' | 'bestseller';
     title: string;
@@ -38,7 +40,10 @@ const itemVariants = {
 
 export function ProductRail({ type, title, section, className }: ProductRailProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
-    const renderabilityConfig = getVape420StorefrontRenderabilityConfig(section);
+    const { config } = useActiveVerticalPack();
+    const renderabilityConfig = config 
+        ? getVape420StorefrontRenderabilityConfig(config, section)
+        : null;
 
     // Select hook based on type
     const useHook = type === 'featured'
@@ -68,7 +73,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
         }
     }
 
-    if (isLoading) {
+    if (isLoading || !renderabilityConfig) {
         return (
             <div className={cn('py-6', className)}>
                 <div className="mb-6 flex items-center justify-between px-4 sm:px-0">
@@ -78,7 +83,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     </div>
                 </div>
                 <div className="flex gap-4 overflow-hidden px-4 sm:px-0">
-                    {Array.from({ length: renderabilityConfig.rail.loadingSkeletonCount }).map((_, i) => (
+                    {Array.from({ length: renderabilityConfig?.rail.loadingSkeletonCount ?? 4 }).map((_, i) => (
                         <div key={i} className="min-w-[200px] h-72 sm:min-w-[240px] rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/5 overflow-hidden flex flex-col skeleton-shimmer">
                             <div className="aspect-square bg-white/5 w-full" />
                             <div className="p-6 flex-1 flex flex-col justify-end gap-3 bg-gradient-to-b from-transparent to-black/30">

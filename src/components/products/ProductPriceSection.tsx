@@ -15,8 +15,12 @@ interface ProductPriceSectionProps {
     section: Section;
 }
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 export function ProductPriceSection({ price, compareAtPrice, section }: ProductPriceSectionProps) {
-    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(section);
+    const { config } = useActiveVerticalPack();
+    if (!config) return null;
+    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(config, section);
     const hasDiscount = compareAtPrice && compareAtPrice > price;
 
     return (

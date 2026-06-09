@@ -1,4 +1,4 @@
-import { activeVerticalPackConfig } from './active';
+import type { VerticalPackConfig } from './types';
 import { getStorefrontFallbackImageUrl } from './storefrontFallbacks';
 
 export interface HomeHeroSliderFallbackConfig {
@@ -57,15 +57,15 @@ const VAPE420_HOME_HERO_SLIDER_FALLBACKS: HomeHeroSliderFallbackConfig[] = [
     },
 ];
 
-export const getVape420HomeHeroPrimaryCopy = () =>
-    activeVerticalPackConfig.marketing.homeHero.primaryCopy;
+export const getVape420HomeHeroPrimaryCopy = (config: VerticalPackConfig) =>
+    config.marketing.homeHero.primaryCopy;
 
-export const getVape420HomeHeroSliderFallbacks = (): HomeHeroSliderFallbackConfig[] => {
-    if (activeVerticalPackConfig.id === 'vape-420') {
+export const getVape420HomeHeroSliderFallbacks = (config: VerticalPackConfig): HomeHeroSliderFallbackConfig[] => {
+    if (config.id === 'vape-420') {
         return VAPE420_HOME_HERO_SLIDER_FALLBACKS;
     }
 
-    return activeVerticalPackConfig.sections.map((section, idx) => {
+    return config.sections.map((section, idx) => {
         const themeToken = section.themeToken;
         let bgGradient = 'from-indigo-900 via-sky-900 to-slate-900';
         let bgGradientLight = 'from-indigo-500 via-sky-500 to-slate-600';
@@ -79,10 +79,10 @@ export const getVape420HomeHeroSliderFallbacks = (): HomeHeroSliderFallbackConfi
 
         return {
             id: String(idx + 1),
-            title: activeVerticalPackConfig.marketing.homeHero.primaryCopy.title,
-            subtitle: activeVerticalPackConfig.marketing.homeHero.primaryCopy.subtitle,
-            description: activeVerticalPackConfig.marketing.homeHero.primaryCopy.description,
-            tag: activeVerticalPackConfig.marketing.homeHero.primaryCopy.tag,
+            title: config.marketing.homeHero.primaryCopy.title,
+            subtitle: config.marketing.homeHero.primaryCopy.subtitle,
+            description: config.marketing.homeHero.primaryCopy.description,
+            tag: config.marketing.homeHero.primaryCopy.tag,
             image,
             ctaText: 'Ver Más',
             ctaLink: section.routePrefix,

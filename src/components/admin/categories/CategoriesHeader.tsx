@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: CategoriesHeader ───
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Cabecera premium del modulo de categorias con orbes esmeralda/lima,
@@ -10,6 +10,8 @@ import { Plus, FolderTree, Layers, Flame, Grid3X3 } from 'lucide-react';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 import { buildAdminSectionCatalog } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface CategoriesHeaderProps {
     categories: Category[];
@@ -18,20 +20,21 @@ interface CategoriesHeaderProps {
     onNew: () => void;
 }
 
-const SECTION_CATALOG = buildAdminSectionCatalog();
-
 export function CategoriesHeader({ categories, sectionFilter, onSectionChange, onNew }: CategoriesHeaderProps) {
+    const { config } = useActiveVerticalPack();
+    const SECTION_CATALOG = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
+
     const roots    = categories.filter(c => !c.parent_id);
     const children = categories.filter(c => !!c.parent_id);
     const popular  = categories.filter(c => c.is_popular);
     const sectionTabs: { label: string; value: Section | 'all'; activeClassName: string; idleClassName: string }[] = [
         { label: 'Todas', value: 'all', activeClassName: 'bg-white/10 text-white shadow-lg shadow-white/5 ring-1 ring-white/10', idleClassName: 'text-white/40 hover:text-white/70' },
-        ...SECTION_CATALOG.sections.map(section => ({
+        ...(SECTION_CATALOG?.sections.map(section => ({
             label: section.shortLabel,
             value: section.slug,
             activeClassName: section.selectedButtonClassName,
             idleClassName: section.idleButtonClassName,
-        })),
+        })) || []),
     ];
 
     return (

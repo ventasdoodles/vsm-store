@@ -8,13 +8,14 @@ import {
     buildStorefrontFeaturedCategoryFallbacks,
     buildStorefrontHeroSliderFallbacks,
 } from '@/config/productization/storefrontFallbacks';
+import { vape420VerticalPackConfig } from '@/config/productization/vape420VerticalPack';
 import type { StoreSettings } from '@/services';
 
 type StorefrontHeroSliderFallback = NonNullable<StoreSettings['hero_sliders']>[number];
 type StorefrontFeaturedCategoryFallback = NonNullable<StoreSettings['featured_categories']>[number];
 
 const STORE_FRONT_HERO_SLIDER_FALLBACKS = buildStorefrontHeroSliderFallbacks(
-    getVape420HomeHeroSliderFallbacks(),
+    getVape420HomeHeroSliderFallbacks(vape420VerticalPackConfig),
 );
 
 export function getStorefrontHeroSliderFallbacks(): StorefrontHeroSliderFallback[] {
@@ -22,7 +23,7 @@ export function getStorefrontHeroSliderFallbacks(): StorefrontHeroSliderFallback
 }
 
 const STORE_FRONT_FEATURED_CATEGORY_FALLBACKS = buildStorefrontFeaturedCategoryFallbacks(
-    getVape420CategoryShowcaseFallbackCategories(),
+    getVape420CategoryShowcaseFallbackCategories(vape420VerticalPackConfig),
 );
 
 export function getStorefrontFeaturedCategoryFallbacks(): StorefrontFeaturedCategoryFallback[] {
@@ -63,5 +64,6 @@ export function getStorefrontSettingsFallback(): StoreSettings {
         },
         flash_deals_end: null,
         is_ai_assistant_enabled: false,
+        vertical_pack_config: vape420VerticalPackConfig,
     } as StoreSettings;
 }

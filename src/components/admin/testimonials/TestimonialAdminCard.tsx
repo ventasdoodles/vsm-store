@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck, Sparkles, EyeOff, Eye, Pencil, Trash2, Copy, Star } from 'lucide-react';
 import { getAdminSectionCatalogEntry } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import type { Testimonial } from '@/types/testimonial';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +22,8 @@ export function TestimonialAdminCard({
     onToggleFeatured,
     onToggleActive,
 }: TestimonialAdminCardProps) {
-    const section = t.section ? getAdminSectionCatalogEntry(t.section) : null;
+    const { config } = useActiveVerticalPack();
+    const section = t.section && config ? getAdminSectionCatalogEntry(t.section as any, config) : null;
 
     return (
         <div

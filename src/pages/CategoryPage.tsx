@@ -26,11 +26,16 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { FilterSidebar } from '@/components/products/FilterSidebar';
 import { getAvailableFilters, applyFilters, type FilterState } from '@/lib/product-filtering';
 import { getVape420SectionPresentationConfig } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
-    const section = useSectionFromPath();
-    const sectionPresentationConfig = getVape420SectionPresentationConfig(section);
+    const { config } = useActiveVerticalPack();
+
+    if (!config) return null;
+
+    const section = useSectionFromPath(config);
+    const sectionPresentationConfig = getVape420SectionPresentationConfig(config, section);
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
     const [filtersOpen, setFiltersOpen] = useState(false);
@@ -161,6 +166,8 @@ export function CategoryPage() {
             </div>
         );
     }
+
+    if (!sectionPresentationConfig || !section) return null;
 
     return (
         <div className="container-vsm py-8">

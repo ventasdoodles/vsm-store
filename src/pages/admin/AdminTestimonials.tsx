@@ -7,6 +7,7 @@ import type { TestimonialFormData } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 // ─── Subcomponents ───
 import { TestimonialsHeader } from '@/components/admin/testimonials/TestimonialsHeader';
@@ -36,6 +37,7 @@ const EMPTY_FORM: TestimonialFormData = {
 const PAGE_SIZE = 12;
 
 export function AdminTestimonials() {
+    const { config } = useActiveVerticalPack();
     const { error, info } = useNotification();
     const { confirm } = useConfirm();
 
@@ -92,9 +94,9 @@ export function AdminTestimonials() {
         const avgRating = total > 0
             ? (testimonials.reduce((s: number, t: Testimonial) => s + t.rating, 0) / total).toFixed(1)
             : '0';
-        const sectionCounts = buildAdminSectionCounts(testimonials);
+        const sectionCounts = config ? buildAdminSectionCounts(testimonials, config) : {} as Record<string, number>;
         return { total, active, featured, avgRating, sectionCounts };
-    }, [testimonials]);
+    }, [testimonials, config]);
 
     // Pagination Calculation
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));

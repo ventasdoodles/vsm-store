@@ -18,14 +18,19 @@ import { SocialProof } from '@/components/home/SocialProof';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 import { getVape420SectionPageConfig, getVape420SectionPresentationConfig } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function SectionPage() {
-    const section = useSectionFromPath();
-    const sectionConfig = getVape420SectionPageConfig(section);
-    const sectionPresentationConfig = getVape420SectionPresentationConfig(section);
-    const Icon = sectionPresentationConfig.isVape ? Flame : Leaf;
-    const cfg = { ...sectionConfig, ...sectionPresentationConfig };
-    const isVape = cfg.themeToken === 'vape';
+    const { config } = useActiveVerticalPack();
+    
+    if (!config) return null;
+
+    const section = useSectionFromPath(config);
+    const sectionConfig = getVape420SectionPageConfig(config, section);
+    const sectionPresentationConfig = getVape420SectionPresentationConfig(config, section);
+    const Icon = sectionPresentationConfig?.isVape ? Flame : Leaf;
+    const cfg = sectionConfig && sectionPresentationConfig ? { ...sectionConfig, ...sectionPresentationConfig } : null;
+    const isVape = cfg?.themeToken === 'vape';
 
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
@@ -78,6 +83,8 @@ export function SectionPage() {
 
     // Stats
     const onSaleCount = products.filter(p => p.compare_at_price && p.compare_at_price > p.price).length;
+
+    if (!cfg || !section) return null;
 
     return (
         <div className="min-h-screen pb-20 bg-theme-primary">

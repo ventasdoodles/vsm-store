@@ -12,26 +12,28 @@ import {
     normalizeVape420SpecKey,
 } from '@/config/productization';
 
+import type { VerticalPackConfig } from '@/config/productization/types';
+
 /**
  * Mapeo de sugerencias de especificaciones técnicas por slug de categoría.
  * Se usan slugs para mayor estabilidad frente a cambios de ID.
  */
-export const SUGGESTED_SPECS: Record<string, string[]> = getVape420SuggestedSpecs();
+export const getSuggestedSpecs = (config: VerticalPackConfig): Record<string, string[]> => getVape420SuggestedSpecs(config);
 
 /**
  * Sugerencias genéricas por sección si no hay una categoría específica mapeada.
  */
-export const SECTION_DEFAULT_SPECS: Record<Section, string[]> = getVape420SectionDefaultSpecs();
+export const getSectionDefaultSpecs = (config: VerticalPackConfig): Record<Section, string[]> => getVape420SectionDefaultSpecs(config);
 
 /**
  * Mapa de normalización de llaves.
  * Convierte variaciones comunes a la llave canónica del sistema.
  */
-export const SPEC_KEY_NORMALIZATION: Record<string, string> = getVape420SpecKeyNormalization();
+export const getSpecKeyNormalization = (config: VerticalPackConfig): Record<string, string> => getVape420SpecKeyNormalization(config);
 
 /**
  * Normaliza una llave de especificación según el diccionario y reglas básicas.
  */
-export function normalizeSpecKey(key: string): string {
-    return normalizeVape420SpecKey(key);
+export function normalizeSpecKey(key: string, config: VerticalPackConfig): string {
+    return normalizeVape420SpecKey(key, config);
 }

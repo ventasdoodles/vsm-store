@@ -44,7 +44,9 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
     Flower2,
 };
 
-export const FALLBACK_CATEGORIES: FeaturedCategory[] = getVape420CategoryShowcaseFallbackCategories().map(
+import type { VerticalPackConfig } from '@/config/productization/types';
+
+export const getFallbackCategories = (config: VerticalPackConfig): FeaturedCategory[] => getVape420CategoryShowcaseFallbackCategories(config).map(
     (category) => ({
         id: category.id,
         name: category.name,

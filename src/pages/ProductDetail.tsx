@@ -25,10 +25,15 @@ import { motion } from 'framer-motion';
 import { SocialProof } from '@/components/home/SocialProof';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 import { getVape420SectionPresentationConfig } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function ProductDetail() {
     const { slug } = useParams<{ slug: string }>();
-    const section = useSectionFromPath();
+    const { config } = useActiveVerticalPack();
+
+    if (!config) return null;
+
+    const section = useSectionFromPath(config);
 
     const { data: product, isLoading, error } = useProductBySlug(slug ?? '', section);
 
@@ -66,7 +71,9 @@ export function ProductDetail() {
         );
     }
 
-    const productPresentationConfig = getVape420SectionPresentationConfig(product.section);
+    const productPresentationConfig = getVape420SectionPresentationConfig(config, product.section);
+
+    if (!productPresentationConfig) return null;
 
     return (
         <motion.div

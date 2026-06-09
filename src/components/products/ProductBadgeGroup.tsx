@@ -12,8 +12,12 @@ interface ProductBadgeGroupProps {
     product: Product;
 }
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 export function ProductBadgeGroup({ product }: ProductBadgeGroupProps) {
-    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(product.section);
+    const { config } = useActiveVerticalPack();
+    if (!config) return null;
+    const productSurfaceConfig = getVape420ProductSurfacePresentationConfig(config, product.section);
 
     // 1. Validar vigencia de flags legados
     const now = new Date();

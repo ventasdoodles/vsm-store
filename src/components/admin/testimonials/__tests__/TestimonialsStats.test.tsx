@@ -4,9 +4,11 @@ import { describe, expect, it } from 'vitest';
 import { buildAdminSectionCatalog } from '@/config/productization';
 import { TestimonialsStats } from '../TestimonialsStats';
 
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
+
 describe('TestimonialsStats', () => {
     it('renders section metrics from the shared admin section catalog', () => {
-        const catalog = buildAdminSectionCatalog();
+        const catalog = buildAdminSectionCatalog(getStorefrontSettingsFallback().vertical_pack_config!);
         const sectionCounts = {
             vape: 11,
             '420': 7,

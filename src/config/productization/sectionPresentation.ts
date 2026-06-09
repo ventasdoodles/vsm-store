@@ -1,6 +1,5 @@
 import type { Section } from '@/types/constants';
-import type { VerticalSectionConfig } from './types';
-import { activeVerticalPackConfig } from './active';
+import type { VerticalPackConfig, VerticalSectionConfig } from './types';
 import type {
     SectionPageProductizationConfig,
     SectionPresentationProductizationConfig,
@@ -55,8 +54,8 @@ const buildSectionPresentationConfig = (
     };
 };
 
-const sectionPresentationBySlug = new Map(
-    activeVerticalPackConfig.sections.map(
+const getSectionPresentationBySlug = (config: VerticalPackConfig) => new Map(
+    config.sections.map(
         (section): readonly [Section, SectionPresentationProductizationConfig] => [
             section.slug as Section,
             buildSectionPresentationConfig(section),
@@ -65,8 +64,10 @@ const sectionPresentationBySlug = new Map(
 );
 
 export const getVape420SectionPresentationConfig = (
+    config: VerticalPackConfig,
     slug: Section,
 ): SectionPresentationProductizationConfig => {
+    const sectionPresentationBySlug = getSectionPresentationBySlug(config);
     const section = sectionPresentationBySlug.get(slug);
 
     if (!section) {
@@ -76,8 +77,8 @@ export const getVape420SectionPresentationConfig = (
     return section;
 };
 
-export const getVape420SectionPageConfig = (slug: Section): SectionPageProductizationConfig => {
-    const section = getVape420SectionPresentationConfig(slug);
+export const getVape420SectionPageConfig = (config: VerticalPackConfig, slug: Section): SectionPageProductizationConfig => {
+    const section = getVape420SectionPresentationConfig(config, slug);
     return {
         slug: section.slug,
         title: section.title,

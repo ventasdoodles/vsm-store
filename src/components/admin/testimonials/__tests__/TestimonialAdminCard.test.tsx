@@ -5,7 +5,9 @@ import { buildAdminSectionCatalog } from '@/config/productization';
 import type { Testimonial } from '@/types/testimonial';
 import { TestimonialAdminCard } from '../TestimonialAdminCard';
 
-const catalog = buildAdminSectionCatalog();
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
+
+const catalog = buildAdminSectionCatalog(getStorefrontSettingsFallback().vertical_pack_config!);
 
 function makeTestimonial(section: Testimonial['section']): Testimonial {
     return {

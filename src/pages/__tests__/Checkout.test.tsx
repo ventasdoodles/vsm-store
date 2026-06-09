@@ -5,7 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Checkout } from '../Checkout';
 import { useCartStore } from '@/stores/cart.store';
 import type { Product } from '@/types/product';
-import { STORE_META_COPY } from '@/constants/storeMeta';
+import { getStoreMetaCopy } from '@/constants/storeMeta';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
+
+const STORE_META_COPY = getStoreMetaCopy(getStorefrontSettingsFallback().vertical_pack_config!);
 
 const navigateMock = vi.fn();
 const warningMock = vi.fn();

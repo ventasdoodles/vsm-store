@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ProductBreadcrumbs — Navegación jerárquica para la página de producto.
  * 
  * @module ProductBreadcrumbs
@@ -19,8 +19,12 @@ interface ProductBreadcrumbsProps {
     categoryId?: string;
 }
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 export function ProductBreadcrumbs({ section, productName, productSlug, categoryId }: ProductBreadcrumbsProps) {
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(section);
+    const { config } = useActiveVerticalPack();
+    if (!config) return null;
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, section);
     const sectionLabel = productDetailConfig.isVape ? 'Vape' : '420';
     const { pathname } = useLocation();
 

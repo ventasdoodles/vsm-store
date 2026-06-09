@@ -3,7 +3,10 @@ import type { PropsWithChildren } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { Home } from '../Home';
-import { STORE_META_COPY } from '@/constants/storeMeta';
+import { getStoreMetaCopy } from '@/constants/storeMeta';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
+
+const STORE_META_COPY = getStoreMetaCopy(getStorefrontSettingsFallback().vertical_pack_config!);
 
 vi.mock('framer-motion', () => ({
     Reorder: {

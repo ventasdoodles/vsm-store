@@ -26,10 +26,12 @@ import {
     type AttributeUpdatePayload,
 } from '@/lib/domain/adminAttributes';
 import { buildAdminSectionCatalog } from '@/config/productization';
-
-const adminSectionCatalog = buildAdminSectionCatalog();
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function AdminAttributes() {
+    const { config } = useActiveVerticalPack();
+    const adminSectionCatalog = config ? buildAdminSectionCatalog(config) : { sections: [] };
+
     const queryClient = useQueryClient();
     const notify = useNotification();
     const { confirm } = useConfirm();

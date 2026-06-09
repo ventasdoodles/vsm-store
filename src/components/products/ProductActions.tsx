@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ProductActions — Selector de cantidad, boton de agregar y compartir.
  *
  * @module ProductActions
@@ -18,16 +18,20 @@ import type { ProductVariant } from '@/types/variant';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
 import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 interface ProductActionsProps {
     product: Product;
 }
 
 export function ProductActions({ product }: ProductActionsProps) {
+    const { config } = useActiveVerticalPack();
     const productDetailConfig = useMemo(
-        () => getVape420ProductDetailPresentationConfig(product.section),
-        [product.section],
+        () => config ? getVape420ProductDetailPresentationConfig(config, product.section) : null,
+        [config, product.section],
     );
+
+    if (!config || !productDetailConfig) return null;
 
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);

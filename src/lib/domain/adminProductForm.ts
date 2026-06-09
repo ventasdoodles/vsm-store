@@ -2,44 +2,37 @@ import type { Category } from '@/types/category';
 import type { Product, Section, ProductStatus } from '@/types/product';
 import type { ProductFormData } from '@/services/admin';
 import { getAdminDefaultSectionSlug } from '@/config/productization';
+import type { VerticalPackConfig } from '@/config/productization/types';
 import { slugify } from '@/lib/utils';
 
-export const DEFAULT_PRODUCT_FORM: ProductFormData = {
-    name: '',
-    slug: '',
-    description: '',
-    short_description: '',
-    price: 0,
-    compare_at_price: null,
-    stock: 0,
-    sku: '',
-    section: getAdminDefaultSectionSlug(),
-    category_id: '',
-    tags: [],
-    status: 'active' as ProductStatus,
-    images: [],
-    cover_image: null,
-    is_featured: false,
-    is_featured_until: null,
-    is_new: false,
-    is_new_until: null,
-    is_bestseller: false,
-    is_bestseller_until: null,
-    is_active: true,
-    specs: {},
-    badges: [],
-    ai_sales_note: null,
-    ai_is_featured: false,
-    ai_exclude: false,
-};
-
-export function buildDefaultProductForm(): ProductFormData {
+export function buildDefaultProductForm(config?: VerticalPackConfig): ProductFormData {
     return {
-        ...DEFAULT_PRODUCT_FORM,
-        tags: [...DEFAULT_PRODUCT_FORM.tags],
-        images: [...DEFAULT_PRODUCT_FORM.images],
-        specs: { ...DEFAULT_PRODUCT_FORM.specs },
-        badges: [...DEFAULT_PRODUCT_FORM.badges],
+        name: '',
+        slug: '',
+        description: '',
+        short_description: '',
+        price: 0,
+        compare_at_price: null,
+        stock: 0,
+        sku: '',
+        section: config ? getAdminDefaultSectionSlug(config) : '',
+        category_id: '',
+        tags: [],
+        status: 'active' as ProductStatus,
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        specs: {},
+        badges: [],
+        ai_sales_note: null,
+        ai_is_featured: false,
+        ai_exclude: false,
     };
 }
 

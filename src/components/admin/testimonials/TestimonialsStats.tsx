@@ -2,6 +2,8 @@ import { buildAdminSectionCatalog } from '@/config/productization';
 import type { Section } from '@/types/constants';
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface StatsProps {
     stats: {
@@ -14,7 +16,8 @@ interface StatsProps {
 }
 
 export function TestimonialsStats({ stats, sectionCounts }: StatsProps) {
-    const adminSectionCatalog = buildAdminSectionCatalog();
+    const { config } = useActiveVerticalPack();
+    const adminSectionCatalog = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 py-4">
@@ -41,7 +44,7 @@ export function TestimonialsStats({ stats, sectionCounts }: StatsProps) {
                 icon={<Star className="w-5 h-5 fill-amber-400 text-amber-400 drop-shadow-sm" />} 
                 gradient="bg-gradient-to-br from-yellow-500/10 to-transparent"
             />
-            {adminSectionCatalog.sections.map((section) => (
+            {adminSectionCatalog?.sections.map((section) => (
                 <StatBadge
                     key={section.slug}
                     label={section.displayLabel}

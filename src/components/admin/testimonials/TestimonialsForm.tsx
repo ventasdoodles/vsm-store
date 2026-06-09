@@ -2,8 +2,8 @@ import { Loader2, Save, X, Star } from 'lucide-react';
 import type { TestimonialFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { buildAdminSectionCatalog } from '@/config/productization';
-
-const adminSectionCatalog = buildAdminSectionCatalog();
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface TestimonialsFormProps {
     form: TestimonialFormData;
@@ -22,6 +22,9 @@ export function TestimonialsForm({
     editingId,
     isPending,
 }: TestimonialsFormProps) {
+    const { config } = useActiveVerticalPack();
+    const adminSectionCatalog = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
+
     return (
         <form
             onSubmit={onSubmit}
@@ -128,7 +131,7 @@ export function TestimonialsForm({
                         className="appearance-none w-full bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-theme-primary focus:border-accent-primary outline-none focus:bg-theme-primary/[0.08] focus:ring-4 focus:ring-accent-primary/10 transition-all shadow-inner"
                     >
                         <option value="">🌐 General (ambas secciones)</option>
-                        {adminSectionCatalog.sections.map((section) => (
+                        {adminSectionCatalog?.sections.map((section) => (
                             <option key={section.slug} value={section.slug}>
                                 {section.formLabel}
                             </option>

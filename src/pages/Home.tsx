@@ -20,7 +20,8 @@ import { WheelInvitation } from '@/components/home/WheelInvitation';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 import { SmartBanner } from '@/components/home/ai/SmartBanner';
 import { useAuth } from '@/hooks/useAuth';
-import { STORE_META_COPY } from '@/constants/storeMeta';
+import { getStoreMetaCopy } from '@/constants/storeMeta';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 // Lazy-load heavier components
 const SocialProof = lazy(() => import('@/components/home/SocialProof').then(m => ({ default: m.SocialProof })));
@@ -39,6 +40,8 @@ type SectionId =
 
 export function Home() {
     const { profile } = useAuth();
+    const { config } = useActiveVerticalPack();
+    const storeMetaCopy = config ? getStoreMetaCopy(config) : null;
 
     // 1. Define section priority based on IA Context [Wave 120]
     const sectionOrder = useMemo(() => {
@@ -165,15 +168,17 @@ export function Home() {
         }
     };
 
+    if (!config || !storeMetaCopy) return null;
+
     return (
         <div className="min-h-screen pb-20 pt-0 bg-theme-primary transition-colors duration-300">
             <SEO
                 title="Inicio"
-                description={STORE_META_COPY.home.seoDescription}
+                description={storeMetaCopy.home.seoDescription}
             />
             <OrganizationJsonLd />
 
-            <h1 className="sr-only">{STORE_META_COPY.home.hiddenHeading}</h1>
+            <h1 className="sr-only">{storeMetaCopy.home.hiddenHeading}</h1>
 
             <div className="space-y-12 md:space-y-16">
                 <SectionErrorBoundary name="MegaHero">

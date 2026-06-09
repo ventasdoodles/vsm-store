@@ -6,6 +6,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { Product } from '@/types/product';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface FrequentlyBoughtTogetherProps {
@@ -13,6 +14,7 @@ interface FrequentlyBoughtTogetherProps {
 }
 
 export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTogetherProps) {
+    const { config } = useActiveVerticalPack();
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +22,9 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     const { trigger: haptic } = useHaptic();
     const { success } = useNotification();
     const [isAdding, setIsAdding] = useState(false);
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(currentProduct.section);
+    
+    if (!config) return null;
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, currentProduct.section);
 
     useEffect(() => {
         const loadRecommendations = async () => {

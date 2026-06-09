@@ -20,28 +20,31 @@ import {
     updateHomeFeaturedCategorySlot,
 } from '@/lib/domain/homeFeaturedCategories';
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 // Subcomponents for the module
 import { HomeEditorHeader } from '@/components/admin/home-editor/HomeEditorHeader';
 import { HomeEditorSlotCard } from '@/components/admin/home-editor/HomeEditorSlotCard';
 
 export function AdminHomeEditor() {
+    const { config } = useActiveVerticalPack();
     const { data: settings, isLoading } = useStoreSettings();
     const updateMutation = useUpdateStoreSettings();
     const { data: storeCategories = [] } = useCategories();
     const { success, error: notifyError } = useNotification();
 
     const [categories, setCategories] = useState<FeaturedCategory[]>(() =>
-        buildHomeFeaturedCategories(null),
+        buildHomeFeaturedCategories(config, null),
     );
     const [isDirty, setIsDirty] = useState(false);
 
     // Sync with the DB when settings arrive
     useEffect(() => {
         if (settings?.featured_categories) {
-            setCategories(buildHomeFeaturedCategories(settings.featured_categories));
+            setCategories(buildHomeFeaturedCategories(config, settings.featured_categories));
             setIsDirty(false);
         }
-    }, [settings?.featured_categories]);
+    }, [settings?.featured_categories, config]);
 
     /** Update a field for a specific slot */
     const updateSlot = useCallback((index: number, field: keyof FeaturedCategory, value: string) => {
@@ -81,7 +84,7 @@ export function AdminHomeEditor() {
 
     /** Discard changes and go back to the DB-backed state */
     const handleDiscard = () => {
-        setCategories(buildHomeFeaturedCategories(settings?.featured_categories));
+        setCategories(buildHomeFeaturedCategories(config, settings?.featured_categories));
         setIsDirty(false);
     };
 

@@ -3,7 +3,7 @@ import {
     getVape420HomeHeroPrimaryCopy,
     getVape420HomeHeroSliderFallbacks,
 } from '@/config/productization/homeHero';
-import type { HomeHeroMarketingCopy } from '@/config/productization/types';
+import type { HomeHeroMarketingCopy, VerticalPackConfig } from '@/config/productization/types';
 
 export interface HomeHeroCopy extends HomeHeroMarketingCopy {
     title: string;
@@ -12,7 +12,7 @@ export interface HomeHeroCopy extends HomeHeroMarketingCopy {
     tag: string;
 }
 
-export const NATIONAL_HOME_HERO_COPY: HomeHeroCopy = getVape420HomeHeroPrimaryCopy();
+export const getNationalHomeHeroCopy = (config: VerticalPackConfig): HomeHeroCopy => getVape420HomeHeroPrimaryCopy(config);
 export const getHomeHeroSliderFallbacks = getVape420HomeHeroSliderFallbacks;
 export const getHomeHeroFallbackImageUrl = getVape420HomeHeroFallbackImageUrl;
 
@@ -36,11 +36,11 @@ export const hasStaleCityHeroCopy = (slide: HomeHeroSlideLike) => {
     );
 };
 
-export const normalizeHomeHeroSlide = <T extends HomeHeroSlideLike>(slide: T): T => {
+export const normalizeHomeHeroSlide = <T extends HomeHeroSlideLike>(slide: T, config: VerticalPackConfig): T => {
     if (!hasStaleCityHeroCopy(slide)) return slide;
 
     return {
         ...slide,
-        ...NATIONAL_HOME_HERO_COPY,
+        ...getNationalHomeHeroCopy(config),
     };
 };

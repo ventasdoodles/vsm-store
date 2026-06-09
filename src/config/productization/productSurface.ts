@@ -59,10 +59,13 @@ const getThemeClasses = (themeToken: string) => {
     }
 };
 
+import type { VerticalPackConfig } from './types';
+
 export const getVape420ProductSurfacePresentationConfig = (
+    config: VerticalPackConfig,
     slug: Section,
 ): ProductSurfaceProductizationConfig => {
-    const section = getVape420SectionPresentationConfig(slug);
+    const section = getVape420SectionPresentationConfig(config, slug);
     const theme = getThemeClasses(section.themeToken);
 
     return {

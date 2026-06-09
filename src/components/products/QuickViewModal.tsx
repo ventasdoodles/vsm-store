@@ -18,6 +18,8 @@ import { ProductBadgeGroup } from './ProductBadgeGroup';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
 import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 interface QuickViewModalProps {
     product: Product;
     isOpen: boolean;
@@ -25,6 +27,7 @@ interface QuickViewModalProps {
 }
 
 export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
+    const { config } = useActiveVerticalPack();
     const { prediction, isLoading: isOracleLoading } = useInventoryOracle(product.id, product.stock);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
@@ -43,8 +46,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         [product, selectedVariant],
     );
     const productDetailConfig = useMemo(
-        () => getVape420ProductDetailPresentationConfig(product.section),
-        [product.section],
+        () => config ? getVape420ProductDetailPresentationConfig(config, product.section) : null,
+        [config, product.section],
     );
     const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
 
@@ -56,7 +59,9 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
 
             setSelectedVariant(firstVariant ?? null);
         }
-    }, [variations, hasVariations, product, selectedVariant]);
+    }, [product, variations, hasVariations, selectedVariant]);
+
+    if (!config || !productDetailConfig) return null;
 
     useEffect(() => {
         setQuantity((current) => Math.min(Math.max(1, current), maxQuantity));

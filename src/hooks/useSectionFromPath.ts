@@ -6,7 +6,10 @@ import { useLocation } from 'react-router-dom';
 import { resolveSectionFromRouteManifest } from '@/config/productization';
 import type { Section } from '@/types/constants';
 
-export function useSectionFromPath(): Section {
+import type { VerticalPackConfig } from '@/config/productization/types';
+
+export function useSectionFromPath(config?: VerticalPackConfig | null): Section {
     const { pathname } = useLocation();
-    return resolveSectionFromRouteManifest(pathname);
+    if (!config) return 'vape' as Section; // Fallback during load
+    return resolveSectionFromRouteManifest(pathname, config);
 }

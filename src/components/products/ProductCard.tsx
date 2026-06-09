@@ -23,6 +23,7 @@ import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
 import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import { SITE_CONFIG } from '@/config/site';
 
 import { ProductBadgeGroup } from './ProductBadgeGroup';
@@ -69,9 +70,10 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
     const productHref = useMemo(() => `/${product.section}/${product.slug}`, [product.section, product.slug]);
     const purchaseability = useMemo(() => getStorefrontProductPurchaseability(product), [product]);
+    const { config } = useActiveVerticalPack();
     const productSurfaceConfig = useMemo(
-        () => getVape420ProductSurfacePresentationConfig(product.section),
-        [product.section],
+        () => config ? getVape420ProductSurfacePresentationConfig(config, product.section) : null,
+        [config, product.section],
     );
     const requiresOptionSelection = purchaseability.requiresVariantSelection;
     const shouldShowImageDots = product.images?.length > 1;
@@ -296,44 +298,64 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </motion.button>
                             )}
 
-                            {/* Quick Actions (Bottom) */}
-                            <div className="absolute bottom-4 left-4 right-4 flex gap-2 translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-[0.22, 1, 0.36, 1]">
-                                <button
-                                    onClick={handleQuickView}
-                                    className="flex-1 h-12 bg-white text-slate-900 font-black rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-all text-[10px] tracking-widest shadow-xl active:scale-95"
-                                >
-                                    <Eye className="w-4 h-4" />
-                                    <span className={compact ? 'hidden' : 'inline'}>VISTA RÃPIDA</span>
-                                </button>
-                                <button
-                                    onClick={handleQuickAdd}
-                                    disabled={!purchaseability.canAddToCart && !requiresOptionSelection}
-                                    className={cn(
-                                        "h-12 bg-slate-900/90 backdrop-blur-xl hover:bg-slate-900 text-white rounded-xl flex items-center justify-center transition-all shadow-xl border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
-                                        (!purchaseability.canAddToCart || requiresOptionSelection) ? "px-4 w-auto" : "w-12",
-                                        isEmergency && "bg-green-600 hover:bg-green-500 border-green-400"
-                                    )}
-                                >
-                                    {isEmergency ? (
-                                        <MessageCircle className="w-5 h-5 text-white" />
-                                    ) : (
-                                        requiresOptionSelection ? <span className="text-[10px] font-black tracking-widest uppercase">VER OPCIONES</span> : (
-                                            !purchaseability.canAddToCart ? <span className="text-[10px] font-black tracking-widest uppercase">{purchaseability.ctaLabel}</span> : (
-                                                isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                            {/* Quick actions desktop */}
+                            {config && productSurfaceConfig && (
+                                <div className="absolute top-2 right-2 flex flex-col gap-2 translate-x-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 hidden md:flex z-10">
+                                    <button
+                                        onClick={handleQuickView}
+                                        className="flex-1 h-12 bg-white text-slate-900 font-black rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-all text-[10px] tracking-widest shadow-xl active:scale-95"
+                                    >
+                                        <Eye className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={handleQuickAdd}
+                                        disabled={!purchaseability.canAddToCart && !requiresOptionSelection}
+                                        className={cn(
+                                            "h-12 bg-slate-900/90 backdrop-blur-xl hover:bg-slate-900 text-white rounded-xl flex items-center justify-center transition-all shadow-xl border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
+                                            (!purchaseability.canAddToCart || requiresOptionSelection) ? "px-4 w-auto" : "w-12",
+                                            isEmergency && "bg-green-600 hover:bg-green-500 border-green-400"
+                                        )}
+                                    >
+                                        {isEmergency ? (
+                                            <MessageCircle className="w-5 h-5 text-white" />
+                                        ) : (
+                                            requiresOptionSelection ? <span className="text-[10px] font-black tracking-widest uppercase">VER OPCIONES</span> : (
+                                                !purchaseability.canAddToCart ? <span className="text-[10px] font-black tracking-widest uppercase">{purchaseability.ctaLabel}</span> : (
+                                                    isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                                                )
                                             )
-                                        )
-                                    )}
-                                </button>
-                            </div>
+                                        )}
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Info Section */}
                         <div className="p-6 flex-1 flex flex-col relative justify-between bg-gradient-to-b from-transparent to-black/30">
+                            {/* Contenido principal */}
+                            <Link to={productHref} className="p-4 flex flex-col flex-1 relative z-10">
+                                {/* Brand / Section - Usando la configuración inyectada */}
+                                <div className="mb-2">
+                                    {config && productSurfaceConfig ? (
+                                        <span className={cn(
+                                            'text-[10px] font-black uppercase tracking-widest',
+                                            productSurfaceConfig.productChipClassName,
+                                        )}>
+                                            {productSurfaceConfig.isVape ? 'Vape' : '420'}
+                                        </span>
+                                    ) : (
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                                            {' '}
+                                        </span>
+                                    )}
+                                </div>
+                            </Link>
+
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between gap-2">
                                     <span className={cn(
                                         "text-[9px] font-black uppercase tracking-[0.25em] px-2.5 py-1 rounded-full border",
-                                        productSurfaceConfig.productChipClassName
+                                        productSurfaceConfig?.productChipClassName
                                     )}>
                                         {product.section}
                                     </span>
@@ -355,7 +377,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
                                 <h3 className={cn(
                                     "font-black text-white leading-tight transition-colors line-clamp-2 tracking-tight",
-                                    productSurfaceConfig.productTitleHoverClassName,
+                                    productSurfaceConfig?.productTitleHoverClassName,
                                     compact ? "text-base" : "text-xl"
                                 )}>
                                     {product.name}
@@ -364,17 +386,26 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
                             <div className="mt-6 flex items-end justify-between">
                                 <div className="flex flex-col">
-                                    {product.compare_at_price && product.compare_at_price > product.price && (
-                                        <span className="text-xs text-white/30 line-through font-bold mb-0.5">
-                                            {formatPrice(product.compare_at_price)}
-                                        </span>
-                                    )}
-                                    <span className={cn(
-                                        "font-black tracking-tighter text-white",
-                                        compact ? "text-xl" : "text-3xl"
-                                    )}>
-                                        {formatPrice(product.price)}
-                                    </span>
+                                    {/* Precios */}
+                                    <div className="mt-auto pt-3 flex items-baseline gap-2">
+                                        {config && productSurfaceConfig ? (
+                                            <span className={cn(
+                                                'text-lg font-bold',
+                                                productSurfaceConfig.priceAccentTextClassName,
+                                            )}>
+                                                {formatPrice(product.price)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-lg font-bold text-theme-primary">
+                                                {formatPrice(product.price)}
+                                            </span>
+                                        )}
+                                        {product.compare_at_price && product.compare_at_price > product.price && (
+                                            <span className="text-sm text-theme-tertiary line-through">
+                                                {formatPrice(product.compare_at_price)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <motion.button

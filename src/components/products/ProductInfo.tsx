@@ -19,9 +19,13 @@ interface ProductInfoProps {
     product: Product;
 }
 
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+
 export function ProductInfo({ product }: ProductInfoProps) {
+    const { config } = useActiveVerticalPack();
+    if (!config) return null;
     const { prediction, isLoading: isOracleLoading } = useInventoryOracle(product.id, product.stock);
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(product.section);
+    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, product.section);
 
     const containerVariants = {
         hidden: { opacity: 0 },

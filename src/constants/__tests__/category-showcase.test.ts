@@ -4,16 +4,17 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { vape420VerticalPackConfig } from '@/config/productization';
 import { getStorefrontFeaturedCategoryFallbacks, getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
-import { FALLBACK_CATEGORIES } from '../category-showcase';
+import { getFallbackCategories } from '../category-showcase';
 
 const fallbackUrl = (path: string) => new URL(path, window.location.origin).toString();
 const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'category-showcase.ts'), 'utf8');
 
 describe('category showcase constants public surface', () => {
     it('keeps fallback categories backed by the Vape/420 vertical pack', () => {
-        expect(FALLBACK_CATEGORIES).toEqual(getStorefrontFeaturedCategoryFallbacks());
-        expect(getStorefrontSettingsFallback().featured_categories).toEqual(FALLBACK_CATEGORIES);
-        expect(FALLBACK_CATEGORIES).toEqual([
+        const fallbacks = getFallbackCategories(vape420VerticalPackConfig);
+        expect(fallbacks).toEqual(getStorefrontFeaturedCategoryFallbacks());
+        expect(getStorefrontSettingsFallback().featured_categories).toEqual(fallbacks);
+        expect(fallbacks).toEqual([
             {
                 id: '1',
                 name: 'Líquidos',
@@ -52,7 +53,7 @@ describe('category showcase constants public surface', () => {
             },
         ]);
         expect(vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories.map((category) => category.slug)).toEqual(
-            FALLBACK_CATEGORIES.map((category) => category.slug),
+            fallbacks.map((category) => category.slug),
         );
     });
 

@@ -2,21 +2,22 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { vape420VerticalPackConfig } from '@/config/productization';
 import {
     getHomeHeroFallbackImageUrl,
     getHomeHeroSliderFallbacks,
-    NATIONAL_HOME_HERO_COPY,
+    getNationalHomeHeroCopy,
 } from '../homeHero';
 
 const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'homeHero.ts'), 'utf8');
 
 describe('home hero constants public surface', () => {
     it('keeps fallback slides backed by the home hero productization leaf', () => {
-        expect(NATIONAL_HOME_HERO_COPY.title).toBe('Vapes y 420');
-        expect(getHomeHeroSliderFallbacks()).toEqual([
+        expect(getNationalHomeHeroCopy(vape420VerticalPackConfig).title).toBe('Vapes y 420');
+        expect(getHomeHeroSliderFallbacks(vape420VerticalPackConfig)).toEqual([
             expect.objectContaining({
                 id: '1',
-                title: NATIONAL_HOME_HERO_COPY.title,
+                title: getNationalHomeHeroCopy(vape420VerticalPackConfig).title,
                 image: '/images/storefront-fallbacks/hero-vape.svg',
                 ctaLink: '/vape',
             }),

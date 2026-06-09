@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildAdminSectionCatalog, getAdminDefaultSectionSlug } from '@/config/productization';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
 
 const warningMock = vi.fn();
 const successMock = vi.fn();
@@ -97,8 +98,9 @@ describe('ProductEditorDrawer', () => {
             />,
         );
 
-        const catalog = buildAdminSectionCatalog();
-        const defaultSection = getAdminDefaultSectionSlug();
+        const config = getStorefrontSettingsFallback().vertical_pack_config!;
+        const catalog = buildAdminSectionCatalog(config);
+        const defaultSection = getAdminDefaultSectionSlug(config);
 
         fireEvent.click(screen.getByRole('button', { name: /Clasificaci/i }));
 
@@ -140,7 +142,8 @@ describe('ProductEditorDrawer', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Set category' }));
         fireEvent.click(screen.getByRole('button', { name: /Crear Producto/i }));
 
-        const label = buildAdminSectionCatalog().sections.map((section) => section.shortLabel).join(' o ');
+        const config = getStorefrontSettingsFallback().vertical_pack_config!;
+        const label = buildAdminSectionCatalog(config).sections.map((section) => section.shortLabel).join(' o ');
         expect(warningMock).toHaveBeenCalledWith('Revisar datos requeridos', `Debes seleccionar una sección (${label}).`);
     });
 });

@@ -7,6 +7,7 @@ import {
     findMatchingHomeFeaturedCategoryId,
     updateHomeFeaturedCategorySlot,
 } from '../homeFeaturedCategories';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
 
 const createCategory = (overrides: Partial<FeaturedCategory> = {}): FeaturedCategory => ({
     id: 'slot-1',
@@ -41,7 +42,8 @@ describe('homeFeaturedCategories', () => {
             createCategory({ id: 'saved-2', name: '', slug: '' }),
         ];
 
-        const categories = buildHomeFeaturedCategories(saved);
+        const config = getStorefrontSettingsFallback().vertical_pack_config!;
+        const categories = buildHomeFeaturedCategories(config, saved);
 
         expect(categories).toHaveLength(4);
         expect(categories[0]).toBe(saved[0]);

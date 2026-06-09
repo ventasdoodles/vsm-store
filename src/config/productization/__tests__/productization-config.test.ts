@@ -3,8 +3,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { SITE_CONFIG } from '@/config/site';
-import { NATIONAL_HOME_HERO_COPY } from '@/constants/homeHero';
-import { STORE_META_COPY } from '@/constants/storeMeta';
+import { getNationalHomeHeroCopy } from '@/constants/homeHero';
+import { getStoreMetaCopy } from '@/constants/storeMeta';
+import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallback';
+
+const NATIONAL_HOME_HERO_COPY = getNationalHomeHeroCopy(getStorefrontSettingsFallback().vertical_pack_config!);
+const STORE_META_COPY = getStoreMetaCopy(getStorefrontSettingsFallback().vertical_pack_config!);
 import {
     buildVerticalPackRouteManifest,
     assertValidVerticalPackContract,
@@ -87,9 +91,9 @@ describe('productization config boundary', () => {
 
     it('keeps Vape/420 taxonomy and specs in the vertical pack', () => {
         expect(() => assertValidVerticalPackContract(vape420VerticalPackConfig)).not.toThrow();
-        expect(getVape420SectionRouteManifest()).toEqual(buildVerticalPackRouteManifest(vape420VerticalPackConfig));
+        expect(getVape420SectionRouteManifest(vape420VerticalPackConfig)).toEqual(buildVerticalPackRouteManifest(vape420VerticalPackConfig));
         expect(vape420VerticalPackConfig.sections.map((section) => section.slug)).toEqual(['vape', '420']);
-        expect(getVape420SectionPageConfig('vape')).toEqual(
+        expect(getVape420SectionPageConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 title: 'Vape Collection',
                 subtitle: 'Pods, l\u00edquidos, accesorios y todo lo que necesitas para vapear.',
@@ -98,7 +102,7 @@ describe('productization config boundary', () => {
                 themeToken: 'vape',
             }),
         );
-        expect(getVape420SectionPresentationConfig('vape')).toEqual(
+        expect(getVape420SectionPresentationConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 title: 'Vape Collection',
                 subtitle: 'Pods, l\u00edquidos, accesorios y todo lo que necesitas para vapear.',
@@ -108,7 +112,7 @@ describe('productization config boundary', () => {
                 sortHighlightClassName: 'bg-vape-500/10 font-semibold text-vape-400',
             }),
         );
-        expect(getVape420SectionPresentationConfig('420')).toEqual(
+        expect(getVape420SectionPresentationConfig(vape420VerticalPackConfig, '420')).toEqual(
             expect.objectContaining({
                 title: '420 Zone',
                 subtitle: 'Herbal, grinders, papel, accesorios y m\u00e1s para tu sesi\u00f3n perfecta.',
@@ -118,7 +122,7 @@ describe('productization config boundary', () => {
                 sortHighlightClassName: 'bg-herbal-500/10 font-semibold text-herbal-400',
             }),
         );
-        expect(getVape420ProductSurfacePresentationConfig('vape')).toEqual(
+        expect(getVape420ProductSurfacePresentationConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 isVape: true,
                 priceAccentTextClassName: 'text-vape-400',
@@ -132,7 +136,7 @@ describe('productization config boundary', () => {
                 quickViewSelectedVariantClassName: 'border-vape-500 bg-vape-500/10 text-vape-400',
             }),
         );
-        expect(getVape420ProductSurfacePresentationConfig('420')).toEqual(
+        expect(getVape420ProductSurfacePresentationConfig(vape420VerticalPackConfig, '420')).toEqual(
             expect.objectContaining({
                 isVape: false,
                 priceAccentTextClassName: 'text-herbal-400',
@@ -146,7 +150,7 @@ describe('productization config boundary', () => {
                 quickViewSelectedVariantClassName: 'border-herbal-500 bg-herbal-500/10 text-herbal-400',
             }),
         );
-        expect(getVape420ProductDetailPresentationConfig('vape')).toEqual(
+        expect(getVape420ProductDetailPresentationConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 isVape: true,
                 breadcrumbLinkHoverClassName: 'hover:text-vape-400',
@@ -160,7 +164,7 @@ describe('productization config boundary', () => {
                 quickViewSelectedThumbnailClassName: 'border-vape-500 ring-4 ring-vape-500/20 shadow-lg shadow-vape-500/20',
             }),
         );
-        expect(getVape420ProductDetailPresentationConfig('420')).toEqual(
+        expect(getVape420ProductDetailPresentationConfig(vape420VerticalPackConfig, '420')).toEqual(
             expect.objectContaining({
                 isVape: false,
                 breadcrumbLinkHoverClassName: 'hover:text-herbal-400',
@@ -174,7 +178,7 @@ describe('productization config boundary', () => {
                 quickViewSelectedThumbnailClassName: 'border-herbal-500 ring-4 ring-herbal-500/20 shadow-lg shadow-herbal-500/20',
             }),
         );
-        expect(getVape420StorefrontRenderabilityConfig('vape')).toEqual(
+        expect(getVape420StorefrontRenderabilityConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 rail: expect.objectContaining({
                     loadingSkeletonCount: 4,
@@ -202,7 +206,7 @@ describe('productization config boundary', () => {
                 }),
             }),
         );
-        expect(getVape420StorefrontRenderabilityConfig()).toEqual(
+        expect(getVape420StorefrontRenderabilityConfig(vape420VerticalPackConfig)).toEqual(
             expect.objectContaining({
                 rail: expect.objectContaining({
                     emptyStateCtaHref: '/buscar',
@@ -212,7 +216,7 @@ describe('productization config boundary', () => {
                 }),
             }),
         );
-        expect(getVape420SectionPageConfig('420')).toEqual(
+        expect(getVape420SectionPageConfig(vape420VerticalPackConfig, '420')).toEqual(
             expect.objectContaining({
                 title: '420 Zone',
                 subtitle: 'Herbal, grinders, papel, accesorios y m\u00e1s para tu sesi\u00f3n perfecta.',
@@ -249,13 +253,13 @@ describe('productization config boundary', () => {
             'Tipo',
             'THC%',
         ]);
-        expect(getVape420SuggestedSpecs()).toBe(vape420VerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug);
-        expect(getVape420SectionDefaultSpecs()).toEqual({
+        expect(getVape420SuggestedSpecs(vape420VerticalPackConfig)).toBe(vape420VerticalPackConfig.attributeSchema.suggestedSpecsByCategorySlug);
+        expect(getVape420SectionDefaultSpecs(vape420VerticalPackConfig)).toEqual({
             vape: ['Marca', 'Modelo', 'Color'],
             '420': ['Marca', 'Tipo', 'Efecto'],
         });
-        expect(getVape420SpecKeyNormalization().battery).toBe('Batería');
-        expect(normalizeVape420SpecKey(' battery:')).toBe('Batería');
+        expect(getVape420SpecKeyNormalization(vape420VerticalPackConfig).battery).toBe('Batería');
+        expect(normalizeVape420SpecKey(' battery:', vape420VerticalPackConfig)).toBe('Batería');
         expect(vape420VerticalPackConfig.marketing.homeHero.primaryCopy).toEqual({
             title: 'Vapes y 420',
             subtitle: 'seleccionados',
@@ -264,7 +268,7 @@ describe('productization config boundary', () => {
             tag: 'Envíos Nacionales',
         });
         expect(NATIONAL_HOME_HERO_COPY).toEqual(vape420VerticalPackConfig.marketing.homeHero.primaryCopy);
-        expect(getVape420HomeHeroSliderFallbacks()).toEqual([
+        expect(getVape420HomeHeroSliderFallbacks(vape420VerticalPackConfig)).toEqual([
             expect.objectContaining({
                 id: '1',
                 title: 'Vapes y 420',
@@ -287,10 +291,10 @@ describe('productization config boundary', () => {
         expect(getVape420HomeHeroFallbackImageUrl('/images/storefront-fallbacks/hero-vape.svg')).toBe(
             new URL('/images/storefront-fallbacks/hero-vape.svg', window.location.origin).toString(),
         );
-        expect(getVape420CategoryShowcaseFallbackCategories()).toBe(
+        expect(getVape420CategoryShowcaseFallbackCategories(vape420VerticalPackConfig)).toBe(
             vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories,
         );
-        expect(getVape420SectionRouteManifest()).toEqual([
+        expect(getVape420SectionRouteManifest(vape420VerticalPackConfig)).toEqual([
             {
                 sectionSlug: 'vape',
                 rootRoute: '/vape',
@@ -302,10 +306,10 @@ describe('productization config boundary', () => {
                 slugRoutePattern: '/420/:slug',
             },
         ]);
-        expect(getVape420SectionRouteManifest().map((route) => route.rootRoute)).toEqual(
+        expect(getVape420SectionRouteManifest(vape420VerticalPackConfig).map((route) => route.rootRoute)).toEqual(
             vape420VerticalPackConfig.sections.map((section) => section.routePrefix),
         );
-        expect(getVape420PublicSectionRouteDeclarations()).toEqual([
+        expect(getVape420PublicSectionRouteDeclarations(vape420VerticalPackConfig)).toEqual([
             {
                 sectionSlug: 'vape',
                 path: '/vape',
@@ -327,11 +331,11 @@ describe('productization config boundary', () => {
                 elementName: 'SectionSlugResolver',
             },
         ]);
-        expect(resolveSectionFromRouteManifest('/vape')).toBe('vape');
-        expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug')).toBe('vape');
-        expect(resolveSectionFromRouteManifest('/420')).toBe('420');
-        expect(resolveSectionFromRouteManifest('/420/manifest-test-slug')).toBe('420');
-        expect(resolveSectionFromRouteManifest('/unmatched-route')).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/vape', vape420VerticalPackConfig)).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/vape/manifest-test-slug', vape420VerticalPackConfig)).toBe('vape');
+        expect(resolveSectionFromRouteManifest('/420', vape420VerticalPackConfig)).toBe('420');
+        expect(resolveSectionFromRouteManifest('/420/manifest-test-slug', vape420VerticalPackConfig)).toBe('420');
+        expect(resolveSectionFromRouteManifest('/unmatched-route', vape420VerticalPackConfig)).toBe('vape');
         expect(vape420VerticalPackConfig.marketing.categoryShowcase.fallbackCategories).toEqual(expect.arrayContaining([
             expect.objectContaining({
                 id: '1',

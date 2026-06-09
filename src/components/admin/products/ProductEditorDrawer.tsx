@@ -11,10 +11,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { Camera, Save, Package2, Loader2, FolderTree, X, Plus, Layers, Sparkles, LayoutDashboard, BrainCircuit, ShieldCheck, Zap, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
-    SUGGESTED_SPECS, 
-    SECTION_DEFAULT_SPECS, 
+    getSuggestedSpecs, 
+    getSectionDefaultSpecs, 
     normalizeSpecKey 
 } from '@/constants/specs.constants';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
@@ -30,9 +31,7 @@ import { z } from 'zod';
 import { buildAdminSectionCatalog, getAdminDefaultSectionSlug } from '@/config/productization';
 
 type EditorTab = 'comercial' | 'clasificacion' | 'configuracion' | 'inteligencia';
-const SECTION_CATALOG = buildAdminSectionCatalog();
-const DEFAULT_SECTION = getAdminDefaultSectionSlug();
-const SECTION_LABELS = SECTION_CATALOG.sections.map((section) => section.shortLabel);
+
 
 interface ProductEditorDrawerProps {
     product: Product | null;
@@ -55,7 +54,6 @@ const DEFAULT_FORM: Partial<ProductFormData> = {
     compare_at_price: null,
     stock: 0,
     sku: '',
-    section: DEFAULT_SECTION,
     category_id: '',
     tags: [],
     specs: {},
@@ -69,8 +67,7 @@ const DEFAULT_FORM: Partial<ProductFormData> = {
     ai_exclude: false
 };
 
-/** Esquema de validación Zod para el editor de productos */
-const ProductEditorSchema = z.object({
+const getProductEditorSchema = (SECTION_LABELS: string[]) => z.object({
     name: z.string().min(1, 'El nombre del paquete o producto es obligatorio.'),
     price: z.coerce.number().min(0.01, 'El precio debe ser mayor a $0.'),
     stock: z.coerce.number().min(0, 'El stock no puede ser un valor negativo.'),
@@ -138,6 +135,10 @@ export function ProductEditorDrawer({
         new Set(['short_description', 'description', 'ai_sales_note', 'specs', 'tags'])
     );
     const notify = useNotification();
+    const { config } = useActiveVerticalPack();
+    const SECTION_CATALOG = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
+    const DEFAULT_SECTION = useMemo(() => config ? getAdminDefaultSectionSlug(config) : 'vape', [config]);
+    const SECTION_LABELS = useMemo(() => SECTION_CATALOG ? SECTION_CATALOG.sections.map((section) => section.shortLabel) : [], [SECTION_CATALOG]);
 
     const { data: fullProduct } = useAdminProductDetail(isOpen && product?.id ? product.id : null);
 
@@ -147,13 +148,15 @@ export function ProductEditorDrawer({
     }, [categories, formData.category_id]);
 
     const specSuggestions = useMemo(() => {
-        const categorySuggestions = currentCategory ? SUGGESTED_SPECS[currentCategory.slug] || [] : [];
-        const sectionSuggestions = formData.section ? SECTION_DEFAULT_SPECS[formData.section as Section] || [] : [];
+        if (!config) return [];
+        const categorySuggestions = currentCategory ? getSuggestedSpecs(config)[currentCategory.slug] || [] : [];
+        const sectionSuggestions = formData.section ? getSectionDefaultSpecs(config)[formData.section as Section] || [] : [];
         return Array.from(new Set([...categorySuggestions, ...sectionSuggestions]));
-    }, [currentCategory, formData.section]);
+    }, [currentCategory, formData.section, config]);
 
     const handleAddSpec = (rawKey: string) => {
-        const key = normalizeSpecKey(rawKey);
+        if (!config) return false;
+        const key = normalizeSpecKey(rawKey, config);
         if (key && !formData.specs?.[key]) {
             const next = { ...formData.specs };
             next[key] = '';
@@ -236,7 +239,13 @@ export function ProductEditorDrawer({
     };
 
     const handleSave = () => {
+        const ProductEditorSchema = getProductEditorSchema(SECTION_LABELS);
         const result = ProductEditorSchema.safeParse(formData);
+        if (!formData.section) {
+            const label = SECTION_CATALOG?.sections.map((section) => section.shortLabel).join(' o ');
+            notify.warning('Revisar datos requeridos', `Debes seleccionar una sección (${label}).`);
+            return;
+        }
         if (!result.success) {
             const firstError = result.error.issues[0];
             if (firstError) notify.warning('Revisar datos requeridos', firstError.message);
@@ -423,7 +432,7 @@ export function ProductEditorDrawer({
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
                                         <select name="section" value={formData.section || DEFAULT_SECTION} onChange={handleChange} className={INPUT_CLS}>
-                                            {SECTION_CATALOG.sections.map((section) => (
+                                            {SECTION_CATALOG?.sections.map((section) => (
                                                 <option key={section.slug} value={section.slug}>
                                                     {section.displayLabel}
                                                 </option>

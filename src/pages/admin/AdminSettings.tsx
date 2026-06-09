@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // â”€â”€â”€ COMPONENTE: AdminSettings â”€â”€â”€
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar el formulario de configuracion de la tienda.
@@ -25,6 +25,7 @@ import { WhatsAppSettings } from '@/components/admin/settings/WhatsAppSettings';
 import { SocialSettings } from '@/components/admin/settings/SocialSettings';
 import { PaymentSettings } from '@/components/admin/settings/PaymentSettings';
 import { GeneralSettings } from '@/components/admin/settings/GeneralSettings';
+import { VerticalPackConfigSettings } from '@/components/admin/settings/VerticalPackConfigSettings';
 import { SettingsSaveBar } from '@/components/admin/settings/SettingsSaveBar';
 
 export function AdminSettings() {
@@ -85,9 +86,9 @@ export function AdminSettings() {
                 <SocialSettings formData={formData} handleChange={handleChange} />
                 <PaymentSettings formData={formData} handleChange={handleChange} />
                 <GeneralSettings formData={formData} handleChange={handleChange} />
+                <VerticalPackConfigSettings formData={formData} handleChange={handleChange} />
                 <SettingsSaveBar isPending={updateMutation.isPending} />
             </form>
         </div>
     );
 }
-

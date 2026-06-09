@@ -10,6 +10,7 @@ import { TreePine } from 'lucide-react';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 import { getAdminSectionCatalogEntry } from '@/config/productization';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import { CategoryTreeNode } from './CategoryTreeNode';
 import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 
@@ -39,8 +40,9 @@ export function CategoryTreeContainer({
     onToggleActive,
     isToggling,
 }: CategoryTreeContainerProps) {
+    const { config } = useActiveVerticalPack();
     const sectionFilterLabel =
-        sectionFilter === 'all' ? null : getAdminSectionCatalogEntry(sectionFilter)?.shortLabel ?? sectionFilter;
+        sectionFilter === 'all' ? null : (config ? getAdminSectionCatalogEntry(sectionFilter, config)?.shortLabel : sectionFilter) ?? sectionFilter;
 
     return (
         <div className="relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-5 shadow-xl backdrop-blur-md">

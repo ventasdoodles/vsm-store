@@ -24,6 +24,7 @@ import { getVape420PublicSectionRouteDeclarations } from '@/config/productizatio
 
 
 import { TacticalProvider } from '@/contexts/TacticalContext';
+import { VerticalPackProvider, useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 
 // ─── Componentes lazy del shell (no se necesitan en primer render) ────────────
@@ -99,7 +100,7 @@ const AdminAttributes = lazy(() => import('@/pages/admin/AdminAttributes').then(
 const AdminWheelGame  = lazy(() => import('@/pages/admin/AdminWheelGame').then(m => ({ default: m.AdminWheelGame })));
 const AdminBatchManager = lazy(() => import('@/pages/admin/AdminBatchManager').then(m => ({ default: m.AdminBatchManager })));
 const AdminCesarinOS = lazy(() => import('@/pages/admin/AdminCesarinOS').then(m => ({ default: m.AdminCesarinOS })));
-const publicSectionRouteDeclarations = getVape420PublicSectionRouteDeclarations();
+// publicSectionRouteDeclarations moved to StorefrontApp
 
 // Minimal loading fallback
 function PageLoader() {
@@ -127,14 +128,23 @@ export function App() {
         return <SecondVerticalProofFixture />;
     }
 
-    return <StorefrontApp />;
+    return (
+        <VerticalPackProvider>
+            <StorefrontApp />
+        </VerticalPackProvider>
+    );
 }
 
 function StorefrontApp() {
     const { pathname, search } = useLocation();
     const { user } = useAuth();
     const { data: settings } = useStoreSettings();
+    const { config, isLoading } = useActiveVerticalPack();
     const isAdmin = pathname.startsWith('/admin');
+
+    const publicSectionRouteDeclarations = config 
+        ? getVape420PublicSectionRouteDeclarations(config)
+        : [];
 
     // Pilot Gate: durable client-side exposure flag shared across storefront contexts
     const [isPilotAuthorized, setIsPilotAuthorized] = useState(() => {
@@ -322,6 +332,7 @@ function StorefrontApp() {
                 <Layout>
                     <Suspense fallback={<PageLoader />}>
                         <ErrorBoundary>
+                            {isLoading ? <PageLoader /> : (
                             <Routes>
                                 <Route path="/" element={<Home />} />
                                 <Route path="/nuevo" element={<NewArrivals />} />
@@ -368,6 +379,7 @@ function StorefrontApp() {
                                 <Route path="/wishlist" element={<Wishlist />} />
                                 <Route path="*" element={<NotFound />} />
                             </Routes>
+                            )}
                         </ErrorBoundary>
                     </Suspense>
                 </Layout>

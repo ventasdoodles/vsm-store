@@ -9,6 +9,8 @@ import { Search, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildAdminSectionCatalog } from '@/config/productization';
 import type { Section } from '@/types/constants';
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { useMemo } from 'react';
 
 interface ProductsFilterProps {
     search: string;
@@ -21,16 +23,7 @@ interface ProductsFilterProps {
     onQuickFilterChange: (filter: 'low-stock' | 'no-image' | 'bestsellers' | '') => void;
 }
 
-const SECTION_CATALOG = buildAdminSectionCatalog();
 
-/** Tabs de seccion */
-const SECTION_TABS: { label: string; value: Section | '' }[] = [
-    { label: 'Todos', value: '' },
-    ...SECTION_CATALOG.sections.map((section) => ({
-        label: section.shortLabel,
-        value: section.slug,
-    })),
-];
 
 export function ProductsFilter({
     search,
@@ -42,6 +35,19 @@ export function ProductsFilter({
     onToggleInactive,
     onQuickFilterChange,
 }: ProductsFilterProps) {
+    const { config } = useActiveVerticalPack();
+    const SECTION_TABS = useMemo(() => {
+        if (!config) return [{ label: 'Todos', value: '' }];
+        const catalog = buildAdminSectionCatalog(config);
+        return [
+            { label: 'Todos', value: '' },
+            ...catalog.sections.map((section) => ({
+                label: section.shortLabel,
+                value: section.slug,
+            })),
+        ] as { label: string; value: Section | '' }[];
+    }, [config]);
+
     return (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Search */}

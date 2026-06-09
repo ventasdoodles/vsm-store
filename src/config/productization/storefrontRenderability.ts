@@ -1,5 +1,5 @@
 import type { Section } from '@/types/constants';
-import { activeVerticalPackConfig } from './active';
+import type { VerticalPackConfig } from './types';
 
 export interface StorefrontRenderabilityRailConfig {
     loadingSkeletonCount: number;
@@ -29,18 +29,19 @@ export interface StorefrontRenderabilityProductizationConfig {
 }
 
 export const getVape420StorefrontRenderabilityConfig = (
+    config: VerticalPackConfig,
     section?: Section,
 ): StorefrontRenderabilityProductizationConfig => {
     const sectionHref = section ? `/${section}` : '/buscar';
 
     let themeToken = 'vape';
     if (section) {
-        const found = activeVerticalPackConfig.sections.find((s) => s.slug === section);
+        const found = config.sections.find((s) => s.slug === section);
         if (found) {
             themeToken = found.themeToken;
         }
     } else {
-        themeToken = activeVerticalPackConfig.sections[0]?.themeToken || 'vape';
+        themeToken = config.sections[0]?.themeToken || 'vape';
     }
 
     let actionButtonClass = 'mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-700 hover:-translate-y-0.5';

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { vape420VerticalPackConfig } from '../vape420VerticalPack';
 import { getVape420StorefrontRenderabilityConfig } from '../storefrontRenderability';
 
 describe('storefront renderability productization', () => {
     it('keeps the shared grid and rail renderability contract stable', () => {
-        expect(getVape420StorefrontRenderabilityConfig('vape')).toEqual(
+        expect(getVape420StorefrontRenderabilityConfig(vape420VerticalPackConfig, 'vape')).toEqual(
             expect.objectContaining({
                 rail: expect.objectContaining({
                     loadingSkeletonCount: 4,
@@ -34,7 +35,7 @@ describe('storefront renderability productization', () => {
     });
 
     it('keeps the fallback hrefs stable when no section is supplied', () => {
-        const config = getVape420StorefrontRenderabilityConfig();
+        const config = getVape420StorefrontRenderabilityConfig(vape420VerticalPackConfig);
 
         expect(config.rail.emptyStateCtaHref).toBe('/buscar');
         expect(config.grid.emptyStateCtaHref).toBe('/buscar');

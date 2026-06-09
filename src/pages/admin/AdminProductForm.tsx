@@ -27,19 +27,20 @@ import {
     removeProductTag,
 } from '@/lib/domain/adminProductForm';
 import { buildAdminSectionCatalog } from '@/config/productization';
-
-const adminSectionCatalog = buildAdminSectionCatalog();
+import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 const inputCls =
     'w-full rounded-xl border border-theme bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
 
 export function AdminProductForm() {
+    const { config } = useActiveVerticalPack();
+    const adminSectionCatalog = config ? buildAdminSectionCatalog(config) : null;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { success, error: notifyError } = useNotification();
     const { id } = useParams<{ id: string }>();
     const isEditing = id && id !== 'new';
-    const [form, setForm] = useState<ProductFormData>(buildDefaultProductForm());
+    const [form, setForm] = useState<ProductFormData>(() => buildDefaultProductForm(config || undefined));
     const [tagInput, setTagInput] = useState('');
     const [showTagSuggestions, setShowTagSuggestions] = useState(false);
 
@@ -57,21 +58,26 @@ export function AdminProductForm() {
     const { data: categories = [] } = useQuery({
         queryKey: ['admin', 'categories'],
         queryFn: getAllCategories,
+        staleTime: 60_000,
     });
 
-    // Query: Product Details (if editing)
-    const { data: product, isLoading: loadingProduct } = useQuery({
-        queryKey: ['admin', 'product', id],
-        queryFn: () => getProductById(id!),
-        enabled: !!isEditing,
-    });
+    const [loadingProduct, setLoadingProduct] = useState(false);
 
-    // Sync form with product data when loaded
+    // Cargar producto existente
     useEffect(() => {
-        if (product) {
-            setForm(buildProductFormFromProduct(product));
+        if (!config) return;
+        if (isEditing) {
+            setLoadingProduct(true);
+            getProductById(id!).then(data => {
+                if (data) {
+                    setForm(buildProductFormFromProduct(data));
+                }
+                setLoadingProduct(false);
+            }).catch(() => setLoadingProduct(false));
         }
-    }, [product]);
+    }, [id, isEditing, config]);
+
+    if (!config || !adminSectionCatalog) return null;
 
     // Mutation: Save Product
     const mutation = useMutation({
