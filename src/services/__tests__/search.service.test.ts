@@ -82,4 +82,27 @@ describe('searchProducts', () => {
         expect(orFilter).not.toContain('tags.cs.{mango},{bad}');
         expect(orFilter).not.toContain('tags.cs.');
     });
+
+    it('does not allow Unicode or non-ASCII characters in the tags contains filter', async () => {
+        const query = createProductsQuery();
+        fromMock.mockReturnValue(query);
+
+        await searchProducts('café');
+
+        const orFilter = query.or.mock.calls[0]?.[0] as string;
+        expect(orFilter).toContain('name.ilike.%café%');
+        expect(orFilter).not.toContain('tags.cs.{café}');
+        expect(orFilter).not.toContain('tags.cs.');
+    });
+
+    it('allows valid ASCII alphanumerics and hyphens in the tags filter after trimming whitespace', async () => {
+        const query = createProductsQuery();
+        fromMock.mockReturnValue(query);
+
+        await searchProducts('   valid-tag-123   ');
+
+        const orFilter = query.or.mock.calls[0]?.[0] as string;
+        expect(orFilter).toContain('name.ilike.%   valid-tag-123   %');
+        expect(orFilter).toContain('tags.cs.{valid-tag-123}');
+    });
 });

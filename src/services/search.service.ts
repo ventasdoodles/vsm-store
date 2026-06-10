@@ -20,7 +20,7 @@ interface SearchOptions {
 
 function buildSafeTagFilter(query: string): string | null {
     const tag = query.trim();
-    if (!/^[\p{L}\p{N}-]+$/u.test(tag)) return null;
+    if (!/^[A-Za-z0-9-]+$/.test(tag)) return null;
     return `tags.cs.{${tag}}`;
 }
 
