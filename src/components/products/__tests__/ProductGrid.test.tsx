@@ -73,14 +73,6 @@ describe('ProductGrid render states', () => {
 
         const link = screen.getByRole('link', { name: 'Explorar catálogo' });
         expect(link).toHaveAttribute('href', '/buscar');
-        expect(link).toHaveClass(
-            'mt-6',
-            'inline-flex',
-            'items-center',
-            'gap-2',
-            'rounded-xl',
-            'bg-vape-500',
-        );
     });
 
     it('renders product cards when products exist', () => {

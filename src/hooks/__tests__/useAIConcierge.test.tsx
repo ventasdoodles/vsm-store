@@ -169,6 +169,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             undefined,
             undefined,
             'session-hook-1',
+            expect.any(Object),
         );
     });
 
@@ -192,8 +193,9 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             undefined,
             undefined,
             'session-hook-1',
+            expect.any(Object),
         );
-        expect(chatMock.mock.calls[0]).toHaveLength(6);
+        expect(chatMock.mock.calls[0]).toHaveLength(7);
     });
 
     it('requires the exact no-write smoke contract query params before auto-triggering', async () => {
@@ -242,7 +244,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             undefined,
             undefined,
             'session-hook-1',
-            { noWriteSmoke: true },
+            expect.objectContaining({ noWriteSmoke: true }),
         );
         await waitFor(() => {
             expect(result.current.messages.at(-1)?.content).toContain('transferencia');
@@ -289,7 +291,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
                 undefined,
                 undefined,
                 'session-hook-1',
-                { noWriteSmoke: true },
+                expect.objectContaining({ noWriteSmoke: true }),
             ]);
         });
         const auditMessages = result.current.messages.filter((message) =>

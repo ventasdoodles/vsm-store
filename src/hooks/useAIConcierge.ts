@@ -301,7 +301,7 @@ export function useAIConcierge() {
 
     const addMessage = useCallback((msg: Partial<ConciergeMessage>) => {
         const fullMsg: ConciergeMessage = {
-            id: Date.now().toString(),
+            id: Date.now().toString() + Math.random().toString(36),
             role: 'assistant',
             content: '',
             timestamp: new Date(),
@@ -320,13 +320,13 @@ export function useAIConcierge() {
             });
 
             const userMsg: ConciergeMessage = {
-                id: Date.now().toString(),
+                id: Date.now().toString() + Math.random().toString(36),
                 role: 'user',
                 content: displayContent,
                 timestamp: new Date(),
             };
             const assistantMsg: ConciergeMessage = {
-                id: (Date.now() + 1).toString(),
+                id: Date.now().toString() + Math.random().toString(36),
                 role: 'assistant',
                 content: escalation.content,
                 timestamp: new Date(),
@@ -368,7 +368,7 @@ export function useAIConcierge() {
             pendingTurnRef.current = { displayContent, requestContent, recoverySeed };
 
             const userMsg: ConciergeMessage = {
-                id: Date.now().toString(),
+                id: Date.now().toString() + Math.random().toString(36),
                 role: 'user',
                 content: displayContent || 'Mensaje de voz',
                 timestamp: new Date(),
@@ -397,7 +397,7 @@ export function useAIConcierge() {
 
                 
                 let streamTextBuffer = '';
-                const assistantMessageId = (Date.now() + 1).toString();
+                const assistantMessageId = Date.now().toString() + Math.random().toString(36);
 
                 const executeRequest = async () => {
 
@@ -438,7 +438,7 @@ export function useAIConcierge() {
                 setIsSlowResponse(false);
 
                 const assistantMsg: ConciergeAssistantMessage = {
-                    id: (Date.now() + 1).toString(),
+                    id: assistantMessageId,
                     role: 'assistant',
                     content: response.message,
                     timestamp: new Date(),
@@ -558,7 +558,7 @@ export function useAIConcierge() {
 
                 if (smokeAudit) {
                     const assistantMsg: ConciergeAssistantMessage = {
-                        id: (Date.now() + 1).toString(),
+                        id: Date.now().toString() + Math.random().toString(36),
                         role: 'assistant',
                         content: 'No-write RAG quality smoke prompt failed with sanitized status.',
                         timestamp: new Date(),

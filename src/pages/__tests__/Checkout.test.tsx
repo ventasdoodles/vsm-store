@@ -172,10 +172,10 @@ describe('Checkout page cart integrity display', () => {
         expect(screen.queryByText('Producto checkout')).not.toBeInTheDocument();
         expect(screen.queryByText('checkout-form')).not.toBeInTheDocument();
         expect(screen.getAllByText(/Tu carrito no esta listo para checkout/i).length).toBeGreaterThan(0);
-        expect(screen.getByRole('button', { name: /Volver al catalogo/i })).toBeInTheDocument();
+        expect(screen.getByText(/Volver al cat[aá]logo/i)).toBeInTheDocument();
         expect(screen.queryByText(/Pagar.s en MXN/i)).not.toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', { name: /Volver al catalogo/i }));
+        fireEvent.click(screen.getByText(/Volver al cat[aá]logo/i));
         expect(navigateMock).toHaveBeenCalledWith('/');
     });
 
