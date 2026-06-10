@@ -220,7 +220,7 @@ describe('scoped RAG answer-quality harness', () => {
 
     expect(contract.execution_status).toBe('SUCCESS');
     expect(contract.match_strategy).toBe('MODERATE_CONFIDENCE_MULTI_SOURCE');
-    expect(contract.ui_render_hint).toContain('No puedo confirmar');
+    expect(contract.ui_render_hint).toContain('ACLARACION DE ENVIO: No puedo confirmar');
     expect(contract.ui_render_hint).toContain('garantia de entrega manana');
     expect(contract.ui_render_hint).toContain('entrega a domicilio');
     expect(contract.ui_render_hint).toContain('DHL ocurre');
@@ -243,7 +243,7 @@ describe('scoped RAG answer-quality harness', () => {
 
     expect(contract.execution_status).toBe('SUCCESS');
     expect(contract.match_strategy).toBe('MODERATE_CONFIDENCE_MULTI_SOURCE');
-    expect(contract.ui_render_hint).toContain('No puedo confirmar');
+    expect(contract.ui_render_hint).toContain('ACLARACION DE ENVIO: No puedo confirmar');
     expect(contract.ui_render_hint).toContain('garantia de entrega manana');
     expect(contract.ui_render_hint).toContain('entrega a domicilio');
     expect(contract.ui_render_hint).toContain('DHL');
@@ -258,6 +258,22 @@ describe('scoped RAG answer-quality harness', () => {
     expect(contract.ui_render_hint).not.toMatch(/si\s+.*domicilio/i);
     expect(contract.ui_render_hint).not.toMatch(/garantizamos/i);
     expect(contract.ui_render_hint).not.toMatch(/entrega ma[Ã±n]ana a domicilio confirmada/i);
+  });
+
+  it('preserves payment chunk while appending shipping qualification for combined queries', () => {
+    const contract = evaluateKnowledgeRAGTree([
+      { ...paymentChunk, similarity: 0.74 },
+      { ...shippingScopeChunk, similarity: 0.73 },
+      { ...shippingCostChunk, similarity: 0.72 },
+    ], true, 13, '¿Puedo pagar con tarjeta y me llega mañana a domicilio?');
+
+    expect(contract.match_strategy).toBe('MODERATE_CONFIDENCE_MULTI_SOURCE');
+    expect(contract.ui_render_hint).toContain('Metodos de pago aceptados');
+    expect(contract.ui_render_hint).toContain('transferencia');
+    expect(contract.ui_render_hint).toContain('ACLARACION DE ENVIO: No puedo confirmar');
+    expect(contract.ui_render_hint).toContain('DHL ocurre');
+    expect(contract.resolved_chunks).toHaveLength(3);
+    assertNoHallucinatedPaymentOrShippingClaim(contract.ui_render_hint);
   });
 
   it('uses a bounded store-hours limitation when policy support is absent', () => {

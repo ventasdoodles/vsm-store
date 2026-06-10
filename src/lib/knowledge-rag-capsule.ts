@@ -108,28 +108,31 @@ function buildKnowledgeAnswerHint(
     chunks: InternalKnowledgeChunkType[],
     query?: string
 ): string {
-    if (isUnsupportedShippingPromiseQuery(query)) {
-        const boundedShippingHint = buildUnsupportedShippingPromiseHint(chunks);
-        if (boundedShippingHint) {
-            return boundedShippingHint;
-        }
-    }
-
+    let baseHint = '';
     const topChunk = chunks[0];
     const title = normalizeKnowledgeText(topChunk?.title);
     const content = trimKnowledgePreview(topChunk?.content);
 
     if (!title || !content) {
-        return getGenericKnowledgeHint(strategy);
+        baseHint = getGenericKnowledgeHint(strategy);
+    } else {
+        const intro = strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
+            ? 'Segun nuestras politicas oficiales'
+            : strategy === 'LOW_CONFIDENCE_FALLBACK'
+                ? 'Lo mas cercano que encontre en la base de conocimiento'
+                : 'Lo mas relevante que encontre en nuestros manuales';
+
+        baseHint = `${intro}: ${title}. ${content}`;
     }
 
-    const intro = strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
-        ? 'Segun nuestras politicas oficiales'
-        : strategy === 'LOW_CONFIDENCE_FALLBACK'
-            ? 'Lo mas cercano que encontre en la base de conocimiento'
-            : 'Lo mas relevante que encontre en nuestros manuales';
+    if (isUnsupportedShippingPromiseQuery(query)) {
+        const boundedShippingHint = buildUnsupportedShippingPromiseHint(chunks);
+        if (boundedShippingHint) {
+            return `${baseHint} \n\nACLARACION DE ENVIO: ${boundedShippingHint}`;
+        }
+    }
 
-    return `${intro}: ${title}. ${content}`;
+    return baseHint;
 }
 
 export function buildDegradedKnowledgeContract(
