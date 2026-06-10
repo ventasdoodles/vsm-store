@@ -3,6 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReviewDrawer } from '../ReviewDrawer';
 import { buildAdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
 import { saveEvaluation } from '@/services/admin/admin-eval.service';
+import type { ReactNode } from 'react';
+
+vi.mock('framer-motion', () => ({
+    AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
+    motion: {
+        div: ({ children, className, ...props }: any) => {
+            const { layout, layoutId, ...rest } = props;
+            return <div className={className} {...rest}>{children}</div>;
+        },
+        button: ({ children, className, ...props }: any) => <button className={className} {...props}>{children}</button>,
+    },
+}));
 
 vi.mock('@/services/admin/admin-eval.service', () => ({
     getEvaluation: vi.fn().mockResolvedValue(null),

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, Plus, Target, AlertCircle, Pencil, Check, X } from 'lucide-react';
 import { AIRule } from '@/types/cesarin';
 import { cn } from '@/lib/utils';
@@ -136,11 +136,16 @@ export function TabRules({ rules, isLoading, onToggle, onUpdate, newRule, setNew
             </div>
 
             {/* Rules Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <AnimatePresence>
                 {rules.map((rule) => {
                     const isEditing = editingId === rule.id;
                     return (
-                        <div
+                        <motion.div
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
                             key={rule.id}
                             className={cn(
                                 'p-6 rounded-[2rem] border transition-all duration-500',
@@ -239,10 +244,11 @@ export function TabRules({ rules, isLoading, onToggle, onUpdate, newRule, setNew
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     );
                 })}
-            </div>
+                </AnimatePresence>
+            </motion.div>
 
             {/* Empty state */}
             {rules.length === 0 && (

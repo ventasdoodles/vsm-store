@@ -1,0 +1,138 @@
+{
+  "scenario_file_name": "cesarin_scenarios.json",
+  "threshold_pack": "phase-1-strict",
+  "timestamp": "2026-06-09T23:28:53.818Z",
+  "overall_counts": {
+    "total": 9,
+    "PASS": 9,
+    "DEGRADED": 0,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "results": [
+    {
+      "scenario_id": "policy-shipping-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "POLICY_INQUIRY",
+      "tools_called": [
+        "get_store_policy"
+      ],
+      "latency_ms": 670,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "knowledge_rag_foundation",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "product-search-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "PRODUCT_SEARCH",
+      "tools_called": [
+        "search_products"
+      ],
+      "latency_ms": 266,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "product_search_integrity",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "inventory-outlook-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "INVENTORY_OUTLOOK",
+      "tools_called": [
+        "get_inventory_outlook"
+      ],
+      "latency_ms": 133,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "mixed-intent-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "CHECKOUT_READINESS",
+      "tools_called": [
+        "storefront_checkout_readiness"
+      ],
+      "latency_ms": 186,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_checkout_readiness",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "product-search-fallback-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "PRODUCT_SEARCH",
+      "tools_called": [
+        "search_products"
+      ],
+      "latency_ms": 139,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "product_search_integrity",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "product-oos-substitute-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "INVENTORY_OUTLOOK",
+      "tools_called": [
+        "get_inventory_outlook"
+      ],
+      "latency_ms": 130,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "inventory-outlook-hedging-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "INVENTORY_OUTLOOK",
+      "tools_called": [
+        "get_inventory_outlook"
+      ],
+      "latency_ms": 129,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "inventory-outlook-low-signal-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "INVENTORY_OUTLOOK",
+      "tools_called": [
+        "get_inventory_outlook"
+      ],
+      "latency_ms": 425,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "degraded-ux-timeout-01",
+      "status": "PASS",
+      "passed": true,
+      "detected_intent": "PRODUCT_SEARCH",
+      "tools_called": [],
+      "latency_ms": 290,
+      "reasons": [],
+      "response": "Claro. ¿Buscas algo económico, algo de mejor calidad o algo específico por sabor/presentación?",
+      "capsule_name": null,
+      "fallback_used": false
+    }
+  ]
+}

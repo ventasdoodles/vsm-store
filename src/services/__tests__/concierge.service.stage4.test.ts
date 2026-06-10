@@ -18,6 +18,7 @@ vi.mock('@/lib/supabase', () => ({
     functions: {
       invoke: (...args: unknown[]) => (invokeMock as any)(args[0], args[1]),
     },
+    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
     from: vi.fn(() => ({
       insert: (...args: unknown[]) => (insertMock as any)(args[0]),
     })),
@@ -65,6 +66,26 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
     executeAuthenticatedLoyaltyStatusCapsuleMock.mockReset();
     getProductsByIdsMock.mockReset();
+
+    global.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
+        const body = options?.body ? JSON.parse(options.body) : {};
+        const result = await (invokeMock as any)('customer-intelligence', { body });
+        
+        if (result && result.error) {
+            return {
+                ok: false,
+                status: 403,
+                text: async () => JSON.stringify(result.error)
+            };
+        }
+        
+        return {
+            ok: true,
+            status: 200,
+            json: async () => result?.data || {},
+            headers: new Map([['content-type', 'application/json']])
+        };
+    });
   });
 
   it('trusts the explicit edge telemetry contract over the legacy boolean when deciding client fallback logging', async () => {

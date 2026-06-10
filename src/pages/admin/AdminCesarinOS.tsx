@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     Bot, Save, RefreshCcw, Brain, ShieldCheck,
     TrendingUp,
@@ -205,17 +205,7 @@ function getNavGroupClass(groupId: CesarinTabGroup): string {
     return 'border-white/5 bg-white/[0.02]';
 }
 
-function getNavButtonClass(groupId: CesarinTabGroup, isActive: boolean): string {
-    if (isActive) {
-        return 'border-vape-500/30 bg-vape-500 text-white shadow-[0_10px_20px_rgba(168,85,247,0.2)]';
-    }
 
-    if (groupId === 'daily') {
-        return 'border-vape-500/10 bg-white/[0.04] text-white/65 hover:bg-white/[0.07] hover:text-white';
-    }
-
-    return 'border-white/5 bg-white/[0.02] text-white/40 hover:bg-white/[0.05] hover:text-white/70';
-}
 
 export function AdminCesarinOS() {
     const [activeTab, setActiveTab] = useState<CesarinTabId>('pilot');
@@ -639,15 +629,26 @@ export function AdminCesarinOS() {
                                     onClick={() => setActiveTab(tab.id)}
                                     aria-label={`Abrir ${tab.label}`}
                                     className={cn(
-                                        'flex items-center gap-2 rounded-2xl border px-4 py-3 transition-all',
+                                        'relative flex items-center gap-2 rounded-2xl border px-4 py-3 transition-all overflow-hidden group',
                                         group.id === 'daily' && 'flex-1',
-                                        getNavButtonClass(group.id, activeTab === tab.id),
+                                        activeTab === tab.id
+                                            ? 'border-vape-500/50 bg-vape-500/10 text-vape-400 shadow-[0_0_20px_rgba(168,85,247,0.15)]'
+                                            : 'border-white/5 bg-white/[0.02] text-white/40 hover:bg-white/[0.06] hover:text-white/80'
                                     )}
                                 >
+                                    {activeTab === tab.id && (
+                                        <motion.div
+                                            layoutId="activeTabIndicator"
+                                            className="absolute inset-0 bg-vape-500/20 backdrop-blur-md"
+                                            transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <div className="relative z-10 flex items-center gap-2">
                                     <tab.icon className="h-4 w-4" />
                                     <div className="text-left">
                                         <div className="text-[10px] font-black uppercase tracking-widest">{tab.label}</div>
                                         <div className="text-[10px] text-inherit/70">{tab.title}</div>
+                                    </div>
                                     </div>
                                 </button>
                             ))}

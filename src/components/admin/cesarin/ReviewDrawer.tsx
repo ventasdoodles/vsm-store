@@ -281,7 +281,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed inset-y-0 right-0 w-full max-w-xl bg-[#0a0a0f] border-l border-white/10 shadow-2xl z-[101] overflow-y-auto"
+                        className="fixed inset-y-0 right-0 w-full max-w-xl bg-[#0a0a0f]/95 backdrop-blur-3xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] z-[101] overflow-y-auto"
                     >
                         {/* Header */}
                         <div className="sticky top-0 bg-[#0a0a0f]/80 backdrop-blur-md p-6 border-b border-white/10 flex items-center justify-between z-10">
@@ -307,7 +307,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                                 <div className="flex items-center gap-2 text-[10px] font-black uppercase text-vape-400 tracking-widest">
                                     <MessageSquare className="h-3 w-3" /> Turno Seleccionado
                                 </div>
-                                <div className="space-y-4 p-6 rounded-3xl bg-white/[0.02] border border-white/5">
+                                <div className="space-y-4 p-6 rounded-3xl bg-white/[0.03] backdrop-blur-xl border border-white/5 shadow-inner">
                                     <div className="space-y-1">
                                         <p className="text-[10px] uppercase font-bold text-white/30">Usuario</p>
                                         <p className="text-sm text-white/90 font-medium italic">"{interaction?.query}"</p>
@@ -438,7 +438,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-6">
+                                <motion.div layout className="grid grid-cols-1 gap-6">
                                     <div className="space-y-3">
                                         <label className="text-xs font-black uppercase tracking-widest text-white/60">Categoría de Falla (Primary Tag)</label>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -478,7 +478,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                                             ))}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
                             </section>
 
                             {/* Structured Feedback */}

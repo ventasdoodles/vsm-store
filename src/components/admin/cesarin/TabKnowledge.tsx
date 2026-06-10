@@ -391,9 +391,9 @@ export function TabKnowledge({ products, productSearch, setProductSearch, onUpda
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
+                    <motion.div layout className="grid grid-cols-1 gap-4">
                         {products.map((product) => (
-                            <div key={product.id} className="p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 flex flex-col md:flex-row md:items-center gap-6 group hover:bg-white/[0.04] transition-all">
+                            <motion.div layout key={product.id} className="p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 flex flex-col md:flex-row md:items-center gap-6 group hover:bg-white/[0.06] hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all">
                                 <div className="flex-1 space-y-4">
                                     <div className="flex items-center gap-4">
                                         <span className={`h-2 w-2 rounded-full ${product.ai_exclude ? 'bg-red-500' : 'bg-emerald-500'}`} />
@@ -429,9 +429,9 @@ export function TabKnowledge({ products, productSearch, setProductSearch, onUpda
                                         </button>
                                     ))}
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </motion.div>

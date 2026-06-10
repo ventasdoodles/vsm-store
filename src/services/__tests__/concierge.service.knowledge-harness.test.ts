@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   edgeInvoke: vi.fn(),
-  telemetryFrom: vi.fn(),
+  telemetryfrom: vi.fn(),
+    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
   telemetryInsert: vi.fn(),
   executeKnowledgeCapsule: vi.fn(),
   executeProductSearchCapsule: vi.fn(),
