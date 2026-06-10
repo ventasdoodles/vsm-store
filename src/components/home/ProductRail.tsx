@@ -123,26 +123,45 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     </Link>
                 </div>
 
-                <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] px-6 py-8 sm:px-8 sm:py-10">
-                    <div className="mx-auto flex max-w-xl flex-col items-center text-center">
-                        <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${theme.gradient} shadow-lg ${theme.shadow}`}>
-                            {theme.icon}
-                        </div>
-                        <h3 className="text-xl sm:text-2xl font-black text-white uppercase italic tracking-tighter">
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                    whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] px-6 py-12 sm:px-12 sm:py-16 backdrop-blur-3xl shadow-2xl"
+                >
+                    <div className={`absolute -top-40 -right-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-[80px] pointer-events-none`} />
+                    <div className={`absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-[80px] pointer-events-none`} />
+
+                    <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center text-center">
+                        <motion.div 
+                            initial={{ scale: 0, rotate: -10 }}
+                            whileInView={{ scale: 1, rotate: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ type: 'spring', damping: 12, delay: 0.2 }}
+                            className={`mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br ${theme.gradient} shadow-lg ${theme.shadow}`}
+                        >
+                            <div className="scale-125">{theme.icon}</div>
+                        </motion.div>
+                        <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter drop-shadow-md">
                             {renderabilityConfig.rail.emptyStateTitle}
                         </h3>
-                        <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-theme-secondary">
+                        <p className="mt-4 max-w-md text-sm sm:text-base font-medium leading-relaxed text-theme-secondary/80">
                             {renderabilityConfig.rail.emptyStateDescription}
                         </p>
-                        <Link
-                            to={renderabilityConfig.rail.emptyStateCtaHref}
-                            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-primary px-5 py-3 text-xs font-black uppercase tracking-wider text-black transition-all hover:scale-105"
-                        >
-                            {renderabilityConfig.rail.emptyStateCtaLabel}
-                            <ArrowRight className="h-4 w-4" />
+                        <Link to={renderabilityConfig.rail.emptyStateCtaHref}>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`mt-8 relative overflow-hidden inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r ${theme.gradient} px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:shadow-2xl ${theme.shadow}`}
+                            >
+                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                                <span className="relative z-10">{renderabilityConfig.rail.emptyStateCtaLabel}</span>
+                                <ArrowRight className="relative z-10 h-5 w-5" />
+                            </motion.button>
                         </Link>
                     </div>
-                </div>
+                </motion.div>
             </section>
         );
     }
