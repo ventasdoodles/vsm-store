@@ -19,6 +19,7 @@ import {
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useAuth } from '@/hooks/useAuth';
 import { useCesarinSignalStates, SignalState } from '@/hooks/useCesarinSignalStates';
+import type { AdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
 import { useCesarinActivityLog } from '@/hooks/useCesarinActivityLog';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { Power, PowerOff } from 'lucide-react';
@@ -717,8 +718,7 @@ export function AdminCesarinOS() {
                                 semantic_match_success: reviewInteraction.semantic_match_success ?? false,
                                 raw_analyst_intent: reviewInteraction.raw_analyst_intent ?? null,
                                 offered_products: (reviewInteraction.offered_products as unknown as { id: string; name: string; slug: string; }[]) ?? null,
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                decision_trace: reviewInteraction.decision_trace as any ?? null,
+                                decision_trace: (reviewInteraction.decision_trace as unknown as AdminDecisionTraceView) ?? null,
                             } : null}
                         />
                     </div>

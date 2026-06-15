@@ -23,7 +23,7 @@ export function TestimonialAdminCard({
     onToggleActive,
 }: TestimonialAdminCardProps) {
     const { config } = useActiveVerticalPack();
-    const section = t.section && config ? getAdminSectionCatalogEntry(t.section as any, config) : null;
+    const section = t.section && config ? getAdminSectionCatalogEntry(t.section as Parameters<typeof getAdminSectionCatalogEntry>[0], config) : null;
 
     return (
         <div

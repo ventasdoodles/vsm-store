@@ -48,6 +48,32 @@ describe('conciergeService Stage 3 memory-aware reranking', () => {
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
     executeAuthenticatedLoyaltyStatusCapsuleMock.mockReset();
+
+    global.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
+        const body = options?.body ? JSON.parse(options.body) : {};
+        const result = await invokeMock('customer-intelligence', { body });
+        
+        if (result && result.error) {
+            if (result.error.message && result.error.message.includes('fetch failed')) {
+                throw new TypeError('fetch failed');
+            }
+            if (result.error.message === 'REQUEST_TIMEOUT') {
+                throw new Error('REQUEST_TIMEOUT');
+            }
+            return {
+                ok: false,
+                status: 403,
+                text: async () => JSON.stringify(result.error)
+            };
+        }
+        
+        return {
+            ok: true,
+            status: 200,
+            json: async () => result?.data || {},
+            headers: new Map([['content-type', 'application/json']])
+        };
+    });
   });
 
   it('reranks client capsule product suggestions using compact memory context', async () => {

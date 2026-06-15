@@ -234,8 +234,7 @@ function getVisibleHelpSurface(input: {
     if (message.role !== 'assistant') return null;
 
     const capsuleName = message.capsule_contract?.capsule_name ?? null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const primaryIntent = (turnAnalysis as any)?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
+    const primaryIntent = (turnAnalysis as { primary_intent?: string })?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
 
     if (message.source_context) {
         const brief = message.source_context.brief;

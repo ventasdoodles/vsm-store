@@ -133,6 +133,32 @@ describe('conciergeService execution bridge', () => {
     insertMock.mockClear();
     executeStorefrontCheckoutReadinessCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
+
+    global.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
+        const body = options?.body ? JSON.parse(options.body) : {};
+        const result = await invokeMock('customer-intelligence', { body });
+        
+        if (result && result.error) {
+            if (result.error.message && result.error.message.includes('fetch failed')) {
+                throw new TypeError('fetch failed');
+            }
+            if (result.error.message === 'REQUEST_TIMEOUT') {
+                throw new Error('REQUEST_TIMEOUT');
+            }
+            return {
+                ok: false,
+                status: 403,
+                text: async () => JSON.stringify(result.error)
+            };
+        }
+        
+        return {
+            ok: true,
+            status: 200,
+            json: async () => result?.data || {},
+            headers: new Map([['content-type', 'application/json']])
+        };
+    });
   });
 
   it('adds a checkout handoff CTA only for ready-to-checkout storefront truth', async () => {

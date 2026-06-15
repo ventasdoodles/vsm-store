@@ -59,7 +59,7 @@ export function ProductTableRow({
     const isDeleting = isDeletingId === product.id;
     const isSaving = isSavingId === product.id;
     const { config } = useActiveVerticalPack();
-    const sectionCatalogEntry = config && product.section ? getAdminSectionCatalogEntry(product.section as any, config) : null;
+    const sectionCatalogEntry = config && product.section ? getAdminSectionCatalogEntry(product.section as Parameters<typeof getAdminSectionCatalogEntry>[0], config) : null;
     const sectionBadgeClassName = sectionCatalogEntry?.badgeClassName ?? 'bg-white/10 text-white/60 ring-white/20';
     const sectionBadgeLabel = sectionCatalogEntry?.shortLabel ?? product.section;
     const sectionHrefPrefix = sectionCatalogEntry?.routePrefix ?? `/${product.section}`;

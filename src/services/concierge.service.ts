@@ -753,7 +753,18 @@ export const conciergeService = {
 
             if (!res.ok) {
                 const errText = await res.text().catch(() => 'Unknown error');
-                throw new Error(`HTTP error! status: ${res.status} body: ${errText}`);
+                const error = new Error(`HTTP error! status: ${res.status} body: ${errText}`);
+                
+                try {
+                    const errJson = JSON.parse(errText);
+                    if (errJson && errJson.no_write_smoke) {
+                        attachCustomerIntelligenceNoWriteSmokeMetadata(error, errJson.no_write_smoke);
+                    }
+                } catch (e) {
+                    // Not JSON, ignore
+                }
+                
+                throw error;
             }
 
             let data: any = null;

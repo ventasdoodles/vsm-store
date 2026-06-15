@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   edgeInvoke: vi.fn(),
   telemetryFrom: vi.fn(),
-    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+  auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
   telemetryInsert: vi.fn(),
   executeKnowledgeCapsule: vi.fn(),
   executeProductSearchCapsule: vi.fn(),
@@ -26,6 +26,7 @@ vi.mock('@/lib/supabase', () => ({
       invoke: (...args: unknown[]) => mocks.edgeInvoke(...args),
     },
     from: (...args: unknown[]) => mocks.telemetryFrom(...args),
+    auth: mocks.auth,
   },
 }));
 
@@ -62,6 +63,44 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
     Object.values(mocks).forEach((mock: any) => {
       if (typeof mock.mockReset === 'function') mock.mockReset();
     });
+
+    global.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
+        const body = options?.body ? JSON.parse(options.body) : {};
+        const result = await mocks.edgeInvoke('customer-intelligence', { body });
+        
+        if (result && result.error) {
+            if (result.error.message && result.error.message.includes('fetch failed')) {
+                throw new TypeError('fetch failed');
+            }
+            if (result.error.message === 'REQUEST_TIMEOUT') {
+                throw new Error('REQUEST_TIMEOUT');
+            }
+            return {
+                ok: false,
+                status: 403,
+                text: async () => {
+                    if (result.data) {
+                        return JSON.stringify(result.data);
+                    }
+                    if (result.error instanceof Error) {
+                        return JSON.stringify({
+                            message: result.error.message,
+                            no_write_smoke: (result.error as any).no_write_smoke
+                        });
+                    }
+                    return JSON.stringify(result.error);
+                }
+            };
+        }
+        
+        return {
+            ok: true,
+            status: 200,
+            json: async () => result?.data || {},
+            headers: new Map([['content-type', 'application/json']])
+        };
+    });
+
     mocks.telemetryFrom.mockImplementation(() => {
       throw new Error('telemetry disabled in no-mutation harness');
     });

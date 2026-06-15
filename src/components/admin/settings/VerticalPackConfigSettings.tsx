@@ -99,7 +99,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
         const currentSection = newConfig.sections[index] || {
             slug: '', label: '', shortLabel: '', routePrefix: '', description: '', seoDescription: '', themeToken: ''
         };
-        newConfig.sections[index] = { ...currentSection, [field]: value } as any;
+        newConfig.sections[index] = { ...currentSection, [field]: value } as VerticalPackConfig['sections'][number];
         handleObjectChange(newConfig);
     };
 

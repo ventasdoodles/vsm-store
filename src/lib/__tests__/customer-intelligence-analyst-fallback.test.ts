@@ -7,13 +7,19 @@ import { buildNeutralAnalystFallbackReport } from '../../../supabase/functions/c
 
 const TEST_VALID_INTENTS = ['CHIT_CHAT', 'PRODUCT_SEARCH', 'UNKNOWN'];
 const TEST_DIRNAME = dirname(fileURLToPath(import.meta.url));
-const CUSTOMER_INTELLIGENCE_INDEX = resolve(
+const CONCIERGE_CHAT = resolve(
   TEST_DIRNAME,
-  '../../../supabase/functions/customer-intelligence/index.ts'
+  '../../../supabase/functions/customer-intelligence/handlers/concierge-chat.ts'
+);
+const TELEMETRY_UTILS = resolve(
+  TEST_DIRNAME,
+  '../../../supabase/functions/customer-intelligence/shared/telemetry-utils.ts'
 );
 
 function readCustomerIntelligenceSource() {
-  return readFileSync(CUSTOMER_INTELLIGENCE_INDEX, 'utf8');
+  const chat = readFileSync(CONCIERGE_CHAT, 'utf8');
+  const utils = readFileSync(TELEMETRY_UTILS, 'utf8');
+  return chat + '\n' + utils;
 }
 
 function extractStringArray(source: string, pattern: RegExp) {
@@ -322,8 +328,8 @@ describe('customer-intelligence analyst degradation fallback', () => {
     expect(source).toContain('function buildGeminiTokenUsageTelemetry(');
     expect(source).toContain('token_usage: {');
     expect(source).toContain('analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata)');
-    expect(source).toContain('sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, sommelierResult?.usageMetadata)');
+    expect(source).toContain('sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, localSommelierResult?.usageMetadata)');
     expect(source).not.toContain('analyst: analystResult?.usageMetadata ?? null');
-    expect(source).not.toContain('sommelier: sommelierResult?.usageMetadata ?? null');
+    expect(source).not.toContain('sommelier: localSommelierResult?.usageMetadata ?? null');
   });
 });
