@@ -48,7 +48,7 @@ export function HomeEditorSlotCard({
                         <option value="">â€” Elegir categorÃ­a existente â€”</option>
                         {storeCategories.map((cat) => (
                             <option key={cat.id} value={cat.id}>
-                                {cat.name} ({config ? getAdminSectionCatalogEntry(cat.section as any, config)?.shortLabel : cat.section})
+                                {cat.name} ({config ? getAdminSectionCatalogEntry(cat.section as Parameters<typeof getAdminSectionCatalogEntry>[0], config)?.shortLabel : cat.section})
                                 {cat.image_url ? ' ðŸ“·' : ''}
                             </option>
                         ))}

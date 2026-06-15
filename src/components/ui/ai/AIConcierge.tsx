@@ -870,8 +870,7 @@ export const AIConcierge: React.FC = () => {
                                                         )}
                                                         <div className="flex flex-col gap-2">
                                                             {message.suggestedProducts?.map((p) => {
-                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                                const product = p as any;
+                                                                const product = p as Product & { status_signal?: string; badge_text?: string };
                                                                 return (
                                                                 <motion.div
                                                                     key={product.id}
@@ -928,8 +927,7 @@ export const AIConcierge: React.FC = () => {
                                                         </p>
                                                         <div className="flex flex-col gap-2">
                                                             {message.suggestedProducts?.slice(0, 3).map((p) => {
-                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                                const product = p as any;
+                                                                const product = p as Product & { status_signal?: string; badge_text?: string };
                                                                 return (
                                                                 <button
                                                                     key={`recovery-${product.id}`}

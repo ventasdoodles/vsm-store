@@ -28,7 +28,8 @@ function loadLocal(): ActivityEntry[] {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         return raw ? (JSON.parse(raw) as ActivityEntry[]) : [];
-    } catch {
+    } catch (error) {
+        console.error('[cesarin:activity-log] Error loading local storage:', error);
         return [];
     }
 }
@@ -36,7 +37,8 @@ function loadLocal(): ActivityEntry[] {
 function persistLocal(entries: ActivityEntry[]) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    } catch {
+    } catch (error) {
+        console.error('[cesarin:activity-log] Error persisting to local storage:', error);
         // storage unavailable — degrade gracefully
     }
 }
@@ -123,7 +125,8 @@ export function useCesarinActivityLog() {
         setActivityLog([]);
         try {
             localStorage.removeItem(STORAGE_KEY);
-        } catch {
+        } catch (error) {
+            console.error('[cesarin:activity-log] Error clearing local storage:', error);
             // ignore
         }
         // Note: DB rows are preserved (append-only audit trail)

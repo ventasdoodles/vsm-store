@@ -21,7 +21,8 @@ function loadLocal(): Record<string, SignalState> {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         return raw ? (JSON.parse(raw) as Record<string, SignalState>) : {};
-    } catch {
+    } catch (error) {
+        console.error('[cesarin:signal-states] Error loading local storage:', error);
         return {};
     }
 }
@@ -29,7 +30,8 @@ function loadLocal(): Record<string, SignalState> {
 function persistLocal(states: Record<string, SignalState>) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
-    } catch {
+    } catch (error) {
+        console.error('[cesarin:signal-states] Error persisting to local storage:', error);
         // storage unavailable — degrade gracefully
     }
 }

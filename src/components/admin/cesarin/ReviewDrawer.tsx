@@ -244,7 +244,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                     onMarkSignal(interaction.id, {
                         status: 'convertida_mejora',
                         handled_at: new Date().toISOString(),
-                        ref_label: (created as any)?.ref_label || formData.primary_tag,
+                        ref_label: (created as { ref_label?: string })?.ref_label || formData.primary_tag,
                     });
                 }
             } else {

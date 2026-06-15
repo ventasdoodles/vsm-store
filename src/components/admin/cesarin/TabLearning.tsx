@@ -36,7 +36,8 @@ function formatHandledAt(iso: string): string {
             day: '2-digit', month: '2-digit',
             hour: '2-digit', minute: '2-digit',
         });
-    } catch {
+    } catch (error) {
+        console.error('[TabLearning] Error formatting handledAt date:', error);
         return iso;
     }
 }
@@ -84,7 +85,8 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
                 handled_at: new Date().toISOString(),
                 ref_label: (result as { ref_label?: string } | void)?.ref_label,
             });
-        } catch {
+        } catch (error) {
+            console.error('[TabLearning] Error creating improvement:', error);
             // error toast handled by parent; don't mark status on failure
         } finally {
             setLoadingKey(null);

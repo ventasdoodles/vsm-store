@@ -412,7 +412,7 @@ export function useAIConcierge() {
                             const clone = [...prev];
                             const lastIndex = clone.findIndex(m => m.id === assistantMessageId);
                             if (lastIndex !== -1) {
-                                clone[lastIndex] = { ...clone[lastIndex], content: streamTextBuffer, isStreaming: true } as any;
+                                clone[lastIndex] = { ...clone[lastIndex], content: streamTextBuffer, isStreaming: true } as ConciergeMessage;
                             } else {
                                 clone.push({
                                     id: assistantMessageId,
@@ -420,7 +420,7 @@ export function useAIConcierge() {
                                     content: streamTextBuffer,
                                     timestamp: new Date(),
                                     isStreaming: true,
-                                } as any);
+                                } as ConciergeMessage);
                             }
                             return clone;
                         });

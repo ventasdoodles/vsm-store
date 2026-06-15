@@ -417,9 +417,9 @@ export function TabKnowledge({ products, productSearch, setProductSearch, onUpda
                                     ].map((action) => (
                                         <button
                                             key={action.field}
-                                            onClick={() => onUpdateProduct(product.id, action.field, !(product as any)[action.field])}
+                                            onClick={() => onUpdateProduct(product.id, action.field, !(product as unknown as Record<string, unknown>)[action.field])}
                                             className={`flex items-center gap-2 px-5 py-3 rounded-2xl transition-all text-[10px] font-black uppercase tracking-widest ${
-                                                (product as any)[action.field] 
+                                                (product as unknown as Record<string, unknown>)[action.field] 
                                                 ? `${action.bg} ${action.color} border border-${action.color}/20` 
                                                 : 'text-white/20 hover:text-white/40'
                                             }`}

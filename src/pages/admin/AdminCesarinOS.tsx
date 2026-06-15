@@ -706,18 +706,19 @@ export function AdminCesarinOS() {
                             onClose={() => setIsReviewOpen(false)}
                             onMarkSignal={handleMarkSignal}
                             interaction={reviewInteraction ? {
-                                id: (reviewInteraction as any).id,
-                                query: (reviewInteraction as any).query || '',
-                                response: (reviewInteraction as any).response_text || '',
-                                created_at: (reviewInteraction as any).created_at,
-                                capsule: (reviewInteraction as any).capsule ?? null,
-                                detected_intent: (reviewInteraction as any).detected_intent ?? null,
-                                fallback_used: (reviewInteraction as any).fallback_used ?? false,
-                                product_card_count: (reviewInteraction as any).product_card_count ?? 0,
-                                semantic_match_success: (reviewInteraction as any).semantic_match_success ?? false,
-                                raw_analyst_intent: (reviewInteraction as any).raw_analyst_intent ?? null,
-                                offered_products: (reviewInteraction as any).offered_products ?? null,
-                                decision_trace: (reviewInteraction as any).decision_trace ?? null,
+                                id: reviewInteraction.id,
+                                query: reviewInteraction.query || '',
+                                response: reviewInteraction.response_text || '',
+                                created_at: reviewInteraction.created_at,
+                                capsule: reviewInteraction.capsule ?? null,
+                                detected_intent: reviewInteraction.detected_intent ?? null,
+                                fallback_used: reviewInteraction.fallback_used ?? false,
+                                product_card_count: reviewInteraction.product_card_count ?? 0,
+                                semantic_match_success: reviewInteraction.semantic_match_success ?? false,
+                                raw_analyst_intent: reviewInteraction.raw_analyst_intent ?? null,
+                                offered_products: (reviewInteraction.offered_products as unknown as { id: string; name: string; slug: string; }[]) ?? null,
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                decision_trace: reviewInteraction.decision_trace as any ?? null,
                             } : null}
                         />
                     </div>

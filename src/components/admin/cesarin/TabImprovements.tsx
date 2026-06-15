@@ -112,7 +112,8 @@ function EditPanel({ item, currentUserId, onSaved }: EditPanelProps) {
             await updateImprovementItem(item.id, updates);
             onSaved(updates);
             toast.success('Ítem actualizado');
-        } catch {
+        } catch (error) {
+            console.error('[TabImprovements] Error saving improvement item:', error);
             toast.error('Error al guardar el ítem');
         } finally {
             setIsSaving(false);
@@ -125,7 +126,8 @@ function EditPanel({ item, currentUserId, onSaved }: EditPanelProps) {
             await updateImprovementItem(item.id, { owner_id: currentUserId });
             onSaved({ owner_id: currentUserId });
             toast.success('Te asignaste este ítem');
-        } catch {
+        } catch (error) {
+            console.error('[TabImprovements] Error assigning improvement item:', error);
             toast.error('Error al asignar');
         }
     };
@@ -135,7 +137,8 @@ function EditPanel({ item, currentUserId, onSaved }: EditPanelProps) {
             await updateImprovementItem(item.id, { owner_id: null });
             onSaved({ owner_id: null });
             toast.success('Asignación removida');
-        } catch {
+        } catch (error) {
+            console.error('[TabImprovements] Error unassigning improvement item:', error);
             toast.error('Error al desasignar');
         }
     };
@@ -347,7 +350,7 @@ export function TabImprovements() {
                 {STATUS_TABS.map(tab => (
                     <button
                         key={tab.value}
-                        onClick={() => { setStatusFilter(tab.value as any); setExpandedId(null); }}
+                        onClick={() => { setStatusFilter(tab.value as 'all' | 'open' | 'in_progress' | 'resolved' | 'wont_fix'); setExpandedId(null); }}
                         className={cn(
                             'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
                             statusFilter === tab.value

@@ -30,7 +30,8 @@ export function PilotParityDiagnostics() {
 
             try {
                 setSwDiagnostics(await readServiceWorkerDiagnostics());
-            } catch {
+            } catch (error) {
+                console.error('[PilotParityDiagnostics] Error reading service worker diagnostics:', error);
                 setSwDiagnostics(null);
             }
         };
