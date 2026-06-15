@@ -34,7 +34,7 @@ type CesarinStorefrontAttachmentOffer = NonNullable<InternalCapsuleContract['att
 type CesarinStorefrontReplenishmentSignal = NonNullable<InternalCapsuleContract['replenishment_signal']>;
 
 export interface CesarinStorefrontActionButtonView {
-  kind: 'OPEN_PDP' | 'ADD_TO_CART';
+  kind: 'OPEN_PDP' | 'ADD_TO_CART' | 'OPEN_CART';
   label: string;
   product: CesarinActionProductRef;
   quantity?: number;

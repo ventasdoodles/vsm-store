@@ -149,7 +149,8 @@ function readCheckoutDraft(): CheckoutDraftSnapshot {
       address: typeof parsed?.address === 'string' ? parsed.address : '',
       paymentMethod,
     };
-  } catch {
+  } catch (error) {
+    console.error('[storefront-checkout-readiness] Error extracting checkout values:', error);
     return {
       customerName: '',
       customerPhone: '',
@@ -243,7 +244,8 @@ async function buildCartSnapshot(items: CartItem[]): Promise<CartSnapshot> {
         hasIssues: issues.length > 0,
       },
     };
-  } catch {
+  } catch (error) {
+    console.error('[storefront-checkout-readiness] Error preparing contextual cart:', error);
     return {
       items,
       validationResult: {
@@ -298,7 +300,8 @@ async function resolveCouponSignal(query: string, subtotal: number, customerId?:
       couponValid: validation.valid,
       couponMessage: validation.message,
     };
-  } catch {
+  } catch (error) {
+    console.error('[storefront-checkout-readiness] Error evaluating active coupon:', error);
     return {
       couponCode,
       couponValid: null,

@@ -805,7 +805,8 @@ export async function executeProductSearchCapsule(
       }).catch(() => null) ?? undefined;
     }
     }
-  } catch {
+  } catch (error) {
+    console.error('[ai-capsule-orchestrator] DB Latency Error in executeProductSearchCapsule:', error);
     context.infrastructure_error = 'DB_LATENCY';
   }
 
@@ -978,7 +979,8 @@ export async function executeKnowledgeCapsule(
     
     // 4. STRUCTURED RESULT RETURN
     return contract;
-  } catch {
+  } catch (error) {
+    console.error('[ai-capsule-orchestrator] Knowledge Error in executeKnowledgeCapsule:', error);
     return buildDegradedKnowledgeContract('DB_LATENCY', Date.now() - startMs);
   }
 }
@@ -1022,7 +1024,8 @@ export async function executeCartOperatorCapsule(
         if (data) {
            resolvedProductId = data.id;
         }
-     } catch {
+     } catch (error) {
+        console.error('[ai-capsule-orchestrator] Catalog Latency Error in executeCartOperatorCapsule:', error);
         return buildDegradedCartContract(Date.now() - startMs, 'CATALOG_LATENCY');
      }
   }

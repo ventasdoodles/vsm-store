@@ -80,13 +80,15 @@ function getNextStepFamilyLabel(family: unknown): string | null {
     }
 }
 
+import type { CesarinStorefrontNextStepView, CesarinStorefrontActionButtonView } from '@/lib/cesarin-stage5';
+
 function formatSmokeAuditList(value: unknown): string {
     return Array.isArray(value) && value.length > 0
         ? value.filter((item): item is string => typeof item === 'string').join(', ')
         : 'none';
 }
 
-function getNextStepTrustNote(nextStepView: any): string | null {
+function getNextStepTrustNote(nextStepView: CesarinStorefrontNextStepView | null): string | null {
     switch (nextStepView?.family) {
         case 'KEEP_EXPLORING':
             return 'Todavia estamos afinando';
@@ -103,7 +105,7 @@ function getNextStepTrustNote(nextStepView: any): string | null {
     }
 }
 
-function shouldShowSelectorNeededGuidance(messageContent: string, nextStepView: any): boolean {
+function shouldShowSelectorNeededGuidance(messageContent: string, nextStepView: CesarinStorefrontNextStepView | null): boolean {
     if (nextStepView?.family !== 'SELECTOR_NEEDED' || !nextStepView?.guidance) {
         return false;
     }
@@ -117,8 +119,8 @@ function shouldShowSelectorNeededGuidance(messageContent: string, nextStepView: 
     return !normalizedMessage.includes(normalizedSelector);
 }
 
-function getNextStepActions(nextStepView: any): any[] {
-    return [nextStepView?.primaryAction, nextStepView?.secondaryAction].filter(Boolean);
+function getNextStepActions(nextStepView: CesarinStorefrontNextStepView | null): CesarinStorefrontActionButtonView[] {
+    return [nextStepView?.primaryAction, nextStepView?.secondaryAction].filter((a): a is CesarinStorefrontActionButtonView => Boolean(a));
 }
 
 function isFullStorefrontProduct(value: unknown): value is Product {
@@ -152,7 +154,7 @@ function collectCartAssemblyProductIds(messages: ConciergeMessage[], fetchedProd
     const ids = new Set<string>();
 
     for (const message of messages) {
-        const nextStepView = (message as any).capsule_contract?.next_step_view;
+        const nextStepView = message.capsule_contract?.next_step_view;
         for (const action of getNextStepActions(nextStepView)) {
             if (action?.kind !== 'ADD_TO_CART') continue;
             const productId = action.product?.id;
@@ -166,18 +168,18 @@ function collectCartAssemblyProductIds(messages: ConciergeMessage[], fetchedProd
     return [...ids];
 }
 
-function getNextStepActionKey(action: any, index: number): string {
+function getNextStepActionKey(action: CesarinStorefrontActionButtonView | null, index: number): string {
     const productId = typeof action?.product?.id === 'string' ? action.product.id : 'cart';
     return `${action?.kind ?? 'action'}-${productId}-${index}`;
 }
 
-function getAdvisoryActionLabel(action: any, eligibility: CesarinCartAssemblyEligibility | null): string {
+function getAdvisoryActionLabel(action: CesarinStorefrontActionButtonView | null, eligibility: CesarinCartAssemblyEligibility | null): string {
     const productName = action?.product?.name ?? 'producto';
     if (eligibility?.requiresVariantSelection) return `Elegir opcion de ${productName}`;
     return `Revisar ${productName}`;
 }
 
-function getAddActionLabel(action: any, eligibility: CesarinCartAssemblyEligibility): string {
+function getAddActionLabel(action: CesarinStorefrontActionButtonView | null, eligibility: CesarinCartAssemblyEligibility): string {
     const productName = action?.product?.name ?? 'producto';
     if (eligibility.safeQuantity > 1 && eligibility.safeQuantity < eligibility.requestedQuantity) {
         return `Agregar ${eligibility.safeQuantity} x ${productName}`;
@@ -224,15 +226,16 @@ function emitCtaMeasurement(input: {
 function getVisibleHelpSurface(input: {
     message: ConciergeMessage;
     showProductSurfaces: boolean;
-    nextStepView: any;
-    turnAnalysis: any;
+    nextStepView: CesarinStorefrontNextStepView | null;
+    turnAnalysis: unknown;
     hasEligibleCartAssemblyAction?: boolean;
 }): { label: string; note?: string; tone: CesarinVisibleHelpTone } | null {
     const { message, showProductSurfaces, nextStepView, turnAnalysis, hasEligibleCartAssemblyAction = false } = input;
     if (message.role !== 'assistant') return null;
 
-    const capsuleName = (message as any).capsule_contract?.capsule_name ?? null;
-    const primaryIntent = turnAnalysis?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
+    const capsuleName = message.capsule_contract?.capsule_name ?? null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const primaryIntent = (turnAnalysis as any)?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
 
     if (message.source_context) {
         const brief = message.source_context.brief;
@@ -274,7 +277,7 @@ function getVisibleHelpSurface(input: {
     if (showProductSurfaces && message.suggestedProducts?.length) {
         return {
             label: 'Ayuda de producto',
-            note: getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy),
+            note: getSuggestionGroupLabel(message.capsule_contract?.match_strategy),
             tone: 'catalog',
         };
     }
@@ -534,7 +537,7 @@ export const AIConcierge: React.FC = () => {
                 }
             }
 
-            const nextStepView = (message as any).capsule_contract?.next_step_view ?? null;
+            const nextStepView = message.capsule_contract?.next_step_view ?? null;
             const actions = getNextStepActions(nextStepView);
             for (const [index, action] of actions.entries()) {
                 if (action?.kind !== 'ADD_TO_CART' && action?.kind !== 'OPEN_CART') continue;
@@ -633,19 +636,19 @@ export const AIConcierge: React.FC = () => {
                                 {(() => {
                                     const lastAssistantId = [...messages].reverse().find(m => m.role === 'assistant')?.id ?? null;
                                     return messages.map((message) => {
-                                    const turnAnalysis = (message as ConciergeMessage).turn_analysis ?? (message as any).capsule_contract?.turn_analysis ?? null;
+                                    const turnAnalysis = (message as ConciergeMessage).turn_analysis ?? message.capsule_contract?.turn_analysis ?? null;
                                     const catalogGate = latestCatalogGate ?? (message as ConciergeMessage).catalog_gate ?? buildConciergeCatalogGate({
                                         query: message.content,
                                         turnAnalysis,
                                         intent: message.intent,
                                         assistantMessage: message.content,
-                                        capsuleContract: (message as any).capsule_contract,
-                                        has_catalog_content: Boolean(message.suggestedProducts?.length || (message as any).capsule_contract?.next_step_view),
+                                        capsuleContract: message.capsule_contract,
+                                        has_catalog_content: Boolean(message.suggestedProducts?.length || message.capsule_contract?.next_step_view),
                                     });
                                     const showProductSurfaces = shouldShowCatalogSurfacesNow && catalogGate.is_open;
-                                    const nextStepView = (message as any).capsule_contract?.next_step_view ?? null;
-                                    const recoveryHint = isCesarinApproximateMatchStrategy((message as any).capsule_contract?.match_strategy)
-                                        ? getCesarinApproximateRecoveryHint((message as any).capsule_contract?.match_strategy)
+                                    const nextStepView = message.capsule_contract?.next_step_view ?? null;
+                                    const recoveryHint = isCesarinApproximateMatchStrategy(message.capsule_contract?.match_strategy)
+                                        ? getCesarinApproximateRecoveryHint(message.capsule_contract?.match_strategy)
                                         : null;
                                     const hasSuggestedProducts = (message.suggestedProducts?.length ?? 0) > 0;
                                     const showRecoveryHint = Boolean(
@@ -662,7 +665,7 @@ export const AIConcierge: React.FC = () => {
                                         ),
                                     );
                                     const nextStepActions = getNextStepActions(nextStepView);
-                                    const hasEligibleCartAssemblyAction = nextStepActions.some((action: any) => {
+                                    const hasEligibleCartAssemblyAction = nextStepActions.some((action) => {
                                         if (action?.kind !== 'ADD_TO_CART') return false;
                                         const product = getCartAssemblyProduct(action.product?.id, message.suggestedProducts, cartAssemblyProducts);
                                         return resolveCesarinCartAssemblyEligibility({
@@ -819,20 +822,20 @@ export const AIConcierge: React.FC = () => {
                                             </motion.button>
                                         )}
 
-                                        {(message as any).capsule_contract?.capsule_name === 'knowledge_rag_foundation' &&
-                                            (message as any).capsule_contract?.resolved_chunks?.length > 0 && (
+                                        {message.capsule_contract?.capsule_name === 'knowledge_rag_foundation' &&
+                                            message.capsule_contract?.resolved_chunks?.length > 0 && (
                                             <div className="mt-2 w-full space-y-3">
                                                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
-                                                    {(message as any).capsule_contract?.match_strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
+                                                    {message.capsule_contract?.match_strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
                                                         ? 'Politica Oficial'
-                                                        : (message as any).capsule_contract?.match_strategy === 'MODERATE_CONFIDENCE_MULTI_SOURCE'
+                                                        : message.capsule_contract?.match_strategy === 'MODERATE_CONFIDENCE_MULTI_SOURCE'
                                                             ? 'Manual y Guias'
-                                                            : (message as any).capsule_contract?.match_strategy === 'LOW_CONFIDENCE_FALLBACK'
+                                                            : message.capsule_contract?.match_strategy === 'LOW_CONFIDENCE_FALLBACK'
                                                                 ? 'Info Relacionada'
                                                                 : 'Base de Conocimiento'}
                                                 </p>
                                                 <div className="flex flex-col gap-2">
-                                                    {(message as any).capsule_contract.resolved_chunks.map((chunk: any, index: number) => (
+                                                    {message.capsule_contract.resolved_chunks.map((chunk: { id: string; title: string; category: string; content: string }, index: number) => (
                                                         <div
                                                             key={`${chunk.id}-${index}`}
                                                             className="flex flex-col gap-1 p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-left relative overflow-hidden"
@@ -858,7 +861,7 @@ export const AIConcierge: React.FC = () => {
                                                 {hasSuggestedProducts && (
                                                     <>
                                                         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
-                                                            {getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy)}
+                                                            {getSuggestionGroupLabel(message.capsule_contract?.match_strategy)}
                                                         </p>
                                                         {showRecoveryHint && recoveryHint && (
                                                             <p className="text-[10px] text-white/45 leading-relaxed font-medium">
@@ -866,7 +869,10 @@ export const AIConcierge: React.FC = () => {
                                                             </p>
                                                         )}
                                                         <div className="flex flex-col gap-2">
-                                                            {(message.suggestedProducts as any[]).map((product: any) => (
+                                                            {message.suggestedProducts?.map((p) => {
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                const product = p as any;
+                                                                return (
                                                                 <motion.div
                                                                     key={product.id}
                                                                     whileHover={{ x: 5 }}
@@ -910,7 +916,8 @@ export const AIConcierge: React.FC = () => {
                                                                         <ShoppingBag className="h-4 w-4" />
                                                                     </button>
                                                                 </motion.div>
-                                                            ))}
+                                                                );
+                                                            })}
                                                         </div>
                                                     </>
                                                 )}
@@ -920,7 +927,10 @@ export const AIConcierge: React.FC = () => {
                                                             Afinemos esto
                                                         </p>
                                                         <div className="flex flex-col gap-2">
-                                                            {(message.suggestedProducts as any[]).slice(0, 3).map((product: any) => (
+                                                            {message.suggestedProducts?.slice(0, 3).map((p) => {
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                const product = p as any;
+                                                                return (
                                                                 <button
                                                                     key={`recovery-${product.id}`}
                                                                     type="button"
@@ -930,7 +940,8 @@ export const AIConcierge: React.FC = () => {
                                                                 >
                                                                     Esta se parece mas: {product.name}
                                                                 </button>
-                                                            ))}
+                                                                );
+                                                            })}
                                                             <button
                                                                 type="button"
                                                                 disabled={isLoading}
@@ -970,7 +981,7 @@ export const AIConcierge: React.FC = () => {
                                                             {(() => {
                                                                 const actions = nextStepActions;
 
-                                                                return actions.map((action: any, index: number) => {
+                                                                return actions.map((action, index: number) => {
                                                                     const productId = action?.product?.id;
                                                                     const actionProduct = getCartAssemblyProduct(
                                                                         productId,
