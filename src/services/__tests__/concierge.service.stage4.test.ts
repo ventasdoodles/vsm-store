@@ -22,9 +22,6 @@ vi.mock('@/lib/supabase', () => ({
     from: vi.fn(() => ({
       insert: (...args: unknown[]) => (insertMock as any)(args[0]),
     })),
-    auth: {
-      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
-    },
   },
 }));
 

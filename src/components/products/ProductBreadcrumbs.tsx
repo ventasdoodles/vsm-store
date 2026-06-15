@@ -23,9 +23,8 @@ import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function ProductBreadcrumbs({ section, productName, productSlug, categoryId }: ProductBreadcrumbsProps) {
     const { config } = useActiveVerticalPack();
-    if (!config) return null;
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, section);
-    const sectionLabel = productDetailConfig.isVape ? 'Vape' : '420';
+    const productDetailConfig = config ? getVape420ProductDetailPresentationConfig(config, section) : null;
+    const sectionLabel = productDetailConfig?.isVape ? 'Vape' : '420';
     const { pathname } = useLocation();
 
     const { data: category } = useCategoryById(categoryId);
@@ -35,6 +34,9 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
         { name: 'Inicio', item: '/' },
         { name: sectionLabel, item: `/${section}` },
     ];
+    
+    if (!config || !productDetailConfig) return null;
+
     if (category) {
         breadcrumbItems.push({ name: category.name, item: `/${section}/${category.slug}` });
     }

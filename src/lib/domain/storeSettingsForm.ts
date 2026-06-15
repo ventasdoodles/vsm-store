@@ -106,7 +106,7 @@ export function buildStoreSettingsUpdatePayload(
     let parsedConfig = {};
     try {
         parsedConfig = JSON.parse(formData.vertical_pack_config || '{}');
-    } catch (e) {
+    } catch (_e) {
         // Fallback to empty if invalid JSON
         parsedConfig = {};
     }

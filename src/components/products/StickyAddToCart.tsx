@@ -26,12 +26,12 @@ export function StickyAddToCart({
     purchaseability,
 }: StickyAddToCartProps) {
     const { config } = useActiveVerticalPack();
-    if (!config) return null;
+
     const addItem = useCartStore((s) => s.addItem);
     const { trigger } = useHaptic();
     const { warning } = useNotification();
     const [quantity, setQuantity] = useState(1);
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, product.section);
+    const productDetailConfig = config ? getVape420ProductDetailPresentationConfig(config, product.section) : null;
     const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
 
     useEffect(() => {
@@ -56,6 +56,10 @@ export function StickyAddToCart({
         );
         setQuantity(1);
     };
+
+    if (!config || !productDetailConfig) return null;
+
+    if (!isVisible) return null;
 
     return (
         <div

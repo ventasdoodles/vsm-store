@@ -9,7 +9,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
     motion: {
         div: ({ children, className, ...props }: any) => {
-            const { layout, layoutId, ...rest } = props;
+            const { layout: _layout, layoutId: _layoutId, ...rest } = props;
             return <div className={className} {...rest}>{children}</div>;
         },
         button: ({ children, className, ...props }: any) => <button className={className} {...props}>{children}</button>,

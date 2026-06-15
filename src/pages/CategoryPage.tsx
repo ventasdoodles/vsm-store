@@ -32,10 +32,8 @@ export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
     const { config } = useActiveVerticalPack();
 
-    if (!config) return null;
-
     const section = useSectionFromPath(config);
-    const sectionPresentationConfig = getVape420SectionPresentationConfig(config, section);
+    const sectionPresentationConfig = config ? getVape420SectionPresentationConfig(config, section) : null;
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
     const [filtersOpen, setFiltersOpen] = useState(false);

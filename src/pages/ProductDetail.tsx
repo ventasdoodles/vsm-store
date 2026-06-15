@@ -31,8 +31,6 @@ export function ProductDetail() {
     const { slug } = useParams<{ slug: string }>();
     const { config } = useActiveVerticalPack();
 
-    if (!config) return null;
-
     const section = useSectionFromPath(config);
 
     const { data: product, isLoading, error } = useProductBySlug(slug ?? '', section);
@@ -46,6 +44,7 @@ export function ProductDetail() {
         }
     }, [product, product?.id]);
 
+    if (!config) return null;
     if (isLoading) return <ProductSkeleton />;
 
     if (error || !product) {

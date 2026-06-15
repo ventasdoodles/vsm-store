@@ -780,14 +780,18 @@ export const conciergeService = {
                                     try {
                                         const newText = JSON.parse(dataLine.slice(6));
                                         options.onChunk(newText);
-                                    } catch (e) {}
+                                    } catch (_e) {
+                                        // ignore parse errors on partial stream chunks
+                                    }
                                 }
                             } else if (line?.startsWith('event: metadata')) {
                                 const dataLine = lines[i+1];
                                 if (dataLine && dataLine.startsWith('data: ')) {
                                     try {
                                         finalMetadata = JSON.parse(dataLine.slice(6));
-                                    } catch (e) {}
+                                    } catch (_e) {
+                                        // ignore parse errors on partial metadata
+                                    }
                                 }
                             }
                         }

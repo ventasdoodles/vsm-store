@@ -58,7 +58,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
             const parsed = JSON.parse(formData.vertical_pack_config);
             setConfig({ ...DEFAULT_CONFIG, ...parsed, marketing: { ...DEFAULT_CONFIG.marketing, ...(parsed.marketing || {}) } });
             setParseError(false);
-        } catch (e) {
+        } catch (_e) {
             setParseError(true);
             setConfig(null);
             setActiveTab('advanced');

@@ -77,8 +77,6 @@ export function AdminProductForm() {
         }
     }, [id, isEditing, config]);
 
-    if (!config || !adminSectionCatalog) return null;
-
     // Mutation: Save Product
     const mutation = useMutation({
         mutationFn: (data: ProductFormData) => {
@@ -94,6 +92,8 @@ export function AdminProductForm() {
             notifyError('Error', (err as Error)?.message || 'No se pudo guardar el producto');
         },
     });
+
+    if (!config || !adminSectionCatalog) return null;
 
     // Ordenar jerárquicamente: padre primero, luego sus hijos inmediatamente después
     const filteredCats = buildProductCategoriesForSection(categories, form.section);

@@ -23,8 +23,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     const { success } = useNotification();
     const [isAdding, setIsAdding] = useState(false);
     
-    if (!config) return null;
-    const productDetailConfig = getVape420ProductDetailPresentationConfig(config, currentProduct.section);
+    const productDetailConfig = config ? getVape420ProductDetailPresentationConfig(config, currentProduct.section) : null;
 
     useEffect(() => {
         const loadRecommendations = async () => {
@@ -42,6 +41,8 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
 
         if (currentProduct) loadRecommendations();
     }, [currentProduct]);
+
+    if (!config || !productDetailConfig) return null;
 
     if (isLoading || relatedProducts.length === 0) return null;
 

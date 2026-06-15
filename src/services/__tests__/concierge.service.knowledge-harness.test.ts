@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   edgeInvoke: vi.fn(),
-  telemetryfrom: vi.fn(),
+  telemetryFrom: vi.fn(),
     auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
   telemetryInsert: vi.fn(),
   executeKnowledgeCapsule: vi.fn(),
@@ -59,7 +59,9 @@ import { conciergeService } from '../concierge.service';
 
 describe('conciergeService knowledge capsule no-mutation harness', () => {
   beforeEach(() => {
-    Object.values(mocks).forEach((mock) => mock.mockReset());
+    Object.values(mocks).forEach((mock: any) => {
+      if (typeof mock.mockReset === 'function') mock.mockReset();
+    });
     mocks.telemetryFrom.mockImplementation(() => {
       throw new Error('telemetry disabled in no-mutation harness');
     });

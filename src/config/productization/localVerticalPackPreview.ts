@@ -25,7 +25,7 @@ export interface LocalVerticalPackPreview {
     products: SecondVerticalProofProduct[];
 }
 
-export interface LocalVerticalPackPreviewSectionViewModel extends VerticalPackSectionReadModel {}
+export type LocalVerticalPackPreviewSectionViewModel = VerticalPackSectionReadModel;
 
 export interface LocalVerticalPackPreviewViewModel {
     previewKey: LocalVerticalPackPreviewKey;

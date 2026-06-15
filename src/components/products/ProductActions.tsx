@@ -31,7 +31,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         [config, product.section],
     );
 
-    if (!config || !productDetailConfig) return null;
+
 
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);
@@ -91,6 +91,8 @@ export function ProductActions({ product }: ProductActionsProps) {
     }, []);
 
     const handleAddToCart = () => {
+        if (!config || !productDetailConfig) return null;
+
         if (!purchaseability.canAddToCart) {
             warning('Compra no disponible', purchaseability.detail);
             return;
@@ -112,6 +114,8 @@ export function ProductActions({ product }: ProductActionsProps) {
             openCart();
         }, 600);
     };
+
+    if (!config || !productDetailConfig) return null;
 
     return (
         <div className="space-y-6" ref={containerRef}>

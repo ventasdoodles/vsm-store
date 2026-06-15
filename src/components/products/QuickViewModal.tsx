@@ -61,7 +61,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         }
     }, [product, variations, hasVariations, selectedVariant]);
 
-    if (!config || !productDetailConfig) return null;
+
 
     useEffect(() => {
         setQuantity((current) => Math.min(Math.max(1, current), maxQuantity));
@@ -115,6 +115,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         );
     };
 
+    if (!config || !productDetailConfig) return null;
     if (!isOpen) return null;
 
     const modalContent = (
