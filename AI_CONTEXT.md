@@ -23,6 +23,7 @@
   - `docs/archive/STORE_FRONT_AI_PILOT_CONTEXT_ARCHIVE_2026-05-16.md`.
 
 ## Current Repository Baseline
+- **Edge Error Parsing:** Error handling for `fetch` invocations toward Supabase Edge Functions requires explicitly parsing the error body (e.g. `await res.text()`) to recover structured metadata (such as `no_write_smoke`) before throwing the generic Error. This ensures that telemetry and test harnesses receive the necessary propagation data rather than a flattened error string.
 
 ## Cesarin Strict Schema Enforcement (Structured Outputs)
 - Cesarin Strict Schema Enforcement `6f8e973` is ACCEPT as a high-value stability lane. Accepted facts: The `concierge-chat.ts` Analyst invocation was refactored to eliminate regex-based JSON parsing (`rawAnalystText.match(/\{[\s\S]*\}/)`). The Analyst now uses `invokeGeminiTextModel` (routed through the LLM Gateway) and relies natively on `responseMimeType: "application/json"` to guarantee structured JSON output from Gemini. This eliminates silent fallback degradations caused by LLM markdown wrapping hallucinations. Validation: `typecheck` passed cleanly. Non-claims: The Sommelier generation was not migrated to Strict JSON Schema because its streaming frontend parser currently relies on a custom regex chunk extractor.
