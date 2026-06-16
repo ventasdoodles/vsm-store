@@ -44,7 +44,7 @@ export interface ConciergeMessage {
         url: string;
         type: 'whatsapp' | 'link';
     };
-    capsule_contract?: any;
+    capsule_contract?: Record<string, any>;
 }
 
 interface ConciergeProductSearchMemoryContext {
@@ -344,7 +344,7 @@ export function buildConciergeCatalogGate(input: {
     turnAnalysis?: ConciergeTurnAnalysis | null;
     intent?: ConciergeMessage['intent'] | string | null;
     assistantMessage?: string | null;
-    capsuleContract?: any;
+    capsuleContract?: Record<string, any>;
     has_catalog_content?: boolean;
 }): ConciergeCatalogGate {
     const primaryIntent = canonicalizeTurnIntent(
@@ -717,7 +717,7 @@ export const conciergeService = {
         catalog_gate?: ConciergeCatalogGate;
         source_context?: ConciergeSourceContext;
         action?: ConciergeMessage['action'];
-        capsule_contract?: any; // Exposing it structurally as requested
+        capsule_contract?: Record<string, any>; // Exposing it structurally as requested
     }> {
         const invokeStart = Date.now();
         const effectiveTelemetrySessionId = cesarinSessionId ?? null;
@@ -767,7 +767,7 @@ export const conciergeService = {
                 throw error;
             }
 
-            let data: any = null;
+            let data: Record<string, any> = {};
             if (options?.onChunk && res.headers.get('Content-Type')?.includes('text/event-stream')) {
                 const reader = res.body?.getReader();
                 const decoder = new TextDecoder();
@@ -919,10 +919,10 @@ export const conciergeService = {
                         baseMessage: adaptiveConversation.message,
                         turnAnalysis: commercialTurnAnalysis,
                         commercialMove: commercialJudgment.move,
-                        capsuleTruthSignals: (capsuleContract as any).truth_signals ?? null,
-                        capsuleHelpContract: (capsuleContract as any).help_contract ?? null,
+                        capsuleTruthSignals: (capsuleContract as Record<string, any>).truth_signals ?? null,
+                        capsuleHelpContract: (capsuleContract as Record<string, any>).help_contract ?? null,
                         capsuleAttachmentOffer: attachmentOffer,
-                        capsuleReplenishmentSignal: (capsuleContract as any).replenishment_signal ?? null,
+                        capsuleReplenishmentSignal: (capsuleContract as Record<string, any>).replenishment_signal ?? null,
                     });
 
                     if (shouldShowCatalogSurfaces && rerankedProducts.length > 0) {
@@ -952,9 +952,9 @@ export const conciergeService = {
                         }
                         : undefined;
                     const telemetryNextStep = extractTelemetryNextStepTruth(compactNextStepView);
-                    (capsuleContract as any).next_step_view = compactNextStepView;
-                    (capsuleContract as any).turn_analysis = commercialTurnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
+                    (capsuleContract as Record<string, any>).turn_analysis = commercialTurnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
                     void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
@@ -1023,7 +1023,7 @@ export const conciergeService = {
                         products: capsuleContract.resolved_products,
                         shouldShowCatalogSurfaces,
                         executionStatus: capsuleContract.execution_status,
-                        truthSignals: (capsuleContract as any).truth_signals ?? null,
+                        truthSignals: (capsuleContract as Record<string, any>).truth_signals ?? null,
                         maxSentences: 8,
                     });
 
@@ -1096,10 +1096,10 @@ export const conciergeService = {
                             guidance: renderableNextStepGuidance,
                         }
                         : undefined;
-                    (capsuleContract as any).resolved_products = visibleProducts;
-                    (capsuleContract as any).next_step_view = compactNextStepView;
-                    (capsuleContract as any).turn_analysis = kitTurnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).resolved_products = visibleProducts;
+                    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
+                    (capsuleContract as Record<string, any>).turn_analysis = kitTurnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
                     void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
@@ -1218,10 +1218,10 @@ export const conciergeService = {
                             guidance: renderableNextStepGuidance,
                         }
                         : undefined;
-                    (capsuleContract as any).resolved_products = visibleProducts;
-                    (capsuleContract as any).next_step_view = compactNextStepView;
-                    (capsuleContract as any).turn_analysis = budgetTurnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).resolved_products = visibleProducts;
+                    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
+                    (capsuleContract as Record<string, any>).turn_analysis = budgetTurnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
                     void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
@@ -1338,10 +1338,10 @@ export const conciergeService = {
                             guidance: renderableNextStepGuidance,
                         }
                         : undefined;
-                    (capsuleContract as any).resolved_products = visibleProducts;
-                    (capsuleContract as any).next_step_view = compactNextStepView;
-                    (capsuleContract as any).turn_analysis = compatibilityTurnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).resolved_products = visibleProducts;
+                    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
+                    (capsuleContract as Record<string, any>).turn_analysis = compatibilityTurnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
                     void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
@@ -1447,10 +1447,10 @@ export const conciergeService = {
                         assist_action_present: false,
                         source_context_present: Boolean(sourceContext),
                     });
-                    (capsuleContract as any).turn_analysis = turnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).turn_analysis = turnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
                     if (noWriteSmokeActive) {
-                        (capsuleContract as any).no_write_smoke = data.no_write_smoke;
+                        (capsuleContract as Record<string, any>).no_write_smoke = data.no_write_smoke;
                     }
                     return {
                         message: prefixedKnowledgeMessage || capsuleContract.ui_render_hint,
@@ -1519,10 +1519,10 @@ export const conciergeService = {
                             guidance: renderableNextStepGuidance,
                         }
                         : undefined;
-                    (capsuleContract as any).resolved_products = visibleProducts;
-                    (capsuleContract as any).next_step_view = compactNextStepView;
-                    (capsuleContract as any).turn_analysis = inventoryTurnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).resolved_products = visibleProducts;
+                    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
+                    (capsuleContract as Record<string, any>).turn_analysis = inventoryTurnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
                     void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
@@ -1631,8 +1631,8 @@ export const conciergeService = {
                         source_context_present: Boolean(sourceContext),
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
-                    (capsuleContract as any).turn_analysis = turnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).turn_analysis = turnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
                     return {
                         message: prefixedTrackingMessage || capsuleContract.customer_response_draft,
                         intent: 'support',
@@ -1693,8 +1693,8 @@ export const conciergeService = {
                         source_context_present: Boolean(sourceContext),
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
-                    (capsuleContract as any).turn_analysis = turnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).turn_analysis = turnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
                     return {
                         message: prefixedWarrantyMessage || capsuleContract.customer_response_draft,
                         intent: 'support',
@@ -1754,8 +1754,8 @@ export const conciergeService = {
                         source_context_present: Boolean(sourceContext),
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
-                    (capsuleContract as any).turn_analysis = turnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).turn_analysis = turnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
                     return {
                         message: prefixedLoyaltyMessage || capsuleContract.customer_response_draft,
                         intent: 'info',
@@ -1823,8 +1823,8 @@ export const conciergeService = {
                         source_context_present: Boolean(sourceContext),
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
-                    (capsuleContract as any).turn_analysis = checkoutTurnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).turn_analysis = checkoutTurnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
                     return {
                         message: prefixedCheckoutMessage || capsuleContract.customer_response_draft,
                         intent: 'support',
@@ -1880,8 +1880,8 @@ export const conciergeService = {
                         assist_action_present: false,
                         source_context_present: Boolean(sourceContext),
                     });
-                    (capsuleContract as any).turn_analysis = turnAnalysis;
-                    (capsuleContract as any).catalog_gate = catalogGate;
+                    (capsuleContract as Record<string, any>).turn_analysis = turnAnalysis;
+                    (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later
                         message: prefixedCartMessage,

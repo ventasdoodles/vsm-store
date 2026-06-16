@@ -44,8 +44,9 @@ export const adminCompatibilityService = {
     const { data, error } = await query.order('name');
     if (error) throw error;
 
-    const concepts = data.map((c: any) => ({
+    const concepts = data.map((c: { concept_aliases?: { count: number }[], outgoing_relations?: { count: number }[], incoming_relations?: { count: number }[], name: string, id: string, brand: string | null, concept_type: "VEHICLE_MODEL" | "SPARE_PART" | "GENERIC" | "BRAND_ONLY" | "CATEGORY" }) => ({
       ...c,
+      brand: c.brand ?? undefined,
       alias_count: c.concept_aliases?.[0]?.count || 0,
       relation_count: (c.outgoing_relations?.[0]?.count || 0) + (c.incoming_relations?.[0]?.count || 0)
     }));
@@ -61,7 +62,7 @@ export const adminCompatibilityService = {
 
     if (aliasError) throw aliasError;
 
-    const aliasConceptIds = new Set((aliasMatches ?? []).map((alias: any) => alias.concept_id));
+    const aliasConceptIds = new Set((aliasMatches ?? []).map((alias: { concept_id: string }) => alias.concept_id));
 
     return concepts.filter((concept) => {
       const nameMatch = concept.name.toLowerCase().includes(normalizedSearch);

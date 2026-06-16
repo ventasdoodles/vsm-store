@@ -102,7 +102,7 @@ export function buildStoreSettingsFormData(
 export function buildStoreSettingsUpdatePayload(
     formData: SettingsFormData,
     settingsId: number,
-): any { // We return any to accommodate JSON parsing, or Omit<SettingsFormData, 'vertical_pack_config'> & { vertical_pack_config: any }
+): Omit<SettingsFormData, 'vertical_pack_config'> & { vertical_pack_config: Record<string, unknown>; id: number } {
     let parsedConfig = {};
     try {
         parsedConfig = JSON.parse(formData.vertical_pack_config || '{}');

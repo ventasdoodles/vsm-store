@@ -9,6 +9,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
+import type { StoreSettings } from '@/services';
 import { Loader2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 import { STORE_SETTINGS_ID } from '@/constants/app';
@@ -58,7 +59,7 @@ export function AdminSettings() {
         e.preventDefault();
         try {
             await updateMutation.mutateAsync(
-                buildStoreSettingsUpdatePayload(formData, STORE_SETTINGS_ID),
+                buildStoreSettingsUpdatePayload(formData, STORE_SETTINGS_ID) as unknown as Partial<StoreSettings>,
             );
             success('ConfiguraciÃ³n guardada', 'Los cambios se han aplicado correctamente.');
         } catch (err) {

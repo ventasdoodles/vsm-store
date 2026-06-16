@@ -426,9 +426,16 @@ export function useAIConcierge() {
                         });
                     };
 
-                    const baseArgs: any[] = [requestContent, history, profile || undefined, audio, undefined, cesarinSessionIdRef.current];
                     const options = noWriteSmoke ? { noWriteSmoke: true, onChunk } : { onChunk };
-                    return await conciergeService.chat(...baseArgs as [any, any, any, any, any, any], options);
+                    return await conciergeService.chat(
+                        requestContent,
+                        history,
+                        profile || undefined,
+                        audio,
+                        undefined,
+                        cesarinSessionIdRef.current,
+                        options
+                    );
                 };
 
                 void slowResponsePromise;
@@ -493,7 +500,7 @@ export function useAIConcierge() {
 
                 const nextStepView = assistantMsg.capsule_contract?.next_step_view ?? null;
                 if (catalogGate.is_open && !nextStepView && shouldOfferCesarinApproximateRecovery(
-                    assistantMsg.capsule_contract,
+                    assistantMsg.capsule_contract as Parameters<typeof shouldOfferCesarinApproximateRecovery>[0],
                     (assistantMsg.suggestedProducts ?? []) as CesarinActiveRecoveryState['suggestedProducts'],
                 )) {
                     setActiveRecovery({

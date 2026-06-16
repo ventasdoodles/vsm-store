@@ -56,9 +56,10 @@ export function useAdminKnowledge() {
             if (selectedNode?.id === id) {
                 setSelectedNode(persistedNode);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error updating knowledge node:', error);
-            toast.error(error.message || 'Error al guardar. Verifica la validación de servidor.');
+            const message = error instanceof Error ? error.message : 'Error al guardar. Verifica la validación de servidor.';
+            toast.error(message);
         } finally {
             setIsSaving(false);
         }
@@ -73,7 +74,7 @@ export function useAdminKnowledge() {
             if (selectedNode?.id === id) {
                 setSelectedNode(authoritativeNode);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error toggling status:', error);
             toast.error('Error al cambiar estatus');
         } finally {
