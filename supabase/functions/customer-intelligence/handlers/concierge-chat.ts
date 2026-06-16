@@ -68,13 +68,10 @@ import {
     resolveStorefrontCompatibilityCheck,
 } from '../storefront-compatibility.ts'
 import {
-    buildCustomerIntelligenceNoWriteSmokeMetadata,
-    buildCustomerIntelligenceNoWriteSmokeErrorFields,
-    type CustomerIntelligenceNoWriteSmokeMetadata,
-    isCustomerIntelligenceNoWriteSmokeRequest,
-    shouldSuppressCustomerIntelligenceCall,
-    shouldSuppressCustomerIntelligenceWrite,
-} from '../no-write-smoke.ts'
+import { buildCustomerIntelligenceNoWriteSmokeMetadata, buildCustomerIntelligenceNoWriteSmokeErrorFields, type CustomerIntelligenceNoWriteSmokeMetadata, isCustomerIntelligenceNoWriteSmokeRequest, shouldSuppressCustomerIntelligenceCall, shouldSuppressCustomerIntelligenceWrite } from '../no-write-smoke.ts';
+import { CustomerMemoryRepo } from '../infrastructure/memory.repo.ts';
+import { buildAnalystSystemPrompt, buildAnalystUserPromptBlocks } from '../domain/prompt.builder.ts';
+import { GeminiAnalystAdapter } from '../adapters/gemini.adapter.ts';
 
 // Credentials will be loaded per-request for maximum resilience
 // â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
@@ -160,67 +157,13 @@ export async function handleConciergeChat(
             const { audio, mimeType } = body;
 
             // --- Phase 4.0: Selective Memory Read ---
-            let customerMemory: any = null;
-            const memoryTrace: any = {
-                read_attempted: false,
-                row_found: false,
-                context_injected: false,
-                interests_count: 0,
-                preference_signal_count: 0,
-                preference_summary_injected: false,
-                soft_continuity_source: 'none',
-                soft_continuity_topic: null,
-                soft_continuity_shift: false,
-                soft_reopen_candidate: false,
-                skipped_reason: null
-            };
-
-            const cid = customerContext?.id;
-            if (cid) {
-                memoryTrace.read_attempted = true;
-                console.log(`[Memory] Reading for cid: ${cid}`);
-                const { data: mem, error: memErr } = await supabase
-                    .from('ai_customer_memory')
-                    .select('detected_interests, interests_metadata, preference_signals, preference_summary, last_interaction_at')
-                    .eq('customer_id', cid)
-                    .maybeSingle();
-                
-                if (memErr) {
-                   console.error(`[Memory] Query error: ${memErr.message}`);
-                   memoryTrace.skipped_reason = `query_error: ${memErr.message}`;
-                } else if (mem && ((mem.detected_interests?.length ?? 0) > 0 || hasCustomerPreferenceSummary(mem.preference_summary))) {
-                    // --- Strength-Based Prioritization ---
-                    const meta = mem.interests_metadata || {};
-                    const detectedInterests = mem.detected_interests || [];
-                    const sortedInterests = [...detectedInterests].sort((a, b) => {
-                        const metaA = meta[a.toLowerCase()] || { hits: 0, last_at: '0' };
-                        const metaB = meta[b.toLowerCase()] || { hits: 0, last_at: '0' };
-                        
-                        // 1. Primary: Frequency (hits)
-                        if (metaB.hits !== metaA.hits) return metaB.hits - metaA.hits;
-                        // 2. Secondary: Recency (last_at)
-                        return new Date(metaB.last_at).getTime() - new Date(metaA.last_at).getTime();
-                    });
-
-                    customerMemory = {
-                        ...mem,
-                        prioritized_interests: sortedInterests
-                    };
-                    memoryTrace.row_found = true;
-                    memoryTrace.context_injected = true;
-                    memoryTrace.interests_count = detectedInterests.length;
-                    memoryTrace.preference_signal_count = Object.keys(mem.preference_signals || {}).length;
-                    memoryTrace.preference_summary_injected = hasCustomerPreferenceSummary(mem.preference_summary);
-                    console.log(
-                        `[Memory] Success: interests=${detectedInterests.length}, preference_signals=${memoryTrace.preference_signal_count}, summary=${memoryTrace.preference_summary_injected}`
-                    );
-                } else { 
-                    memoryTrace.skipped_reason = mem ? "empty_memory" : "no_row"; 
-                    console.log(`[Memory] Skipped: ${memoryTrace.skipped_reason}`);
-                }
-            } else { 
-                memoryTrace.skipped_reason = "no_id"; 
-                console.log(`[Memory] No CID provided in context.`);
+            const memoryRepo = new CustomerMemoryRepo(supabase);
+            const { memory: customerMemory, trace: memoryTrace } = await memoryRepo.getPrioritizedMemory(customerContext?.id);
+            
+            if (memoryTrace.row_found) {
+                 console.log(`[Memory] Success: interests=${memoryTrace.interests_count}, preference_signals=${memoryTrace.preference_signal_count}, summary=${memoryTrace.preference_summary_injected}`);
+            } else {
+                 console.log(`[Memory] Skipped: ${memoryTrace.skipped_reason}`);
             }
 
             const customerPreferencePromptSummary = buildCustomerPreferencePromptSummary(
@@ -267,199 +210,26 @@ export async function handleConciergeChat(
                 || isHighConfidenceProductSearchTurn(preAnalystSignals.normalizedQuery)
             )
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
-            const analystSystemPrompt = `
-                Eres "The Analyst", el motor de decision por turno de VSM Store.
-                Decide primero si este turno se resuelve mejor con respuesta directa, una pregunta corta o una capacidad real de tienda.
-                No empujes catalogo, politicas, carrito ni herramientas por reflejo.
-                
-                REGLA DE TURNO PRIMARIO:
-                - El intent debe reflejar el turno actual más importante, no la inercia del historial.
-                - Si el mensaje trae dos necesidades, elige una primera y deja la otra como secondary_intents.
-                - No mezcles varias necesidades en una sola salida robótica.
-                
-                CAPABILITY BOX:
-                ${analystCapabilitySummary}
-                
-                REGLAS DE CAPACIDAD:
-                - Por defecto gana model_turn_reasoning si el turno se puede resolver honestamente sin lookup ni accion real.
-                - OWN_FUNCTION gana cuando hace falta verdad privada, estado interno o accion real.
-                - NATIVE_PUBLIC solo entra si hace falta contexto publico externo de verdad; no por reflejo.
-                - Si primero conviene aclarar, deja "tool_calls" en [] aunque exista una capacidad posible.
-                - REGLA DE requires_semantic_expansion: false para nombres específicos; true solo para conceptos o preferencias vagas.
-                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
-                
-                ATAJOS DE CLASIFICACION SOLO SI EL TURNO LO PIDE:
-                - KITS, starter setup o hardware upgrade -> KIT_ASSEMBLY.
-                - ALGO MAS BARATO / price friction / trade-down -> BUDGET_RESCUE.
-                - CHECKOUT readiness / close-now friction / payment-method / shipping-cost readiness -> CHECKOUT_READINESS.
-                - COMPATIBILIDAD/FIT -> COMPATIBILITY_CHECK.
-                - URL explicita o verificacion publica externa real -> PUBLIC_INFO.
-                - FUERA DE DOMINIO -> OUT_OF_DOMAIN sin herramientas.
-                - SOLO usa UNKNOWN si el mensaje es realmente indescifrable.
-            `;
-
-            const analystUserPromptBlocks = [
-                `MENSAJE: "${query || 'Audio Context'}"`,
-                `CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}`,
-                customerMemory ? `
-                --- MEMORIA PERSISTENTE (SESIÓN ANTERIOR) ---
-                ESTA INFORMACIÓN ES SOLO PARA SESGAR BÚSQUEDAS Y DESAMBIGUAR.
-                LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÓRICO.
-                REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
-                ${customerMemory.prioritized_interests?.length ? `INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}` : ''}
-                ${customerPreferencePromptSummary ? `RESUMEN LIGERO DE GUSTOS: ${customerPreferencePromptSummary}` : ''}
-                ${customerCommercialMemoryGuidance ? `GUIA COMERCIAL DE CONTINUIDAD: ${customerCommercialMemoryGuidance}` : ''}
-                REGLAS:
-                - Lo actual manda sobre lo historico.
-                - Una tendencia debil no es verdad dura.
-                - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
-                - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
-                ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
-                ` : '',
-                softContinuity.prompt_block ? `
-                ${softContinuity.prompt_block}
-                REGLA DE CONTINUIDAD:
-                - Si usas continuidad, que sea una frase corta y humilde.
-                - Si el turno actual cambio de carril, no arrastres el carril previo.
-                - No abras catalogo, carrito ni politicas solo por contexto previo.
-                ` : ''
-            ];
-
-            const formattedAnalystHistory = Array.isArray(history) 
-                ? history.slice(-6).map((h: any) => ({
-                    role: h.role === 'assistant' ? 'model' : 'user',
-                    parts: [{ text: h.content }]
-                })) 
-                : [];
+            const analystSystemPrompt = buildAnalystSystemPrompt(analystCapabilitySummary);
+            const analystUserPromptBlocks = buildAnalystUserPromptBlocks({
+                capabilitySummary: analystCapabilitySummary,
+                query: query || '',
+                customerContext,
+                customerMemory,
+                customerPreferencePromptSummary,
+                customerCommercialMemoryGuidance,
+                softContinuityPromptBlock: softContinuity.prompt_block
+            });
 
             // ═══ HARDENING 2: GEMINI RESILIENCE — ANALYST CALL WITH FALLBACK ═══
-            let analystResult: any = {};
-            let geminiError: string | null = null;
-            let rawAnalystText = '';
-
-            try {
-                analystResult = await invokeGeminiTextModel(
-                    _GEMINI_API_KEY,
-                    CONCIERGE_ANALYST_MODEL,
-                    {
-                        systemInstruction: { parts: [{ text: analystSystemPrompt }] },
-                        contents: [
-                            ...formattedAnalystHistory,
-                            { role: 'user', parts: [{ text: analystUserPromptBlocks.filter(Boolean).join('\n') }] }
-                        ],
-                        generationConfig: {
-                            temperature: 0.1,
-                            response_mime_type: 'application/json',
-                            response_schema: {
-                                type: 'OBJECT',
-                                properties: {
-                                    intent: {
-                                        type: 'STRING',
-                                        enum: ['CART_OPERATION', 'CHECKOUT_READINESS', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'],
-                                    },
-                                    primary_intent: { type: 'STRING' },
-                                    secondary_intents: { type: 'ARRAY', items: { type: 'STRING' } },
-                                    turn_priority: { type: 'ARRAY', items: { type: 'STRING' } },
-                                    current_turn_decision: {
-                                        type: 'STRING',
-                                        enum: ['DIRECT_ANSWER', 'ASK_CLARIFYING_QUESTION', 'USE_CAPABILITY'],
-                                    },
-                                    turn_decision: { type: 'STRING' },
-                                    doubts: { type: 'ARRAY', items: { type: 'STRING' } },
-                                    tool_calls: {
-                                        type: 'ARRAY',
-                                        items: {
-                                            type: 'OBJECT',
-                                            properties: {
-                                                name: { type: 'STRING' },
-                                                args: { type: 'OBJECT' },
-                                                reason: { type: 'STRING' },
-                                            },
-                                            required: ['name', 'args'],
-                                        },
-                                    },
-                                    customer_dna: {
-                                        type: 'OBJECT',
-                                        properties: {
-                                            interests: { type: 'ARRAY', items: { type: 'STRING' } },
-                                            preference_signals: { type: 'ARRAY', items: { type: 'OBJECT' } },
-                                        },
-                                    },
-                                    conversational_prefix: { type: 'STRING' },
-                                },
-                                required: ['intent', 'current_turn_decision', 'tool_calls'],
-                            },
-                        },
-                        safetySettings: SAFETY_SETTINGS,
-                    },
-                    "Analyst text model execution"
-                );
-
-                rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                const analystUsage = buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult.usageMetadata);
-                if (analystUsage) {
-                    console.warn('[Analyst Tokens]', JSON.stringify(analystUsage));
-                }
-            } catch (e: any) {
-                console.error(`[Analyst] Gateway error: ${e.message}`);
-                geminiError = e.message;
-            }
-
-            // Parse analyst response with strict contract validation
-            // Contract: Analyst must emit { intent, tool_calls: [] }
-            // Valid intents: CART_OPERATION | CHECKOUT_READINESS | KIT_ASSEMBLY | BUDGET_RESCUE | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN
-            const VALID_INTENTS = ['CART_OPERATION', 'CHECKOUT_READINESS', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
-
-            let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
-            let analystParseValid = false;
-
-            if (rawAnalystText) {
-                try {
-                    // Structured output (response_schema) guarantees valid JSON from Gemini.
-                    let parsed: any = null;
-                    try {
-                        parsed = JSON.parse(rawAnalystText);
-                    } catch (e: any) {
-                        console.error(`[Analyst] Strict JSON parsing failed: ${e.message}. Falling back.`);
-                        throw new Error('Native JSON parsing failed');
-                    }
-
-                    // Validate Analyst contract
-                    if (!parsed || typeof parsed !== 'object') {
-                        throw new Error('Analyst response is not a JSON object');
-                    }
-
-                    const reportIntent = (parsed.intent || '').toUpperCase();
-                    if (!VALID_INTENTS.includes(reportIntent)) {
-                        console.error(`[Analyst] Invalid intent: "${reportIntent}", valid options: ${VALID_INTENTS.join(', ')}`);
-                        geminiError = `Analyst invalid intent: "${reportIntent}"`;
-                    } else if (!Array.isArray(parsed.tool_calls)) {
-                        const toolCallsType = parsed.tool_calls === null ? 'null' : typeof parsed.tool_calls;
-                        console.warn('[Analyst] Structured output invalid:', JSON.stringify({
-                            reason: 'tool_calls_not_array',
-                            field: 'tool_calls',
-                            received_type: toolCallsType,
-                            intent: reportIntent,
-                        }));
-                        throw new Error('Analyst tool_calls not array');
-                    } else {
-                        // Contract valid: required fields present and well-formed
-                        analystReport = parsed;
-                        analystParseValid = true;
-                        console.warn(`[Analyst] Contract valid: intent="${reportIntent}", tool_calls.length=${(parsed.tool_calls || []).length}`);
-                    }
-                } catch (e) {
-                    console.error("[Analyst] Parse error:", (e as any).message);
-                    geminiError = geminiError || `Analyst parse error: ${(e as any).message}`;
-                }
-            }
-
-            // If Analyst failed (gemini error) OR contract validation failed (malformed/invalid output),
-            // use safe degradation. Do NOT continue with malformed output as if it were valid.
-            if (geminiError || !analystParseValid) {
-                console.warn(`[Analyst] Degradation fallback active due to: ${geminiError || 'contract validation failed'}`);
-                analystReport = buildNeutralAnalystFallbackReport();
-            }
+            const adapter = new GeminiAnalystAdapter(_GEMINI_API_KEY, CONCIERGE_ANALYST_MODEL);
+            const { report: analystReport, rawText: rawAnalystText, error: geminiError } = await adapter.analyzeTurn(
+                analystSystemPrompt, 
+                analystUserPromptBlocks, 
+                history
+            );
+            
+            let analystParseValid = !geminiError;
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
             const analystIntent = intent; // A85: captured before any guardrail override
