@@ -1,6 +1,8 @@
 -- Fix AI Catalog Sync (Soft Delete Visibility)
 -- Ensures that products marked as is_active = false or status != 'active' are completely invisible to semantic search
 
+DROP FUNCTION IF EXISTS match_products(vector, float, int, int);
+
 CREATE OR REPLACE FUNCTION match_products (
   query_embedding vector(768),
   match_threshold float,

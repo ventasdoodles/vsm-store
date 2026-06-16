@@ -45,13 +45,22 @@ CREATE POLICY "Edge functions can read behavior rules"
     TO anon, authenticated
     USING (true);
 
+-- Create standard updated_at function if it doesn't exist
+CREATE OR REPLACE FUNCTION public.set_current_timestamp_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Triggers for updated_at
 CREATE TRIGGER set_ai_behavior_rules_updated_at
     BEFORE UPDATE ON public.ai_behavior_rules
     FOR EACH ROW
-    EXECUTE FUNCTION set_current_timestamp_updated_at();
+    EXECUTE FUNCTION public.set_current_timestamp_updated_at();
 
 CREATE TRIGGER set_ai_study_materials_updated_at
     BEFORE UPDATE ON public.ai_study_materials
     FOR EACH ROW
-    EXECUTE FUNCTION set_current_timestamp_updated_at();
+    EXECUTE FUNCTION public.set_current_timestamp_updated_at();
