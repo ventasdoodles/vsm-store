@@ -225,6 +225,20 @@ export async function enrichProduct(
     }
 }
 
+async function syncProductEmbedding(id: string, name: string, description: string, section: string) {
+    const textToEmbed = `Producto: ${name}. Categoría: ${section}. Descripción: ${description}`.trim();
+    const { data: embedData, error: embedError } = await supabase.functions.invoke('embeddings-processor', {
+        body: { text: textToEmbed }
+    });
+    
+    if (embedError || !embedData?.embedding) {
+        console.error('Error generating product embedding:', embedError);
+        return;
+    }
+    
+    await supabase.from('products').update({ embedding: embedData.embedding }).eq('id', id);
+}
+
 export async function createProduct(product: ProductFormData) {
     const { data, error } = await supabase
         .from('products')
@@ -233,6 +247,10 @@ export async function createProduct(product: ProductFormData) {
         .single();
 
     if (error) throw error;
+
+    // Auto-sync AI embedding
+    syncProductEmbedding(data.id, product.name || '', product.description || '', product.section || '').catch(console.error);
+
     return data;
 }
 
@@ -241,18 +259,24 @@ export async function updateProduct(id: string, product: Partial<ProductFormData
         .from('products')
         .update(product)
         .eq('id', id)
-        .select('id, name, slug, price, stock, sku, section, category_id, is_active')
+        .select('id, name, slug, price, stock, sku, section, category_id, is_active, description')
         .single();
 
     if (error) throw error;
+
+    // Re-sync AI embedding only if text fields changed
+    if (product.name !== undefined || product.description !== undefined || product.section !== undefined) {
+        syncProductEmbedding(data.id, data.name || '', data.description || '', data.section || '').catch(console.error);
+    }
+
     return data;
 }
 
 export async function deleteProduct(id: string) {
-    // Soft delete: marcar como inactivo
+    // Soft delete: marcar como inactivo y status inactive
     const { error } = await supabase
         .from('products')
-        .update({ is_active: false })
+        .update({ is_active: false, status: 'inactive' })
         .eq('id', id);
 
     if (error) throw error;
