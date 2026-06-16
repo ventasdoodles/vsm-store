@@ -51,10 +51,6 @@ export function TabInterventions() {
   const [filter, setFilter] = useState<'pending' | 'all'>('pending');
   const [improvementMap, setImprovementMap] = useState<Record<string, ImprovementItem>>({});
 
-  // Fetch recommendations on mount and when filter changes
-  useEffect(() => {
-    fetchRecommendations();
-  }, [fetchRecommendations]);
 
   const fetchRecommendations = useCallback(async () => {
     setIsLoading(true);
@@ -72,6 +68,11 @@ export function TabInterventions() {
       setIsLoading(false);
     }
   }, [filter]);
+
+  // Fetch recommendations on mount and when filter changes
+  useEffect(() => {
+    fetchRecommendations();
+  }, [fetchRecommendations]);
 
   const handleApprove = async (rec: RecommendationWithSignal) => {
     setDecidingId(rec.id);
