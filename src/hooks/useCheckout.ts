@@ -256,7 +256,9 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
 
             if (dbOrderId) {
-                await markWhatsAppSent(dbOrderId).catch(() => { });
+                await markWhatsAppSent(dbOrderId).catch((err) => {
+                    console.error('Failed to mark WhatsApp as sent:', err);
+                });
             }
 
             // FASE 5: Post-procesamiento

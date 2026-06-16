@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AuthContext.tsx - VSM Store
  * 
  * Contexto global de autenticaciÃ³n que gestiona el estado de Supabase Auth
@@ -141,7 +141,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         void import('@/stores/wishlist.store')
                             .then(({ useWishlistStore }) => {
                                 const store = useWishlistStore.getState();
-                                return store.syncToDb().then(() => store.loadFromDb()).catch(() => { });
+                                return store.syncToDb().then(() => store.loadFromDb()).catch((err) => {
+                                    console.error('Error syncing wishlist during sign in:', err);
+                                });
                             })
                             .catch((error) => {
                                 console.error('Error loading wishlist store:', error);

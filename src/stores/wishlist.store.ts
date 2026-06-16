@@ -1,4 +1,4 @@
-﻿import { create } from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
 import * as wishlistService from '@/services';
@@ -27,7 +27,9 @@ export const useWishlistStore = create<WishlistState>()(
                     set({ items: [...currentItems, product] });
                     // Fire-and-forget sync
                     supabase.auth.getUser().then(({ data: { user } }) => {
-                        if (user) wishlistService.addToWishlist(user.id, product.id).catch(() => {});
+                        if (user) wishlistService.addToWishlist(user.id, product.id).catch((err) => {
+                            console.error('Wishlist sync add failed:', err);
+                        });
                     });
                 }
             },
@@ -35,7 +37,9 @@ export const useWishlistStore = create<WishlistState>()(
                 set({ items: get().items.filter((item) => item.id !== productId) });
                 // Fire-and-forget sync
                 supabase.auth.getUser().then(({ data: { user } }) => {
-                    if (user) wishlistService.removeFromWishlist(user.id, productId).catch(() => {});
+                    if (user) wishlistService.removeFromWishlist(user.id, productId).catch((err) => {
+                        console.error('Wishlist sync remove failed:', err);
+                    });
                 });
             },
             toggleItem: (product) => {
@@ -53,7 +57,9 @@ export const useWishlistStore = create<WishlistState>()(
             clearWishlist: () => {
                 set({ items: [] });
                 supabase.auth.getUser().then(({ data: { user } }) => {
-                    if (user) wishlistService.clearWishlist(user.id).catch(() => {});
+                    if (user) wishlistService.clearWishlist(user.id).catch((err) => {
+                        console.error('Wishlist sync clear failed:', err);
+                    });
                 });
             },
 
@@ -64,7 +70,9 @@ export const useWishlistStore = create<WishlistState>()(
                 if (items.length === 0) return;
                 
                 for (const item of items) {
-                    await wishlistService.addToWishlist(user.id, item.id).catch(() => {});
+                    await wishlistService.addToWishlist(user.id, item.id).catch((err) => {
+                        console.error('Wishlist batch add failed:', err);
+                    });
                 }
             },
 

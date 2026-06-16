@@ -22,7 +22,9 @@ export function useWheelAudio() {
             document.removeEventListener('pointerdown', initAudio);
             document.removeEventListener('keydown', initAudio);
             if (audioCtx.current?.state !== 'closed') {
-                audioCtx.current?.close().catch(() => {});
+                audioCtx.current?.close().catch((err) => {
+                    console.error('Failed to close audio context:', err);
+                });
             }
         };
     }, []);
