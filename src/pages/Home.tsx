@@ -6,25 +6,26 @@
  */
 import { lazy, Suspense, useMemo } from 'react';
 import { Reorder } from 'framer-motion';
-import { ProductRail } from '@/components/home/ProductRail';
-import { PromoSection } from '@/components/home/PromoSection';
 import { MegaHero } from '@/components/home/MegaHero';
-import { CategoryShowcase } from '@/components/home/CategoryShowcase';
-import { FlashDeals } from '@/components/home/FlashDeals';
-import { BrandsCarousel } from '@/components/home/BrandsCarousel';
-import { TrustBadges } from '@/components/home/TrustBadges';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
-import { WheelInvitation } from '@/components/home/WheelInvitation';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
-import { SmartBanner } from '@/components/home/ai/SmartBanner';
+import { useAuth } from '@/hooks/useAuth';
 import { useAuth } from '@/hooks/useAuth';
 import { getStoreMetaCopy } from '@/constants/storeMeta';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
-// Lazy-load heavier components
+// Lazy-load heavier components and below-the-fold sections
 const SocialProof = lazy(() => import('@/components/home/SocialProof').then(m => ({ default: m.SocialProof })));
+const ProductRail = lazy(() => import('@/components/home/ProductRail').then(m => ({ default: m.ProductRail })));
+const PromoSection = lazy(() => import('@/components/home/PromoSection').then(m => ({ default: m.PromoSection })));
+const CategoryShowcase = lazy(() => import('@/components/home/CategoryShowcase').then(m => ({ default: m.CategoryShowcase })));
+const FlashDeals = lazy(() => import('@/components/home/FlashDeals').then(m => ({ default: m.FlashDeals })));
+const BrandsCarousel = lazy(() => import('@/components/home/BrandsCarousel').then(m => ({ default: m.BrandsCarousel })));
+const TrustBadges = lazy(() => import('@/components/home/TrustBadges').then(m => ({ default: m.TrustBadges })));
+const WheelInvitation = lazy(() => import('@/components/home/WheelInvitation').then(m => ({ default: m.WheelInvitation })));
+const SmartBanner = lazy(() => import('@/components/home/ai/SmartBanner').then(m => ({ default: m.SmartBanner })));
 
 type SectionId = 
     | 'smart-banner' 
@@ -84,40 +85,49 @@ export function Home() {
         return activeOrder;
     }, [profile]);
 
-    // 2. Section Map
     const renderSection = (id: SectionId) => {
         switch (id) {
             case 'smart-banner':
                 return (
                     <SectionErrorBoundary key={id} name="SmartBanner">
-                        <SmartBanner />
+                        <Suspense fallback={<div className="h-[60px] skeleton-shimmer rounded-xl" />}>
+                            <SmartBanner />
+                        </Suspense>
                     </SectionErrorBoundary>
                 );
             case 'categories':
                 return (
                     <SectionErrorBoundary key={id} name="CategoryShowcase">
-                        <CategoryShowcase />
+                        <Suspense fallback={<div className="h-[200px] skeleton-shimmer rounded-2xl" />}>
+                            <CategoryShowcase />
+                        </Suspense>
                     </SectionErrorBoundary>
                 );
             case 'brands':
                 return (
                     <DeferredSection key={id} minHeight="160px">
                         <SectionErrorBoundary name="BrandsCarousel">
-                            <BrandsCarousel />
+                            <Suspense fallback={<div className="h-[160px] skeleton-shimmer rounded-2xl" />}>
+                                <BrandsCarousel />
+                            </Suspense>
                         </SectionErrorBoundary>
                     </DeferredSection>
                 );
             case 'wheel':
                 return (
                     <SectionErrorBoundary key={id} name="WheelInvitation">
-                        <WheelInvitation />
+                        <Suspense fallback={<div className="h-[300px] skeleton-shimmer rounded-2xl" />}>
+                            <WheelInvitation />
+                        </Suspense>
                     </SectionErrorBoundary>
                 );
             case 'flash-deals':
                 return (
                     <DeferredSection key={id} minHeight="300px">
                         <SectionErrorBoundary name="FlashDeals">
-                            <FlashDeals />
+                            <Suspense fallback={<div className="h-[300px] skeleton-shimmer rounded-2xl" />}>
+                                <FlashDeals />
+                            </Suspense>
                         </SectionErrorBoundary>
                     </DeferredSection>
                 );
@@ -125,7 +135,9 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="320px">
                         <SectionErrorBoundary name="ProductRail:bestseller">
-                            <ProductRail type="bestseller" title="Los Más Vendidos" />
+                            <Suspense fallback={<div className="h-[320px] skeleton-shimmer rounded-2xl" />}>
+                                <ProductRail type="bestseller" title="Los Más Vendidos" />
+                            </Suspense>
                         </SectionErrorBoundary>
                     </DeferredSection>
                 );
@@ -133,7 +145,9 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="200px">
                         <SectionErrorBoundary name="PromoSection">
-                            <PromoSection />
+                            <Suspense fallback={<div className="h-[200px] skeleton-shimmer rounded-2xl" />}>
+                                <PromoSection />
+                            </Suspense>
                         </SectionErrorBoundary>
                     </DeferredSection>
                 );
@@ -141,7 +155,9 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="320px">
                         <SectionErrorBoundary name="ProductRail:new">
-                            <ProductRail type="new" title="Nuevos Lanzamientos" />
+                            <Suspense fallback={<div className="h-[320px] skeleton-shimmer rounded-2xl" />}>
+                                <ProductRail type="new" title="Nuevos Lanzamientos" />
+                            </Suspense>
                         </SectionErrorBoundary>
                     </DeferredSection>
                 );
@@ -159,7 +175,9 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="120px">
                         <SectionErrorBoundary name="TrustBadges">
-                            <TrustBadges />
+                            <Suspense fallback={<div className="h-[120px] skeleton-shimmer rounded-2xl" />}>
+                                <TrustBadges />
+                            </Suspense>
                         </SectionErrorBoundary>
                     </DeferredSection>
                 );
