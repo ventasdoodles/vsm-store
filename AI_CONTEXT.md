@@ -25,6 +25,11 @@
 ## Current Repository Baseline
 - **Edge Error Parsing:** Error handling for `fetch` invocations toward Supabase Edge Functions requires explicitly parsing the error body (e.g. `await res.text()`) to recover structured metadata (such as `no_write_smoke`) before throwing the generic Error. This ensures that telemetry and test harnesses receive the necessary propagation data rather than a flattened error string.
 
+## V-Coins / Loyalty System Overhaul (`78c41b0`)
+- **Architecture**: The loyalty module is fortified with `calculateLoyaltyPointsWithMultiplier` and `isPointsExpired` functions to govern dynamic tier rewards (1.5x, 2.0x) and point invalidation.
+- **Auto Tier Upgrades**: Upgrades between tiers (Bronze to Platinum) are handled immutably at the DB layer via `tr_auto_tier_on_order_update` firing on order payment or delivery, falling back to a centralized config.
+- **SmartQuests & Wheel**: Real-time metrics replace mock data in `SmartQuests.tsx`. Wheel prizes correctly credit users via the `apply_wheel_prize_points` RPC wrapper with DB traceability.
+
 ## Cesarin Strict Schema Enforcement (Structured Outputs)
 - Cesarin Strict Schema Enforcement `6f8e973` is ACCEPT as a high-value stability lane. Accepted facts: The `concierge-chat.ts` Analyst invocation was refactored to eliminate regex-based JSON parsing (`rawAnalystText.match(/\{[\s\S]*\}/)`). The Analyst now uses `invokeGeminiTextModel` (routed through the LLM Gateway) and relies natively on `responseMimeType: "application/json"` to guarantee structured JSON output from Gemini. This eliminates silent fallback degradations caused by LLM markdown wrapping hallucinations. Validation: `typecheck` passed cleanly. Non-claims: The Sommelier generation was not migrated to Strict JSON Schema because its streaming frontend parser currently relies on a custom regex chunk extractor.
 
