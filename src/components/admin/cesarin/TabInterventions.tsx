@@ -12,7 +12,7 @@
  * Actions remain manual/out-of-band (no automatic execution)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
@@ -54,10 +54,9 @@ export function TabInterventions() {
   // Fetch recommendations on mount and when filter changes
   useEffect(() => {
     fetchRecommendations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [fetchRecommendations]);
 
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = useCallback(async () => {
     setIsLoading(true);
     try {
       const recs = await getRecommendations({
@@ -72,7 +71,7 @@ export function TabInterventions() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filter]);
 
   const handleApprove = async (rec: RecommendationWithSignal) => {
     setDecidingId(rec.id);

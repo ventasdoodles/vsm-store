@@ -355,8 +355,7 @@ export const selectTotalItems = (state: CartState) =>
 export const selectSubtotal = (state: CartState) =>
     state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
-// Total final â€” actualmente igual a subtotal.
-// TODO: cuando se implemente descuentos/envÃ­o, recibir como parÃ¡metros aquÃ­.
+// Total final — actualmente igual a subtotal (descuentos se calculan en checkout)
 export const selectTotal = selectSubtotal;
 
 // â”€â”€â”€ SincronizaciÃ³n entre pestaÃ±as â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

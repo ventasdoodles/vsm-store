@@ -180,9 +180,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                                         {(() => {
                                             try {
                                                 return new URL(log.url, 'https://vsm.store').pathname;
-                                            } catch (error) {
-                                                // eslint-disable-next-line no-console
-                                                console.error('[SystemLogsPanel] Error parsing log URL', error);
+                                            } catch (_error) {
                                                 return log.url;
                                             }
                                         })()}

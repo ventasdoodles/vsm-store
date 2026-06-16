@@ -24,7 +24,7 @@ if (supabaseUrl) {
         link.rel = 'preconnect';
         link.href = origin;
         document.head.appendChild(link);
-    } catch (e) {
+    } catch (_e) {
         // Fallback or ignore
     }
 }

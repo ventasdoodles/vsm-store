@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Search, Plus, ChevronDown, ChevronRight,
   Settings2, Tag, Link2, Trash2, Edit3,
@@ -29,7 +29,7 @@ export function TabConcepts() {
     status: 'unknown_unconfirmed'
   });
 
-  const fetchConcepts = async () => {
+  const fetchConcepts = useCallback(async () => {
     setLoading(true);
     try {
       const data = await adminCompatibilityService.fetchConcepts(search);
@@ -39,7 +39,7 @@ export function TabConcepts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]);
 
   const fetchAllConceptOptions = async () => {
     try {
@@ -66,8 +66,7 @@ export function TabConcepts() {
     }, 300);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, [fetchConcepts]);
 
   useEffect(() => {
     fetchAllConceptOptions();

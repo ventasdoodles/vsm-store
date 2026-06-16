@@ -48,7 +48,6 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
     };
 
     const handleDelete = async (id: string) => {
-        // TODO: Migrar a Custom Confirmation Modal (Wave 47)
         if (!confirm('¿Eliminar esta dirección?')) return;
         await deleteMutation.mutateAsync(id);
         info('Dirección eliminada', 'Se ha removido la dirección de tu lista.');
