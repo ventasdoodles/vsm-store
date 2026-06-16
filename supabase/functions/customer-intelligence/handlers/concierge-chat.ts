@@ -266,83 +266,16 @@ export async function handleConciergeChat(
                 || preAnalystSignals.isInventoryMatch
                 || isHighConfidenceProductSearchTurn(preAnalystSignals.normalizedQuery)
             )
-                ? 12000
-                : 20000;
-
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
-            const analystPrompt = `
+            const analystSystemPrompt = `
                 Eres "The Analyst", el motor de decision por turno de VSM Store.
                 Decide primero si este turno se resuelve mejor con respuesta directa, una pregunta corta o una capacidad real de tienda.
                 No empujes catalogo, politicas, carrito ni herramientas por reflejo.
                 
-                MENSAJE: "${query || 'Audio Context'}"
-                CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}
-                ${customerMemory ? `
-                --- MEMORIA PERSISTENTE (SESIÃ“N ANTERIOR) ---
-                ESTA INFORMACIÃ“N ES SOLO PARA SESGAR BÃšSQUEDAS Y DESAMBIGUAR.
-                LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÃ“RICO.
-                REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
-                ${customerMemory.prioritized_interests?.length ? `INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}` : ''}
-                ${customerPreferencePromptSummary ? `RESUMEN LIGERO DE GUSTOS: ${customerPreferencePromptSummary}` : ''}
-                ${customerCommercialMemoryGuidance ? `GUIA COMERCIAL DE CONTINUIDAD: ${customerCommercialMemoryGuidance}` : ''}
-                REGLAS:
-                - Lo actual manda sobre lo historico.
-                - Una tendencia debil no es verdad dura.
-                - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
-                - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
-                ÃšLTIMA INTERACCIÃ“N: ${customerMemory.last_interaction_at}
-                ` : ''}
-                ${softContinuity.prompt_block ? `
-                ${softContinuity.prompt_block}
-                REGLA DE CONTINUIDAD:
-                - Si usas continuidad, que sea una frase corta y humilde.
-                - Si el turno actual cambio de carril, no arrastres el carril previo.
-                - No abras catalogo, carrito ni politicas solo por contexto previo.
-                ` : ''}
-                HISTORIAL: ${JSON.stringify(history?.slice(-3) || [])}
-
-                RESPONDE ESTRICTAMENTE EN JSON:
-                {
-                    "intent": "CART_OPERATION | CHECKOUT_READINESS | KIT_ASSEMBLY | BUDGET_RESCUE | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PUBLIC_INFO | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
-                    "primary_intent": "same as intent",
-                    "secondary_intents": ["intentos secundarios en orden de prioridad"],
-                    "turn_priority": ["primary_intent", "secondary_intent"],
-                    "current_turn_decision": "DIRECT_ANSWER | ASK_CLARIFYING_QUESTION | USE_CAPABILITY",
-                    "turn_decision": "DIRECT_ANSWER | ASK_CLARIFYING_QUESTION | USE_CAPABILITY",
-                    "doubts": ["lista de dudas percibidas"],
-                    "tool_calls": [
-                        { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explÃ­citamente pidiÃ³ meterlo al carrito" },
-                        { "name": "knowledge_rag_foundation", "args": { "query": "bÃºsqueda semÃ¡ntica de polÃ­tica", "is_ambiguous": false }, "reason": "porque pregunta sobre envÃ­os" },
-                        { "name": "product_search_integrity", "args": { "query": "bÃºsqueda", "is_ambiguous": false, "requires_semantic_expansion": true }, "reason": "porque busca vapes" }
-                    ],
-                    "customer_dna": {
-                        "interests": ["vapes", "menta"],
-                        "preference_signals": [
-                            { "category": "flavor", "value": "menta", "evidence": "explicit", "label": "menta" },
-                            { "category": "budget", "value": "barato", "evidence": "inferred", "label": "cuida precio" }
-                        ]
-                    },
-                    "conversational_prefix": "Frase opcional, corta y natural. Solo si aporta contexto real; no repitas la respuesta ni cierres por reflejo. VacÃ­o si no es posible."
-                }
-
-                EJEMPLOS MINIMOS:
-                1. "hola" -> {"intent": "CHIT_CHAT", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
-                2. "Â¿cuÃ¡l es la polÃ­tica de envÃ­os?" -> {"intent": "POLICY_INQUIRY", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "polÃ­tica de envÃ­os", "is_ambiguous": false}}]}
-                3. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}]}
-                4. "resumeme esta pagina https://ejemplo.com/lanzamiento" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_url_context", "args": {"query": "resumeme esta pagina", "urls": ["https://ejemplo.com/lanzamiento"]}}]}
-                
-                5. "armame un kit con pods y liquido al 5%" -> {"intent": "KIT_ASSEMBLY", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_kitting_basket", "args": {"query": "armame un kit con pods y liquido al 5%", "upgrade_intent": true, "wants_device": true, "wants_consumable": true, "wants_liquid": true}}]}
-
-                6. "ya puedo pagar?" -> {"intent": "CHECKOUT_READINESS", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_checkout_readiness", "args": {"query": "ya puedo pagar?"}}]}
-
-                7. "algo parecido pero mas barato que el caliburn g3" -> {"intent": "BUDGET_RESCUE", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_budget_rescue", "args": {"query": "algo parecido pero mas barato que el caliburn g3"}}]}
-
-                8. "le queda a mi caliburn g3?" -> {"intent": "COMPATIBILITY_CHECK", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_compatibility_check", "args": {"query": "le queda a mi caliburn g3?", "cart_product_ids": []}}]}
-
                 REGLA DE TURNO PRIMARIO:
-                - El intent debe reflejar el turno actual mÃ¡s importante, no la inercia del historial.
+                - El intent debe reflejar el turno actual más importante, no la inercia del historial.
                 - Si el mensaje trae dos necesidades, elige una primera y deja la otra como secondary_intents.
-                - No mezcles varias necesidades en una sola salida robÃ³tica.
+                - No mezcles varias necesidades en una sola salida robótica.
                 
                 CAPABILITY BOX:
                 ${analystCapabilitySummary}
@@ -352,8 +285,8 @@ export async function handleConciergeChat(
                 - OWN_FUNCTION gana cuando hace falta verdad privada, estado interno o accion real.
                 - NATIVE_PUBLIC solo entra si hace falta contexto publico externo de verdad; no por reflejo.
                 - Si primero conviene aclarar, deja "tool_calls" en [] aunque exista una capacidad posible.
-                - REGLA DE requires_semantic_expansion: false para nombres especÃ­ficos; true solo para conceptos o preferencias vagas.
-                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacÃ­o [].
+                - REGLA DE requires_semantic_expansion: false para nombres específicos; true solo para conceptos o preferencias vagas.
+                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
                 
                 ATAJOS DE CLASIFICACION SOLO SI EL TURNO LO PIDE:
                 - KITS, starter setup o hardware upgrade -> KIT_ASSEMBLY.
@@ -365,21 +298,55 @@ export async function handleConciergeChat(
                 - SOLO usa UNKNOWN si el mensaje es realmente indescifrable.
             `;
 
-            // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” ANALYST CALL WITH FALLBACK â•â•â•
+            const analystUserPromptBlocks = [
+                `MENSAJE: "${query || 'Audio Context'}"`,
+                `CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}`,
+                customerMemory ? `
+                --- MEMORIA PERSISTENTE (SESIÓN ANTERIOR) ---
+                ESTA INFORMACIÓN ES SOLO PARA SESGAR BÚSQUEDAS Y DESAMBIGUAR.
+                LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÓRICO.
+                REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
+                ${customerMemory.prioritized_interests?.length ? `INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}` : ''}
+                ${customerPreferencePromptSummary ? `RESUMEN LIGERO DE GUSTOS: ${customerPreferencePromptSummary}` : ''}
+                ${customerCommercialMemoryGuidance ? `GUIA COMERCIAL DE CONTINUIDAD: ${customerCommercialMemoryGuidance}` : ''}
+                REGLAS:
+                - Lo actual manda sobre lo historico.
+                - Una tendencia debil no es verdad dura.
+                - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
+                - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
+                ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
+                ` : '',
+                softContinuity.prompt_block ? `
+                ${softContinuity.prompt_block}
+                REGLA DE CONTINUIDAD:
+                - Si usas continuidad, que sea una frase corta y humilde.
+                - Si el turno actual cambio de carril, no arrastres el carril previo.
+                - No abras catalogo, carrito ni politicas solo por contexto previo.
+                ` : ''
+            ];
+
+            const formattedAnalystHistory = Array.isArray(history) 
+                ? history.slice(-6).map((h: any) => ({
+                    role: h.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: h.content }]
+                })) 
+                : [];
+
+            // ═══ HARDENING 2: GEMINI RESILIENCE — ANALYST CALL WITH FALLBACK ═══
             let analystResult: any = {};
-            let analystResponse: Response | null = null;
             let geminiError: string | null = null;
             let rawAnalystText = '';
 
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), analystTimeoutMs);
-
-                analystResponse = await geminiGenerateContent({
-                    apiKey: _GEMINI_API_KEY,
-                    model: CONCIERGE_ANALYST_MODEL,
-                    body: {
-                        contents: [{ parts: [{ text: analystPrompt }] }],
+                analystResult = await invokeGeminiTextModel(
+                    _GEMINI_API_KEY,
+                    CONCIERGE_ANALYST_MODEL,
+                    {
+                        systemInstruction: { parts: [{ text: analystSystemPrompt }] },
+                        contents: [
+                            ...formattedAnalystHistory,
+                            { role: 'user', parts: [{ text: analystUserPromptBlocks.filter(Boolean).join('\n') }] }
+                        ],
                         generationConfig: {
                             temperature: 0.1,
                             response_mime_type: 'application/json',
@@ -425,39 +392,17 @@ export async function handleConciergeChat(
                         },
                         safetySettings: SAFETY_SETTINGS,
                     },
-                    signal: controller.signal,
-                });
+                    "Analyst text model execution"
+                );
 
-                clearTimeout(timeoutId);
-
-                // Handle 429 (rate limit) and 500+ errors gracefully
-                if (analystResponse.status === 429) {
-                    console.warn(`[Analyst] Rate limited (429): backing off`);
-                    geminiError = 'Gemini rate limit (429)';
-                } else if (analystResponse.status >= 500) {
-                    console.warn(`[Analyst] Server error (${analystResponse.status}): Gemini degraded`);
-                    geminiError = `Gemini server error (${analystResponse.status})`;
-                } else if (!analystResponse.ok) {
-                    analystResult = await analystResponse.json();
-                    console.error(`[Analyst] HTTP ${analystResponse.status}:`, JSON.stringify(analystResult).slice(0, 300));
-                    geminiError = analystResult.error?.message || `HTTP ${analystResponse.status}`;
-                } else {
-                    analystResult = await analystResponse.json();
-                    rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    const analystUsage = buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult.usageMetadata);
-                    console.warn(`[Analyst] raw status: ${analystResponse.status}, text length: ${rawAnalystText.length}`);
-                    if (analystUsage) {
-                        console.warn('[Analyst Tokens]', JSON.stringify(analystUsage));
-                    }
+                rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const analystUsage = buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult.usageMetadata);
+                if (analystUsage) {
+                    console.warn('[Analyst Tokens]', JSON.stringify(analystUsage));
                 }
             } catch (e: any) {
-                if (e.name === 'AbortError') {
-                    console.warn(`[Analyst] Request timeout (>${analystTimeoutMs}ms): Gemini response degraded`);
-                    geminiError = 'Analyst timeout';
-                } else {
-                    console.error(`[Analyst] Fetch error: ${e.message}`);
-                    geminiError = e.message;
-                }
+                console.error(`[Analyst] Gateway error: ${e.message}`);
+                geminiError = e.message;
             }
 
             // Parse analyst response with strict contract validation
@@ -1239,9 +1184,7 @@ export async function handleConciergeChat(
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
 
-            // --- CAPABILITY CAPSULE ROUTING HANDOFF (General Concierge Dialog) ---
-            // --- ENGINE 2: THE SOMMELIER (Creative & Empathetic Response) ---
-            const sommelierPrompt = `
+            // --- CAPABILITY C            const sommelierSystemPrompt = `
                 IDENTIDAD: Eres ${aiConfig?.name || 'Cesarin'}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
                 MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
                 MODO: ${aiConfig?.behavior_mode || 'vendedor'}
@@ -1249,7 +1192,7 @@ export async function handleConciergeChat(
                 REGLAS DE COMPORTAMIENTO:
                 ${aiRules?.map((r: { content: string }) => `- ${r.content}`).join('\n') || ''}
 
-                POLÃTICAS OPERATIVAS (BÃ¡sicas):
+                POLÍTICAS OPERATIVAS (Básicas):
                 ${VSM_OPERATIONAL_RULES}
 
                 PRESENCIA COMERCIAL:
@@ -1261,105 +1204,41 @@ export async function handleConciergeChat(
                 - Si el momento ya da para cerrar, avanza corto y natural, sin urgencia inventada.
                 - Humor ligero o picardia solo si sale solo y no roba foco.
                 - No narres estados internos ni hables como sistema acomodando carriles.
-
-                --- CONOCIMIENTO OPERATIVO (Tools / Source of Truth) ---
-                POLÃTICAS:
-                ${knowledgeOutput}
-
-                PRODUCTOS ENCONTRADOS:
-                ${searchOutput}
-                
-                ESTADO DE PEDIDO (Tracking):
-                ${trackOutput}
-
-                PROYECCIÃ“N DE INVENTARIO:
-                ${inventoryOutput}
-
-                CALIDAD_SEÃ‘AL:
-                ${inventorySignalQuality}
-                REGLAS DE RESPUESTA DE DISPONIBILIDAD:
-                - Di primero la disponibilidad actual tal como venga en el reporte.
-                - Si mencionas outlook o proyeccion, dejalo despues y como estimacion secundaria.
-                - No conviertas outlook en promesa de regreso, restock o disponibilidad futura.
-                - Si hoy esta agotado, dilo como agotado hoy o en este momento.
-
-                COMPATIBILIDAD (Source of Truth):
-                ${compatibilityOutput}
-                REGLAS DE RESPUESTA DE COMPATIBILIDAD:
-                1. Si el reporte dice [GENERALIZACION], DEBES usar lenguaje precavido ("normalmente", "por lo general", "suelen").
-                2. Si el reporte dice [ESPECIFICO], puedes ser directo ("SÃ­, es compatible").
-                3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmaciÃ³n, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.
-                4. NUNCA inventes compatibilidades que no estÃ©n en el reporte.
-
-                WEB PUBLICA (Contexto externo, no privado):
-                BUSQUEDA:
-                ${publicWebSearchOutput}
-                FUENTES:
-                ${compactPublicWebSearchSources}
-
-                URL CONTEXT:
-                ${publicUrlContextOutput}
-                URLS RECUPERADAS:
-                ${compactPublicUrlContextSources}
-                REGLAS DE WEB PUBLICA:
-                - Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.
-                - Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.
-                - Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.
-                - No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.
-                - Si el turno se resuelve solo con modelo o continuidad ligera, no fuerces a contar la web como protagonista.
-
-                --- INFORME DEL ANALISTA ---
-                ${JSON.stringify(analystReport)}
-
-                ${customerPreferencePromptSummary ? `
-                --- MEMORIA LIGERA DE GUSTOS (CLIENTE AUTENTICADO) ---
-                ${customerPreferencePromptSummary}
-                REGLAS DE MEMORIA:
-                - Usala solo si afina recomendacion o evita repetir algo que ya rechazo.
-                - Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.
-                - No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.
-                - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
-                ${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}
-                ` : ''}
-                ${softContinuity.prompt_block ? `
-                ${softContinuity.prompt_block}
-                REGLA DE CONTINUIDAD BLANDA:
-                - Si retomas algo previo, hazlo corto, humilde y solo si ayuda.
-                - Si el turno cambio de carril, responde el carril actual sin quedarte pegado al anterior.
-                - No conviertas continuidad en backstory ni en empuje comercial.
-                ` : ''}
-                --- PERFIL DE TURNO ACTUAL ---
-                INTENT PRINCIPAL: ${turnProfile.primary_intent}
-                INTENTOS SECUNDARIOS: ${turnProfile.secondary_intents.join(', ') || 'ninguno'}
-                PRIORIDAD: ${turnProfile.turn_priority.join(' > ')}
-                DECISION DEL TURNO: ${turnProfile.current_turn_decision}
-                FOCO: ${turnProfile.turn_focus}
-                REGLA DE TURNO:
-                - Responde directo cuando baste.
-                - Pregunta solo por el dato minimo util.
-                - Resuelve primero el intent principal del turno actual.
-                - Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.
-                - Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.
-                - Si no hubo verdad real de catalogo, politica, tracking, compatibilidad o contexto web publico util, no inventes.
-                - Haz una sola jugada central por turno.
-                - Usa maximo dos frases cortas cuando alcance.
-                - Usa maximo una pregunta.
-                - No repitas la misma recomendacion en respuesta, resumen y cierre.
-                - No cierres con empuje comercial por reflejo.
-
-                --- CATALOG GATE ---
-                ABIERTO: ${catalogGate.is_open ? 'SI' : 'NO'}
-                RAZON: ${catalogGate.reason}
-                REGLA DE CATALOGO:
-                - Si el gate esta cerrado, no muestres tarjetas, recuperacion aproximada ni siguiente paso de producto.
-                - Si el gate esta abierto, puedes usar catalogo solo para resolver mejor el turno actual.
-
-                CLIENTE: "${query || 'Audio Context'}"
-                HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
                 
                 ${RESPONSE_SHAPE_RULES}
                 ${RESPONSE_FORMAT_RULES.replace('NUMBER', '521234567890')}
             `;
+
+            const sommelierUserPromptBlocks = [
+                `--- CONOCIMIENTO OPERATIVO (Tools / Source of Truth) ---`,
+                `POLÍTICAS:\n${knowledgeOutput}`,
+                `PRODUCTOS ENCONTRADOS:\n${searchOutput}`,
+                `ESTADO DE PEDIDO (Tracking):\n${trackOutput}`,
+                `PROYECCIÓN DE INVENTARIO:\n${inventoryOutput}`,
+                `CALIDAD_SEÑAL:\n${inventorySignalQuality}`,
+                `REGLAS DE RESPUESTA DE DISPONIBILIDAD:\n- Di primero la disponibilidad actual tal como venga en el reporte.\n- Si mencionas outlook o proyeccion, dejalo despues y como estimacion secundaria.\n- No conviertas outlook en promesa de regreso, restock o disponibilidad futura.\n- Si hoy esta agotado, dilo como agotado hoy o en este momento.`,
+                `COMPATIBILIDAD (Source of Truth):\n${compatibilityOutput}`,
+                `REGLAS DE RESPUESTA DE COMPATIBILIDAD:\n1. Si el reporte dice [GENERALIZACION], DEBES usar lenguaje precavido ("normalmente", "por lo general", "suelen").\n2. Si el reporte dice [ESPECIFICO], puedes ser directo ("Sí, es compatible").\n3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmación, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.\n4. NUNCA inventes compatibilidades que no estén en el reporte.`,
+                `WEB PUBLICA (Contexto externo, no privado):`,
+                `BUSQUEDA:\n${publicWebSearchOutput}`,
+                `FUENTES:\n${compactPublicWebSearchSources}`,
+                `URL CONTEXT:\n${publicUrlContextOutput}`,
+                `URLS RECUPERADAS:\n${compactPublicUrlContextSources}`,
+                `REGLAS DE WEB PUBLICA:\n- Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.\n- Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.\n- Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.\n- No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.\n- Si el turno se resuelve solo con modelo o continuidad ligera, no fuerces a contar la web como protagonista.`,
+                `--- INFORME DEL ANALISTA ---\n${JSON.stringify(analystReport)}`,
+                customerPreferencePromptSummary ? `--- MEMORIA LIGERA DE GUSTOS (CLIENTE AUTENTICADO) ---\n${customerPreferencePromptSummary}\nREGLAS DE MEMORIA:\n- Usala solo si afina recomendacion o evita repetir algo que ya rechazo.\n- Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.\n- No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.\n- Si lo que pide hoy contradice memoria previa, gana lo de hoy.\n${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}` : '',
+                softContinuity.prompt_block ? `${softContinuity.prompt_block}\nREGLA DE CONTINUIDAD BLANDA:\n- Si retomas algo previo, hazlo corto, humilde y solo si ayuda.\n- Si el turno cambio de carril, responde el carril actual sin quedarte pegado al anterior.\n- No conviertas continuidad en backstory ni en empuje comercial.` : '',
+                `--- PERFIL DE TURNO ACTUAL ---`,
+                `INTENT PRINCIPAL: ${turnProfile.primary_intent}`,
+                `INTENTOS SECUNDARIOS: ${turnProfile.secondary_intents.join(', ') || 'ninguno'}`,
+                `PRIORIDAD: ${turnProfile.turn_priority.join(' > ')}`,
+                `DECISION DEL TURNO: ${turnProfile.current_turn_decision}`,
+                `FOCO: ${turnProfile.turn_focus}`,
+                `REGLA DE TURNO:\n- Responde directo cuando baste.\n- Pregunta solo por el dato minimo util.\n- Resuelve primero el intent principal del turno actual.\n- Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.\n- Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.\n- Si no hubo verdad real de catalogo, politica, tracking, compatibilidad o contexto web publico util, no inventes.\n- Haz una sola jugada central por turno.\n- Usa maximo dos frases cortas cuando alcance.\n- Usa maximo una pregunta.\n- No repitas la misma recomendacion en respuesta, resumen y cierre.\n- No cierres con empuje comercial por reflejo.`,
+                `--- CATALOG GATE ---\nABIERTO: ${catalogGate.is_open ? 'SI' : 'NO'}\nRAZON: ${catalogGate.reason}\nREGLA DE CATALOGO:\n- Si el gate esta cerrado, no muestres tarjetas, recuperacion aproximada ni siguiente paso de producto.\n- Si el gate esta abierto, puedes usar catalogo solo para resolver mejor el turno actual.`,
+                `CLIENTE: "${query || 'Audio Context'}"`
+            ];
+
 
             const shouldShortCircuitClarification =
                 turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION'
@@ -1709,15 +1588,26 @@ export async function handleConciergeChat(
                 return aiData;
             };
 
+            const formattedSommelierHistory = Array.isArray(history) 
+                ? history.slice(-6).map((h: any) => ({
+                    role: h.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: h.content }]
+                })) 
+                : [];
+
             const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
             if (audio) parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
-            parts.push({ text: sommelierPrompt });
+            parts.push({ text: sommelierUserPromptBlocks.filter(Boolean).join('\n\n') });
 
             const geminiOptions = {
                 apiKey: _GEMINI_API_KEY,
                 model: CONCIERGE_SOMMELIER_MODEL,
                 body: { 
-                    contents: [{ parts }], 
+                    systemInstruction: { parts: [{ text: sommelierSystemPrompt }] },
+                    contents: [
+                        ...formattedSommelierHistory,
+                        { role: 'user', parts }
+                    ], 
                     generationConfig: { 
                         temperature: 0.4,
                         response_mime_type: 'application/json'
