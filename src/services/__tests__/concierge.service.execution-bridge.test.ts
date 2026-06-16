@@ -136,7 +136,7 @@ describe('conciergeService execution bridge', () => {
 
     global.fetch = vi.fn().mockImplementation(async (_url: string, options: any) => {
         const body = options?.body ? JSON.parse(options.body) : {};
-        const result = await invokeMock('customer-intelligence', { body });
+        const result = await (invokeMock as any)('customer-intelligence', { body });
         
         if (result && result.error) {
             if (result.error.message && result.error.message.includes('fetch failed')) {

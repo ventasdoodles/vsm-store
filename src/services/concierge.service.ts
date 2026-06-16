@@ -760,7 +760,7 @@ export const conciergeService = {
                     if (errJson && errJson.no_write_smoke) {
                         attachCustomerIntelligenceNoWriteSmokeMetadata(error, errJson.no_write_smoke);
                     }
-                } catch (e) {
+                } catch (_e) {
                     // Not JSON, ignore
                 }
                 
