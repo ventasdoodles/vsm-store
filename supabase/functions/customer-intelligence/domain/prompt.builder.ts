@@ -6,6 +6,7 @@ export interface AnalystPromptContext {
     customerPreferencePromptSummary: string | null;
     customerCommercialMemoryGuidance: string | null;
     softContinuityPromptBlock: string | null;
+    customerProactiveInsights: any | null;
 }
 
 export function buildAnalystSystemPrompt(capabilitySummary: string, behaviorRules: import('../infrastructure/behavior-rules.repo.ts').AIBehaviorRule[] = []): string {
@@ -78,6 +79,32 @@ export function buildAnalystUserPromptBlocks(context: AnalystPromptContext): str
         - Si el turno actual cambio de carril, no arrastres el carril previo.
         - No abras catalogo, carrito ni politicas solo por contexto previo.
         `);
+    }
+
+    if (context.customerProactiveInsights) {
+        const insights = context.customerProactiveInsights;
+        let proactiveText = '';
+        if (insights.items_due_for_replenishment?.length) {
+            proactiveText += `- REPLENISHMENT: El cliente compró hace días líquidos/desechables que podrían estar por terminarse (${insights.items_due_for_replenishment.map((i:any) => i.product_name).join(', ')}). Si dice hola, sugiere cordialmente reponerlos.\n`;
+        }
+        if (insights.owned_hardware_models?.length) {
+            proactiveText += `- KITTING DE HARDWARE: El cliente es dueño de estos equipos: ${insights.owned_hardware_models.join(', ')}. Si pide consumibles (resistencias, pods, repuestos) y no especifica el modelo, ASUME que son para estos equipos directamente, sin hacerle perder tiempo preguntando.\n`;
+        }
+        if (insights.customer_tier) {
+            proactiveText += `- LEALTAD: Nivel actual: ${insights.customer_tier}. Si vas a recomendar o vender algo extra, puedes mencionar de forma casual su nivel para hacerlo sentir especial.\n`;
+        }
+
+        if (proactiveText.length > 0) {
+            blocks.push(`
+        --- GANCHOS COMERCIALES PROACTIVOS ---
+        INFORMACIÓN DE COMPRAS PASADAS REALES.
+        ${proactiveText}
+        REGLA PROACTIVA: Usa esta información COMO UN EJECUTIVO DE CUENTA. 
+        - Si el usuario sólo dice hola y tienes Replenishment, recomiéndale de vuelta su producto.
+        - Si el usuario busca algo y tienes Kitting, NO PREGUNTES para qué equipo es si ya lo tienes en la lista.
+        - Sé natural y no presiones.
+        `);
+        }
     }
 
     return blocks.filter(Boolean).join('\n');

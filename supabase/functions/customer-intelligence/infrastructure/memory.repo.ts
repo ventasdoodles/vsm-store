@@ -1,3 +1,9 @@
+export interface ProactiveInsights {
+    customer_tier?: string | null;
+    items_due_for_replenishment?: any[];
+    owned_hardware_models?: string[];
+}
+
 export interface CustomerMemoryRecord {
     detected_interests?: string[];
     interests_metadata?: Record<string, { hits: number; last_at: string }>;
@@ -5,6 +11,7 @@ export interface CustomerMemoryRecord {
     preference_summary?: string | null;
     last_interaction_at?: string;
     prioritized_interests?: string[];
+    proactive_insights?: ProactiveInsights | null;
 }
 
 export interface MemoryTrace {
@@ -14,6 +21,7 @@ export interface MemoryTrace {
     interests_count: number;
     preference_signal_count: number;
     preference_summary_injected: boolean;
+    proactive_insights_injected: boolean;
     soft_continuity_source: string;
     soft_continuity_topic: string | null;
     soft_continuity_shift: boolean;
@@ -46,11 +54,21 @@ export class CustomerMemoryRepo {
 
         trace.read_attempted = true;
         
-        const { data: mem, error: memErr } = await this.supabase
-            .from('ai_customer_memory')
-            .select('detected_interests, interests_metadata, preference_signals, preference_summary, last_interaction_at')
-            .eq('customer_id', customerId)
-            .maybeSingle();
+        const [memResult, insightsResult] = await Promise.all([
+            this.supabase
+                .from('ai_customer_memory')
+                .select('detected_interests, interests_metadata, preference_signals, preference_summary, last_interaction_at')
+                .eq('customer_id', customerId)
+                .maybeSingle(),
+            this.supabase
+                .from('vw_ai_proactive_insights')
+                .select('customer_tier, items_due_for_replenishment, owned_hardware_models')
+                .eq('customer_id', customerId)
+                .maybeSingle()
+        ]);
+
+        const { data: mem, error: memErr } = memResult;
+        const { data: insights, error: insightsErr } = insightsResult;
 
         if (memErr) {
             console.error(`[MemoryRepo] Query error: ${memErr.message}`);
@@ -58,10 +76,19 @@ export class CustomerMemoryRepo {
             return { memory: null, trace };
         }
 
+        if (insightsErr) {
+            console.error(`[MemoryRepo] Insights Query error: ${insightsErr.message}`);
+        }
+
         const hasInterests = (mem?.detected_interests?.length ?? 0) > 0;
         const hasSummary = Boolean(mem?.preference_summary && mem.preference_summary.trim().length > 0);
+        const hasInsights = Boolean(insights && (
+            (insights.items_due_for_replenishment?.length ?? 0) > 0 || 
+            (insights.owned_hardware_models?.length ?? 0) > 0 ||
+            insights.customer_tier
+        ));
 
-        if (mem && (hasInterests || hasSummary)) {
+        if ((mem && (hasInterests || hasSummary)) || hasInsights) {
             const meta = mem.interests_metadata || {};
             const detectedInterests = mem.detected_interests || [];
             
@@ -75,19 +102,21 @@ export class CustomerMemoryRepo {
 
             const memory: CustomerMemoryRecord = {
                 ...mem,
-                prioritized_interests: sortedInterests
+                prioritized_interests: sortedInterests,
+                proactive_insights: insights
             };
 
             trace.row_found = true;
             trace.context_injected = true;
             trace.interests_count = detectedInterests.length;
-            trace.preference_signal_count = Object.keys(mem.preference_signals || {}).length;
+            trace.preference_signal_count = Object.keys(mem?.preference_signals || {}).length;
             trace.preference_summary_injected = hasSummary;
+            trace.proactive_insights_injected = hasInsights;
             
             return { memory, trace };
         }
 
-        trace.skipped_reason = mem ? "empty_memory" : "no_row";
+        trace.skipped_reason = (mem || insights) ? "empty_memory" : "no_row";
         return { memory: null, trace };
     }
 }

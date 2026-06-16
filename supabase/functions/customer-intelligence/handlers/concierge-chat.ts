@@ -222,7 +222,8 @@ export async function handleConciergeChat(
                 customerMemory,
                 customerPreferencePromptSummary,
                 customerCommercialMemoryGuidance,
-                softContinuityPromptBlock: softContinuity.prompt_block
+                softContinuityPromptBlock: softContinuity.prompt_block,
+                customerProactiveInsights: customerMemory?.proactive_insights || null
             });
 
             // ═══ HARDENING 2: GEMINI RESILIENCE — ANALYST CALL WITH FALLBACK ═══
@@ -1002,6 +1003,7 @@ export async function handleConciergeChat(
                 `REGLAS DE WEB PUBLICA:\n- Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.\n- Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.\n- Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.\n- No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.\n- Si el turno se resuelve solo con modelo o continuidad ligera, no fuerces a contar la web como protagonista.`,
                 `--- INFORME DEL ANALISTA ---\n${JSON.stringify(analystReport)}`,
                 customerPreferencePromptSummary ? `--- MEMORIA LIGERA DE GUSTOS (CLIENTE AUTENTICADO) ---\n${customerPreferencePromptSummary}\nREGLAS DE MEMORIA:\n- Usala solo si afina recomendacion o evita repetir algo que ya rechazo.\n- Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.\n- No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.\n- Si lo que pide hoy contradice memoria previa, gana lo de hoy.\n${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}` : '',
+                memoryRecord?.proactive_insights ? `--- GANCHOS COMERCIALES PROACTIVOS ---\n${JSON.stringify(memoryRecord.proactive_insights)}\nREGLA PROACTIVA (Ejecutivo de Cuenta):\n- Si hay Replenishment y el usuario solo saluda, ofrécele reponer su producto sutilmente.\n- Si hay Kitting de Hardware y busca consumibles, asume que son para su equipo.\n- Usa esta información como herramienta de venta, no la menciones sin motivo.` : '',
                 softContinuity.prompt_block ? `${softContinuity.prompt_block}\nREGLA DE CONTINUIDAD BLANDA:\n- Si retomas algo previo, hazlo corto, humilde y solo si ayuda.\n- Si el turno cambio de carril, responde el carril actual sin quedarte pegado al anterior.\n- No conviertas continuidad en backstory ni en empuje comercial.` : '',
                 `--- PERFIL DE TURNO ACTUAL ---`,
                 `INTENT PRINCIPAL: ${turnProfile.primary_intent}`,
