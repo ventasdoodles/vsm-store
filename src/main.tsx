@@ -15,6 +15,20 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { initMonitoring } from './services/monitoring.service';
 import './index.css';
 
+// Supabase preconnect -> ahorra ~100-200ms en primer API call
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+if (supabaseUrl) {
+    try {
+        const origin = new URL(supabaseUrl).origin;
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = origin;
+        document.head.appendChild(link);
+    } catch (e) {
+        // Fallback or ignore
+    }
+}
+
 // Graceful PWA cache hygiene.
 // We keep one local runtime fingerprint marker so diagnostics can compare the
 // current shell against the last loaded build without forcing a blind reload.

@@ -21,21 +21,6 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" onload="this.rel='stylesheet'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
 
-  <!-- Supabase preconnect -> ahorra ~100-200ms en primer API call -->
-  <script type="module">
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    if (url) {
-      try {
-        const origin = new URL(url).origin;
-        const link = document.createElement('link');
-        link.rel = 'preconnect';
-        link.href = origin;
-        document.head.appendChild(link);
-      } catch (e) {
-        // Fallback or ignore
-      }
-    }
-  </script>
 
   <title>VSM Store</title>
 </head>
