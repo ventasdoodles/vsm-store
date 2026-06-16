@@ -127,7 +127,7 @@ export function ProductVariantsEditor({
             setSelectedAttributes([]);
             setSelectedValues({});
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [existingVariants, basePrice]);
 
     const handleToggleAttribute = (attrId: string) => {

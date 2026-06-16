@@ -312,6 +312,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             notifyError('Error de procesamiento', userMessage + ' Por favor intenta de nuevo.');
             setSending(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         items, subtotal, finalTotal, discount, earnedPoints, appliedCoupon,
         isAuthenticated, user, settings,

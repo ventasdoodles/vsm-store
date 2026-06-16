@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: ImageUploader ───
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Cargador de imagenes drag-and-drop glassmorphism con grid de previews,
@@ -37,7 +37,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
             }
             onChange(newUrls);
         } catch (error) {
-            // eslint-disable-next-line no-console
+
             console.error('Error al subir imagenes:', error);
             notify.error('Error', 'Hubo un error al subir la imagen. Intenta de nuevo.');
         } finally {

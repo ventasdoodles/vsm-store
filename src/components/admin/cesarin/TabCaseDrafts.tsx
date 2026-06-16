@@ -66,7 +66,7 @@ export function TabCaseDrafts() {
                 evaluation_summary: selectedDraft.evaluation_summary ?? '',
             });
         }
-    }, [selectedDraft?.id]);
+    }, [selectedDraft]);
 
     // Live-computed readiness from current form state
     const liveReadiness = selectedDraft

@@ -286,12 +286,12 @@ export function AdminCesarinOS() {
         } catch (error) {
             console.error('Error fetching AI config:', error);
         }
-    }, [supabase]);
+    }, []);
 
     const fetchRules = useCallback(async () => {
         const { data, error } = await supabase.from('ai_rules').select('*').order('priority', { ascending: false });
         if (!error && data) setRules(data as AIRule[]);
-    }, [supabase]);
+    }, []);
 
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
@@ -314,7 +314,7 @@ export function AdminCesarinOS() {
         } finally {
             setIsLoading(false);
         }
-    }, [productSearch, supabase]);
+    }, [productSearch]);
 
     useEffect(() => {
         fetchConfig();
@@ -388,7 +388,7 @@ export function AdminCesarinOS() {
             toast.error('Error al actualizar directriz');
             throw _err;
         }
-    }, [supabase, logAdminAction]);
+    }, [logAdminAction]);
 
     const handleMarkSignal = useCallback((id: string, state: SignalState) => {
         markSignal(id, state, operatorEmail);

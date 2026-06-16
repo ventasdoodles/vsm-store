@@ -1,4 +1,4 @@
-﻿/**
+/**
  * CustomerNotes — CRM Insights y Segmentación de Perfil
  * 
  * Bloque estilo Notion con:
@@ -95,11 +95,11 @@ export function CustomerNotes({ customer }: Props) {
 
     // Auto-save notes feature like Notion
     // Only triggers on debounced value changes — other deps are stable refs/state
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (isDirty && debouncedNotes !== customer?.admin_notes?.notes) {
             updateMutation.mutate({ notes: debouncedNotes });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedNotes]);
 
     return (

@@ -69,7 +69,7 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
         tick();
         const id = setInterval(tick, 1000);
         return () => clearInterval(id);
-    }, [nextExpiring?.id, nextExpiring?.ends_at]);
+    }, [nextExpiring]);
 
     const isUrgent = timeLeft && timeLeft.total < 3_600_000; // < 1h
 

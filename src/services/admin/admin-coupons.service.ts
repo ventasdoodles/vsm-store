@@ -93,9 +93,7 @@ export async function deleteCoupon(code: string) {
  * Reparación A65: Heurística local (Reality Repair) para evitar dependencia de backend inexistente.
  */
 export async function generateCouponSystem(goal: 'conversion' | 'retention' | 'clearance'): Promise<{ code: string; discount_value: number; description: string }> {
-    if (import.meta.env.DEV) {
-        console.log(`[SYSTEM_SUGGESTION] Generating coupon for goal: ${goal}`);
-    }
+
 
     // Heurísticas de negocio locales
     const prefix = goal === 'conversion' ? 'BIENVENIDO' : goal === 'retention' ? 'VUELVE' : 'LIQUIDA';
@@ -124,9 +122,7 @@ export async function generateCouponSystem(goal: 'conversion' | 'retention' | 'c
  * Reparación A65: Estimación basada en reglas de negocio (Reality Repair).
  */
 export async function forecastCouponImpact(coupon: CouponFormData): Promise<{ reach: number; potential_revenue: number; recommendation: string }> {
-    if (import.meta.env.DEV) {
-        console.log(`[SYSTEM_SUGGESTION] Forecasting impact for coupon: ${coupon.code}`);
-    }
+
 
     // Heurística de alcance basada en el valor del descuento
     const baseReach = 150;

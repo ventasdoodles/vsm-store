@@ -62,6 +62,7 @@ export async function insertOperatorAction(
  *  - Write succeeded → row id returned
  */
 export async function probeCesarinTrace(): Promise<void> {
+    // eslint-disable-next-line no-console
     console.group('[cesarin-trace] Write-path diagnostic');
 
     // ── operator_actions probe ───────────────────────────────────────────────
@@ -76,6 +77,7 @@ export async function probeCesarinTrace(): Promise<void> {
         } else {
             // Probe row intentionally kept — it proves the write path works
             // and appears in the shared activity log as evidence.
+            // eslint-disable-next-line no-console
             console.info('operator_actions INSERT: OK — id', data?.id);
         }
     } catch (e) {
@@ -94,12 +96,14 @@ export async function probeCesarinTrace(): Promise<void> {
             console.error('signal_states UPSERT:', error.code, '—', error.message);
         } else {
             // Probe row intentionally kept — proves the write path works.
+            // eslint-disable-next-line no-console
             console.info('signal_states UPSERT: OK — analytics_id', data?.analytics_id);
         }
     } catch (e) {
         console.error('signal_states UPSERT exception:', e);
     }
 
+    // eslint-disable-next-line no-console
     console.groupEnd();
 }
 

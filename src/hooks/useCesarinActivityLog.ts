@@ -50,7 +50,7 @@ export function useCesarinActivityLog() {
     useEffect(() => {
         getOperatorActions(MAX_ENTRIES)
             .then(rows => {
-                console.info(`[cesarin:activity-log] Hydrated ${rows.length} shared rows from DB`);
+
                 if (rows.length === 0) return;
                 const dbEntries: ActivityEntry[] = rows.map(r => ({
                     id:         r.id,

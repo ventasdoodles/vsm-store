@@ -51,6 +51,7 @@ export function useAppMonitoring() {
                 channelRef.current = null;
             }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdmin, user?.id, anonKey]); // SIN location.pathname aquí
 
     // 2. Tracking de Actividad (Se dispara al cambiar de ruta, sin recrear el canal)

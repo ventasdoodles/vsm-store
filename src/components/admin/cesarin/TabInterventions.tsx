@@ -54,6 +54,7 @@ export function TabInterventions() {
   // Fetch recommendations on mount and when filter changes
   useEffect(() => {
     fetchRecommendations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const fetchRecommendations = async () => {
