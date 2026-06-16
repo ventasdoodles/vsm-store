@@ -13,7 +13,8 @@ import {
     createBrand,
     updateBrand,
     deleteBrand,
-    getTagNames
+    getTagNames,
+    type CategoryFormData
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 
@@ -34,7 +35,7 @@ export function useAdminCategories() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string, data: any }) => updateCategory(id, data),
+        mutationFn: ({ id, data }: { id: string, data: Partial<CategoryFormData> }) => updateCategory(id, data),
         onSuccess: () => { invalidate(); success('Actualizado', 'Categoría actualizada'); }
     });
 
@@ -51,8 +52,8 @@ export function useAdminCategories() {
     return {
         categories: query.data ?? [],
         isLoading: query.isLoading,
-        createCategory: (data: any) => createMutation.mutateAsync(data),
-        updateCategory: (id: string, data: any) => updateMutation.mutateAsync({ id, data }),
+        createCategory: (data: CategoryFormData) => createMutation.mutateAsync(data),
+        updateCategory: (id: string, data: Partial<CategoryFormData>) => updateMutation.mutateAsync({ id, data }),
         deleteCategory: (id: string) => deleteMutation.mutateAsync(id),
         toggleActive: (id: string, flag: boolean) => toggleMutation.mutateAsync({ id, flag }),
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || toggleMutation.isPending

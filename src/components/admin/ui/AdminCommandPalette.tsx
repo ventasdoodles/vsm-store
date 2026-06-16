@@ -65,7 +65,7 @@ export function AdminCommandPalette() {
             const data = await search(q);
 
             const dynamicResults: SearchResult[] = [
-                ...data.products.map((p: any) => ({
+                ...data.products.map((p: { id: string; name: string }) => ({
                     id: p.id,
                     type: 'product' as const,
                     title: p.name,
@@ -79,7 +79,7 @@ export function AdminCommandPalette() {
                     subtitle: 'Orden logística',
                     url: `/admin/orders?id=${o.id}`
                 })),
-                ...data.customers.map((c: any) => ({
+                ...data.customers.map((c: { id: string; full_name: string | null; email: string | null }) => ({
                     id: c.id,
                     type: 'customer' as const,
                     title: c.full_name || 'Cliente sin nombre',

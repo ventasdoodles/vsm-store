@@ -8,10 +8,12 @@ import type { ReactNode } from 'react';
 vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
     motion: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         div: ({ children, className, ...props }: any) => {
             const { layout: _layout, layoutId: _layoutId, ...rest } = props;
             return <div className={className} {...rest}>{children}</div>;
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         button: ({ children, className, ...props }: any) => <button className={className} {...props}>{children}</button>,
     },
 }));

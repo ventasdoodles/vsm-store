@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { usePilotOps, type TimeRange } from '@/hooks/admin/useAdminPilotOps';
 import type { PilotBucket, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { getEvaluationsByIds, EvaluationData } from '@/services/admin/admin-eval.service';
-import { getImprovementItemsByAnalyticsIds } from '@/services/admin/admin-improvement.service';
+import { getImprovementItemsByAnalyticsIds, ImprovementItem } from '@/services/admin/admin-improvement.service';
 import { buildAdminImprovementWorkflowViewForInteraction } from '@/services/admin/admin-improvement-workflow.service';
 import { SignalState } from '@/hooks/useCesarinSignalStates';
 
@@ -256,7 +256,7 @@ function QueryRow({ row, onReview, evalMap, signalMap, improvementMap }: {
     onReview: (row: PilotQueryRow) => void;
     evalMap: Record<string, EvaluationData>;
     signalMap: Record<string, SignalState>;
-    improvementMap: Record<string, any>;
+    improvementMap: Record<string, ImprovementItem>;
 }) {
     const isRescue  = row.raw_analyst_intent === 'UNKNOWN' && row.capsule !== null;
     const evalEntry = evalMap[row.id] ?? null;
@@ -411,7 +411,7 @@ export function PilotTelemetry({ onReview, signalStates }: { onReview: (row: Pil
     } = usePilotOps();
 
     const [evalMap,   setEvalMap]   = useState<Record<string, EvaluationData>>({});
-    const [improvementMap, setImprovementMap] = useState<Record<string, any>>({});
+    const [improvementMap, setImprovementMap] = useState<Record<string, ImprovementItem>>({});
 
     useEffect(() => {
         if (!queryLog || queryLog.length === 0) {

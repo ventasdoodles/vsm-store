@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // â”€â”€â”€ STORE: Cart Store â”€â”€â”€
  * // Arquitectura: State Manager (Lego Master)
  * // Proposito principal: GestiÃ³n del carrito de compras con persistencia y validaciÃ³n de integridad.
@@ -381,7 +381,9 @@ if (typeof window !== 'undefined') {
                 ) {
                     useCartStore.setState({ items: parsed.state.items });
                 }
-            } catch { /* ignore malformed JSON */ }
+            } catch (error) { 
+                console.error('[cart.store] Error parsing localStorage cart-storage:', error);
+            }
         }
     });
 }

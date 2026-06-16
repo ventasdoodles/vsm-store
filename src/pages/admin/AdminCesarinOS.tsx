@@ -406,7 +406,7 @@ export function AdminCesarinOS() {
         );
     }, [markSignal, logAdminAction, operatorEmail]);
 
-    const updateProductAI = async (productId: string, field: string, value: any) => {
+    const updateProductAI = async (productId: string, field: string, value: unknown) => {
         try {
             const { error } = await supabase.from('products').update({ [field]: value }).eq('id', productId);
             if (error) throw error;

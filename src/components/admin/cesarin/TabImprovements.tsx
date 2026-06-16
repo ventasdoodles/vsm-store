@@ -12,6 +12,8 @@ import {
     Save, User, UserMinus, Link, FileText
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { EvaluationData } from '@/services/admin/admin-eval.service';
+import { PrivateCaseDraft } from '@/types/cesarin';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { getEvaluationsByIds } from '@/services/admin/admin-eval.service';
@@ -253,8 +255,8 @@ export function TabImprovements() {
     const [laneFilter,    setLaneFilter]    = useState<ImprovementLane | 'all'>('all');
     const [expandedId,    setExpandedId]    = useState<string | null>(null);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    const [evaluationMap, setEvaluationMap] = useState<Record<string, any>>({});
-    const [caseDraftMap, setCaseDraftMap] = useState<Record<string, any>>({});
+    const [evaluationMap, setEvaluationMap] = useState<Record<string, EvaluationData>>({});
+    const [caseDraftMap, setCaseDraftMap] = useState<Record<string, PrivateCaseDraft>>({});
 
     // Resolve current auth user once
     useEffect(() => {

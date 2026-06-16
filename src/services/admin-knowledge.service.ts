@@ -9,21 +9,21 @@ export interface StoreKnowledgeNode {
     category: KnowledgeCategory;
     source_type: string;
     source_id: string | null;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
     is_active: boolean;
     created_at: string;
     updated_at: string;
     has_embedding: boolean;
 }
 
-function mapKnowledgeRow(row: any): StoreKnowledgeNode {
+function mapKnowledgeRow(row: Record<string, unknown>): StoreKnowledgeNode {
     const has_embedding = row.embedding !== null;
-    delete row.embedding;
+    const { embedding: _embedding, ...rest } = row;
 
     return {
-        ...row,
+        ...rest,
         has_embedding,
-    };
+    } as unknown as StoreKnowledgeNode;
 }
 
 async function fetchKnowledgeChunkById(id: string): Promise<StoreKnowledgeNode> {
@@ -56,14 +56,14 @@ export const adminKnowledgeService = {
         const { data, error } = await query;
         if (error) throw error;
 
-        return data.map((row: any) => mapKnowledgeRow(row));
+        return data.map((row: Record<string, unknown>) => mapKnowledgeRow(row));
     },
 
     // Dual-layer validation happens inside the edge function (authoritative) 
     // and here we just transmit the explicit payload.
     async updateKnowledgeChunk(
         id: string, 
-        payload: { title: string; content: string; category: KnowledgeCategory; source_type: string; metadata?: Record<string, any> }
+        payload: { title: string; content: string; category: KnowledgeCategory; source_type: string; metadata?: Record<string, unknown> }
     ): Promise<StoreKnowledgeNode> {
         const { data, error } = await supabase.functions.invoke('knowledge-ingestor', {
             body: {

@@ -73,7 +73,8 @@ export function Loyalty() {
         try {
             const { discount } = await redeemMutation.mutateAsync({ customerId: user.id, points: loyaltyConfig.min_points_to_redeem });
             notify.success('¡V-Coins canjeados!', `Has canjeado ${loyaltyConfig.min_points_to_redeem} V-Coins por un descuento de $${discount}. Se aplicará en tu próxima compra.`);
-        } catch {
+        } catch (error) {
+            console.error('[Loyalty] Error canjeando V-Coins:', error);
             notify.error('Error', 'No se pudieron canjear los V-Coins. Intenta de nuevo.');
         }
     };

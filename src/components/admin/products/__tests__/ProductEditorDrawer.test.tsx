@@ -9,7 +9,7 @@ const warningMock = vi.fn();
 const successMock = vi.fn();
 const errorMock = vi.fn();
 const infoMock = vi.fn();
-const enrichProductMock = vi.fn((..._args: any[]) => Promise.resolve(null));
+const enrichProductMock = vi.fn((..._args: unknown[]) => Promise.resolve(null));
 const useAdminProductDetailMock = vi.fn((id: string | null) => ({ data: null, id }));
 const isTechnicalTagMock = vi.fn((tag: string) => tag.startsWith('tech'));
 
@@ -28,7 +28,7 @@ vi.mock('@/hooks/useNotification', () => ({
 }));
 
 vi.mock('@/services/admin', () => ({
-    enrichProduct: (...args: any[]) => enrichProductMock(...args),
+    enrichProduct: (...args: unknown[]) => enrichProductMock(...args),
 }));
 
 vi.mock('@/services/admin/admin-tags.service', () => ({

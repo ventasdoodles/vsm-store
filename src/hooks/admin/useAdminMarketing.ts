@@ -19,7 +19,9 @@ import {
     updateTestimonial,
     deleteTestimonial,
     toggleTestimonialFeatured,
-    toggleTestimonialActive
+    toggleTestimonialActive,
+    type CouponFormData,
+    type TestimonialFormData
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 import { useAdminTactical } from './useAdminTactical';
@@ -46,7 +48,7 @@ export function useAdminCoupons() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ code, data }: { code: string; data: any }) => updateCoupon(code, data),
+        mutationFn: ({ code, data }: { code: string; data: Partial<CouponFormData> }) => updateCoupon(code, data),
         onSuccess: () => {
             invalidate();
             success('Cupón actualizado', 'Los cambios se guardaron correctamente.');
@@ -66,8 +68,8 @@ export function useAdminCoupons() {
     return {
         coupons,
         isLoading,
-        createCoupon: (data: any) => createMutation.mutate(data),
-        updateCoupon: (code: string, data: any) => updateMutation.mutate({ code, data }),
+        createCoupon: (data: CouponFormData) => createMutation.mutate(data),
+        updateCoupon: (code: string, data: Partial<CouponFormData>) => updateMutation.mutate({ code, data }),
         deleteCoupon: (id: string) => deleteMutation.mutate(id),
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
     };
@@ -125,7 +127,7 @@ export function useAdminFlashDeals() {
     return {
         deals: query.data ?? [],
         isLoading: query.isLoading,
-        saveDeal: (data: any) => saveMutation.mutate(data),
+        saveDeal: (data: Record<string, unknown>) => saveMutation.mutate(data),
         deleteDeal: (id: string) => deleteMutation.mutate(id),
         toggleActive: (id: string, active: boolean) => toggleActiveMutation.mutate({ id, active }),
         suggestDeal: (productId: string, price: number, stock: number) => 
@@ -159,7 +161,7 @@ export function useAdminTestimonials() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string, data: any }) => updateTestimonial(id, data),
+        mutationFn: ({ id, data }: { id: string, data: Partial<TestimonialFormData> }) => updateTestimonial(id, data),
         onSuccess: () => { 
             invalidate(); 
             success('Actualizado', 'Testimonio modificado'); 
@@ -197,8 +199,8 @@ export function useAdminTestimonials() {
     return {
         testimonials,
         isLoading,
-        createTestimonial: (data: any) => createMutation.mutate(data),
-        updateTestimonial: (id: string, data: any) => updateMutation.mutate({ id, data }),
+        createTestimonial: (data: TestimonialFormData) => createMutation.mutate(data),
+        updateTestimonial: (id: string, data: Partial<TestimonialFormData>) => updateMutation.mutate({ id, data }),
         deleteTestimonial: (id: string) => deleteMutation.mutate(id),
         toggleFeatured: (id: string, featured: boolean) => toggleFeaturedMutation.mutate({ id, featured }),
         toggleActive: (id: string, active: boolean) => toggleActiveMutation.mutate({ id, active }),

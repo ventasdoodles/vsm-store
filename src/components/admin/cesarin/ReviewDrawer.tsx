@@ -13,16 +13,20 @@ import type { AdminDecisionTraceView } from '@/services/admin/admin-decision-tra
 import {
     createImprovementItem as createImprovementItemFn,
     getImprovementItemsByAnalyticsIds,
+    ImprovementItem,
     laneFromPrimaryTag,
 } from '@/services/admin/admin-improvement.service';
+import { PrivateCaseDraft } from '@/types/cesarin';
 import {
     createCaseDraft,
     deriveCaseDraftReadiness,
     getCaseDraftsByInteractionIds,
+    type CreateCaseDraftInput
 } from '@/services/admin/admin-case-drafts.service';
 import { buildAdminImprovementWorkflowViewForInteraction } from '@/services/admin/admin-improvement-workflow.service';
 import { CesarinDecisionTracePanel } from './CesarinDecisionTracePanel';
 import { CesarinImprovementWorkflowPanel } from './CesarinImprovementWorkflowPanel';
+import { SignalState } from '@/hooks/useCesarinSignalStates';
 
 interface ReviewDrawerProps {
     isOpen: boolean;
@@ -42,7 +46,7 @@ interface ReviewDrawerProps {
         offered_products?: Array<{ id: string; name: string; slug: string }> | null;
         decision_trace?: AdminDecisionTraceView | null;
     } | null;
-    onMarkSignal?: (id: string, state: any) => void;
+    onMarkSignal?: (id: string, state: SignalState) => void;
 }
 
 const SIGNAL_STATUS_CONFIG: Record<SignalStatusDB, { label: string; color: string }> = {
@@ -97,8 +101,8 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
     const [promoteToQueue, setPromoteToQueue] = useState(false);
     const [signalState,    setSignalState]    = useState<SignalStateRow | null>(null);
     const [savedEvaluation, setSavedEvaluation] = useState<EvaluationData | null>(null);
-    const [improvementItem, setImprovementItem] = useState<any | null>(null);
-    const [caseDraft, setCaseDraft] = useState<any | null>(null);
+    const [improvementItem, setImprovementItem] = useState<ImprovementItem | null>(null);
+    const [caseDraft, setCaseDraft] = useState<PrivateCaseDraft | CreateCaseDraftInput | null>(null);
     const [savingAsDraft,  setSavingAsDraft]  = useState(false);
     const [formData, setFormData] = useState<Partial<EvaluationData>>({
         score: 5,

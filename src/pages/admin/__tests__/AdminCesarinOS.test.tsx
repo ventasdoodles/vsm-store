@@ -12,7 +12,7 @@ function createSupabaseQuery(table: string) {
     const emptyListResponse = { data: [], error: null };
     const emptySingleResponse = { data: null, error: null };
 
-    const query: any = {
+    const query: Record<string, unknown> = {
         select: vi.fn(() => query),
         eq: vi.fn(() => query),
         ilike: vi.fn(() => query),
@@ -22,7 +22,7 @@ function createSupabaseQuery(table: string) {
         maybeSingle: vi.fn(() => Promise.resolve(emptySingleResponse)),
         order: vi.fn(() => (table === 'products' ? query : Promise.resolve(emptyListResponse))),
         limit: vi.fn(() => Promise.resolve(emptyListResponse)),
-        then: (resolve: any, reject: any) => Promise.resolve(emptyListResponse).then(resolve, reject),
+        then: (resolve: (value: unknown) => unknown, reject: (reason?: unknown) => void) => Promise.resolve(emptyListResponse).then(resolve, reject),
     };
 
     return query;

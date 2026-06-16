@@ -16,7 +16,7 @@ export function useAdminKnowledge() {
             const data = await adminKnowledgeService.fetchKnowledgeChunks(search, categoryFilter);
             setNodes(data);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error fetching knowledge nodes:', error);
             toast.error('Error al cargar la base de conocimiento');
             return [];
@@ -44,7 +44,7 @@ export function useAdminKnowledge() {
 
     const updateNode = async (
         id: string, 
-        payload: { title: string; content: string; category: KnowledgeCategory; source_type: string; metadata?: Record<string, any> }
+        payload: { title: string; content: string; category: KnowledgeCategory; source_type: string; metadata?: Record<string, unknown> }
     ) => {
         setIsSaving(true);
         try {

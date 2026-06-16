@@ -75,7 +75,8 @@ export async function readRuntimeReleaseManifest(): Promise<RuntimeReleaseManife
 
         const payload = await response.json();
         return isRuntimeReleaseManifest(payload) ? payload : null;
-    } catch {
+    } catch (error) {
+        console.error('[runtime-build] Error fetching manifest:', error);
         return null;
     }
 }
@@ -85,7 +86,8 @@ export function parseServiceWorkerVersion(scriptUrl: string | null | undefined):
 
     try {
         return new URL(scriptUrl, typeof window !== 'undefined' ? window.location.origin : 'http://localhost').searchParams.get('v');
-    } catch {
+    } catch (error) {
+        console.error('[runtime-build] Error parsing script URL:', error);
         return null;
     }
 }

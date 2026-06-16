@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // â”€â”€â”€ COMPONENTE: SystemLogsPanel â”€â”€â”€
  * // Arquitectura: Dumb Component (Visual Feed)
  * // Proposito principal: Feed de logs del sistema con filtros por nivel y colores semanticos.
@@ -180,7 +180,9 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                                         {(() => {
                                             try {
                                                 return new URL(log.url, 'https://vsm.store').pathname;
-                                            } catch {
+                                            } catch (error) {
+                                                // eslint-disable-next-line no-console
+                                                console.error('[SystemLogsPanel] Error parsing log URL', error);
                                                 return log.url;
                                             }
                                         })()}

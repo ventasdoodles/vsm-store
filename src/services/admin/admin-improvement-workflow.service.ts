@@ -6,6 +6,7 @@ import type {
     PrivateCaseDraft,
     SimulationResult,
 } from '@/types/cesarin';
+import type { CreateCaseDraftInput } from './admin-case-drafts.service';
 
 export type AdminWorkflowEvidenceKind =
     | 'authoritative'
@@ -80,7 +81,7 @@ type InteractionInput = {
     evaluation?: EvaluationSummary | null;
     signalState?: SignalStateSummary | null;
     improvementItem?: ImprovementItem | null;
-    caseDraft?: PrivateCaseDraft | null;
+    caseDraft?: PrivateCaseDraft | CreateCaseDraftInput | null;
 };
 
 type SimulationInput = {
@@ -124,7 +125,8 @@ function formatIsoShort(value?: string | null): string {
             hour: '2-digit',
             minute: '2-digit',
         });
-    } catch {
+    } catch (error) {
+        console.error('[formatIsoShort] Error formatting date', error);
         return value;
     }
 }

@@ -8,7 +8,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
-import { SimulationReport, SimulationResult } from '@/types/cesarin';
+import { SimulationReport, SimulationResult, PrivateCaseDraft } from '@/types/cesarin';
 import { computeReportInsights } from '@/lib/cesarin-insights';
 import {
     createCaseDraft,
@@ -36,7 +36,7 @@ export function TabQuality() {
     const [reports, setReports] = useState<SimulationReport[]>([]);
     const [selectedReport, setSelectedReport] = useState<SimulationReport | null>(null);
     const [selectedResult, setSelectedResult] = useState<SimulationResult | null>(null);
-    const [draftMap, setDraftMap] = useState<Record<string, any>>({});
+    const [draftMap, setDraftMap] = useState<Record<string, PrivateCaseDraft>>({});
     const [isJudging, setIsJudging] = useState(false);
     const [savingDraftId, setSavingDraftId] = useState<string | null>(null);
 
@@ -199,7 +199,7 @@ export function TabQuality() {
                     readiness_status: deriveCaseDraftReadiness(null, failureReason),
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
-                },
+                } as PrivateCaseDraft,
             }));
             toast.success('Caso guardado en borrador');
         } catch (_err) {

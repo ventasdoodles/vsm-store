@@ -148,8 +148,8 @@ export function TabConcepts() {
       await refreshExpandedConceptDetails(expandedConcept);
       await fetchConcepts();
       await fetchAllConceptOptions();
-    } catch (error: any) {
-      toast.error(error.message || 'Error al crear relacion (posible duplicado)');
+    } catch (error) {
+      toast.error((error as Error).message || 'Error al crear relacion (posible duplicado)');
     }
   };
 
@@ -167,8 +167,8 @@ export function TabConcepts() {
       await fetchAllConceptOptions();
       setNewAlias('');
       toast.success('Alias agregado');
-    } catch (error: any) {
-      toast.error(error.message || 'Error al agregar alias');
+    } catch (error) {
+      toast.error((error as Error).message || 'Error al agregar alias');
     }
   };
 
