@@ -15,7 +15,7 @@ export interface CouponValidation {
 }
 
 /** Interface para el registro de la DB (§1.2) */
-const COUPON_SELECT = 'code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until';
+const COUPON_SELECT = 'code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, customer_id';
 
 export interface CouponRow {
     code: string;
@@ -28,6 +28,7 @@ export interface CouponRow {
     is_active: boolean;
     valid_from: string | null;
     valid_until: string | null;
+    customer_id: string | null;
 }
 
 /**
@@ -73,6 +74,11 @@ export async function validateCoupon(
             discount: 0,
             message: `Compra mínima de $${coupon.min_purchase} requerida para este cupón`,
         };
+    }
+
+    // Verificar si el cupón está asignado a un cliente específico
+    if (coupon.customer_id && coupon.customer_id !== customerId) {
+        return { valid: false, discount: 0, message: 'Este cupón no es válido para esta cuenta' };
     }
 
     // Verificar si el cliente ya lo usó

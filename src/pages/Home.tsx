@@ -12,7 +12,6 @@ import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 import { useAuth } from '@/hooks/useAuth';
-import { useAuth } from '@/hooks/useAuth';
 import { getStoreMetaCopy } from '@/constants/storeMeta';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 

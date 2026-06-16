@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // â”€â”€â”€ COMPONENTE: AdminMonitoring â”€â”€â”€
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar la suscripcion Presence de Supabase (usuarios en vivo)
@@ -18,6 +18,7 @@ import { MonitoringStatsGrid } from '@/components/admin/monitoring/MonitoringSta
 import { LiveUsersPanel, type ActiveUser } from '@/components/admin/monitoring/LiveUsersPanel';
 import { SystemLogsPanel, type AppLogEntry } from '@/components/admin/monitoring/SystemLogsPanel';
 import { HealthPulse } from '@/components/admin/monitoring/HealthPulse';
+import { InventoryAlertsPanel } from '@/components/admin/monitoring/InventoryAlertsPanel';
 
 /** Query keys centralizadas */
 const QUERY_KEYS = {
@@ -126,6 +127,8 @@ export function AdminMonitoring() {
                             uptimeMinutes={uptimeMinutes}
                         />
                     </div>
+                    
+                    <InventoryAlertsPanel />
                 </div>
             </div>
 

@@ -32,7 +32,7 @@ export interface CouponFormData {
 export async function getAllCoupons() {
     const { data, error } = await supabase
         .from('coupons')
-        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at')
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at, customer_id')
         .order('code', { ascending: true }); // Use code as fallback for ordering
 
     if (error) {
@@ -50,13 +50,10 @@ export async function getAllCoupons() {
 }
 
 export async function createCoupon(coupon: CouponFormData) {
-    // Omit customer_id if it's not in the database schema
-    const { customer_id: _customer_id, ...couponData } = coupon;
-    
     const { data, error } = await supabase
         .from('coupons')
-        .insert({ ...couponData, used_count: 0 })
-        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at')
+        .insert({ ...coupon, used_count: 0 })
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at, customer_id')
         .single();
 
     if (error) throw error;
@@ -64,14 +61,11 @@ export async function createCoupon(coupon: CouponFormData) {
 }
 
 export async function updateCoupon(code: string, coupon: Partial<CouponFormData>) {
-    // Omit customer_id if it's not in the database schema
-    const { customer_id: _customer_id, ...couponData } = coupon;
-
     const { data, error } = await supabase
         .from('coupons')
-        .update(couponData)
+        .update(coupon)
         .eq('code', code)
-        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at')
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at, customer_id')
         .single();
 
     if (error) throw error;
@@ -145,3 +139,28 @@ export async function forecastCouponImpact(coupon: CouponFormData): Promise<{ re
     };
 }
 
+
+export interface GenerateDedicatedCouponParams {
+    customerId: string;
+    discountValue: number;
+    discountType?: 'percentage' | 'fixed';
+    minPurchase?: number;
+    validDays?: number;
+}
+
+export async function generateDedicatedCoupon(params: GenerateDedicatedCouponParams): Promise<AdminCoupon> {
+    const { data, error } = await supabase.rpc('admin_generate_dedicated_coupon', {
+        p_customer_id: params.customerId,
+        p_discount_value: params.discountValue,
+        p_discount_type: params.discountType || 'percentage',
+        p_min_purchase: params.minPurchase || 0,
+        p_valid_days: params.validDays || 30
+    });
+
+    if (error) {
+        console.error('Error generating dedicated coupon:', error);
+        throw new Error(error.message || 'Error al generar cupón dedicado');
+    }
+
+    return data as AdminCoupon;
+}

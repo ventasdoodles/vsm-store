@@ -1,4 +1,4 @@
-﻿/**
+/**
  * CustomerMarketing — Máquina de Retención y Lealtad
  * 
  * Panel de incentivos directos al cliente:
@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ticket, Loader2, Sparkles, Coins, TrendingUp } from 'lucide-react';
 import { adjustPoints, getPointsBalance } from '@/services';
+import { generateDedicatedCoupon } from '@/services/admin/admin-coupons.service';
 import { useNotification } from '@/hooks/useNotification';
 import type { AdminCustomerDetail } from '@/services/admin';
 
@@ -31,7 +32,7 @@ export function CustomerMarketing({ customer }: Props) {
     
     const [pointsAmount, setPointsAmount] = useState('');
     const [pointsReason, setPointsReason] = useState('');
-    const [isGeneratingCoupon] = useState(false);
+
 
     const adjustPointsMutation = useMutation({
         mutationFn: () => adjustPoints(customer.id, Number(pointsAmount), pointsReason || 'Ajuste manual (Admin)'),
@@ -55,10 +56,24 @@ export function CustomerMarketing({ customer }: Props) {
         adjustPointsMutation.mutate();
     };
 
-    // TODO: Integrar con admin-coupons.service cuando exista la API de cupones dedicados.
-    // Botón deshabilitado hasta que se implemente el backend real.
-    const handleGenerateUniqueCoupon = () => {
-        notify.warning('Próximamente', 'La generación de cupones dedicados estará disponible en una actualización futura.');
+    const [isGeneratingCoupon, setIsGeneratingCoupon] = useState(false);
+
+    const handleGenerateUniqueCoupon = async () => {
+        try {
+            setIsGeneratingCoupon(true);
+            const coupon = await generateDedicatedCoupon({
+                customerId: customer.id,
+                discountValue: 10,
+                discountType: 'percentage',
+                validDays: 30
+            });
+            notify.success('Cupón Generado', `El cupón ${coupon.code} ha sido creado. (Copiado al portapapeles)`);
+            navigator.clipboard.writeText(coupon.code);
+        } catch (error: any) {
+            notify.error('Fallo', error.message || 'No se pudo generar el cupón');
+        } finally {
+            setIsGeneratingCoupon(false);
+        }
     };
 
     return (
@@ -140,7 +155,7 @@ export function CustomerMarketing({ customer }: Props) {
                         {isGeneratingCoupon ? (
                             <><Loader2 className="h-4 w-4 animate-spin" /> Generando...</>
                         ) : (
-                            <><Sparkles className="h-4 w-4" /> Generar y Copiar MAGIC-10</>
+                            <><Sparkles className="h-4 w-4" /> Generar y Copiar MAGIC-10%</>
                         )}
                     </button>
                 </div>
