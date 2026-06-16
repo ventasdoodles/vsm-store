@@ -70,6 +70,7 @@ import {
 import {
 import { buildCustomerIntelligenceNoWriteSmokeMetadata, buildCustomerIntelligenceNoWriteSmokeErrorFields, type CustomerIntelligenceNoWriteSmokeMetadata, isCustomerIntelligenceNoWriteSmokeRequest, shouldSuppressCustomerIntelligenceCall, shouldSuppressCustomerIntelligenceWrite } from '../no-write-smoke.ts';
 import { CustomerMemoryRepo } from '../infrastructure/memory.repo.ts';
+import { BehaviorRulesRepo } from '../infrastructure/behavior-rules.repo.ts';
 import { buildAnalystSystemPrompt, buildAnalystUserPromptBlocks } from '../domain/prompt.builder.ts';
 import { GeminiAnalystAdapter } from '../adapters/gemini.adapter.ts';
 
@@ -157,6 +158,9 @@ export async function handleConciergeChat(
             const { audio, mimeType } = body;
 
             // --- Phase 4.0: Selective Memory Read ---
+            const behaviorRulesRepo = new BehaviorRulesRepo(supabase);
+            const activeBehaviorRules = await behaviorRulesRepo.getActiveRules();
+            
             const memoryRepo = new CustomerMemoryRepo(supabase);
             const { memory: customerMemory, trace: memoryTrace } = await memoryRepo.getPrioritizedMemory(customerContext?.id);
             
@@ -210,7 +214,7 @@ export async function handleConciergeChat(
                 || isHighConfidenceProductSearchTurn(preAnalystSignals.normalizedQuery)
             )
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
-            const analystSystemPrompt = buildAnalystSystemPrompt(analystCapabilitySummary);
+            const analystSystemPrompt = buildAnalystSystemPrompt(analystCapabilitySummary, activeBehaviorRules);
             const analystUserPromptBlocks = buildAnalystUserPromptBlocks({
                 capabilitySummary: analystCapabilitySummary,
                 query: query || '',
@@ -959,7 +963,8 @@ export async function handleConciergeChat(
                 MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
                 MODO: ${aiConfig?.behavior_mode || 'vendedor'}
                 
-                REGLAS DE COMPORTAMIENTO:
+                REGLAS DE COMPORTAMIENTO (DUEÑO DE TIENDA - MÁXIMA PRIORIDAD):
+                ${activeBehaviorRules?.map(r => `- [${r.type}] ${r.rule_text}`).join('\n') || ''}
                 ${aiRules?.map((r: { content: string }) => `- ${r.content}`).join('\n') || ''}
 
                 POLÍTICAS OPERATIVAS (Básicas):

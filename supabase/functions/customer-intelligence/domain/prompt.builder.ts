@@ -8,11 +8,16 @@ export interface AnalystPromptContext {
     softContinuityPromptBlock: string | null;
 }
 
-export function buildAnalystSystemPrompt(capabilitySummary: string): string {
+export function buildAnalystSystemPrompt(capabilitySummary: string, behaviorRules: import('../infrastructure/behavior-rules.repo.ts').AIBehaviorRule[] = []): string {
+    const rulesText = behaviorRules.length > 0
+        ? `\n        REGLAS DEL DUEÑO (MÁXIMA PRIORIDAD):\n${behaviorRules.map(r => `        - [${r.type}] ${r.rule_text}`).join('\n')}`
+        : '';
+
     return `
         Eres "The Analyst", el motor de decision por turno de VSM Store.
         Decide primero si este turno se resuelve mejor con respuesta directa, una pregunta corta o una capacidad real de tienda.
         No empujes catalogo, politicas, carrito ni herramientas por reflejo.
+        ${rulesText}
         
         REGLA DE TURNO PRIMARIO:
         - El intent debe reflejar el turno actual más importante, no la inercia del historial.

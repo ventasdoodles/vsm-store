@@ -11,12 +11,15 @@ import { STORE_SETTINGS_ID } from '@/constants/app';
 import { TabInteractions } from '@/components/admin/cesarin/TabInteractions';
 import { TabTraining } from '@/components/admin/cesarin/TabTraining';
 import { TabPerformance } from '@/components/admin/cesarin/TabPerformance';
+import { TabRules } from '@/components/admin/cesarin/TabRules';
+import { ShieldCheck } from 'lucide-react';
 
-type CesarinTabId = 'interactions' | 'training' | 'performance';
+type CesarinTabId = 'interactions' | 'training' | 'performance' | 'rules';
 
 const TABS = [
     { id: 'interactions' as CesarinTabId, label: 'Interacciones', icon: MessageSquare, description: 'Revisa qué preguntan tus clientes y califica las respuestas de Cesarin.' },
-    { id: 'training' as CesarinTabId, label: 'Entrenamiento', icon: Brain, description: 'Sube manuales, pega enlaces y ajusta la personalidad de Cesarin.' },
+    { id: 'training' as CesarinTabId, label: 'Material de Estudio', icon: Brain, description: 'Sube manuales, pega enlaces y ajusta la personalidad de Cesarin.' },
+    { id: 'rules' as CesarinTabId, label: 'Reglas de Venta', icon: ShieldCheck, description: 'Establece directrices estrictas sobre lo que Cesarin debe o no debe hacer.' },
     { id: 'performance' as CesarinTabId, label: 'Desempeño', icon: TrendingUp, description: 'Mide cuántos chats cierra y cuál es la calificación promedio.' },
 ];
 
@@ -49,6 +52,8 @@ export function AdminCesarinOS() {
                 return <TabInteractions />;
             case 'training':
                 return <TabTraining />;
+            case 'rules':
+                return <TabRules />;
             case 'performance':
                 return <TabPerformance />;
             default:
