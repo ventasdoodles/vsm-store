@@ -1716,7 +1716,14 @@ export async function handleConciergeChat(
             const geminiOptions = {
                 apiKey: _GEMINI_API_KEY,
                 model: CONCIERGE_SOMMELIER_MODEL,
-                body: { contents: [{ parts }], generationConfig: { temperature: 0.2 }, safetySettings: SAFETY_SETTINGS }
+                body: { 
+                    contents: [{ parts }], 
+                    generationConfig: { 
+                        temperature: 0.4,
+                        response_mime_type: 'application/json'
+                    }, 
+                    safetySettings: SAFETY_SETTINGS 
+                }
             };
 
             if (isStreamingRequest) {

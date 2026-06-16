@@ -146,8 +146,10 @@ function isRoboticClosingSentence(
 ): boolean {
     const normalized = normalizeSentence(sentence);
 
+    // Only remove very explicit and repetitive sales pushes.
+    // "si quieres", "te muestro", "te enseño" are polite and natural, so we no longer remove them!
     const hasInlineClosePattern =
-        /(si quieres|si ya|yo arrancaria|yo me iria|te conviene|vete por|paso mas derecho|llevartelo|de aqui|te dejo .*cerquita|comparar rapido|te saco algo parecido|te muestro|te enseno|te enseño)/.test(normalized);
+        /(te dejo .*cerquita|comparar rapido|te saco algo parecido|paso mas derecho)/.test(normalized);
 
     if (!hasInlineClosePattern) return false;
 
@@ -194,17 +196,16 @@ export function shapeCesarinResponseText(input: ShapeCesarinResponseTextInput): 
 
     if (input.currentTurnDecision === 'ASK_CLARIFYING_QUESTION') {
         const firstQuestion = sentences.find((sentence) => isQuestion(sentence));
-        const firstStatement = sentences.find((sentence) => !isQuestion(sentence));
-        return [firstStatement, firstQuestion]
+        const statements = sentences.filter((sentence) => !isQuestion(sentence));
+        // We put statements first, then the question
+        return [...statements, firstQuestion]
             .filter(Boolean)
-            .slice(0, 2)
             .join(' ')
             .replace(/\s+/g, ' ')
             .trim();
     }
 
     return sentences
-        .slice(0, 2)
         .join(' ')
         .replace(/\s+/g, ' ')
         .trim();
