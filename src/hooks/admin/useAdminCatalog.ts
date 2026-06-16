@@ -14,7 +14,8 @@ import {
     updateBrand,
     deleteBrand,
     getTagNames,
-    type CategoryFormData
+    type CategoryFormData,
+    type Brand
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 
@@ -80,7 +81,7 @@ export function useAdminBrands() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: any }) => updateBrand(id, data),
+        mutationFn: ({ id, data }: { id: string; data: Partial<Brand> }) => updateBrand(id, data),
         onSuccess: () => { invalidate(); success('Actualizada', 'Marca actualizada'); }
     });
 
@@ -92,8 +93,8 @@ export function useAdminBrands() {
     return {
         brands: query.data ?? [],
         isLoading: query.isLoading,
-        createBrand: (data: any) => createMutation.mutateAsync(data),
-        updateBrand: (id: string, data: any) => updateMutation.mutateAsync({ id, data }),
+        createBrand: (data: Omit<Brand, 'id' | 'created_at' | 'updated_at'>) => createMutation.mutateAsync(data),
+        updateBrand: (id: string, data: Partial<Brand>) => updateMutation.mutateAsync({ id, data }),
         deleteBrand: (id: string) => deleteMutation.mutateAsync(id),
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
     };

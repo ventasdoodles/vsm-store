@@ -21,7 +21,8 @@ import {
     toggleTestimonialFeatured,
     toggleTestimonialActive,
     type CouponFormData,
-    type TestimonialFormData
+    type TestimonialFormData,
+    type FlashDealFormData
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 import { useAdminTactical } from './useAdminTactical';
@@ -88,7 +89,7 @@ export function useAdminFlashDeals() {
     const invalidate = () => queryClient.invalidateQueries({ queryKey: ['admin', 'flash-deals'] });
 
     const saveMutation = useMutation({
-        mutationFn: (data: any) => data.id ? updateFlashDeal(data.id, data) : createFlashDeal(data),
+        mutationFn: (data: FlashDealFormData & { id?: string }) => data.id ? updateFlashDeal(data.id, data) : createFlashDeal(data),
         onSuccess: () => { 
             invalidate(); 
             success('Guardado', 'Oferta relámpago actualizada'); 
@@ -127,7 +128,7 @@ export function useAdminFlashDeals() {
     return {
         deals: query.data ?? [],
         isLoading: query.isLoading,
-        saveDeal: (data: Record<string, unknown>) => saveMutation.mutate(data),
+        saveDeal: (data: FlashDealFormData & { id?: string }) => saveMutation.mutate(data),
         deleteDeal: (id: string) => deleteMutation.mutate(id),
         toggleActive: (id: string, active: boolean) => toggleActiveMutation.mutate({ id, active }),
         suggestDeal: (productId: string, price: number, stock: number) => 

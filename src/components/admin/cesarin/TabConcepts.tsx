@@ -182,8 +182,8 @@ export function TabConcepts() {
       await fetchConcepts();
       await fetchAllConceptOptions();
       toast.success('Alias eliminado');
-    } catch (error: any) {
-      toast.error(error.message || 'Error al eliminar alias');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al eliminar alias');
     }
   };
 
@@ -204,8 +204,8 @@ export function TabConcepts() {
       setNewConcept({ name: '', concept_type: 'device', brand: '' });
       setIsCreatingConcept(false);
       toast.success('Concepto creado');
-    } catch (error: any) {
-      toast.error(error.message || 'Error al crear concepto');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al crear concepto');
     }
   };
 

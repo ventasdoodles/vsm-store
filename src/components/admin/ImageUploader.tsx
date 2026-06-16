@@ -1,4 +1,4 @@
-﻿// Image Uploader — VSM Store Admin
+// Image Uploader — VSM Store Admin
 // Drag-and-drop + click-to-browse, con preview grid
 import { useState, useRef, useCallback } from 'react';
 import { Upload, X, Loader2, ImageIcon, Link as LinkIcon } from 'lucide-react';
@@ -76,7 +76,9 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
             onCoverChange(null);
         }
         // Fire-and-forget: try to delete from storage
-        deleteProductImage(url).catch(() => { });
+        deleteProductImage(url).catch((err) => { 
+            console.warn('[ImageUploader] Failed to delete image from storage:', err);
+        });
     };
 
     const handleAddUrl = () => {

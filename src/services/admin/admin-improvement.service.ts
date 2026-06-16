@@ -171,11 +171,11 @@ export async function getImprovementItems(filters?: {
     const { data, error } = await q;
     if (error) throw error;
 
-    return (data ?? []).map((row: any) => ({
+    return (data ?? []).map((row: Record<string, unknown>) => ({
         ...row,
-        source_query:  row.ai_analytics?.query ?? null,
+        source_query:  (row.ai_analytics as Record<string, unknown>)?.query ?? null,
         ai_analytics:  undefined,
-    })) as ImprovementItem[];
+    })) as unknown as ImprovementItem[];
 }
 
 /**

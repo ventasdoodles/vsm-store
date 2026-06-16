@@ -10,7 +10,7 @@ interface TabKnowledgeProps {
     products: ProductAIInfo[];
     productSearch: string;
     setProductSearch: (search: string) => void;
-    onUpdateProduct: (id: string, field: string, value: any) => void;
+    onUpdateProduct: (id: string, field: string, value: unknown) => void;
 }
 
 export function TabKnowledge({ products, productSearch, setProductSearch, onUpdateProduct }: TabKnowledgeProps) {

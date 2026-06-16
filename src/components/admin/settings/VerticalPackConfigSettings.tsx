@@ -133,8 +133,16 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
         { id: 'advanced', label: 'JSON Avanzado', icon: Terminal, desc: 'Control total de datos' },
     ] as const;
 
-    // Componente de Input Premium
-    const PremiumInput = ({ label, value, onChange, icon: Icon, placeholder, mono = false }: any) => (
+    interface PremiumInputProps {
+        label: string;
+        value: string;
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        icon?: React.ElementType;
+        placeholder?: string;
+        mono?: boolean;
+    }
+
+    const PremiumInput = ({ label, value, onChange, icon: Icon, placeholder, mono = false }: PremiumInputProps) => (
         <div className="relative group">
             <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
                 {Icon && <Icon className="w-3 h-3" />}
@@ -152,7 +160,15 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
         </div>
     );
 
-    const PremiumTextarea = ({ label, value, onChange, rows = 3, placeholder }: any) => (
+    interface PremiumTextareaProps {
+        label: string;
+        value: string;
+        onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+        rows?: number;
+        placeholder?: string;
+    }
+
+    const PremiumTextarea = ({ label, value, onChange, rows = 3, placeholder }: PremiumTextareaProps) => (
         <div className="relative group">
             <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
                 {label}
@@ -255,21 +271,21 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                         <PremiumInput 
                                             label="ID de Configuración" 
                                             value={config.id || ''} 
-                                            onChange={(e: any) => updateGeneral('id', e.target.value)} 
+                                            onChange={(e) => updateGeneral('id', e.target.value)} 
                                             icon={Terminal}
                                             mono
                                         />
                                         <PremiumInput 
                                             label="Nombre Corto (Label)" 
                                             value={config.label || ''} 
-                                            onChange={(e: any) => updateGeneral('label', e.target.value)} 
+                                            onChange={(e) => updateGeneral('label', e.target.value)} 
                                             icon={Box}
                                         />
                                     </div>
                                     <PremiumTextarea 
                                         label="Descripción del Propósito de la Tienda" 
                                         value={config.description || ''} 
-                                        onChange={(e: any) => updateGeneral('description', e.target.value)} 
+                                        onChange={(e) => updateGeneral('description', e.target.value)} 
                                         rows={4}
                                     />
                                 </motion.div>
@@ -289,27 +305,27 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                         <PremiumInput 
                                             label="Título Principal (H1)" 
                                             value={config.marketing.homeHero.primaryCopy.title || ''} 
-                                            onChange={(e: any) => updateHero('title', e.target.value)} 
+                                            onChange={(e) => updateHero('title', e.target.value)} 
                                             placeholder="Ej. Encuentra tu estilo"
                                         />
                                         <PremiumInput 
                                             label="Subtítulo Destacado" 
                                             value={config.marketing.homeHero.primaryCopy.subtitle || ''} 
-                                            onChange={(e: any) => updateHero('subtitle', e.target.value)} 
+                                            onChange={(e) => updateHero('subtitle', e.target.value)} 
                                             placeholder="Ej. La mejor colección de temporada"
                                         />
                                     </div>
                                     <PremiumTextarea 
                                         label="Párrafo Descriptivo Persuasivo" 
                                         value={config.marketing.homeHero.primaryCopy.description || ''} 
-                                        onChange={(e: any) => updateHero('description', e.target.value)} 
+                                        onChange={(e) => updateHero('description', e.target.value)} 
                                         rows={4}
                                     />
                                     <div className="w-full md:w-1/2">
                                         <PremiumInput 
                                             label="Etiqueta Superior (Badge)" 
                                             value={config.marketing.homeHero.primaryCopy.tag || ''} 
-                                            onChange={(e: any) => updateHero('tag', e.target.value)} 
+                                            onChange={(e) => updateHero('tag', e.target.value)} 
                                             placeholder="Ej. NUEVO, PROMO, HOT"
                                         />
                                     </div>

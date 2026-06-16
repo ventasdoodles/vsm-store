@@ -123,8 +123,8 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
     const d = row.ai_logic_debug ?? {};
     const rawAnalyst = (d.raw_analyst_report as Record<string, unknown> | null) ?? {};
     const analystReport = (d.analyst_report as Record<string, unknown> | null) ?? {};
-    const toolResults = Array.isArray((analystReport as any)?.tool_results)
-        ? ((analystReport as any).tool_results as Array<Record<string, unknown>>)
+    const toolResults = Array.isArray(analystReport['tool_results'])
+        ? (analystReport['tool_results'] as Array<Record<string, unknown>>)
         : [];
 
     const rawOffered = d.offered_products;
