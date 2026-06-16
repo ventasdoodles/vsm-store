@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import type { VerticalPackConfig } from '@/config/productization/types';
+import { activeVerticalPackConfig } from '@/config/productization/active';
 
 interface VerticalPackContextValue {
     config: VerticalPackConfig | null;
@@ -15,7 +16,7 @@ export const VerticalPackContext = createContext<VerticalPackContextValue>({
 export function VerticalPackProvider({ children }: { children: ReactNode }) {
     const { data: settings, isLoading } = useStoreSettings();
 
-    const config = settings?.vertical_pack_config ?? null;
+    const config = settings?.vertical_pack_config ?? activeVerticalPackConfig;
 
     return (
         <VerticalPackContext.Provider value={{ config, isLoading }}>
