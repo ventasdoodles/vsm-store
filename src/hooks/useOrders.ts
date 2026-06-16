@@ -13,7 +13,7 @@ import type { CreateOrderData } from '@/types/order';
 // Tiempos de frescura de datos
 const ORDERS_STALE_TIME = 1000 * 60 * 2; // 2 min
 const ORDER_DETAIL_STALE_TIME = 1000 * 60; // 1 min
-const POINTS_STALE_TIME = 1000 * 60 * 5; // 5 min
+
 
 // Re-exports para compatibilidad con la UI
 export { ORDER_STATUS } from '@/services';
@@ -159,15 +159,9 @@ export function useCreateOrder() {
 
 /**
  * Obtiene el balance de puntos de lealtad de un cliente.
+ * Re-exported from useLoyalty.ts (canonical source) for backward compatibility.
  */
-export function usePointsBalance(customerId: string | undefined) {
-    return useQuery({
-        queryKey: ['points', customerId],
-        queryFn: () => ordersService.getPointsBalance(customerId!),
-        enabled: !!customerId,
-        staleTime: POINTS_STALE_TIME,
-    });
-}
+export { usePointsBalance } from '@/hooks/useLoyalty';
 
 /**
  * Hook para rastrear el envío de un pedido usando su número de guía.

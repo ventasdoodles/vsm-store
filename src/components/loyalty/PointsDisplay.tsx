@@ -1,4 +1,4 @@
-﻿// Display de puntos - VSM Store
+// Display de puntos - VSM Store
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +14,7 @@ const SIZES = {
     lg: { wrapper: 'gap-2', icon: 'h-6 w-6', number: 'text-3xl', label: 'text-sm' },
 };
 
-export function PointsDisplay({ points, size = 'md', label = 'puntos' }: PointsDisplayProps) {
+export function PointsDisplay({ points, size = 'md', label = 'V-Coins' }: PointsDisplayProps) {
     const s = SIZES[size];
 
     return (

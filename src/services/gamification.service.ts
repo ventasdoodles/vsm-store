@@ -60,8 +60,7 @@ export const gamificationService = {
 
     /**
      * Registra el giro y aplica el premio.
-     * Inserta en wheel_attempts; la lógica de puntos/cupón se aplica via DB trigger
-     * o Edge Function (TODO: migrar a edge function apply-wheel-prize).
+     * Inserta en wheel_attempts y acredita V-Coins si el premio es de tipo 'points'.
      */
     async recordSpin(userId: string, prize: WheelPrize): Promise<void> {
         const { error } = await supabase
@@ -73,5 +72,21 @@ export const gamificationService = {
             });
 
         if (error) throw error;
+
+        // Acreditar V-Coins si el premio es de puntos
+        if (prize.type === 'points' && prize.value.amount && prize.value.amount > 0) {
+            const { error: pointsError } = await supabase.rpc('process_loyalty_points', {
+                p_user_id: userId,
+                p_amount: prize.value.amount,
+                p_type: 'earned',
+                p_description: `🎡 Ruleta de premios: ${prize.label}`,
+            });
+
+            if (pointsError) {
+                if (import.meta.env.DEV) {
+                    console.error('[gamificationService] Error acreditando V-Coins:', pointsError.message);
+                }
+            }
+        }
     },
 };

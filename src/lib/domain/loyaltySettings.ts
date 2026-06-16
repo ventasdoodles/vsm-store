@@ -2,7 +2,7 @@ import type { LoyaltyConfig, LoyaltyTier, StoreSettings } from '@/services';
 
 export const DEFAULT_LOYALTY_SETTINGS: LoyaltyConfig = {
     enable_loyalty: false,
-    points_per_currency: 1,
+    points_per_currency: 0.1,
     currency_per_point: 0.1,
     min_points_to_redeem: 100,
     max_points_per_order: 1000,

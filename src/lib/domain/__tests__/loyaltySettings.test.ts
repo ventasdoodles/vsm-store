@@ -49,7 +49,7 @@ describe('loyaltySettings', () => {
 
         expect(ruleUpdated).not.toBe(base);
         expect(ruleUpdated.points_per_currency).toBe(4);
-        expect(base.points_per_currency).toBe(1);
+        expect(base.points_per_currency).toBe(0.1);
         expect(toggled.enable_loyalty).toBe(true);
         expect(noOpToggle).toBe(toggled);
     });

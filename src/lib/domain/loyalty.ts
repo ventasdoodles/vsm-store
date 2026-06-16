@@ -111,6 +111,33 @@ export function calculateLoyaltyPoints(total: number, pointsPerCurrency: number 
 }
 
 /**
+ * Calcula puntos de lealtad aplicando el multiplicador del tier actual.
+ * Ejemplo: Gold (1.5x) → $1000 compra → 100 pts base × 1.5 = 150 pts
+ */
+export function calculateLoyaltyPointsWithMultiplier(
+    total: number,
+    pointsPerCurrency: number = 0.1,
+    tierMultiplier: number = 1,
+): number {
+    const base = calculateLoyaltyPoints(total, pointsPerCurrency);
+    if (tierMultiplier <= 0 || !Number.isFinite(tierMultiplier)) return base;
+    return Math.floor(base * tierMultiplier);
+}
+
+/**
+ * Verifica si una transacción de puntos ha expirado.
+ */
+export function isPointsExpired(createdAt: string | Date, expiryDays: number): boolean {
+    if (expiryDays <= 0 || !Number.isFinite(expiryDays)) return false;
+    const created = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+    if (isNaN(created.getTime())) return false;
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays > expiryDays;
+}
+
+/**
  * Convierte puntos de lealtad a valor monetario.
  */
 export function pointsToPesos(points: number, currencyPerPoint: number = 0.1): number {

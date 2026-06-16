@@ -126,7 +126,7 @@ export function useLoyaltyIA() {
                     }
                 }
             } catch (err) {
-                console.error('[useLoyaltyIA] Error syncing IA:', err);
+                if (import.meta.env.DEV) console.error('[useLoyaltyIA] Error syncing IA:', err);
             } finally {
                 setIsLoading(false);
             }
