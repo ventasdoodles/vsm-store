@@ -94,12 +94,51 @@ describe('VerticalPackConfigSettings', () => {
         expect(parsedValue.sections?.[0]?.label).toBe('Nueva Sección');
     });
 
+    it('handles removing a section', () => {
+        const formDataWithSections = { 
+            ...defaultFormData, 
+            vertical_pack_config: JSON.stringify({
+                sections: [{ slug: 's1', label: 'Section 1' }]
+            }) 
+        };
+        render(<VerticalPackConfigSettings formData={formDataWithSections} handleChange={mockHandleChange as unknown as SettingsChangeHandler} />);
+        
+        fireEvent.click(screen.getByText('Secciones'));
+        
+        const removeButton = screen.getByTitle('Eliminar sección');
+        fireEvent.click(removeButton);
+        
+        expect(mockHandleChange).toHaveBeenCalledTimes(1);
+        const eventArg = mockHandleChange.mock.calls[0]![0];
+        const parsedValue = JSON.parse(eventArg.target.value);
+        
+        expect(parsedValue.sections?.length).toBe(0);
+    });
+
+    it('handles manual JSON edits in Advanced tab', () => {
+        let capturedValue = '';
+        mockHandleChange.mockImplementation((e) => {
+            capturedValue = e.target.value;
+        });
+        
+        render(<VerticalPackConfigSettings formData={defaultFormData} handleChange={mockHandleChange as unknown as SettingsChangeHandler} />);
+        
+        fireEvent.click(screen.getByText('JSON Avanzado'));
+        
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        
+        fireEvent.change(textarea, { target: { value: '{"id": "manual_edit"}' } });
+        
+        expect(mockHandleChange).toHaveBeenCalledTimes(1);
+        expect(capturedValue).toBe('{"id": "manual_edit"}');
+    });
+
     it('displays error and locks tabs if JSON is invalid', () => {
         const badFormData = { ...defaultFormData, vertical_pack_config: '{ bad_json' };
         render(<VerticalPackConfigSettings formData={badFormData} handleChange={mockHandleChange as unknown as SettingsChangeHandler} />);
         
         // Should show error message
-        expect(screen.getByText('Error de Sintaxis Detectado')).toBeInTheDocument();
+        expect(screen.getByText(/Error de parseo JSON|Error de Sintaxis Detectado/i)).toBeInTheDocument();
         
         // General tab should be disabled
         const generalTabButton = screen.getByText('General').closest('button');

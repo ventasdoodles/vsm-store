@@ -32,13 +32,6 @@ function readCustomerIntelligenceSource() {
   return chat + '\n' + utils + '\n' + adapter + '\n' + builder;
 }
 
-function extractStringArray(source: string, pattern: RegExp) {
-  const match = source.match(pattern);
-  expect(match).not.toBeNull();
-
-  const arraySource = match?.[1] ?? '';
-  return Array.from(arraySource.matchAll(/'([^']+)'/g), ([, value]) => value);
-}
 
 function extractAnalystRequestBlock(source: string) {
   const analystCallStart = source.indexOf('const analystResult = await invokeGeminiTextModel(');
