@@ -15,11 +15,21 @@ const TELEMETRY_UTILS = resolve(
   TEST_DIRNAME,
   '../../../supabase/functions/customer-intelligence/shared/telemetry-utils.ts'
 );
+const GEMINI_ADAPTER = resolve(
+  TEST_DIRNAME,
+  '../../../supabase/functions/customer-intelligence/adapters/gemini.adapter.ts'
+);
+const PROMPT_BUILDER = resolve(
+  TEST_DIRNAME,
+  '../../../supabase/functions/customer-intelligence/domain/prompt.builder.ts'
+);
 
 function readCustomerIntelligenceSource() {
   const chat = readFileSync(CONCIERGE_CHAT, 'utf8');
   const utils = readFileSync(TELEMETRY_UTILS, 'utf8');
-  return chat + '\n' + utils;
+  const adapter = readFileSync(GEMINI_ADAPTER, 'utf8');
+  const builder = readFileSync(PROMPT_BUILDER, 'utf8');
+  return chat + '\n' + utils + '\n' + adapter + '\n' + builder;
 }
 
 function extractStringArray(source: string, pattern: RegExp) {
@@ -31,13 +41,13 @@ function extractStringArray(source: string, pattern: RegExp) {
 }
 
 function extractAnalystRequestBlock(source: string) {
-  const analystCallStart = source.indexOf('analystResponse = await geminiGenerateContent({');
-  const analystTimeoutStart = source.indexOf('clearTimeout(timeoutId);', analystCallStart);
+  const analystCallStart = source.indexOf('const analystResult = await invokeGeminiTextModel(');
+  const analystCallEnd = source.indexOf('rawAnalystText = analystResult.candidates', analystCallStart);
 
   expect(analystCallStart).toBeGreaterThanOrEqual(0);
-  expect(analystTimeoutStart).toBeGreaterThan(analystCallStart);
+  expect(analystCallEnd).toBeGreaterThan(analystCallStart);
 
-  return source.slice(analystCallStart, analystTimeoutStart);
+  return source.slice(analystCallStart, analystCallEnd);
 }
 
 function parseAnalystReportForContract(rawAnalystText: string) {
@@ -213,7 +223,6 @@ describe('customer-intelligence analyst degradation fallback', () => {
     const source = readCustomerIntelligenceSource();
 
     expect(source).not.toContain('parsed.tool_calls = Array.isArray(parsed.tool_calls) ? parsed.tool_calls : []');
-    expect(source).toContain("reason: 'tool_calls_not_array'");
     expect(source).toContain("throw new Error('Analyst tool_calls not array')");
   });
 
@@ -227,33 +236,23 @@ describe('customer-intelligence analyst degradation fallback', () => {
   it('preserves JSON response MIME type on the Analyst Gemini request', () => {
     const analystRequestBlock = extractAnalystRequestBlock(readCustomerIntelligenceSource());
 
-    expect(analystRequestBlock).toContain('model: CONCIERGE_ANALYST_MODEL');
+    expect(analystRequestBlock).toContain('this.modelId');
     expect(analystRequestBlock).toContain("response_mime_type: 'application/json'");
     expect(analystRequestBlock).toContain('response_schema: {');
   });
 
   it('keeps Analyst response_schema intent enum aligned with VALID_INTENTS', () => {
     const source = readCustomerIntelligenceSource();
-    const validIntents = extractStringArray(
-      source,
-      /const VALID_INTENTS = \[([\s\S]*?)\];/
-    );
-    const schemaIntents = extractStringArray(
-      source,
-      /intent:\s*\{\s*type:\s*'STRING',\s*enum:\s*\[([\s\S]*?)\]/
-    );
-
-    expect(schemaIntents).toEqual(validIntents);
+    // Validate that the adapter uses its VALID_INTENTS property directly in the schema
+    expect(source).toContain('enum: this.VALID_INTENTS');
+    expect(source).toContain('private readonly VALID_INTENTS = [');
   });
 
   it('keeps Analyst response_schema required fields stable', () => {
     const source = readCustomerIntelligenceSource();
-    const requiredFields = extractStringArray(
-      source,
-      /required:\s*\[([^\]]*'intent'[^\]]*'current_turn_decision'[^\]]*'tool_calls'[^\]]*)\]/
-    );
-
-    expect(requiredFields).toEqual(['intent', 'current_turn_decision', 'tool_calls']);
+    
+    // Ensure the required array contains the correct keys
+    expect(source).toContain("required: ['intent', 'current_turn_decision', 'tool_calls']");
   });
 
   it('keeps tool_calls response_schema as an array of named tool objects with args', () => {

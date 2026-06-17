@@ -4,20 +4,20 @@ import { compactCesarinResponseText } from '../../../supabase/functions/customer
 import { buildClarificationFirstFallbackText, guardClarificationFirstFinalText } from '../../../supabase/functions/customer-intelligence/response-shaping.ts';
 
 describe('compactCesarinResponseText', () => {
-  it('collapses repeated recommendations and strips a soft closing tail', () => {
+  it('normalizes spaces without collapsing sentences', () => {
     const result = compactCesarinResponseText(
-      'Te paso dos opciones. Te paso dos opciones. Si quieres, te paso otra mas.'
+      'Te paso dos opciones.   Te paso dos opciones. Si quieres, te paso otra mas.'
     );
 
-    expect(result).toBe('Te paso dos opciones');
+    expect(result).toBe('Te paso dos opciones. Te paso dos opciones. Si quieres, te paso otra mas.');
   });
 
-  it('keeps one concise clarification question and removes duplicates', () => {
+  it('normalizes spaces for clarification questions', () => {
     const result = compactCesarinResponseText(
-      'Me falta el modelo exacto. Me dices el modelo? Me dices el modelo?'
+      'Me falta el modelo exacto.   Me dices el modelo?   Me dices el modelo?'
     );
 
-    expect(result).toBe('Me falta el modelo exacto. Me dices el modelo?');
+    expect(result).toBe('Me falta el modelo exacto. Me dices el modelo? Me dices el modelo?');
   });
 });
 

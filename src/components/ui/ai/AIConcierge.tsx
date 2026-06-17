@@ -354,6 +354,7 @@ export const AIConcierge: React.FC = () => {
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         className="flex items-start max-w-[85%]"
+                                        data-testid="typing-indicator"
                                     >
                                         <div className="relative rounded-2xl px-4 py-3 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-[#1a1b26]/80 border border-white/10 rounded-tl-sm backdrop-blur-md">
                                             <div className="flex items-center gap-1.5 h-5">

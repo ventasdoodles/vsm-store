@@ -226,7 +226,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         render(<AIConcierge />);
 
-        expect(screen.getByText('Analizando...')).toBeInTheDocument();
+        expect(screen.getByTestId('typing-indicator')).toBeInTheDocument();
         expect(screen.queryByText('Sigo pensando...')).not.toBeInTheDocument();
     });
 

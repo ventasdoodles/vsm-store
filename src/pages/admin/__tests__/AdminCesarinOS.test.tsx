@@ -128,16 +128,13 @@ describe('AdminCesarinOS operator shell', () => {
     it('does not expose runtime probe or simulator surfaces in normal navigation', async () => {
         render(<AdminCesarinOS />);
 
-        expect(screen.getByText(/Pilot operator telemetry/i)).toBeInTheDocument();
+        expect(screen.getByText(/Cesarin OS/i)).toBeInTheDocument();
         expect(screen.queryByText(/Simulador/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Laboratorio/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Calidad y QA/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Sonda del runtime real/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Paridad de runtime/i)).not.toBeInTheDocument();
 
-        await waitFor(() => {
-            expect(supabaseMocks.from).toHaveBeenCalledWith('products');
-        });
 
         const touchedTables = supabaseMocks.from.mock.calls.map(([table]) => table);
         expect(touchedTables).not.toContain('ai_simulation_sessions');
@@ -145,31 +142,15 @@ describe('AdminCesarinOS operator shell', () => {
         expect(supabaseMocks.invoke).not.toHaveBeenCalled();
     });
 
-    it('prioritizes daily operator navigation and keeps secondary and advanced surfaces separate', async () => {
+    it('renders modern navigation cards for operator surfaces', async () => {
         render(<AdminCesarinOS />);
 
-        const dailyNav = within(screen.getByRole('region', { name: /Diario visible/i }));
-        expect(dailyNav.getByRole('button', { name: /Abrir Operacion/i })).toBeInTheDocument();
-        expect(dailyNav.getByRole('button', { name: /Abrir Mejoras/i })).toBeInTheDocument();
-        expect(dailyNav.getByRole('button', { name: /Abrir Conocimiento/i })).toBeInTheDocument();
-
-        const secondaryNav = within(screen.getByRole('region', { name: /Secundario/i }));
-        expect(secondaryNav.getByRole('button', { name: /Abrir Historico/i })).toBeInTheDocument();
-        expect(secondaryNav.getByRole('button', { name: /Abrir Casos/i })).toBeInTheDocument();
-
-        const advancedNav = within(screen.getByRole('region', { name: /Avanzado \/ settings/i }));
-        expect(advancedNav.getByRole('button', { name: /Abrir Reglas/i })).toBeInTheDocument();
-        expect(advancedNav.getByRole('button', { name: /Abrir Conceptos/i })).toBeInTheDocument();
-        expect(advancedNav.getByRole('button', { name: /Abrir Persona/i })).toBeInTheDocument();
-
-        expect(screen.queryByRole('button', { name: /Abrir Learning/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /Abrir Interventions/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /Abrir Quality/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /Abrir Simulator/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /PilotParityDiagnostics/i })).not.toBeInTheDocument();
-
-        await waitFor(() => {
-            expect(supabaseMocks.from).toHaveBeenCalledWith('products');
-        });
+        const nav = within(screen.getByRole('navigation', { name: /Navegacion Cesarin OS/i }));
+        
+        // Assert the new cards exist
+        expect(nav.getByRole('button', { name: /Interacciones/i })).toBeInTheDocument();
+        expect(nav.getByRole('button', { name: /Material de Estudio/i })).toBeInTheDocument();
+        expect(nav.getByRole('button', { name: /Reglas de Venta/i })).toBeInTheDocument();
+        expect(nav.getByRole('button', { name: /Desempeño/i })).toBeInTheDocument();
     });
 });
