@@ -1,4 +1,4 @@
-import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
+﻿import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
 export interface ProactiveInsights {
     customer_tier?: string | null;

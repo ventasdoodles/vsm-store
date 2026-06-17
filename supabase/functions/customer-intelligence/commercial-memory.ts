@@ -1,4 +1,4 @@
-import type { CustomerPreferenceSummary } from './memory.ts';
+﻿import type { CustomerPreferenceSummary } from './memory.ts';
 
 function normalizeText(value: string): string {
   return value

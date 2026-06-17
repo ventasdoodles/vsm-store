@@ -1,5 +1,5 @@
 /**
- * bundle-intelligence — Supabase Edge Function
+ * bundle-intelligence â€” Supabase Edge Function
  * 
  * AI-powered product bundle suggestions. Analyzes cart contents and product
  * catalog to recommend complementary product bundles with creative names.
@@ -8,8 +8,8 @@
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-2.5-flash â†’ gemini-2.0-flash (1.5 retired)
  * - 2026-03-15: Removed unsupported responseMimeType from generationConfig
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -42,9 +42,9 @@ serve(async (req) => {
 
         const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
-        // 1. Obtener una recomendación compatible del motor de lógica existente
-        // En una Edge Function no podemos importar @/lib/upsell-logic directamente fácilmente
-        // así que simulamos o consultamos la DB para productos de categorías compatibles.
+        // 1. Obtener una recomendaciÃ³n compatible del motor de lÃ³gica existente
+        // En una Edge Function no podemos importar @/lib/upsell-logic directamente fÃ¡cilmente
+        // asÃ­ que simulamos o consultamos la DB para productos de categorÃ­as compatibles.
         
         const { data: categories } = await supabase
             .from('categories')
@@ -63,7 +63,7 @@ serve(async (req) => {
 
         const compatibleSlugs = COMPATIBILITY[categories?.slug || ''] || ['liquidos', 'accesorios-vape']
 
-        // 2. Buscar un producto compatible que esté en stock
+        // 2. Buscar un producto compatible que estÃ© en stock
         const { data: suggestions } = await supabase
             .from('products')
             .select('id, name, price, cover_image, category_id')
@@ -84,7 +84,7 @@ serve(async (req) => {
         // 3. Consultar a Gemini para el nombre creativo del Bundle
         const prompt = `
             Eres un experto en marketing para "VSM Store".
-            Genera un nombre corto y épico (máximo 4 palabras) para un bundle que incluye:
+            Genera un nombre corto y Ã©pico (mÃ¡ximo 4 palabras) para un bundle que incluye:
             1. ${product.name}
             2. ${suggestedProduct.name}
             
@@ -113,7 +113,7 @@ serve(async (req) => {
         const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
         const aiData = JSON.parse(cleanText)
 
-        // 4. Generar cupón dinámico para el bundle (15% descuento)
+        // 4. Generar cupÃ³n dinÃ¡mico para el bundle (15% descuento)
         const bundleCouponCode = `BUNDLE-${Math.random().toString(36).substring(7).toUpperCase()}`
         
         await supabase.from('coupons').insert({

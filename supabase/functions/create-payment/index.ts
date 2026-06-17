@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+﻿import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import mercadopago from 'npm:mercadopago@2.0.8'
 
@@ -154,7 +154,7 @@ serve(async (req) => {
         }
 
         // 2. Construir items para Mercado Pago
-        // Asegurar que prices sean números y titles strings
+        // Asegurar que prices sean nÃºmeros y titles strings
         const items = order.items.map((item: Record<string, unknown>) => ({
             title: item.name || 'Producto VSM',
             quantity: Number(item.quantity),

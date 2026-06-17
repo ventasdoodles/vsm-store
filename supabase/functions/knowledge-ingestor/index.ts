@@ -1,5 +1,5 @@
-/**
- * knowledge-ingestor — Supabase Edge Function
+﻿/**
+ * knowledge-ingestor â€” Supabase Edge Function
  *
  * Handles chunking and embedding ingestion for the Cesarin OS Knowledge RAG
  * foundation (Phase 3.2B). Converts raw text or pre-chunked content into
@@ -88,7 +88,7 @@ interface IngestTextPayload {
     source_type: KnowledgeSourceType
     source_id?: string
     source_filename?: string
-    // Chunking params — optional, defaults apply
+    // Chunking params â€” optional, defaults apply
     target_chunk_size?: number    // Default: 1000 chars
     overlap_chars?: number        // Default: 100 chars
 }
@@ -119,11 +119,11 @@ function chunkMarkdownText(
 
     for (const section of sections) {
         if (section.length <= targetSize) {
-            // Section fits in one chunk — keep it semantically whole.
+            // Section fits in one chunk â€” keep it semantically whole.
             // Small chunks are acceptable (requirement 4).
             chunks.push(section)
         } else {
-            // Section too long — split on paragraph breaks
+            // Section too long â€” split on paragraph breaks
             const paragraphs = section.split(/\n\n+/).map(p => p.trim()).filter(Boolean)
             let currentChunk = ''
 
@@ -140,7 +140,7 @@ function chunkMarkdownText(
                         const overlap = currentChunk.slice(-overlapChars)
                         currentChunk = overlap ? `${overlap}\n\n${para}` : para
                     } else {
-                        // Single paragraph exceeds limit — force-split on sentences
+                        // Single paragraph exceeds limit â€” force-split on sentences
                         const sentences = para.match(/[^.!?]+[.!?]+\s*/g) || [para]
                         let sentChunk = ''
                         for (const sent of sentences) {
@@ -275,7 +275,7 @@ serve(async (req) => {
             const embedding = await generateEmbedding(payload.content)
 
             if (!embedding) {
-                return errorResponse('Failed to generate embedding — chunk was not saved.', 500)
+                return errorResponse('Failed to generate embedding â€” chunk was not saved.', 500)
             }
 
             const { data, error } = await supabase
@@ -320,7 +320,7 @@ serve(async (req) => {
             const embedding = await generateEmbedding(payload.content)
 
             if (!embedding) {
-                return errorResponse('Failed to generate embedding — chunk was not updated.', 500)
+                return errorResponse('Failed to generate embedding â€” chunk was not updated.', 500)
             }
 
             const { data, error } = await supabase
@@ -359,7 +359,7 @@ serve(async (req) => {
             const overlap = payload.overlap_chars ?? 100
             const sourceId = payload.source_id ?? payload.source_filename ?? payload.title.toLowerCase().replace(/\s+/g, '-')
 
-            console.log(`[knowledge-ingestor] ingest_text: "${payload.title}" → source_id: "${sourceId}"`)
+            console.log(`[knowledge-ingestor] ingest_text: "${payload.title}" â†’ source_id: "${sourceId}"`)
 
             // Soft-delete previous version of this document (same source_id)
             await supabase
@@ -383,7 +383,7 @@ serve(async (req) => {
                 const embedding = await generateEmbedding(chunk)
 
                 if (!embedding) {
-                    console.warn(`[knowledge-ingestor] Skipping chunk ${i} — embedding failed`)
+                    console.warn(`[knowledge-ingestor] Skipping chunk ${i} â€” embedding failed`)
                     failed.push({ index: i, reason: 'embedding_failed' })
                     continue
                 }

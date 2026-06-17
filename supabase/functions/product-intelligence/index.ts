@@ -1,15 +1,15 @@
-/**
- * product-intelligence — Supabase Edge Function
+﻿/**
+ * product-intelligence â€” Supabase Edge Function
  *
  * AI-powered product description, copy generation, and structured enrichment.
  * Creates compelling, SEO-friendly product descriptions and marketing copy in Spanish.
  *
- * @model gemini-2.5-flash-lite (via v1 REST API)
+ * @model gemini-2.5-flash-lite-lite (via v1 REST API)
  * @requires GEMINI_API_KEY
  *
  * MIGRATION LOG:
- * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-2.5-flash-lite â†’ gemini-2.0-flash (1.5 retired)
  * - 2026-03-15: Removed unsupported responseMimeType from generationConfig
  * - 2026-03-20: Applied v1 endpoint + removed responseMimeType (payload drift fix)
  * - 2026-03-20: Added enrich_product action with category-aware spec generation
@@ -21,25 +21,25 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 if (!GEMINI_API_KEY) {
     console.error('[product-intelligence] FATAL: GEMINI_API_KEY is not set in environment secrets.')
 }
-const MODEL = 'gemini-2.5-flash'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-// ─── Product Ontology (mirrors src/constants/specs.constants.ts) ─────────────
+// â”€â”€â”€ Product Ontology (mirrors src/constants/specs.constants.ts) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Inlined here because edge functions cannot import from src/. Keep in sync.
 const SUGGESTED_SPECS: Record<string, string[]> = {
     // Vape
-    'disposables':      ['Puffs', 'Capacidad', 'Batería', 'Nicotina', 'Puerto de Carga'],
-    'vape-kits':        ['Watts', 'Batería', 'Capacidad', 'Resistencia Incluida', 'Puerto de Carga'],
+    'disposables':      ['Puffs', 'Capacidad', 'BaterÃ­a', 'Nicotina', 'Puerto de Carga'],
+    'vape-kits':        ['Watts', 'BaterÃ­a', 'Capacidad', 'Resistencia Incluida', 'Puerto de Carga'],
     'pods':             ['Resistencia', 'Capacidad', 'Compatibilidad'],
     'liquidos':         ['Nicotina', 'VG/PG', 'Volumen'],
     'accesorios-vape':  ['Compatibilidad', 'Material'],
     // 420
-    'flores':           ['THC%', 'CBD%', 'Genética', 'Efecto', 'Terpenos'],
-    'extractos':        ['Concentración', 'Método de Extracción', 'Tipo', 'THC%'],
-    'comestibles':      ['Dosis por Porción', 'Total Cannabinoides', 'Sabor'],
-    'vapes-420':        ['Capacidad', 'Voltaje Variable', 'Batería', 'THC%'],
-    'parafernalia':     ['Material', 'Tamaño', 'Compatibilidad'],
+    'flores':           ['THC%', 'CBD%', 'GenÃ©tica', 'Efecto', 'Terpenos'],
+    'extractos':        ['ConcentraciÃ³n', 'MÃ©todo de ExtracciÃ³n', 'Tipo', 'THC%'],
+    'comestibles':      ['Dosis por PorciÃ³n', 'Total Cannabinoides', 'Sabor'],
+    'vapes-420':        ['Capacidad', 'Voltaje Variable', 'BaterÃ­a', 'THC%'],
+    'parafernalia':     ['Material', 'TamaÃ±o', 'Compatibilidad'],
 }
 
 const SECTION_DEFAULT_SPECS: Record<string, string[]> = {
@@ -72,11 +72,11 @@ serve(async (req) => {
                 Tu tarea es generar contenido persuasivo para un producto.
 
                 PRODUCTO: ${name}
-                DESCRIPCIÓN ACTUAL (si existe): ${currentDesc || 'Ninguna'}
+                DESCRIPCIÃ“N ACTUAL (si existe): ${currentDesc || 'Ninguna'}
 
                 INSTRUCCIONES:
-                - Genera una "description" larga y detallada (mínimo 3 párrafos), profesional y enfocada al estilo de vida.
-                - Genera una "short_description" de máximo 20 palabras.
+                - Genera una "description" larga y detallada (mÃ­nimo 3 pÃ¡rrafos), profesional y enfocada al estilo de vida.
+                - Genera una "short_description" de mÃ¡ximo 20 palabras.
                 - Sugiere 5 "tags" relevantes.
                 - Responde estrictamente en JSON.
 
@@ -134,40 +134,40 @@ serve(async (req) => {
 
             const sectionLabel = section === '420'
                 ? 'Cannabis / CBD / THC (mercado 420)'
-                : 'Vapeo — nicotina, hardware y accesorios'
+                : 'Vapeo â€” nicotina, hardware y accesorios'
 
             const prompt = `
 Eres un especialista en productos de vapeo y cannabis para "VSM Store" (Colombia).
 
 PRODUCTO:
 - Nombre: ${name}
-- Sección: ${sectionLabel}
-- Categoría: ${category_slug || 'general'}
-- Descripción actual: ${currentDesc || 'Ninguna'}
+- SecciÃ³n: ${sectionLabel}
+- CategorÃ­a: ${category_slug || 'general'}
+- DescripciÃ³n actual: ${currentDesc || 'Ninguna'}
 - Specs ya ingresadas por el operador: ${alreadyFilledStr}
 
 TAREA:
 Genera un paquete de enriquecimiento completo para este producto. Debes:
 
-1. "description": texto de marketing largo (mínimo 3 párrafos), profesional, en español, enfocado en estilo de vida y beneficios concretos del producto.
+1. "description": texto de marketing largo (mÃ­nimo 3 pÃ¡rrafos), profesional, en espaÃ±ol, enfocado en estilo de vida y beneficios concretos del producto.
 
-2. "short_description": máximo 20 palabras. Resumen para tarjeta de producto en tienda.
+2. "short_description": mÃ¡ximo 20 palabras. Resumen para tarjeta de producto en tienda.
 
-3. "ai_sales_note": 1-2 oraciones sobre el ángulo de venta y el buyer persona ideal.
+3. "ai_sales_note": 1-2 oraciones sobre el Ã¡ngulo de venta y el buyer persona ideal.
 
-4. "specs": objeto con ÚNICAMENTE las siguientes llaves: ${targetSpecsStr}
-   - Propón solo las que puedas inferir razonablemente del nombre del producto.
-   - REGLA CRÍTICA: OMITE la llave "Compatibilidad" si el nombre del producto no hace explícita la compatibilidad con otro hardware. Si la omites, agrégala a "warnings".
-   - No inventes llaves que no están en la lista anterior.
+4. "specs": objeto con ÃšNICAMENTE las siguientes llaves: ${targetSpecsStr}
+   - PropÃ³n solo las que puedas inferir razonablemente del nombre del producto.
+   - REGLA CRÃTICA: OMITE la llave "Compatibilidad" si el nombre del producto no hace explÃ­cita la compatibilidad con otro hardware. Si la omites, agrÃ©gala a "warnings".
+   - No inventes llaves que no estÃ¡n en la lista anterior.
    - Si no puedes inferir un valor con razonable certeza, omite esa llave del objeto.
 
-5. "tags": 5-8 etiquetas semánticas en español específicas del dominio (ej: "dtl", "mtl", "nic-sal", "recargable", "indica", "sativa", "full-spectrum"). No usar nombres de marca como tags.
+5. "tags": 5-8 etiquetas semÃ¡nticas en espaÃ±ol especÃ­ficas del dominio (ej: "dtl", "mtl", "nic-sal", "recargable", "indica", "sativa", "full-spectrum"). No usar nombres de marca como tags.
 
-6. "confidence": "high" si el nombre del producto permite inferir la mayoría de specs con seguridad, "medium" si hay inferencias razonables pero no certeras, "low" si el nombre es muy genérico o ambiguo.
+6. "confidence": "high" si el nombre del producto permite inferir la mayorÃ­a de specs con seguridad, "medium" si hay inferencias razonables pero no certeras, "low" si el nombre es muy genÃ©rico o ambiguo.
 
-7. "warnings": array de advertencias para el operador sobre campos inciertos o que requieren verificación manual. Incluir siempre si "Compatibilidad" fue omitido de specs.
+7. "warnings": array de advertencias para el operador sobre campos inciertos o que requieren verificaciÃ³n manual. Incluir siempre si "Compatibilidad" fue omitido de specs.
 
-Responde ÚNICAMENTE con JSON válido. Sin texto adicional. Sin bloques markdown.
+Responde ÃšNICAMENTE con JSON vÃ¡lido. Sin texto adicional. Sin bloques markdown.
 
 FORMATO:
 {
@@ -219,7 +219,7 @@ FORMATO:
             if (!enrichData.confidence) enrichData.confidence = 'medium'
             if (!enrichData.specs || typeof enrichData.specs !== 'object') enrichData.specs = {}
 
-            console.log(`[product-intelligence] enrich_product OK — confidence: ${enrichData.confidence}, specs keys: ${Object.keys(enrichData.specs).join(', ')}, warnings: ${enrichData.warnings.length}`)
+            console.log(`[product-intelligence] enrich_product OK â€” confidence: ${enrichData.confidence}, specs keys: ${Object.keys(enrichData.specs).join(', ')}, warnings: ${enrichData.warnings.length}`)
 
             return new Response(JSON.stringify(enrichData), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },

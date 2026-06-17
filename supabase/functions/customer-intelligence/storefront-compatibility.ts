@@ -1,4 +1,4 @@
-type CompatibilityRelationType =
+﻿type CompatibilityRelationType =
   | 'uses_coil'
   | 'uses_pod'
   | 'uses_battery'
@@ -100,7 +100,7 @@ const FIT_STRIP_PATTERNS = [
 
 const STOPWORDS = new Set([
   'mi', 'mis', 'tu', 'tuya', 'tuyo', 'este', 'esta', 'ese', 'esa', 'eso', 'con', 'el', 'la', 'los', 'las',
-  'que', 'cual', 'cuál', 'sirve', 'sirven', 'queda', 'quedan', 'funciona', 'funciona', 'compatible',
+  'que', 'cual', 'cuÃ¡l', 'sirve', 'sirven', 'queda', 'quedan', 'funciona', 'funciona', 'compatible',
   'compatibilidad', 'traigo', 'tengo', 'llevo', 'equipo', 'pod', 'pods', 'bateria', 'liquido', 'resistencia',
   'para', 'con', 'al', 'del', 'de', 'mi', 'me', 'lo', 'que', 'un', 'una', 'unos', 'unas',
 ]);
@@ -439,29 +439,29 @@ function buildCompatibilityMessage(input: {
   const candidateName = input.candidate?.name ?? 'ese otro producto';
 
   if (input.kind === 'COMPATIBLE' && input.anchor && input.candidate) {
-    return `Sí, ${candidateName} sí le queda a ${anchorName}. La relación está confirmada en la verdad actual.`;
+    return `SÃ­, ${candidateName} sÃ­ le queda a ${anchorName}. La relaciÃ³n estÃ¡ confirmada en la verdad actual.`;
   }
 
   if (input.kind === 'INCOMPATIBLE' && input.anchor && input.candidate) {
-    return `No, ${candidateName} no le queda a ${anchorName}. La relación en la verdad actual marca incompatibilidad confirmada.`;
+    return `No, ${candidateName} no le queda a ${anchorName}. La relaciÃ³n en la verdad actual marca incompatibilidad confirmada.`;
   }
 
   if (input.kind === 'REVIEW_PRODUCT' && input.anchor && input.suggestions.length > 0) {
-    return `No te lo cierro como ajuste específico todavía, pero sí tengo opciones confirmadas que encajan con ${anchorName}: ${formatProductNames(input.suggestions)}.`;
+    return `No te lo cierro como ajuste especÃ­fico todavÃ­a, pero sÃ­ tengo opciones confirmadas que encajan con ${anchorName}: ${formatProductNames(input.suggestions)}.`;
   }
 
   if (input.kind === 'REVIEW_PRODUCT' && input.anchor && input.relation?.scope === 'class_generalization') {
-    return `La compatibilidad que tengo para ${anchorName} es de clase, no de modelo exacto. Prefiero dejarla en revisión antes de decirte un sí definitivo.`;
+    return `La compatibilidad que tengo para ${anchorName} es de clase, no de modelo exacto. Prefiero dejarla en revisiÃ³n antes de decirte un sÃ­ definitivo.`;
   }
 
   if (input.kind === 'NEEDS_MORE_CONTEXT') {
     return input.usedCartContext
       ? 'Necesito el modelo exacto o la pieza exacta que quieres verificar. Con el carrito solo no me alcanza para cerrar la compatibilidad con seguridad.'
-      : 'Necesito el modelo exacto del dispositivo o la pieza exacta que quieres revisar para decirte si sí le queda.';
+      : 'Necesito el modelo exacto del dispositivo o la pieza exacta que quieres revisar para decirte si sÃ­ le queda.';
   }
 
   if (input.kind === 'NO_GROUNDED_MATCH') {
-    return `No encontré una relación de compatibilidad confirmada para ${anchorName}${input.candidate ? ` con ${candidateName}` : ''} en la verdad actual.`;
+    return `No encontrÃ© una relaciÃ³n de compatibilidad confirmada para ${anchorName}${input.candidate ? ` con ${candidateName}` : ''} en la verdad actual.`;
   }
 
   return 'No pude cerrar la compatibilidad con la verdad actual.';

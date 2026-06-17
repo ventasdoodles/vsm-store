@@ -1,4 +1,4 @@
-export interface NeutralAnalystFallbackReport {
+﻿export interface NeutralAnalystFallbackReport {
   intent: 'UNKNOWN';
   primary_intent: 'UNKNOWN';
   secondary_intents: [];

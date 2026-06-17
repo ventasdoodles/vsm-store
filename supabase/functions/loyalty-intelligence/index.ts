@@ -1,5 +1,5 @@
-/**
- * loyalty-intelligence — Supabase Edge Function
+﻿/**
+ * loyalty-intelligence â€” Supabase Edge Function
  * 
  * AI-powered loyalty program analysis. Evaluates customer purchase patterns,
  * tier progression, and generates personalized retention strategies.
@@ -8,8 +8,8 @@
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-2.5-flash-lite â†’ gemini-2.0-flash (1.5 retired)
  * - 2026-03-15: Removed unsupported responseMimeType + fixed duplicate temperature
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -19,7 +19,7 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 if (!GEMINI_API_KEY) {
     console.error('[loyalty-intelligence] FATAL: GEMINI_API_KEY is not set in environment secrets.')
 }
-const MODEL = 'gemini-2.5-flash'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -57,24 +57,24 @@ serve(async (req) => {
         // 2. Definir Prompt para Gemini basado en segmento
         const prompt = `
             Eres un experto en crecimiento (Growth Hacker) para "VSM Store", una tienda premium de vapeo.
-            Tu misión es generar una recompensa personalizada para un cliente basada en su comportamiento.
+            Tu misiÃ³n es generar una recompensa personalizada para un cliente basada en su comportamiento.
 
             DATOS DEL CLIENTE:
             - Nombre: ${finalIntel.full_name}
             - Segmento: ${finalIntel.segment}
             - Salud: ${finalIntel.health_status}
             - Valor Monetrio: $${finalIntel.monetary}
-            - Recencia: ${finalIntel.recency_days} días.
+            - Recencia: ${finalIntel.recency_days} dÃ­as.
 
-            GUÍAS DE GENERACIÓN:
-            - Para "Campeón": Ofrece algo pequeño (10%) pero con mensaje de agradecimiento VIP.
-            - Para "Leal": 15% para mantener su hábito.
+            GUÃAS DE GENERACIÃ“N:
+            - Para "CampeÃ³n": Ofrece algo pequeÃ±o (10%) pero con mensaje de agradecimiento VIP.
+            - Para "Leal": 15% para mantener su hÃ¡bito.
             - Para "En Riesgo" o "Casi Perdido": 20-25% agresivo para recuperarlo.
             - Para "Nuevo": 15% para incentivar la segunda compra.
-            - Tono: Energético, premium, centrado en el beneficio.
-            - Máximo 30 palabras para el mensaje.
+            - Tono: EnergÃ©tico, premium, centrado en el beneficio.
+            - MÃ¡ximo 30 palabras para el mensaje.
 
-            RESPONDE ÚNICAMENTE CON UN JSON EN ESTE FORMATO:
+            RESPONDE ÃšNICAMENTE CON UN JSON EN ESTE FORMATO:
             {
                 "personalizedMessage": "...",
                 "discountValue": 0,
@@ -105,7 +105,7 @@ serve(async (req) => {
         const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
         const aiData = JSON.parse(cleanText);
 
-        // 4. Crear Cupón en la DB
+        // 4. Crear CupÃ³n en la DB
         const uniqueCode = `${aiData.campaignTag}-${Math.random().toString(36).substring(7).toUpperCase()}`
 
         const { data: coupon, error: couponError } = await supabase
@@ -125,7 +125,7 @@ serve(async (req) => {
 
         if (couponError) throw couponError
 
-        // 5. Registrar Proposición Inteligente
+        // 5. Registrar ProposiciÃ³n Inteligente
         const { data: proposition, error: propError } = await supabase
             .from('smart_loyalty_propositions')
             .insert({

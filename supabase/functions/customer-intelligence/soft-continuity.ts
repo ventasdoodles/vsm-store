@@ -1,4 +1,4 @@
-export interface SoftContinuityHistoryTurn {
+﻿export interface SoftContinuityHistoryTurn {
   role: 'user' | 'assistant';
   content: string;
 }

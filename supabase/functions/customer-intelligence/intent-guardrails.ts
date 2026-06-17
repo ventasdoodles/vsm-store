@@ -1,4 +1,4 @@
-import type { ToolCall } from './tools.ts';
+﻿import type { ToolCall } from './tools.ts';
 import { getCapabilityIdsForIntent } from './tool-index.ts';
 
 export type StorefrontResolvedIntent =
@@ -106,7 +106,7 @@ function normalizeTurnQuery(query: string): string {
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[¿?¡!]/g, ' ')
+        .replace(/[Â¿?Â¡!]/g, ' ')
         .trim();
 }
 
@@ -150,7 +150,7 @@ function isNoWriteRagSmokePolicyPrompt(normalizedQuery: string): boolean {
 }
 
 function detectKittingMatch(normalizedQuery: string): boolean {
-    return /\b(kit|kitting|starter kit|setup|set up|armame|arme|armar|equipo completo|equipo entero|quiero cambiar de desechables|cambiar a pods|pasarme a pods|pasar a pods|de desechables a pods|upgrade de hardware|upgrade a pods|arma me un kit|armame un equipo|armame un setup|equipo con liquido|equipo con líquido)\b/.test(normalizedQuery);
+    return /\b(kit|kitting|starter kit|setup|set up|armame|arme|armar|equipo completo|equipo entero|quiero cambiar de desechables|cambiar a pods|pasarme a pods|pasar a pods|de desechables a pods|upgrade de hardware|upgrade a pods|arma me un kit|armame un equipo|armame un setup|equipo con liquido|equipo con lÃ­quido)\b/.test(normalizedQuery);
 }
 
 function detectBudgetRescueMatch(normalizedQuery: string): boolean {
@@ -243,7 +243,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
 }
 
 function detectExplicitProductRequest(normalizedQuery: string): boolean {
-    return /recomiend|recomend|muestr|ensename|enseñame|quiero ver|que opciones|que productos|que me sugieres|que me recomiendas|que sabores|dame opciones|busco algo|quiero algo|quiero un|quiero una|tienes algo/.test(normalizedQuery);
+    return /recomiend|recomend|muestr|ensename|enseÃ±ame|quiero ver|que opciones|que productos|que me sugieres|que me recomiendas|que sabores|dame opciones|busco algo|quiero algo|quiero un|quiero una|tienes algo/.test(normalizedQuery);
 }
 
 function detectInventorySpecificProductReference(normalizedQuery: string): boolean {

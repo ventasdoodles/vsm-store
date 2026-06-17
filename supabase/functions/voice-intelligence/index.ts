@@ -1,5 +1,5 @@
-/**
- * voice-intelligence — Supabase Edge Function
+﻿/**
+ * voice-intelligence â€” Supabase Edge Function
  * 
  * AI-powered voice/text input processing. Converts natural language queries
  * into structured search queries for the product catalog.
@@ -8,8 +8,8 @@
  * @requires GEMINI_API_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-2.5-flash â†’ gemini-2.0-flash (1.5 retired)
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
@@ -57,13 +57,13 @@ serve(async (req) => {
 
         const prompt = `
             Eres el asistente inteligente de "VSM Store", una tienda premium de vapes y accesorios.
-            Tu tarea es convertir la entrada del usuario (texto o audio) en una consulta de búsqueda (keywords) eficiente.
+            Tu tarea es convertir la entrada del usuario (texto o audio) en una consulta de bÃºsqueda (keywords) eficiente.
             
             Reglas:
-            - Si hay audio, primero transcríbelo.
-            - Extrae solo las palabras clave más relevantes (producto, sabor, marca).
+            - Si hay audio, primero transcrÃ­belo.
+            - Extrae solo las palabras clave mÃ¡s relevantes (producto, sabor, marca).
             - Elimina palabras de relleno como "buscame", "quiero", "tienes", "por favor".
-            - Si el usuario menciona "barato" o "oferta", prioriza los términos de búsqueda que podrían llevar a eso.
+            - Si el usuario menciona "barato" o "oferta", prioriza los tÃ©rminos de bÃºsqueda que podrÃ­an llevar a eso.
             
             ${transcript ? `Frase del usuario: "${transcript}"` : 'Procesa el audio adjunto.'}
             

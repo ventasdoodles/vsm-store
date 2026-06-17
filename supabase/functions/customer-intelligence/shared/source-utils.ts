@@ -1,4 +1,4 @@
-import { ToolResult } from '../tools.ts';
+﻿import { ToolResult } from '../tools.ts';
 
 export type PublicSourceContext = {
     label: string;
@@ -66,7 +66,7 @@ export function buildPublicSourceContext(toolResults: ToolResult[]): PublicSourc
     }
 
     const brief = sources.length > 0
-        ? sources.map((source) => source.title).join(' · ')
+        ? sources.map((source) => source.title).join(' Â· ')
         : undefined;
 
     return {

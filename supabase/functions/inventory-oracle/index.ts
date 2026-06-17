@@ -1,5 +1,5 @@
-/**
- * inventory-oracle — Supabase Edge Function
+﻿/**
+ * inventory-oracle â€” Supabase Edge Function
  * 
  * AI-powered inventory analysis and stock predictions using Google Gemini.
  * Analyzes product stock levels, sales velocity, and order history to generate
@@ -9,8 +9,8 @@
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-2.5-flash-lite â†’ gemini-2.0-flash (1.5 retired)
  * - 2026-03-15: Removed unsupported responseMimeType from generationConfig
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -20,7 +20,7 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 if (!GEMINI_API_KEY) {
     console.error('[inventory-oracle] FATAL: GEMINI_API_KEY is not set in environment secrets.')
 }
-const MODEL = 'gemini-2.5-flash'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -47,7 +47,7 @@ serve(async (req) => {
 
         const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
-        // 1. Obtener datos históricos del producto
+        // 1. Obtener datos histÃ³ricos del producto
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
@@ -83,13 +83,13 @@ serve(async (req) => {
         else if (daysUntilOut < 30) urgencyLevel = "medium";
 
         let customerMessage = "Stock estable.";
-        if (urgencyLevel === "critical") customerMessage = "¡Últimas unidades! Se agotará muy pronto.";
-        else if (urgencyLevel === "high") customerMessage = "Inventario bajando rápido, te sugerimos apartarlo.";
-        else if (urgencyLevel === "medium") customerMessage = "Aún hay stock, pero tiene buena demanda.";
+        if (urgencyLevel === "critical") customerMessage = "Â¡Ãšltimas unidades! Se agotarÃ¡ muy pronto.";
+        else if (urgencyLevel === "high") customerMessage = "Inventario bajando rÃ¡pido, te sugerimos apartarlo.";
+        else if (urgencyLevel === "medium") customerMessage = "AÃºn hay stock, pero tiene buena demanda.";
 
         let adminRecommendation = "Mantener monitoreo.";
         if (urgencyLevel === "critical") adminRecommendation = "URGENTE: Solicitar resurtido inmediato.";
-        else if (urgencyLevel === "high") adminRecommendation = "Planear resurtido para la próxima semana.";
+        else if (urgencyLevel === "high") adminRecommendation = "Planear resurtido para la prÃ³xima semana.";
 
         const oracleData = {
             daysUntilOut,

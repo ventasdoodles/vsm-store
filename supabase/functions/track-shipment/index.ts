@@ -1,4 +1,4 @@
-// Supabase Edge Function: track-shipment
+﻿// Supabase Edge Function: track-shipment
 // Proxy seguro para la API de DHL Shipment Tracking
 // Docs: https://developer.dhl.com/api-reference/shipment-tracking
 
@@ -30,7 +30,7 @@ serve(async (req: Request) => {
         const DHL_API_KEY = Deno.env.get('DHL_API_KEY');
 
         if (!DHL_API_KEY) {
-            // Sin API key → retornamos error claro para que el frontend lo maneje
+            // Sin API key â†’ retornamos error claro para que el frontend lo maneje
             return new Response(
                 JSON.stringify({ error: 'DHL_API_KEY no configurada', code: 'NOT_CONFIGURED' }),
                 { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -51,7 +51,7 @@ serve(async (req: Request) => {
         if (!dhlRes.ok) {
             if (dhlRes.status === 404) {
                 return new Response(
-                    JSON.stringify({ error: 'Número de guía no encontrado. Verifica que sea correcto.', code: 'NOT_FOUND' }),
+                    JSON.stringify({ error: 'NÃºmero de guÃ­a no encontrado. Verifica que sea correcto.', code: 'NOT_FOUND' }),
                     { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
                 );
             }
@@ -66,7 +66,7 @@ serve(async (req: Request) => {
 
         if (!shipment) {
             return new Response(
-                JSON.stringify({ error: 'No se encontraron datos para este número de guía.', code: 'NOT_FOUND' }),
+                JSON.stringify({ error: 'No se encontraron datos para este nÃºmero de guÃ­a.', code: 'NOT_FOUND' }),
                 { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
@@ -86,19 +86,19 @@ serve(async (req: Request) => {
 
         const STATUS_TEXT: Record<string, string> = {
             pending: 'Pendiente',
-            in_transit: 'En Tránsito',
+            in_transit: 'En TrÃ¡nsito',
             delivered: 'Entregado',
-            exception: 'Problema con el Envío',
+            exception: 'Problema con el EnvÃ­o',
         };
 
         // Transformar eventos en el formato de nuestra UI
         const events = (shipment.events ?? []).map((ev: Record<string, unknown>, i: number) => ({
             id: String(i),
             date: ev.timestamp ?? new Date().toISOString(),
-            status: ev.description ?? 'Actualización del envío',
+            status: ev.description ?? 'ActualizaciÃ³n del envÃ­o',
             location: [ev.location?.address?.addressLocality, ev.location?.address?.countryCode]
                 .filter(Boolean)
-                .join(', ') || 'En tránsito',
+                .join(', ') || 'En trÃ¡nsito',
             isCompleted: true,
         }));
 

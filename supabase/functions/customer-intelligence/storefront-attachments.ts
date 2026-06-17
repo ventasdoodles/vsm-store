@@ -1,4 +1,4 @@
-type AttachableRelationType =
+﻿type AttachableRelationType =
   | 'uses_coil'
   | 'uses_pod'
   | 'uses_battery'

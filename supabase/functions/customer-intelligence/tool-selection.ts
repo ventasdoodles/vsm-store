@@ -1,4 +1,4 @@
-import type { CatalogGateDecision, TurnFirstIntentProfile } from './intent-guardrails.ts';
+﻿import type { CatalogGateDecision, TurnFirstIntentProfile } from './intent-guardrails.ts';
 import {
   UI_AFFORDANCES,
   getCapabilityDefinition,
@@ -108,7 +108,7 @@ function buildKittingArgs(query: string): Record<string, unknown> {
     upgrade_intent: /cambiar a pods|pasar a pods|pasarme a pods|de desechables a pods|upgrade|mejorar|renovar|kit|setup|equipo completo/.test(normalized),
     wants_device: /\b(device|equipo|hardware|mod|pod|pods|kit|starter|setup|dispositivo|vaporizador)\b/.test(normalized),
     wants_consumable: /\b(pod|pods|cartucho|cartuchos|resistencia|resistencias|coil|coils)\b/.test(normalized),
-    wants_liquid: /\b(liquido|liquido al|líquido|jugo|juice)\b/.test(normalized),
+    wants_liquid: /\b(liquido|liquido al|lÃ­quido|jugo|juice)\b/.test(normalized),
   };
 }
 
@@ -279,7 +279,7 @@ function shouldUsePublicWebSearch(
 
   const explicitWebRequest = /web|internet|google|busca|buscame|investiga|verifica|verificalo|oficial|pagina oficial|sitio oficial|fuente publica|fuente oficial/.test(normalizedQuery);
   const freshnessCue = /actual|actualmente|hoy|reciente|nuevo|nueva|ultimo|ultima|lanz|salio|sale|release|202[4-9]|202\d/.test(normalizedQuery);
-  const publicInfoCue = /marca|modelo|nombre oficial|especific|spec|ficha tecnica|disponible afuera|availability|version|edicion|review|reseña/.test(normalizedQuery);
+  const publicInfoCue = /marca|modelo|nombre oficial|especific|spec|ficha tecnica|disponible afuera|availability|version|edicion|review|reseÃ±a/.test(normalizedQuery);
 
   if (!(explicitWebRequest || freshnessCue || publicInfoCue)) return false;
 

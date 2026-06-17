@@ -1,4 +1,4 @@
-export const CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT = 'customer_intelligence_no_write_v1' as const;
+﻿export const CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT = 'customer_intelligence_no_write_v1' as const;
 
 export type CustomerIntelligenceSuppressedWrite =
   | 'ai_customer_memory'

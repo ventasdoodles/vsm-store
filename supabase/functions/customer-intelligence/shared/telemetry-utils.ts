@@ -1,4 +1,4 @@
-import { ToolResult } from '../tools.ts';
+﻿import { ToolResult } from '../tools.ts';
 
 export type GeminiTokenUsageTelemetry = {
     model: string;
