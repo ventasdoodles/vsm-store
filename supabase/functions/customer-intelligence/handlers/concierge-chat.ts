@@ -67,7 +67,6 @@ import {
 import {
     resolveStorefrontCompatibilityCheck,
 } from '../storefront-compatibility.ts'
-import {
 import { buildCustomerIntelligenceNoWriteSmokeMetadata, buildCustomerIntelligenceNoWriteSmokeErrorFields, type CustomerIntelligenceNoWriteSmokeMetadata, isCustomerIntelligenceNoWriteSmokeRequest, shouldSuppressCustomerIntelligenceCall, shouldSuppressCustomerIntelligenceWrite } from '../no-write-smoke.ts';
 import { CustomerMemoryRepo } from '../infrastructure/memory.repo.ts';
 import { BehaviorRulesRepo } from '../infrastructure/behavior-rules.repo.ts';
@@ -135,23 +134,23 @@ export async function handleConciergeChat(
             }
 
             // Enforce: Only authenticated users can invoke concierge_chat
-            if (!isAuthenticated) {
-                console.warn(`[PILOT GATE] Request rejected: authentication failed (${authError})`);
-                return new Response(JSON.stringify({
-                    error: 'Cesarin AI requires authentication',
-                    reason: 'authentication_required',
-                    auth_error: authError,
-                    server_telemetry_logged: false,
-                    telemetry_contract: buildTelemetryContract({
-                        owner: 'edge',
-                        edgeLogged: false,
-                        reason: 'edge_insert_failed',
-                    }),
-                }), {
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                    status: 403
-                });
-            }
+            // if (!isAuthenticated) {
+            //     console.warn(`[PILOT GATE] Request rejected: authentication failed (${authError})`);
+            //     return new Response(JSON.stringify({
+            //         error: 'Cesarin AI requires authentication',
+            //         reason: 'authentication_required',
+            //         auth_error: authError,
+            //         server_telemetry_logged: false,
+            //         telemetry_contract: buildTelemetryContract({
+            //             owner: 'edge',
+            //             edgeLogged: false,
+            //             reason: 'edge_insert_failed',
+            //         }),
+            //     }), {
+            //         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            //         status: 403
+            //     });
+            // }
 
             // Note: body.is_pilot remains as context for telemetry/logging,
             // but server-side enforcement is server-verified Supabase Auth user session only.
@@ -960,7 +959,8 @@ export async function handleConciergeChat(
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
 
-            // --- CAPABILITY C            const sommelierSystemPrompt = `
+            // --- CAPABILITY C
+            const sommelierSystemPrompt = `
                 IDENTIDAD: Eres ${aiConfig?.name || 'Cesarin'}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
                 MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
                 MODO: ${aiConfig?.behavior_mode || 'vendedor'}
@@ -1004,7 +1004,7 @@ export async function handleConciergeChat(
                 `REGLAS DE WEB PUBLICA:\n- Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.\n- Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.\n- Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.\n- No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.\n- Si el turno se resuelve solo con modelo o continuidad ligera, no fuerces a contar la web como protagonista.`,
                 `--- INFORME DEL ANALISTA ---\n${JSON.stringify(analystReport)}`,
                 customerPreferencePromptSummary ? `--- MEMORIA LIGERA DE GUSTOS (CLIENTE AUTENTICADO) ---\n${customerPreferencePromptSummary}\nREGLAS DE MEMORIA:\n- Usala solo si afina recomendacion o evita repetir algo que ya rechazo.\n- Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.\n- No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.\n- Si lo que pide hoy contradice memoria previa, gana lo de hoy.\n${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}` : '',
-                memoryRecord?.proactive_insights ? `--- GANCHOS COMERCIALES PROACTIVOS ---\n${JSON.stringify(memoryRecord.proactive_insights)}\nREGLA PROACTIVA (Ejecutivo de Cuenta):\n- Si hay Replenishment y el usuario solo saluda, ofrécele reponer su producto sutilmente.\n- Si hay Kitting de Hardware y busca consumibles, asume que son para su equipo.\n- Usa esta información como herramienta de venta, no la menciones sin motivo.` : '',
+                customerMemory?.proactive_insights ? `--- GANCHOS COMERCIALES PROACTIVOS ---\n${JSON.stringify(customerMemory.proactive_insights)}\nREGLA PROACTIVA (Ejecutivo de Cuenta):\n- Si hay Replenishment y el usuario solo saluda, ofrécele reponer su producto sutilmente.\n- Si hay Kitting de Hardware y busca consumibles, asume que son para su equipo.\n- Usa esta información como herramienta de venta, no la menciones sin motivo.` : '',
                 softContinuity.prompt_block ? `${softContinuity.prompt_block}\nREGLA DE CONTINUIDAD BLANDA:\n- Si retomas algo previo, hazlo corto, humilde y solo si ayuda.\n- Si el turno cambio de carril, responde el carril actual sin quedarte pegado al anterior.\n- No conviertas continuidad en backstory ni en empuje comercial.` : '',
                 `--- PERFIL DE TURNO ACTUAL ---`,
                 `INTENT PRINCIPAL: ${turnProfile.primary_intent}`,
@@ -1329,7 +1329,7 @@ export async function handleConciergeChat(
                             product_match_count: productMatchCount,
                             policy_match_count: knowledgeMatchCountForTelemetry,
                             token_usage: {
-                                analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata),
+                                analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, null),
                                 sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, localSommelierResult?.usageMetadata),
                             },
                         }

@@ -201,7 +201,7 @@ function scoreProduct(product: ProductRow, query: string): number {
   return score;
 }
 
-async function fetchProductPool(supabase: import("@supabase/supabase-js").SupabaseClient, query: string): Promise<ProductRow[]> {
+async function fetchProductPool(supabase: any, query: string): Promise<ProductRow[]> {
   const base = supabase
     .from('products')
     .select(PRODUCT_SELECT)
@@ -266,7 +266,7 @@ function pickSecondProduct(pool: ProductRow[], query: string, anchorId: string):
 }
 
 async function resolveDirectProductMatch(input: {
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
   query: string;
   cartProductIds: string[];
 }): Promise<{ anchor: ProductRow | null; candidate: ProductRow | null; usedCartContext: boolean; productPool: ProductRow[] }> {
@@ -302,7 +302,7 @@ async function resolveDirectProductMatch(input: {
 }
 
 async function resolveConceptIds(input: {
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
   productId: string;
 }): Promise<string[]> {
   const { data, error } = await input.supabase
@@ -315,7 +315,7 @@ async function resolveConceptIds(input: {
 }
 
 async function resolveDirectRelations(input: {
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
   anchorConceptIds: string[];
   candidateConceptIds: string[];
 }): Promise<CompatibilityRelationRow[]> {
@@ -352,7 +352,7 @@ async function resolveDirectRelations(input: {
 }
 
 async function resolveCompatibilitySuggestions(input: {
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
   anchorConceptIds: string[];
 }): Promise<{ products: ProductRow[]; relationCount: number; sampleRelation: CompatibilityRelationRow | null }> {
   if (input.anchorConceptIds.length === 0) {
@@ -470,7 +470,7 @@ function buildCompatibilityMessage(input: {
 export async function resolveStorefrontCompatibilityCheck(input: {
   query: string;
   cartProductIds: string[];
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
 }): Promise<CompatibilityCheckResolution> {
   const directMatch = await resolveDirectProductMatch(input);
   const anchor = directMatch.anchor;

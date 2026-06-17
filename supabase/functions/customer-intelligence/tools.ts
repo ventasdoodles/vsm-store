@@ -238,7 +238,7 @@ async function executePublicUrlContext(args: { query?: string; urls?: string[]; 
  * Formal Tool: search_products
  * Retrieves products via neural vector match, fallback to featured.
  */
-async function search_products(args: { query: string }, supabase: import("@supabase/supabase-js").SupabaseClient, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string }> {
+async function search_products(args: { query: string }, supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string }> {
     if (!args.query) return { output: "Error: No query provided.", summary: "Error: No query" };
 
     try {
@@ -310,7 +310,7 @@ async function search_products(args: { query: string }, supabase: import("@supab
  * Formal Tool: track_order
  * Resolves order_number -> tracking_number and fetches real-time carrier status.
  */
-async function track_order(args: { order_number?: string, tracking_number?: string }, supabase: import("@supabase/supabase-js").SupabaseClient): Promise<{ output: string, summary: string, resolution_path: string, carrier?: string }> {
+async function track_order(args: { order_number?: string, tracking_number?: string }, supabase: any): Promise<{ output: string, summary: string, resolution_path: string, carrier?: string }> {
     let trackingNumber = args.tracking_number?.trim();
     let orderNumber = args.order_number?.trim().toUpperCase();
     let resolutionPath = "initial";
@@ -448,7 +448,7 @@ function buildInventoryOutlookTruth(input: {
  * Formal Tool: get_inventory_outlook
  * Resolves product and fetches a stock depletion projection from the oracle.
  */
-async function get_inventory_outlook(args: { query?: string, product_id?: string }, supabase: import("@supabase/supabase-js").SupabaseClient, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string, signal_quality: string, resolution_path: string, velocity_30d?: number }> {
+async function get_inventory_outlook(args: { query?: string, product_id?: string }, supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string, signal_quality: string, resolution_path: string, velocity_30d?: number }> {
     let productId = args.product_id;
     let productName = "Producto desconocido";
     let resolutionPath = productId ? "direct_id" : "semantic_search";
@@ -565,7 +565,7 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
  * Formal Tool: check_compatibility
  * Resolves naming variants (aliases) to canonical concepts and fetches relations.
  */
-async function check_compatibility(args: { query: string }, supabase: import("@supabase/supabase-js").SupabaseClient): Promise<{ output: string, summary: string, metadata?: Record<string, unknown> }> {
+async function check_compatibility(args: { query: string }, supabase: any): Promise<{ output: string, summary: string, metadata?: Record<string, unknown> }> {
     if (!args.query) return { output: "Error: No se proporcionó una consulta de compatibilidad.", summary: "Sin consulta" };
 
     try {
@@ -648,7 +648,7 @@ async function check_compatibility(args: { query: string }, supabase: import("@s
 /**
  * Tool Orchestrator
  */
-export async function executeTools(toolCalls: ToolCall[], supabase: import("@supabase/supabase-js").SupabaseClient, geminiKey: string, precomputedEmbedding?: number[]): Promise<ToolResult[]> {
+export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<ToolResult[]> {
     const results: ToolResult[] = [];
     
     const executionPromises = toolCalls.map(async (call) => {

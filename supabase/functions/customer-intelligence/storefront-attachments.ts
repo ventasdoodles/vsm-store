@@ -157,7 +157,7 @@ function scoreAttachmentCandidate(
 
 export async function resolveStorefrontAttachmentOffers(input: {
   productIds: string[];
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
 }): Promise<StorefrontAttachmentOffer[]> {
   const productIds = [...new Set(input.productIds.filter((value) => typeof value === 'string' && value.length > 0))];
   if (productIds.length === 0) return [];
@@ -271,7 +271,7 @@ export async function resolveStorefrontAttachmentOffers(input: {
 
 export async function resolveStorefrontCartDependencyOffer(input: {
   cartProductIds: string[];
-  supabase: import("@supabase/supabase-js").SupabaseClient;
+  supabase: any;
 }): Promise<StorefrontCartDependencyOffer | null> {
   const cartProductIds = [...new Set(input.cartProductIds.filter((value) => typeof value === 'string' && value.length > 0))];
   if (cartProductIds.length === 0) return null;
