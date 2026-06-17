@@ -1046,7 +1046,7 @@ export async function handleConciergeChat(
             ];
 
 
-            const isPureGreetingBypass = intent === 'CHIT_CHAT' && analystReport.turn_decision === 'ASK_CLARIFYING_QUESTION' && analystConversationalPrefix && toolCalls.length === 0;
+            const isPureGreetingBypass = intent === 'CHIT_CHAT' && analystConversationalPrefix && toolCalls.length === 0;
 
             const shouldShortCircuitClarification =
                 (turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION'
