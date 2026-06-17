@@ -76,8 +76,8 @@ import { GeminiAnalystAdapter } from '../adapters/gemini.adapter.ts';
 // Credentials will be loaded per-request for maximum resilience
 // â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
 const AUXILIARY_MODEL = Deno.env.get('AUXILIARY_MODEL') || 'gemini-2.5-flash';
-const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-pro';
-const CONCIERGE_SOMMELIER_MODEL = Deno.env.get('CONCIERGE_SOMMELIER_MODEL') || 'gemini-2.5-pro';
+const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-flash';
+const CONCIERGE_SOMMELIER_MODEL = Deno.env.get('CONCIERGE_SOMMELIER_MODEL') || 'gemini-2.5-flash';
 
 
 
