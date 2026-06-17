@@ -61,7 +61,7 @@ serve(async (req) => {
         if (dbError) throw new Error(`Database Error: ${dbError.message}`)
         console.log(`[inventory-oracle] Orders found: ${orders?.length || 0}`)
 
-        // 2. Preparar el prompt para Gemini
+        // 2. Preparar datos deterministicamente (Sin LLM para evitar rate limits)
         const salesHistory = (orders || []).map(o => {
             const items = (o.items as any[]) || []
             const item = items.find(i => i.product_id === productId)
@@ -69,64 +69,35 @@ serve(async (req) => {
         }).filter(h => h.quantity > 0)
 
         const totalSales = salesHistory.reduce((acc, item) => acc + item.quantity, 0)
-        const avgDailySales = totalSales / 30
+        const avgDailySales = totalSales / 30 || 0.1 // Prevent division by zero
 
         console.log(`[inventory-oracle] Sales History: ${salesHistory.length} events, Total: ${totalSales}`)
 
-        const prompt = `
-            Eres "El Oráculo de Inventario" de VSM Store.
-            Tu misión es predecir cuándo se agotará el stock de un producto basándote en su historial.
-            
-            DATOS ACTUALES:
-            - Stock en almacén: ${currentStock} unidades.
-            - Ventas totales últimos 30 días: ${totalSales} unidades.
-            - Promedio ventas diarias: ${avgDailySales.toFixed(2)}.
-            
-            DATOS HISTÓRICOS:
-            ${JSON.stringify(salesHistory)}
-            
-            INSTRUCCIONES:
-            - Calcula cuántos días faltan para el agotamiento (daysUntilOut).
-            - Genera un mensaje corto y persuasivo para el cliente (customerMessage).
-            - Genera una recomendación técnica para el administrador (adminRecommendation).
-            
-            Responde estrictamente en JSON:
-            {
-                "daysUntilOut": number,
-                "depletionDate": "ISO Date",
-                "customerMessage": "string",
-                "adminRecommendation": "string",
-                "urgencyLevel": "low" | "medium" | "high" | "critical"
-            }
-        `
+        // 3. Calculos Deterministicos
+        const daysUntilOut = Math.floor(currentStock / avgDailySales)
+        const depletionDate = new Date(Date.now() + daysUntilOut * 24 * 60 * 60 * 1000).toISOString()
+        
+        let urgencyLevel = "low";
+        if (daysUntilOut < 7) urgencyLevel = "critical";
+        else if (daysUntilOut < 15) urgencyLevel = "high";
+        else if (daysUntilOut < 30) urgencyLevel = "medium";
 
-        // 3. Consultar a Gemini
-        console.log('[inventory-oracle] Consulting Gemini v1...')
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.7
-                }
-            })
-        })
+        let customerMessage = "Stock estable.";
+        if (urgencyLevel === "critical") customerMessage = "¡Últimas unidades! Se agotará muy pronto.";
+        else if (urgencyLevel === "high") customerMessage = "Inventario bajando rápido, te sugerimos apartarlo.";
+        else if (urgencyLevel === "medium") customerMessage = "Aún hay stock, pero tiene buena demanda.";
 
-        if (!geminiRes.ok) {
-            const errorDetail = await geminiRes.text();
-            throw new Error(`Gemini API Error: ${geminiRes.status} ${errorDetail}`);
+        let adminRecommendation = "Mantener monitoreo.";
+        if (urgencyLevel === "critical") adminRecommendation = "URGENTE: Solicitar resurtido inmediato.";
+        else if (urgencyLevel === "high") adminRecommendation = "Planear resurtido para la próxima semana.";
+
+        const oracleData = {
+            daysUntilOut,
+            depletionDate,
+            customerMessage,
+            adminRecommendation,
+            urgencyLevel
         }
-
-        const geminiResult = await geminiRes.json()
-        const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-
-        if (!rawText) {
-            throw new Error('Gemini returned an empty response')
-        }
-
-        const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        const oracleData = JSON.parse(jsonText);
 
         return new Response(JSON.stringify(oracleData), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -134,13 +105,10 @@ serve(async (req) => {
 
     } catch (error: unknown) {
         const errObj = error instanceof Error ? error : new Error(String(error));
-        const errorMsg = `[Inventory-Oracle] Error: ${errObj.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
-        console.error(errorMsg);
+        console.error(`[Inventory-Oracle] Error: ${errObj.message}`);
         return new Response(JSON.stringify({ 
             error: errObj.message,
-            context: 'inventory-oracle',
-            gemini_key_present: !!GEMINI_API_KEY,
-            full_error: errObj.stack
+            context: 'inventory-oracle'
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
