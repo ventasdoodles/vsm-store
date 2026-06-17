@@ -1,0 +1,2 @@
+ALTER TABLE categories DROP CONSTRAINT IF EXISTS categories_parent_id_fkey;
+ALTER TABLE categories ADD CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL;

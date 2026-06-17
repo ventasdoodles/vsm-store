@@ -17,6 +17,7 @@ import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 interface CategoryTreeContainerProps {
     roots: Category[];
     allCategories: Category[];
+    childrenMap: Record<string, Category[]>;
     sectionFilter: Section | 'all';
     isLoading: boolean;
     onEdit: (c: Category) => void;
@@ -32,6 +33,7 @@ const SKELETON_COUNT = 4;
 export function CategoryTreeContainer({
     roots,
     allCategories,
+    childrenMap,
     sectionFilter,
     isLoading,
     onEdit,
@@ -79,6 +81,7 @@ export function CategoryTreeContainer({
                                 key={root.id}
                                 category={root}
                                 allCategories={allCategories}
+                                childrenMap={childrenMap}
                                 level={0}
                                 onEdit={onEdit}
                                 onAddChild={onAddChild}

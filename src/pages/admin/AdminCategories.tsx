@@ -7,12 +7,13 @@
  *    Delega TODO el renderizado visual a los Legos en components/admin/categories/.
  * // Regla / Notas: Cero UI propio excepto layout wrapper. Sin `any`, sin cadenas magicas.
  */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAdminCategories } from '@/hooks/admin/useAdminCatalog';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
+import { SYSTEM_CATEGORY_SLUGS } from '@/types/constants';
 import { type CategoryFormData } from '@/services/admin';
 
 import { CategoriesHeader, CategoryForm, CategoryTreeContainer } from '@/components/admin/categories';
@@ -60,7 +61,7 @@ export function AdminCategories() {
 
     const handleDelete = async (cat: Category) => {
         // Proteger categorías de respaldo del sistema
-        if (cat.slug === 'sin-categoria') {
+        if (cat.slug === SYSTEM_CATEGORY_SLUGS.UNCLASSIFIED) {
             notifyError('Protegida', '"Sin Categoría" es una categoría del sistema y no se puede eliminar.');
             return;
         }
@@ -95,6 +96,19 @@ export function AdminCategories() {
     };
 
     // ── Derived data ──
+    const childrenMap = useMemo(() => {
+        const map: Record<string, Category[]> = {};
+        categories.forEach(c => {
+            if (c.parent_id) {
+                if (!map[c.parent_id]) {
+                    map[c.parent_id] = [];
+                }
+                map[c.parent_id]!.push(c);
+            }
+        });
+        return map;
+    }, [categories]);
+
     const visibleRoots = categories.filter(
         c => !c.parent_id && (sectionFilter === 'all' || c.section === sectionFilter),
     );
@@ -111,6 +125,7 @@ export function AdminCategories() {
 
             <CategoryTreeContainer
                 roots={visibleRoots}
+                childrenMap={childrenMap}
                 allCategories={categories}
                 sectionFilter={sectionFilter}
                 isLoading={isLoading}

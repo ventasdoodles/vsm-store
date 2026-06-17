@@ -28,6 +28,7 @@ import { useMemo } from 'react';
 interface CategoryTreeNodeProps {
     category: Category;
     allCategories: Category[];
+    childrenMap: Record<string, Category[]>;
     level?: number;
     onEdit: (c: Category) => void;
     onAddChild: (parent: Category) => void;
@@ -44,6 +45,7 @@ const LEVEL_INDENT = 28;
 export function CategoryTreeNode({
     category,
     allCategories,
+    childrenMap,
     level = 0,
     onEdit,
     onAddChild,
@@ -54,7 +56,7 @@ export function CategoryTreeNode({
     const { config } = useActiveVerticalPack();
     const adminSectionCatalog = useMemo(() => config ? buildAdminSectionCatalog(config) : null, [config]);
 
-    const children = allCategories.filter(c => c.parent_id === category.id);
+    const children = childrenMap[category.id] || [];
     const hasChildren = children.length > 0;
     const [expanded, setExpanded] = useState(true);
     const sectionPresentation = (adminSectionCatalog ? adminSectionCatalog.bySlug[category.section] : null) ?? {
@@ -223,6 +225,7 @@ export function CategoryTreeNode({
                             key={child.id}
                             category={child}
                             allCategories={allCategories}
+                            childrenMap={childrenMap}
                             level={level + 1}
                             onEdit={onEdit}
                             onAddChild={onAddChild}

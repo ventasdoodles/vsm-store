@@ -19,6 +19,7 @@ describe('CategoryTreeContainer', () => {
         render(
             <CategoryTreeContainer
                 roots={[]}
+                childrenMap={{}}
                 allCategories={[] as Category[]}
                 sectionFilter="vape"
                 isLoading={false}

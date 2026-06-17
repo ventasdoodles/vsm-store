@@ -216,6 +216,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                     type="button"
                                     onClick={() => !isDisabled && setActiveTab(tab.id)}
                                     disabled={isDisabled}
+                                    title={isDisabled ? 'Corrige los errores de parseo en JSON Avanzado primero' : undefined}
                                     className={`relative flex items-center gap-4 w-full p-4 rounded-2xl text-left transition-all duration-300 group ${isDisabled ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/[0.04]'}`}
                                 >
                                     {isActive && (
@@ -417,6 +418,16 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                         <div>
                                                             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Descripción Breve</label>
                                                             <textarea value={section.description || ''} onChange={(e) => updateSection(idx, 'description', e.target.value)} rows={2} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white/70 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all resize-none" />
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Descripción SEO</label>
+                                                                <textarea value={section.seoDescription || ''} onChange={(e) => updateSection(idx, 'seoDescription', e.target.value)} rows={2} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white/70 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all resize-none" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Token de Tema</label>
+                                                                <input type="text" value={section.themeToken || ''} onChange={(e) => updateSection(idx, 'themeToken', e.target.value)} placeholder="ej. blue, violet" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </motion.div>

@@ -6,6 +6,10 @@ export const SECTIONS = {
     CANNABIS: '420',
 } as const;
 
+export const SYSTEM_CATEGORY_SLUGS = {
+    UNCLASSIFIED: 'sin-categoria',
+} as const;
+
 export type Section = string;
 
 export const PRODUCT_STATUS = {
