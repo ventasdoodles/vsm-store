@@ -49,8 +49,9 @@ serve(async (req) => {
             .eq('id', customerId)
             .single()
 
+        let finalIntel = intel;
         if (intelError || !intel) {
-            throw new Error('Could not find customer intelligence data')
+            finalIntel = { full_name: 'Cliente', segment: 'Nuevo', health_status: 'Onboarding', monetary: 0, recency_days: 0 };
         }
 
         // 2. Definir Prompt para Gemini basado en segmento
@@ -59,11 +60,11 @@ serve(async (req) => {
             Tu misión es generar una recompensa personalizada para un cliente basada en su comportamiento.
 
             DATOS DEL CLIENTE:
-            - Nombre: ${intel.full_name}
-            - Segmento: ${intel.segment}
-            - Salud: ${intel.health_status}
-            - Valor Monetrio: $${intel.monetary}
-            - Recencia: ${intel.recency_days} días.
+            - Nombre: ${finalIntel.full_name}
+            - Segmento: ${finalIntel.segment}
+            - Salud: ${finalIntel.health_status}
+            - Valor Monetrio: $${finalIntel.monetary}
+            - Recencia: ${finalIntel.recency_days} días.
 
             GUÍAS DE GENERACIÓN:
             - Para "Campeón": Ofrece algo pequeño (10%) pero con mensaje de agradecimiento VIP.
@@ -111,7 +112,7 @@ serve(async (req) => {
             .from('coupons')
             .insert({
                 code: uniqueCode,
-                description: `IA Reward - ${intel.segment}`,
+                description: `IA Reward - ${finalIntel.segment}`,
                 discount_type: aiData.discountType,
                 discount_value: aiData.discountValue,
                 min_purchase: 200, // Hardcoded para evitar uso abusivo
@@ -134,7 +135,7 @@ serve(async (req) => {
                 personalized_message: aiData.personalizedMessage,
                 discount_value: aiData.discountValue,
                 discount_type: aiData.discountType,
-                segment_at_generation: intel.segment
+                segment_at_generation: finalIntel.segment
             })
             .select()
             .single()

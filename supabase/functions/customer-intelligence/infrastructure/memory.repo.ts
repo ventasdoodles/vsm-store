@@ -91,8 +91,8 @@ export class CustomerMemoryRepo {
         ));
 
         if ((mem && (hasInterests || hasSummary)) || hasInsights) {
-            const meta = mem.interests_metadata || {};
-            const detectedInterests = mem.detected_interests || [];
+            const meta = mem?.interests_metadata || {};
+            const detectedInterests = mem?.detected_interests || [];
             
             const sortedInterests = [...detectedInterests].sort((a, b) => {
                 const metaA = meta[a.toLowerCase()] || { hits: 0, last_at: '0' };
