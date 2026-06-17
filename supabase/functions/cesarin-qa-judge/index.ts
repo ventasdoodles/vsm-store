@@ -141,12 +141,13 @@ RESPONDE ESTRICTAMENTE EN JSON:
                 });
 
             } catch (e: unknown) {
-                console.error(`[EVALUATE_TURN] Gemini or persistence error: ${e.message}`);
+                const errObj = e instanceof Error ? e : new Error(String(e));
+                console.error(`[EVALUATE_TURN] Gemini or persistence error: ${errObj.message}`);
                 // Best-effort: evaluation failed, return error but don't fail the request
                 return new Response(JSON.stringify({
                     status: 'error',
                     analytics_id: analytics_id,
-                    error: e.message
+                    error: errObj.message
                 }), {
                     status: 200, // Return 200 to signal non-critical error (caller is non-blocking anyway)
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -209,7 +210,8 @@ RESPONDE ESTRICTAMENTE EN JSON:
         });
 
     } catch (error: unknown) {
-        return new Response(JSON.stringify({ error: error.message }), { 
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        return new Response(JSON.stringify({ error: errObj.message }), { 
             status: 500, 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         });

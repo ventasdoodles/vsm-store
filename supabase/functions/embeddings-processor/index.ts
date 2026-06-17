@@ -40,7 +40,8 @@ serve(async (req) => {
 
     } catch (error: unknown) {
         console.error(error)
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        return new Response(JSON.stringify({ error: errObj.message }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })

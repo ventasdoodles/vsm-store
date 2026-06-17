@@ -102,10 +102,11 @@ serve(async (req) => {
         })
 
     } catch (error: unknown) {
-        console.error(`[Voice-Intelligence] Error: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`[Voice-Intelligence] Error: ${errorMessage}`);
         // Fallback: si falla la IA, devolvemos el texto original para no romper la experiencia
         return new Response(JSON.stringify({ 
-            error: error.message,
+            error: errorMessage,
             searchQuery: transcript,
             isComplex: false,
             gemini_key_present: !!GEMINI_API_KEY

@@ -54,15 +54,16 @@ serve(async (req) => {
 
         throw new Error(`Acción no soportada: ${action}`)
     } catch (error: unknown) {
-        const errorMsg = `[Customer-Intelligence] Error: ${error.message}`;
+        const errorObj = error instanceof Error ? error : new Error(String(error));
+        const errorMsg = `[Customer-Intelligence] Error: ${errorObj.message}`;
         console.error(errorMsg);
         const errorPayload: Record<string, unknown> = {
             version: "V3.4B-STABILIZED-2026-COMPLIANT",
-            error: error.message,
+            error: errorObj.message,
             context: 'customer-intelligence',
             gemini_key_present: !!_GEMINI_API_KEY,
             ...buildCustomerIntelligenceNoWriteSmokeErrorFields(noWriteSmokeForError),
-            ...(noWriteSmokeForError ? {} : { full_error: error.stack }),
+            ...(noWriteSmokeForError ? {} : { full_error: errorObj.stack }),
         };
         return new Response(JSON.stringify(errorPayload), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
