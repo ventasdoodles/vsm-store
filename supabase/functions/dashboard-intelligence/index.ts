@@ -78,7 +78,7 @@ serve(async (req) => {
         `
 
         // Llamar a Gemini 3.1 Flash Lite
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -115,13 +115,14 @@ serve(async (req) => {
         })
 
     } catch (error: unknown) {
-        const errorMsg = `[Dashboard-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        const errorMsg = `[Dashboard-Intelligence] Error: ${errObj.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 
-            error: error.message,
+            error: errObj.message,
             context: 'dashboard-intelligence',
             gemini_key_present: !!GEMINI_API_KEY,
-            full_error: error.stack
+            full_error: errObj.stack
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,

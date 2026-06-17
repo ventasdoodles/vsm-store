@@ -71,14 +71,13 @@ serve(async (req) => {
         `
         parts.push({ text: prompt })
 
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts }],
                 generationConfig: { 
-                    temperature: 0.2,
-                    responseMimeType: "application/json"
+                    temperature: 0.2
                 }
             })
         })

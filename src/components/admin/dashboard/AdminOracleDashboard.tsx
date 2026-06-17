@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
  
  /**
-  * AdminOracleDashboard - Insights proactivos del OrÃ¡culo (IA)
+  * AdminOracleDashboard - Insights proactivos del Oráculo (IA)
   * Muestra alertas inteligentes basadas en predicciones de Gemini.
   */
  export function AdminOracleDashboard() {
@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
                     <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
-                    Insights del OrÃ¡culo VSM AI
+                    Insights del Oráculo VSM AI
                 </h3>
             </div>
 
@@ -60,10 +60,10 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
                         "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
                         isCritical ? "bg-red-500 text-white" : "bg-accent-primary text-white"
                     )}>
-                        {isCritical ? 'Estado CrÃ­tico' : 'Insight IA'}
+                        {isCritical ? 'Estado Crítico' : 'Insight IA'}
                     </span>
                     <span className="text-xs font-bold text-white/40 italic">
-                        Stock: {product.stock} ({prediction.daysUntilOut} dÃ­as)
+                        Stock: {product.stock} ({prediction.daysUntilOut} días)
                     </span>
                 </div>
 

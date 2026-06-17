@@ -76,7 +76,7 @@ serve(async (req) => {
     `
 
         // 3. Llamar a la API de Gemini
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -109,9 +109,10 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
 
-    } catch (error) {
-        console.error(error)
-        return new Response(JSON.stringify({ error: error.message }), {
+    } catch (error: unknown) {
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        console.error(errObj)
+        return new Response(JSON.stringify({ error: errObj.message }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })

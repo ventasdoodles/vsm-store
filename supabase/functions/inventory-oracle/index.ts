@@ -102,7 +102,7 @@ serve(async (req) => {
 
         // 3. Consultar a Gemini
         console.log('[inventory-oracle] Consulting Gemini v1...')
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -133,13 +133,14 @@ serve(async (req) => {
         })
 
     } catch (error: unknown) {
-        const errorMsg = `[Inventory-Oracle] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        const errorMsg = `[Inventory-Oracle] Error: ${errObj.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 
-            error: error.message,
+            error: errObj.message,
             context: 'inventory-oracle',
             gemini_key_present: !!GEMINI_API_KEY,
-            full_error: error.stack
+            full_error: errObj.stack
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,

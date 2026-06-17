@@ -83,14 +83,13 @@ serve(async (req) => {
         `
 
         // 3. Llamar a Gemini
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
-                    temperature: 0.2, // Reducimos para consistencia JSON
-                    responseMimeType: "application/json"
+                    temperature: 0.2 // Reducimos para consistencia JSON
                 }
             })
         })
@@ -146,9 +145,10 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
 
-    } catch (error) {
-        console.error(error)
-        return new Response(JSON.stringify({ error: error.message }), {
+    } catch (error: unknown) {
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        console.error(errObj)
+        return new Response(JSON.stringify({ error: errObj.message }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })

@@ -229,13 +229,14 @@ FORMATO:
         throw new Error(`Unknown action: ${action}`)
 
     } catch (error: unknown) {
-        const errorMsg = `[Product-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        const errorMsg = `[Product-Intelligence] Error: ${errObj.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 
-            error: error.message,
+            error: errObj.message,
             context: 'product-intelligence',
             gemini_key_present: !!GEMINI_API_KEY,
-            full_error: error.stack
+            full_error: errObj.stack
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
