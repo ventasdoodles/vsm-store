@@ -226,13 +226,41 @@ export async function handleConciergeChat(
                 customerProactiveInsights: customerMemory?.proactive_insights || null
             });
 
-            // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” ANALYST CALL WITH FALLBACK â•â•â•
-            const adapter = new GeminiAnalystAdapter(_GEMINI_API_KEY, CONCIERGE_ANALYST_MODEL);
-            const { report: analystReport, rawText: rawAnalystText, error: geminiError } = await adapter.analyzeTurn(
-                analystSystemPrompt, 
-                analystUserPromptBlocks, 
-                history
-            );
+            // â• â• â•  HARDENING 2: GEMINI RESILIENCE â€” ANALYST CALL WITH FALLBACK â• â• â• 
+            let analystReport: Record<string, any> = {};
+            let rawAnalystText = '';
+            let geminiError: any = null;
+
+            const isPureGreeting = preAnalystSignals.isGreeting && 
+                !preAnalystSignals.isProductMatch && 
+                !preAnalystSignals.isPolicyMatch && 
+                !preAnalystSignals.isInventoryMatch && 
+                !preAnalystSignals.isTrackingMatch &&
+                !preAnalystSignals.isWarrantyMatch &&
+                !preAnalystSignals.isLoyaltyMatch &&
+                !preAnalystSignals.isCartMatch &&
+                (query || '').length < 30;
+
+            if (isPureGreeting) {
+                console.log("[concierge-chat] FAST-PATH: Pure greeting detected. Bypassing Analyst AI.");
+                analystReport = {
+                    intent: 'CHIT_CHAT',
+                    turn_decision: 'ASK_CLARIFYING_QUESTION',
+                    conversational_prefix: '¡Hola! Qué gusto saludarte, bienvenido a VSM Store. ¿En qué te puedo ayudar hoy?',
+                    tool_calls: []
+                };
+                rawAnalystText = JSON.stringify(analystReport);
+            } else {
+                const adapter = new GeminiAnalystAdapter(_GEMINI_API_KEY, CONCIERGE_ANALYST_MODEL);
+                const result = await adapter.analyzeTurn(
+                    analystSystemPrompt, 
+                    analystUserPromptBlocks, 
+                    history
+                );
+                analystReport = result.report;
+                rawAnalystText = result.rawText;
+                geminiError = result.error;
+            }
             
             let analystParseValid = !geminiError;
 
