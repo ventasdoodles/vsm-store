@@ -1,18 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ConciergeMessageItem } from './ConciergeMessageItem';
-import { collectCartAssemblyProductIds } from './helpers';
-import { resolveCesarinCartAssemblyEligibility } from '@/lib/cesarin-cart-assembly';
-import { getVariantDisplayName } from '@/lib/domain/products';
-
-import {
-    CartAssemblyFeedback,
-    emitCtaMeasurement,
-    getOrderIdFromUrl,
-    getNextStepActions,
-    getCartAssemblyProduct,
-    getAddActionLabel
-} from './helpers';
-
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot, Loader2, Search, Mic, MicOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,19 +7,20 @@ import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getProductsByIds } from '@/services/products.service';
-import { type ConciergeCatalogGate, type ConciergeMessage } from '@/services';
 import type { Product } from '@/types/product';
-
-function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
-    for (let index = messages.length - 1; index >= 0; index -= 1) {
-        const candidate = messages[index] as ConciergeMessage & { catalog_gate?: ConciergeCatalogGate };
-        if (candidate.catalog_gate) {
-            return candidate.catalog_gate;
-        }
-    }
-
-    return null;
-}
+import { resolveCesarinCartAssemblyEligibility } from '@/lib/cesarin-cart-assembly';
+import { getVariantDisplayName } from '@/lib/domain/products';
+import { ConciergeMessageItem } from './ConciergeMessageItem';
+import {
+    type CartAssemblyFeedback,
+    collectCartAssemblyProductIds,
+    emitCtaMeasurement,
+    getAddActionLabel,
+    getCartAssemblyProduct,
+    getLatestCatalogGate,
+    getNextStepActions,
+    getOrderIdFromUrl,
+} from './helpers';
 
 
 export const AIConcierge: React.FC = () => {
@@ -194,8 +181,6 @@ export const AIConcierge: React.FC = () => {
         }
     };
 
-    
-
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
 
@@ -282,6 +267,10 @@ export const AIConcierge: React.FC = () => {
         .find((message) => message.role === 'assistant')
         ?.catalog_gate;
     const shouldShowCatalogSurfacesNow = latestAssistantCatalogGate?.is_open ?? true;
+    const lastAssistantId = useMemo(
+        () => [...messages].reverse().find((m) => m.role === 'assistant')?.id ?? null,
+        [messages],
+    );
 
     return (
         <>
@@ -334,7 +323,7 @@ export const AIConcierge: React.FC = () => {
 {messages.map((message) => (
                                     <ConciergeMessageItem
                                         key={message.id}
-                                        message={message as any}
+                                        message={message}
                                         latestCatalogGate={latestCatalogGate}
                                         shouldShowCatalogSurfacesNow={shouldShowCatalogSurfacesNow}
                                         cartAssemblyProducts={cartAssemblyProducts}
@@ -342,7 +331,7 @@ export const AIConcierge: React.FC = () => {
                                         cesarinSessionId={cesarinSessionId}
                                         isLoading={isLoading}
                                         activeRecovery={activeRecovery}
-                                        lastAssistantId={[...messages].reverse().find(m => m.role === 'assistant')?.id ?? null}
+                                        lastAssistantId={lastAssistantId}
                                         scrollRef={scrollRef}
                                         handleRecoverySelection={handleRecoverySelection}
                                         handleAddProductToCart={handleAddProductToCart}

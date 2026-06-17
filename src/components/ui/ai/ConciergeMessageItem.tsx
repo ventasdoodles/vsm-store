@@ -10,6 +10,7 @@ import { buildConciergeCatalogGate, type ConciergeMessage, type ConciergeCatalog
 import { getCesarinApproximateRecoveryHint, isCesarinApproximateMatchStrategy } from '@/lib/cesarin-stage1';
 import { isMeaningfullyDistinct } from '@/lib/cesarin-text-utils';
 import type { Product } from '@/types/product';
+import type { CartConversionContext } from '@/stores/cart.store';
 import { CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS } from '@/lib/customer-intelligence-no-write-smoke';
 import {
     getSuggestionGroupLabel,
@@ -42,10 +43,10 @@ export interface ConciergeMessageItemProps {
     lastAssistantId: string | null;
     scrollRef: React.RefObject<HTMLDivElement>;
     handleRecoverySelection?: (kind: 'closest' | 'none', productId?: string) => Promise<void> | void;
-    handleAddProductToCart?: (product: any) => Promise<void> | void;
+    handleAddProductToCart?: (product: { id: string; name: string; quantity?: number; variantToken?: { id: string; name: string } | null; messageId?: string }) => Promise<void> | void;
     handleOpenProduct?: (product: { slug: string; section?: string }) => void;
     sendMessage: (msg: string) => Promise<void>;
-    openCart: (opts: any) => void;
+    openCart: (opts?: CartConversionContext) => void;
     navigate: (path: string) => void;
 }
 
