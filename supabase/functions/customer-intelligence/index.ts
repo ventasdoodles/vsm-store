@@ -1,4 +1,4 @@
-﻿import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from './shared/cors.ts';
 import {
@@ -52,7 +52,7 @@ serve(async (req) => {
             return await handleConciergeChat(req, body, supabase, _GEMINI_API_KEY, _SUPABASE_URL, _SUPABASE_SERVICE_ROLE_KEY, noWriteSmoke, noWriteSmokeForError);
         }
 
-        throw new Error(`AcciÃ³n no soportada: ${action}`)
+        throw new Error(`Acción no soportada: ${action}`)
     } catch (error: unknown) {
         const errorObj = error instanceof Error ? error : new Error(String(error));
         const errorMsg = `[Customer-Intelligence] Error: ${errorObj.message}`;

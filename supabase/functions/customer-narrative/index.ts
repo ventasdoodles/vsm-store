@@ -1,5 +1,5 @@
-﻿/**
- * customer-narrative â€” Supabase Edge Function
+/**
+ * customer-narrative — Supabase Edge Function
  * 
  * AI-powered customer narrative generation. Creates rich, contextual summaries
  * of customer purchase history, preferences, and relationship with the store.
@@ -8,8 +8,8 @@
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-2.5-flash â†’ gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -55,22 +55,22 @@ serve(async (req) => {
         // 2. Construir el prompt para Gemini
         const prompt = `
       Eres un consultor experto en CRM y Estrategia de Retail para la marca "VSM Store" (una tienda premium de vapes y accesorios).
-      Analiza los siguientes datos de un cliente y genera una NARRATIVA EJECUTIVA de mÃ¡ximo 2 frases (40 palabras).
+      Analiza los siguientes datos de un cliente y genera una NARRATIVA EJECUTIVA de máximo 2 frases (40 palabras).
       
       DATOS DEL CLIENTE:
       - Nombre: ${intel.full_name}
       - Segmento: ${intel.segment}
       - Salud: ${intel.health_status}
-      - Recencia: ${intel.recency_days} dÃ­as desde la Ãºltima compra.
-      - Frecuencia: ${intel.frequency} Ã³rdenes totales.
+      - Recencia: ${intel.recency_days} días desde la última compra.
+      - Frecuencia: ${intel.frequency} órdenes totales.
       - Valor: $${intel.monetary} gastados en total.
-      - Ãšltimas Ã³rdenes: ${orders.map(o => `$${o.total} (${o.status})`).join(', ')}
+      - Últimas órdenes: ${orders.map(o => `$${o.total} (${o.status})`).join(', ')}
 
-      GUÃAS:
+      GUÍAS:
       - Tono: Profesional, premium, accionable.
-      - Objetivo: Decirle al administrador quÃ© tipo de cliente es y quÃ© estrategia seguir hoy.
-      - Evita repetir los nÃºmeros tal cual, interpreta el comportamiento.
-      - Ejemplo: "Este cliente es un motor de ingresos Leal; su ticket promedio es alto pero no ha comprado en 30 dÃ­as. Sugiere un acceso exclusivo a la nueva colecciÃ³n para reactivarlo."
+      - Objetivo: Decirle al administrador qué tipo de cliente es y qué estrategia seguir hoy.
+      - Evita repetir los números tal cual, interpreta el comportamiento.
+      - Ejemplo: "Este cliente es un motor de ingresos Leal; su ticket promedio es alto pero no ha comprado en 30 días. Sugiere un acceso exclusivo a la nueva colección para reactivarlo."
 
       NARRATIVA:
     `

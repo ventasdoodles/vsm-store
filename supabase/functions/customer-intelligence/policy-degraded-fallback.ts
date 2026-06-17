@@ -1,4 +1,4 @@
-﻿import { compactCesarinResponseText } from './persona.ts';
+import { compactCesarinResponseText } from './persona.ts';
 
 type PolicyFallbackStrategy =
     | 'policy_context'
@@ -16,7 +16,7 @@ export type DegradedPolicyFallback = {
 const NO_POLICY_OUTPUT_PATTERNS = [
     /^no se consultaron/i,
     /^no se encontro/i,
-    /^no se encontrÃ³/i,
+    /^no se encontró/i,
     /^sin coincidencias/i,
     /^error:/i,
 ];

@@ -1,4 +1,4 @@
-﻿type TurnDecision = 'DIRECT_ANSWER' | 'ASK_CLARIFYING_QUESTION' | 'USE_CAPABILITY' | string | null | undefined;
+type TurnDecision = 'DIRECT_ANSWER' | 'ASK_CLARIFYING_QUESTION' | 'USE_CAPABILITY' | string | null | undefined;
 type StorefrontIntent = string | null | undefined;
 
 export interface ShapeCesarinResponseTextInput {
@@ -38,7 +38,7 @@ function normalizeSentence(value: string): string {
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
-        .replace(/[Â¿?Â¡!.,;:]/g, ' ')
+        .replace(/[¿?¡!.,;:]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 }
@@ -59,7 +59,7 @@ function splitIntoSentences(text: string): string[] {
 }
 
 function isQuestion(sentence: string): boolean {
-    return sentence.includes('?') || sentence.includes('Â¿');
+    return sentence.includes('?') || sentence.includes('¿');
 }
 
 function isThinClarificationText(value: string): boolean {
@@ -80,7 +80,7 @@ function normalizeQueryFragment(value: string | null | undefined): string {
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
-        .replace(/[Ã‚Â¿?Ã‚Â¡!.,;:]/g, ' ')
+        .replace(/[Â¿?Â¡!.,;:]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 }
@@ -90,7 +90,7 @@ function isCutMessageFragment(input: string | null | undefined): boolean {
     const normalized = normalizeQueryFragment(input);
 
     if (!raw) return false;
-    if (/^[Ã‚Â¿?]+$/.test(raw)) return true;
+    if (/^[Â¿?]+$/.test(raw)) return true;
     if (/^(q|qu|que|mmm)$/.test(normalized)) return true;
     if (/^[a-z0-9]{1,2}$/.test(normalized) && !/^(ok|va)$/.test(normalized)) return true;
 
@@ -147,7 +147,7 @@ function isRoboticClosingSentence(
     const normalized = normalizeSentence(sentence);
 
     // Only remove very explicit and repetitive sales pushes.
-    // "si quieres", "te muestro", "te enseÃ±o" are polite and natural, so we no longer remove them!
+    // "si quieres", "te muestro", "te enseño" are polite and natural, so we no longer remove them!
     const hasInlineClosePattern =
         /(te dejo .*cerquita|comparar rapido|te saco algo parecido|paso mas derecho)/.test(normalized);
 
@@ -218,7 +218,7 @@ export function buildClarificationFirstFallbackText(input: ClarificationFirstFal
 
     if (!shouldRepairClarificationFirstFallback(input)) return rawText;
 
-    return 'Claro. Â¿Buscas algo econÃ³mico, algo de mejor calidad o algo especÃ­fico por sabor/presentaciÃ³n?';
+    return 'Claro. ¿Buscas algo económico, algo de mejor calidad o algo específico por sabor/presentación?';
 }
 
 export function guardClarificationFirstFinalText(input: ClarificationFirstFinalTextGuardInput): string {

@@ -1,4 +1,4 @@
-﻿export interface MercadoPagoWebhookNotification {
+export interface MercadoPagoWebhookNotification {
     type: string | null;
     paymentId: string | null;
 }

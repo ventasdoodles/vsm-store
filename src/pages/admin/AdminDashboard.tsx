@@ -15,6 +15,9 @@ import { DashboardStats as StatsCards } from '@/components/admin/dashboard/Dashb
 import { SalesChart } from '@/components/admin/dashboard/SalesChart';
 import { TopProducts } from '@/components/admin/dashboard/TopProducts';
 import { RecentOrders } from '@/components/admin/dashboard/RecentOrders';
+import { DashboardPulse } from '@/components/admin/dashboard/DashboardPulse';
+import { AdminOracleDashboard } from '@/components/admin/dashboard/AdminOracleDashboard';
+import { AIInsights } from '@/components/admin/dashboard/AIInsights';
 
 export function AdminDashboard() {
     // Default to last 7 days
@@ -103,6 +106,20 @@ export function AdminDashboard() {
                     setDateRange={setDateRange}
                     onExport={handleExport}
                 />
+            </motion.div>
+
+            {/* Lego: AI Pulse Tracker */}
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                {stats && <DashboardPulse stats={stats} />}
+            </motion.div>
+
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <AdminOracleDashboard />
+            </motion.div>
+
+            {/* Lego: AI Proactive Insights (Wave 59) */}
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <AIInsights />
             </motion.div>
 
             {/* Lego: Tarjetas de Estadísticas */}

@@ -1,5 +1,5 @@
-﻿/**
- * cesarin-qa-judge â€” Supabase Edge Function
+/**
+ * cesarin-qa-judge — Supabase Edge Function
  * 
  * Separate boundary for semantic judging of Cesarin OS responses.
  * 
@@ -29,7 +29,7 @@ serve(async (req) => {
         )
 
         if (action === 'evaluate_turn') {
-            // â•â•â• HARDENING 3: EVALUATE_TURN ACTION + AI_EVALUATIONS PERSISTENCE â•â•â•
+            // ═══ HARDENING 3: EVALUATE_TURN ACTION + AI_EVALUATIONS PERSISTENCE ═══
             // Evaluate a single conversation turn (question + response) for quality signals.
             // Triggered on frustration or zero-results scenarios.
             // Persists evaluation output to ai_evaluations table (server-trusted path).
@@ -44,22 +44,22 @@ serve(async (req) => {
             const { query, response_text, intent, frustration_detected, zero_results, product_count } = turn_data;
 
             const prompt = `
-Eres un Auditor de Calidad especializado en evaluaciones de conversaciÃ³n para "VSM Store" (tienda de vapes y accesorios).
-EvalÃºa esta interacciÃ³n cliente-IA para detectar problemas de confianza, relevancia y hallucinations.
+Eres un Auditor de Calidad especializado en evaluaciones de conversación para "VSM Store" (tienda de vapes y accesorios).
+Evalúa esta interacción cliente-IA para detectar problemas de confianza, relevancia y hallucinations.
 
-TURNO DE CONVERSACIÃ“N:
+TURNO DE CONVERSACIÓN:
 - Pregunta del cliente: "${query}"
 - Respuesta de Cesarin: "${response_text}"
-- IntenciÃ³n detectada: ${intent}
+- Intención detectada: ${intent}
 - Frustracion del cliente: ${frustration_detected}
-- BÃºsqueda sin resultados: ${zero_results}
+- Búsqueda sin resultados: ${zero_results}
 - Productos ofrecidos: ${product_count}
 
 INSTRUCCIONES:
-1. RELEVANCIA: Â¿La respuesta abordan realmente lo que pidiÃ³ el cliente?
-2. HALLUCINATION: Â¿Hay inventos, datos falsos o suposiciones injustificadas?
-3. TONO: Â¿Mantiene la marca (carnal, desenfadado) sin ser inapropiado?
-4. ESCALATION: Si hay frustracion o cero resultados, Â¿fue comunicado claramente? Â¿se ofrciÃ³ soporte humano?
+1. RELEVANCIA: ¿La respuesta abordan realmente lo que pidió el cliente?
+2. HALLUCINATION: ¿Hay inventos, datos falsos o suposiciones injustificadas?
+3. TONO: ¿Mantiene la marca (carnal, desenfadado) sin ser inapropiado?
+4. ESCALATION: Si hay frustracion o cero resultados, ¿fue comunicado claramente? ¿se ofrció soporte humano?
 
 RESPONDE ESTRICTAMENTE EN JSON:
 {
@@ -68,7 +68,7 @@ RESPONDE ESTRICTAMENTE EN JSON:
     "tone_score": 1-10,
     "escalation_offered": boolean,
     "issues": ["lista de problemas identificados"],
-    "recommendation": "breve recomendaciÃ³n accionable"
+    "recommendation": "breve recomendación accionable"
 }
             `;
 
@@ -99,7 +99,7 @@ RESPONDE ESTRICTAMENTE EN JSON:
 
                 // Score: convert Gemini 1-10 relevance to schema 1-5 (round to nearest integer)
                 const relevanceNorm = Math.max(1, Math.min(10, evaluation.relevance_score || 5));
-                const scoreNorm = Math.ceil(relevanceNorm / 2); // 1-10 â†’ 1-5
+                const scoreNorm = Math.ceil(relevanceNorm / 2); // 1-10 → 1-5
 
                 // Severity: critical if hallucination, high if low relevance, medium/low otherwise
                 let severity = 'low';
@@ -127,7 +127,7 @@ RESPONDE ESTRICTAMENTE EN JSON:
 
                 if (insertErr) {
                     console.error(`[AI_EVALUATIONS] Insert failed: ${insertErr.message}`);
-                    // Don't throw â€” evaluation happened, just persistence failed (log only)
+                    // Don't throw — evaluation happened, just persistence failed (log only)
                 } else {
                     console.warn('[AI_EVALUATIONS] Turn evaluation persisted');
                 }
@@ -158,12 +158,12 @@ RESPONDE ESTRICTAMENTE EN JSON:
         if (action === 'evaluate_scenario') {
             const prompt = `
                 Eres un Experto Auditor de Calidad para "VSM Store".
-                Debes evaluar semÃ¡nticamente si la respuesta de la IA fue correcta.
+                Debes evaluar semánticamente si la respuesta de la IA fue correcta.
 
                 ESCENARIO:
                 - Tipo: ${scenario.scenario_type}
                 - Mensaje Usuario: "${scenario.user_message}"
-                - Pistas de ValidaciÃ³n: ${scenario.validation_hints?.join(', ') || 'N/A'}
+                - Pistas de Validación: ${scenario.validation_hints?.join(', ') || 'N/A'}
 
                 RESPUESTA OBTENIDA:
                 - Texto: "${result.response}"
@@ -171,17 +171,17 @@ RESPONDE ESTRICTAMENTE EN JSON:
                 - Herramientas Usadas: ${result.tools_called?.join(', ') || 'Ninguna'}
                 - Traza de Memoria: ${JSON.stringify(result.memory_trace || {})}
 
-                INSTRUCCIONES DE EVALUACIÃ“N:
-                1. RELEVANCIA DE MEMORIA: Si el mensaje es vago y hay memoria inyectada, Â¿la respuesta se sesgÃ³ correctamente hacia los intereses histÃ³ricos?
-                2. DOMINIO DE INTENCIÃ“N: Si el mensaje es explÃ­cito, Â¿la IA ignorÃ³ el sesgo de memoria para priorizar el deseo actual del usuario?
-                3. VALORACIÃ“N: Penaliza si la IA es redundante con la memoria o si el sesgo impide cumplir la intenciÃ³n actual.
+                INSTRUCCIONES DE EVALUACIÓN:
+                1. RELEVANCIA DE MEMORIA: Si el mensaje es vago y hay memoria inyectada, ¿la respuesta se sesgó correctamente hacia los intereses históricos?
+                2. DOMINIO DE INTENCIÓN: Si el mensaje es explícito, ¿la IA ignoró el sesgo de memoria para priorizar el deseo actual del usuario?
+                3. VALORACIÓN: Penaliza si la IA es redundante con la memoria o si el sesgo impide cumplir la intención actual.
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
                     "tone_score": 1-10,
                     "grounding_score": 1-10,
                     "hallucination_detected": boolean,
-                    "comment": "Breve explicaciÃ³n detallando el comportamiento de la memoria vs intenciÃ³n"
+                    "comment": "Breve explicación detallando el comportamiento de la memoria vs intención"
                 }
             `;
 

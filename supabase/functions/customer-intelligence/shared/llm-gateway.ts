@@ -1,4 +1,4 @@
-﻿import { geminiGenerateContent } from '../../_shared/gemini-api.ts';
+import { geminiGenerateContent } from '../../_shared/gemini-api.ts';
 
 export type LLMProviderConfig = {
     name: 'gemini' | 'anthropic';

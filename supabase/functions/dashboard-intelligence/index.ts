@@ -1,5 +1,5 @@
-﻿/**
- * dashboard-intelligence â€” Supabase Edge Function
+/**
+ * dashboard-intelligence — Supabase Edge Function
  * 
  * AI-powered dashboard insights for the admin panel. Analyzes sales data,
  * order trends, and customer metrics to generate actionable business intelligence.
@@ -8,8 +8,8 @@
  * @requires GEMINI_API_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-2.5-flash â†’ gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
  * - 2026-03-15: Removed unsupported responseMimeType from generationConfig
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -40,41 +40,41 @@ serve(async (req) => {
             throw new Error('GEMINI_API_KEY environment variable is not set')
         }
 
-        // Generar prompt estratÃ©gico enfocado en retail de vapeo/420
+        // Generar prompt estratégico enfocado en retail de vapeo/420
         const prompt = `
-            Eres un OrÃ¡culo IA de Inteligencia de Negocios (C-Level Executive) para "VSM Store", una tienda premium de vapeo y estilo de vida 420.
-            Tu objetivo es analizar los datos operativos actuales y entregar un Veredicto Ejecutivo RelÃ¡mpago (Pulse Tracker) sobre la salud del negocio.
+            Eres un Oráculo IA de Inteligencia de Negocios (C-Level Executive) para "VSM Store", una tienda premium de vapeo y estilo de vida 420.
+            Tu objetivo es analizar los datos operativos actuales y entregar un Veredicto Ejecutivo Relámpago (Pulse Tracker) sobre la salud del negocio.
 
-            DASHBOARD DATA (Hoy y Ãšltimos 7 DÃ­as):
+            DASHBOARD DATA (Hoy y Últimos 7 Días):
             - Ventas de Hoy: $${stats.todaySales || 0}
             - Pedidos Pendientes: ${stats.pendingOrders || 0}
             - Productos con Bajo Stock (<5 uds): ${stats.lowStockProducts || 0}
             - Clientes Activos: ${stats.totalCustomers || 0}
-            - CatÃ¡logo: ${stats.totalProducts || 0} productos activos.
-            - Total Pedidos HistÃ³ricos: ${stats.totalOrders || 0}
+            - Catálogo: ${stats.totalProducts || 0} productos activos.
+            - Total Pedidos Históricos: ${stats.totalOrders || 0}
             - Productos Top Vendidos (7D): ${(stats.topProducts || []).map((p: { name: string, revenue: number }) => `${p.name} ($${p.revenue})`).join(', ')}
 
             INSTRUCCIONES DE SALIDA:
-            Debes retornar estrictamente un JSON vÃ¡lido con la siguiente estructura exacta:
+            Debes retornar estrictamente un JSON válido con la siguiente estructura exacta:
             {
-                "narrative": "Tu narrativa ejecutiva aquÃ­ (mÃ¡ximo 40 palabras, tono urgente pero sofisticado, estilo cyberpunk corporativo).",
-                "anomalies": ["AnomalÃ­a importante 1 (max 8 palabras)", "AnomalÃ­a o sugerencia 2 (max 10 palabras)"],
+                "narrative": "Tu narrativa ejecutiva aquí (máximo 40 palabras, tono urgente pero sofisticado, estilo cyberpunk corporativo).",
+                "anomalies": ["Anomalía importante 1 (max 8 palabras)", "Anomalía o sugerencia 2 (max 10 palabras)"],
                 "health_score": un_numero_del_0_al_100_evaluando_la_operacion
             }
 
             EJEMPLO:
             {
-                "narrative": "El flujo de ingresos es Ã³ptimo, impulsado por extractos premium. Sin embargo, presenciamos un cuello de botella grave en cumplimiento con 15 Ã³rdenes varadas.",
-                "anomalies": ["Alto volumen de despachos pendientes", "3 productos crÃ­ticos a punto de agotarse"],
+                "narrative": "El flujo de ingresos es óptimo, impulsado por extractos premium. Sin embargo, presenciamos un cuello de botella grave en cumplimiento con 15 órdenes varadas.",
+                "anomalies": ["Alto volumen de despachos pendientes", "3 productos críticos a punto de agotarse"],
                 "health_score": 75
             }
 
-            CALCULO HEALTH SCORE (GuÃ­a):
+            CALCULO HEALTH SCORE (Guía):
             - Si hay muchos pedidos pendientes (>5): Resta puntos (Riesgo operativo).
             - Si ventas totales hoy = 0: Escenario de riesgo alto.
-            - Si bajo stock es alto (>3): Riesgo logÃ­stico.
+            - Si bajo stock es alto (>3): Riesgo logístico.
             
-            RESPONDER ÃšNICA Y EXCLUSIVAMENTE CON EL TEXTO JSON COMPATIBLE. NO ENVUELVAS EN BLOQUES DE CÃ“DIGO NI USES MARKDOWN.
+            RESPONDER ÚNICA Y EXCLUSIVAMENTE CON EL TEXTO JSON COMPATIBLE. NO ENVUELVAS EN BLOQUES DE CÓDIGO NI USES MARKDOWN.
         `
 
         // Llamar a Gemini 3.1 Flash Lite
@@ -100,7 +100,7 @@ serve(async (req) => {
 
         if (!rawText) {
             return new Response(JSON.stringify({ 
-                narrative: "OperaciÃ³n estable. Monitoreo en curso.",
+                narrative: "Operación estable. Monitoreo en curso.",
                 anomalies: [],
                 health_score: 100
             }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

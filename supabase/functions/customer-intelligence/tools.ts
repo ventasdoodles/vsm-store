@@ -1,4 +1,4 @@
-﻿import { compactCesarinResponseText } from './persona.ts';
+import { compactCesarinResponseText } from './persona.ts';
 import {
     geminiEmbedText,
     geminiGenerateContentJson,
@@ -301,7 +301,7 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
     } catch (err) {
         return { 
             output: `Error: ${err}`, 
-            summary: "Error en bÃºsqueda de productos" 
+            summary: "Error en búsqueda de productos" 
         };
     }
 }
@@ -337,7 +337,7 @@ async function track_order(args: { order_number?: string, tracking_number?: stri
                 resolutionPath = trackingNumber ? "order_lookup" : "db_status_only";
             } else {
                 return { 
-                    output: `No se encontrÃ³ el pedido ${orderNumber}.`, 
+                    output: `No se encontró el pedido ${orderNumber}.`, 
                     summary: "Pedido no encontrado",
                     resolution_path: "not_found"
                 };
@@ -355,7 +355,7 @@ async function track_order(args: { order_number?: string, tracking_number?: stri
                 const output = `STATUS: ${res.statusText}\nCARRIER: ${res.carrier}\nESTIMATED: ${res.estimatedDelivery || 'Pendiente'}\nLAST_EVENT: ${res.events?.[0]?.status || 'Iniciado'}`;
                 return { 
                     output, 
-                    summary: `Rastreado vÃ­a ${res.carrier}: ${res.statusText}`,
+                    summary: `Rastreado vía ${res.carrier}: ${res.statusText}`,
                     resolution_path: resolutionPath === "order_lookup" ? "api_via_order" : "api_direct",
                     carrier: res.carrier
                 };
@@ -364,7 +364,7 @@ async function track_order(args: { order_number?: string, tracking_number?: stri
             // If API fails or is not configured, fall back to DB status if we have it
             if (dbStatus !== "No encontrado") {
                 return {
-                    output: `Estado en sistema: ${dbStatus}. (Servicio de rastreo detallado no disponible momentÃ¡neamente).`,
+                    output: `Estado en sistema: ${dbStatus}. (Servicio de rastreo detallado no disponible momentáneamente).`,
                     summary: `Estatus local: ${dbStatus} (Fallback API)`,
                     resolution_path: "db_fallback"
                 };
@@ -374,14 +374,14 @@ async function track_order(args: { order_number?: string, tracking_number?: stri
         // 4. Final Fallback/Error
         if (orderNumber && dbStatus !== "No encontrado") {
             return {
-                output: `El pedido ${orderNumber} tiene el estatus: ${dbStatus}. AÃºn no cuenta con nÃºmero de guÃ­a asignado.`,
-                summary: `Sin guÃ­a: ${dbStatus}`,
+                output: `El pedido ${orderNumber} tiene el estatus: ${dbStatus}. Aún no cuenta con número de guía asignado.`,
+                summary: `Sin guía: ${dbStatus}`,
                 resolution_path: "db_status_only"
             };
         }
 
         return { 
-            output: "Por favor proporciona un nÃºmero de pedido (ej. VSM-1001) o de guÃ­a para rastrear.", 
+            output: "Por favor proporciona un número de pedido (ej. VSM-1001) o de guía para rastrear.", 
             summary: "Datos insuficientes para rastreo",
             resolution_path: "insufficient_data"
         };
@@ -480,7 +480,7 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
 
         if (!productId) {
             return {
-                output: "No se encontrÃ³ el producto para analizar su inventario.",
+                output: "No se encontró el producto para analizar su inventario.",
                 summary: "Producto no encontrado",
                 signal_quality: "none",
                 resolution_path: "not_found"
@@ -566,7 +566,7 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
  * Resolves naming variants (aliases) to canonical concepts and fetches relations.
  */
 async function check_compatibility(args: { query: string }, supabase: any): Promise<{ output: string, summary: string, metadata?: Record<string, unknown> }> {
-    if (!args.query) return { output: "Error: No se proporcionÃ³ una consulta de compatibilidad.", summary: "Sin consulta" };
+    if (!args.query) return { output: "Error: No se proporcionó una consulta de compatibilidad.", summary: "Sin consulta" };
 
     try {
         const query = args.query.toLowerCase().trim();
@@ -590,7 +590,7 @@ async function check_compatibility(args: { query: string }, supabase: any): Prom
         const concepts = Array.from(matchedConcepts.values());
         if (concepts.length === 0) {
             return {
-                output: "No identifiquÃ© modelos o piezas especÃ­ficas en tu pregunta. Â¿PodrÃ­as decirme el modelo exacto?",
+                output: "No identifiqué modelos o piezas específicas en tu pregunta. ¿Podrías decirme el modelo exacto?",
                 summary: "Sin conceptos identificados",
                 metadata: { matched_count: 0 }
             };
@@ -612,7 +612,7 @@ async function check_compatibility(args: { query: string }, supabase: any): Prom
         if (!relations || relations.length === 0) {
             const names = concepts.map(c => c.name).join(', ');
             return {
-                output: `No tengo informaciÃ³n de compatibilidad confirmada para: ${names}.`,
+                output: `No tengo información de compatibilidad confirmada para: ${names}.`,
                 summary: "Sin relaciones encontradas",
                 metadata: { matched_count: concepts.length, relations_count: 0 }
             };
@@ -745,7 +745,7 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
             }
         } catch (err) {
             output = `Execution error in ${call.name}: ${err}`;
-            summary = "Error de ejecuciÃ³n";
+            summary = "Error de ejecución";
             status = 'error';
         }
 

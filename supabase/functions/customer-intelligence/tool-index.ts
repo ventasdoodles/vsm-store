@@ -1,4 +1,4 @@
-﻿export type CapabilityClass = 'MODEL_KNOWLEDGE' | 'NATIVE_PUBLIC' | 'OWN_FUNCTION';
+export type CapabilityClass = 'MODEL_KNOWLEDGE' | 'NATIVE_PUBLIC' | 'OWN_FUNCTION';
 export type CapabilityExecution = 'model_only' | 'native_public' | 'client_capsule' | 'edge_function';
 export type CapabilityStatus = 'active' | 'reserved';
 

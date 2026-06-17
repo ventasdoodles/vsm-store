@@ -1,4 +1,4 @@
-﻿export const GENERIC_INTERESTS = new Set([
+export const GENERIC_INTERESTS = new Set([
   'vape',
   'vaping',
   'e-liquid',

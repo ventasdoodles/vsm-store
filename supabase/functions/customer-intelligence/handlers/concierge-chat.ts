@@ -10,7 +10,7 @@ const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
 ];
 /**
- * customer-intelligence Ã¢â‚¬â€ Supabase Edge Function
+ * customer-intelligence â€” Supabase Edge Function
  * 
  * Multi-action AI function for customer-facing intelligence:
  *   - parse_admin_intent: NLP parsing of admin commands
@@ -74,10 +74,10 @@ import { buildAnalystSystemPrompt, buildAnalystUserPromptBlocks } from '../domai
 import { GeminiAnalystAdapter } from '../adapters/gemini.adapter.ts';
 
 // Credentials will be loaded per-request for maximum resilience
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â MODEL STACK (Converged storefront baseline, validated 2026-03-29) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-const AUXILIARY_MODEL = 'gemini-2.5-flash-lite';
-const CONCIERGE_ANALYST_MODEL = 'gemini-flash-latest';
-const CONCIERGE_SOMMELIER_MODEL = 'gemini-2.5-flash-lite';
+// â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
+const AUXILIARY_MODEL = Deno.env.get('AUXILIARY_MODEL') || 'gemini-2.5-flash';
+const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-flash';
+const CONCIERGE_SOMMELIER_MODEL = Deno.env.get('CONCIERGE_SOMMELIER_MODEL') || 'gemini-2.5-flash';
 
 
 
@@ -102,7 +102,7 @@ export async function handleConciergeChat(
     const customerContext = cContext || customer_context;
 
     if (action === 'concierge_chat' || action === 'semantic_search') {
-            // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â HARDENING 1: SERVER-SIDE PILOT ENFORCEMENT (SUPABASE AUTH VERIFICATION) Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+            // â•â•â• HARDENING 1: SERVER-SIDE PILOT ENFORCEMENT (SUPABASE AUTH VERIFICATION) â•â•â•
             // Verify bearer token using Supabase Auth API (server-trusted validation).
             // body.is_pilot is context only; enforcement relies on verified user session.
             const authHeader = req.headers.get('Authorization') || '';
@@ -226,7 +226,7 @@ export async function handleConciergeChat(
                 customerProactiveInsights: customerMemory?.proactive_insights || null
             });
 
-            // â• â• â•  HARDENING 2: GEMINI RESILIENCE â€” ANALYST CALL WITH FALLBACK â• â• â• 
+            // ═══ HARDENING 2: GEMINI RESILIENCE — ANALYST CALL WITH FALLBACK ═══
             let analystReport: Record<string, any> = {};
             let rawAnalystText = '';
             let geminiError: any = null;
@@ -270,12 +270,12 @@ export async function handleConciergeChat(
             const guardrailOverrides: string[] = []; // A85: populated by each override that changes intent
 
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
-            // Las capsules ejecutan; el Analyst tiene autoridad semÃƒÂ¡ntica primaria.
+            // Las capsules ejecutan; el Analyst tiene autoridad semÃ¡ntica primaria.
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
 
             const normalizedQuery = (query || "").toLowerCase()
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[Ã‚Â¿?Ã‚Â¡!]/g, " ")
+                .replace(/[Â¿?Â¡!]/g, " ")
                 .trim();
 
             const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)\s+(a|al|con|para)\b|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
@@ -287,7 +287,7 @@ export async function handleConciergeChat(
             const isWarrantyMatch      = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|falla|defecto)\b/.test(normalizedQuery)
                 || (/\b(garantia|devolucion|rma)\b/.test(normalizedQuery) && /\b(mi|me|llego|vino|pedido|orden|compra|producto|equipo|vape|pod|cartucho|dispositivo|falla|roto|chorreado|prende|sirve|funciona)\b/.test(normalizedQuery));
             const isLoyaltyMatch       = /\b(cuantos puntos tengo|mis puntos|puntos|vcoins|v coins|v-coins|cuanto valen mis puntos|valor de mis puntos|equivalen mis puntos|descuento por puntos|me alcanza con mis puntos|me alcanza para algo con mis puntos|que nivel soy|mi nivel|soy vip|estatus vip|status vip|que tier soy|mi tier|nivel vip)\b/.test(normalizedQuery);
-            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|aÃƒÂ±ade|aÃƒÂ±adir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
+            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|aÃ±ade|aÃ±adir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
             const _hasTimeContext      = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isWarrantyMatch, isLoyaltyMatch, isCartMatch, initialIntent: analystReport.intent };
@@ -348,7 +348,7 @@ export async function handleConciergeChat(
             const analystConversationalPrefix = compactCesarinResponseText(analystReport.conversational_prefix || '') || null;
 
             // --- A85: Structured Guardrail Decision Telemetry ---
-            // Captures the full AnalystÃ¢â€ â€™guardrailÃ¢â€ â€™injection decision chain for persistent diagnostics.
+            // Captures the full Analystâ†’guardrailâ†’injection decision chain for persistent diagnostics.
             // Appended to the debug payload of every capsule router response so the client can
             // persist it in ai_logic_debug without needing to parse edge function logs.
             const guardrailTelemetry = {
@@ -441,11 +441,11 @@ export async function handleConciergeChat(
                 });
             }
             
-            // EL DESVÃƒÂO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
+            // EL DESVÃO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
             // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
             // intent matches it. OR-arm conditions that used tool_call presence as a secondary
             // signal were swallowing CART_OPERATION / ORDER_TRACKING / INVENTORY_OUTLOOK whenever
-            // the Analyst emitted a search call alongside the primary tool Ã¢â‚¬â€ silent misroutes.
+            // the Analyst emitted a search call alongside the primary tool â€” silent misroutes.
             // Guardrail injections (lines 388-403) already guarantee tool call presence for every
             // routable intent, making the OR arms structurally redundant. (A83)
             if (catalogGate.is_open && intent === 'PRODUCT_SEARCH' && capabilityPlan.primaryCapability.name === 'product_search_integrity' && searchCapsuleCall) {
@@ -862,7 +862,7 @@ export async function handleConciergeChat(
 
             // --- OUT OF DOMAIN: Fast-path rejection (no Sommelier call, no product search) ---
             if (intent === 'OUT_OF_DOMAIN') {
-                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. Ã‚Â¿Hay algo de nuestro catÃƒÂ¡logo en lo que pueda ayudarte?';
+                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. Â¿Hay algo de nuestro catÃ¡logo en lo que pueda ayudarte?';
                 const { error: oodTelemetryErr } = await supabase.from('ai_analytics').insert({
                     query: query,
                     response_text: oodReplyText,
@@ -950,19 +950,19 @@ export async function handleConciergeChat(
 
             // Process specific tool outputs for Sommelier context
             const knowledgeResult = toolResults.find(r => r.name === 'knowledge_rag_foundation' || r.name === 'get_store_policy');
-            const knowledgeOutput = knowledgeResult?.output || 'No se consultaron polÃƒÂ­ticas especÃƒÂ­ficas.';
+            const knowledgeOutput = knowledgeResult?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
             const knowledgeMatchCount = (knowledgeResult as any)?.metadata?.chunks_found || 0;
-            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃƒÂ³ bÃƒÂºsqueda de productos.';
-            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultÃƒÂ³ el estado de ningÃƒÂºn pedido.';
+            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃ³ bÃºsqueda de productos.';
+            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultÃ³ el estado de ningÃºn pedido.';
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
-            const inventoryOutput = inventoryResult?.output || 'No se consultÃƒÂ³ la proyecciÃƒÂ³n de inventario.';
+            const inventoryOutput = inventoryResult?.output || 'No se consultÃ³ la proyecciÃ³n de inventario.';
             const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
-            const compatibilityOutput = toolResults.find(r => r.name === 'storefront_compatibility_check' || r.name === 'check_compatibility')?.output || 'No se consultÃƒÂ³ informaciÃƒÂ³n de compatibilidad.';
+            const compatibilityOutput = toolResults.find(r => r.name === 'storefront_compatibility_check' || r.name === 'check_compatibility')?.output || 'No se consultÃ³ informaciÃ³n de compatibilidad.';
 
             const publicWebSearchResult = toolResults.find(r => r.name === 'public_web_search');
             const publicUrlContextResult = toolResults.find(r => r.name === 'public_url_context');
-            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultÃƒÆ’Ã‚Â³ web publica.';
-            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃƒÆ’Ã‚Â³ contexto de URL publica.';
+            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultÃƒÂ³ web publica.';
+            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃƒÂ³ contexto de URL publica.';
             const publicWebSearchSources = Array.isArray((publicWebSearchResult as any)?.metadata?.sources)
                 ? (publicWebSearchResult as any).metadata.sources
                     .map((source: { title?: string; url?: string }) => `- ${source.title || 'Fuente'}: ${source.url || 'sin_url'}`)
@@ -993,11 +993,11 @@ export async function handleConciergeChat(
                 MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
                 MODO: ${aiConfig?.behavior_mode || 'vendedor'}
                 
-                REGLAS DE COMPORTAMIENTO (DUEÃ‘O DE TIENDA - MÃXIMA PRIORIDAD):
+                REGLAS DE COMPORTAMIENTO (DUEÑO DE TIENDA - MÁXIMA PRIORIDAD):
                 ${activeBehaviorRules?.map(r => `- [${r.type}] ${r.rule_text}`).join('\n') || ''}
                 ${aiRules?.map((r: { content: string }) => `- ${r.content}`).join('\n') || ''}
 
-                POLÃTICAS OPERATIVAS (BÃ¡sicas):
+                POLÍTICAS OPERATIVAS (Básicas):
                 ${VSM_OPERATIONAL_RULES}
 
                 PRESENCIA COMERCIAL:
@@ -1016,14 +1016,14 @@ export async function handleConciergeChat(
 
             const sommelierUserPromptBlocks = [
                 `--- CONOCIMIENTO OPERATIVO (Tools / Source of Truth) ---`,
-                `POLÃTICAS:\n${knowledgeOutput}`,
+                `POLÍTICAS:\n${knowledgeOutput}`,
                 `PRODUCTOS ENCONTRADOS:\n${searchOutput}`,
                 `ESTADO DE PEDIDO (Tracking):\n${trackOutput}`,
-                `PROYECCIÃ“N DE INVENTARIO:\n${inventoryOutput}`,
-                `CALIDAD_SEÃ‘AL:\n${inventorySignalQuality}`,
+                `PROYECCIÓN DE INVENTARIO:\n${inventoryOutput}`,
+                `CALIDAD_SEÑAL:\n${inventorySignalQuality}`,
                 `REGLAS DE RESPUESTA DE DISPONIBILIDAD:\n- Di primero la disponibilidad actual tal como venga en el reporte.\n- Si mencionas outlook o proyeccion, dejalo despues y como estimacion secundaria.\n- No conviertas outlook en promesa de regreso, restock o disponibilidad futura.\n- Si hoy esta agotado, dilo como agotado hoy o en este momento.`,
                 `COMPATIBILIDAD (Source of Truth):\n${compatibilityOutput}`,
-                `REGLAS DE RESPUESTA DE COMPATIBILIDAD:\n1. Si el reporte dice [GENERALIZACION], DEBES usar lenguaje precavido ("normalmente", "por lo general", "suelen").\n2. Si el reporte dice [ESPECIFICO], puedes ser directo ("SÃ­, es compatible").\n3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmaciÃ³n, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.\n4. NUNCA inventes compatibilidades que no estÃ©n en el reporte.`,
+                `REGLAS DE RESPUESTA DE COMPATIBILIDAD:\n1. Si el reporte dice [GENERALIZACION], DEBES usar lenguaje precavido ("normalmente", "por lo general", "suelen").\n2. Si el reporte dice [ESPECIFICO], puedes ser directo ("Sí, es compatible").\n3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmación, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.\n4. NUNCA inventes compatibilidades que no estén en el reporte.`,
                 `WEB PUBLICA (Contexto externo, no privado):`,
                 `BUSQUEDA:\n${publicWebSearchOutput}`,
                 `FUENTES:\n${compactPublicWebSearchSources}`,
@@ -1032,7 +1032,7 @@ export async function handleConciergeChat(
                 `REGLAS DE WEB PUBLICA:\n- Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.\n- Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.\n- Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.\n- No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.\n- Si el turno se resuelve solo con modelo o continuidad ligera, no fuerces a contar la web como protagonista.`,
                 `--- INFORME DEL ANALISTA ---\n${JSON.stringify(analystReport)}`,
                 customerPreferencePromptSummary ? `--- MEMORIA LIGERA DE GUSTOS (CLIENTE AUTENTICADO) ---\n${customerPreferencePromptSummary}\nREGLAS DE MEMORIA:\n- Usala solo si afina recomendacion o evita repetir algo que ya rechazo.\n- Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.\n- No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.\n- Si lo que pide hoy contradice memoria previa, gana lo de hoy.\n${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}` : '',
-                customerMemory?.proactive_insights ? `--- GANCHOS COMERCIALES PROACTIVOS ---\n${JSON.stringify(customerMemory.proactive_insights)}\nREGLA PROACTIVA (Ejecutivo de Cuenta):\n- Si hay Replenishment y el usuario solo saluda, ofrÃ©cele reponer su producto sutilmente.\n- Si hay Kitting de Hardware y busca consumibles, asume que son para su equipo.\n- Usa esta informaciÃ³n como herramienta de venta, no la menciones sin motivo.` : '',
+                customerMemory?.proactive_insights ? `--- GANCHOS COMERCIALES PROACTIVOS ---\n${JSON.stringify(customerMemory.proactive_insights)}\nREGLA PROACTIVA (Ejecutivo de Cuenta):\n- Si hay Replenishment y el usuario solo saluda, ofrécele reponer su producto sutilmente.\n- Si hay Kitting de Hardware y busca consumibles, asume que son para su equipo.\n- Usa esta información como herramienta de venta, no la menciones sin motivo.` : '',
                 softContinuity.prompt_block ? `${softContinuity.prompt_block}\nREGLA DE CONTINUIDAD BLANDA:\n- Si retomas algo previo, hazlo corto, humilde y solo si ayuda.\n- Si el turno cambio de carril, responde el carril actual sin quedarte pegado al anterior.\n- No conviertas continuidad en backstory ni en empuje comercial.` : '',
                 `--- PERFIL DE TURNO ACTUAL ---`,
                 `INTENT PRINCIPAL: ${turnProfile.primary_intent}`,
@@ -1054,7 +1054,7 @@ export async function handleConciergeChat(
                 && Boolean(analystConversationalPrefix)) || isPureGreetingBypass;
 
             
-            // --- HARDENING 2: GEMINI RESILIENCE --- SOMMELIER CALL WITH STREAMING SUPPORT --- 
+            // ═══ HARDENING 2: GEMINI RESILIENCE — SOMMELIER CALL WITH STREAMING SUPPORT ═══
             const isStreamingRequest = body.stream === true;
             
             let sommelierResult: Record<string, unknown> = {};
@@ -1229,13 +1229,13 @@ export async function handleConciergeChat(
                     || toolResults.some(r => r.name === 'public_web_search' && r.status === 'success')
                     || toolResults.some(r => r.name === 'public_url_context' && r.status === 'success');
 
-                const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontrÃ©'));
+                const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontré'));
                 const productCardCount = Array.isArray(aiData.products) ? aiData.products.length : Array.isArray(aiData.recommended_products) ? aiData.recommended_products.length : productMatchCount > 0 ? productMatchCount : 0;
                 const cartActionDetected = toolCalls.some(c => c.name === 'cart_operator');
 
                 const escalationRequested = aiData.intent === 'whatsapp' || aiData.action?.type === 'whatsapp' || /hablar con (un |una )?(humano|persona|asesor|agente)/i.test(query || '');
                 const zeroNow = intent === 'PRODUCT_SEARCH' && productCardCount === 0;
-                const priorZeroSignal = Array.isArray(history) && history.some((h: { role: string; content: string }) => h.role === 'assistant' && /no encontr[eÃ©]|no tenemos|no estÃ¡ disponible|sin resultados|agotado/i.test(h.content));
+                const priorZeroSignal = Array.isArray(history) && history.some((h: { role: string; content: string }) => h.role === 'assistant' && /no encontr[eé]|no tenemos|no está disponible|sin resultados|agotado/i.test(h.content));
                 const zeroResultsPersistence = zeroNow && priorZeroSignal;
                 const isConversationalIntent = intent === 'CHIT_CHAT' || isGreeting || aiData.fallback_reason === 'GREETING' || aiData.fallback_reason === 'CHIT_CHAT';
                 const fallbackEmpty = fallbackUsed && productCardCount === 0 && !isConversationalIntent;
@@ -1425,7 +1425,7 @@ export async function handleConciergeChat(
             };
 
             if (isStreamingRequest) {
-                // â•â•â• STREAMING PATH â•â•â•
+                // ═══ STREAMING PATH ═══
                 const { readable, writable } = new TransformStream();
                 const writer = writable.getWriter();
                 const encoder = new TextEncoder();
@@ -1502,6 +1502,7 @@ export async function handleConciergeChat(
                         }
 
                         const finalMetadata = { ...aiData };
+                        delete finalMetadata.text;
                         await writer.write(encoder.encode(`event: metadata\ndata: ${JSON.stringify(finalMetadata)}\n\n`));
                         await writer.close();
                     } catch (err: unknown) {
@@ -1511,7 +1512,7 @@ export async function handleConciergeChat(
 
                 return new Response(readable, { headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' } });
             } else {
-                // â•â•â• LEGACY SYNCHRONOUS PATH (BACKWARD COMPATIBLE) â•â•â•
+                // ═══ LEGACY SYNCHRONOUS PATH (BACKWARD COMPATIBLE) ═══
                 if (!shouldShortCircuitClarification) {
                     try {
                         const controller = new AbortController();

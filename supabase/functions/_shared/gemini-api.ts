@@ -1,4 +1,4 @@
-﻿export const GEMINI_API_VERSION = 'v1beta' as const;
+export const GEMINI_API_VERSION = 'v1beta' as const;
 export const GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001' as const;
 export const GEMINI_EMBEDDING_DIMENSIONALITY = 768;
 

@@ -1,4 +1,4 @@
-﻿export type KnowledgeOperatorRole = 'admin' | 'super_admin' | 'viewer';
+export type KnowledgeOperatorRole = 'admin' | 'super_admin' | 'viewer';
 
 export function extractBearerToken(header: string | null): string | null {
   if (!header) return null;

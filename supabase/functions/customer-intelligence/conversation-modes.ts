@@ -1,4 +1,4 @@
-﻿import type { CustomerPreferenceSummary } from './memory.ts';
+import type { CustomerPreferenceSummary } from './memory.ts';
 
 export type CesarinCommercialConversationMode =
   | 'DIRECT_RECOMMEND'

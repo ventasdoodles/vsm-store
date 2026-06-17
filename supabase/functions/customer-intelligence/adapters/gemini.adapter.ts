@@ -1,4 +1,4 @@
-﻿import { invokeGeminiTextModel } from '../shared/gemini-utils.ts';
+import { invokeGeminiTextModel } from '../shared/gemini-utils.ts';
 import { buildGeminiTokenUsageTelemetry } from '../shared/telemetry-utils.ts';
 import { buildNeutralAnalystFallbackReport } from '../analyst-fallback.ts';
 import { ToolCall } from '../tools.ts';
