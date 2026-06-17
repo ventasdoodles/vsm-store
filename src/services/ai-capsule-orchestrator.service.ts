@@ -689,7 +689,7 @@ export async function executeProductSearchCapsule(
       capsule_version: '1.0.0',
       execution_status: 'DEGRADED',
       match_strategy: 'NO_MATCH',
-      customer_response_draft: 'Tuve un inconveniente interpretando tu búsqueda. ¿Podrías ser un poco más específico?',
+      customer_response_draft: 'Tuve un inconveniente procesando esta solicitud. ¿Podrías brindarme más detalles?',
       search_confidence: 0,
       latency_ms: Date.now() - startMs,
       degraded_reason: 'SCHEMA_ERROR',

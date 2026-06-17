@@ -37,49 +37,49 @@ const APPROXIMATE_MATCH_STRATEGIES = new Set<SupportedMatchStrategy>([
 
 const HUMANIZED_PREFIXES: Record<SupportedMatchStrategy, string[]> = {
     EXACT: [
-        'A ver, ya te ubiqué esa de volada.',
-        'Va, esa si la ubico con mas claridad.',
+        'Aquí tienes el producto que solicitaste.',
+        'He encontrado exactamente lo que buscabas.',
     ],
     SEMANTIC: [
-        'Te soy honesto, exacto exacto no me salió, pero sí vi cosas que van por ahí.',
-        'A ver, no te lo quiero vender como exacto, pero sí encontré unas opciones cercanas.',
-        'Esa me cayó medio en curva, pero sí te puedo enseñar lo más cercano que sí vi.',
+        'No encontré una coincidencia exacta, pero aquí tienes opciones muy similares.',
+        'Estos son los productos que más se acercan a lo que nos describes.',
+        'Te muestro las alternativas más relevantes basadas en tu búsqueda.',
     ],
     TOKEN_RECOVERY: [
-        'Te soy honesto, no la vi tal cual, pero sí me aparecieron coincidencias por nombre que van cerca.',
-        'A ver, exacta no me brincó, pero de volada te enseño lo más parecido por nombre.',
-        'No te quiero inventar el exacto, pero sí te saqué unas cercanas por cómo viene escrito.',
+        'No localicé ese término con exactitud, pero encontré coincidencias por nombre.',
+        'Estos artículos comparten similitudes con el nombre que ingresaste.',
+        'Te presento los resultados que coinciden parcialmente con tu consulta.',
     ],
     FEATURED_FALLBACK: [
-        'No la ubico con suficiente certeza tal cual, pero si te puedo dejar unas opciones utiles para salir del paso.',
-        'A ver, esa no me quedó cerrada, pero sí tengo unas alternativas que valen la pena revisar.',
+        'No pude confirmar ese artículo, pero aquí tienes unas opciones destacadas que podrían interesarte.',
+        'He seleccionado algunas recomendaciones útiles mientras seguimos buscando.',
     ],
     OUT_OF_STOCK_ALTERNATIVE: [
-        'Te soy honesto, esa sí la veo agotada ahorita, pero te dejo cercanas que sí traen movimiento.',
-        'Esa justo no la tengo disponible, pero de volada te paso unas que te pueden resolver parecido.',
+        'El artículo exacto se encuentra agotado en este momento, pero estas alternativas están disponibles.',
+        'Actualmente no tenemos existencias, pero te sugiero estas opciones similares.',
     ],
     NO_MATCH: [
-        'Te soy honesto, esa sí me agarró en curva y no la vi tal cual.',
-        'A ver, no te quiero inventar una coincidencia donde no la tengo.',
-        'Todavía ando verde con algunos nombres raros, y esa no la pude confirmar tal cual.',
+        'Lo lamento, no logré encontrar un artículo que coincida con tu búsqueda.',
+        'No tenemos resultados para esa consulta en este momento.',
+        'Tuve un inconveniente interpretando tu búsqueda. ¿Podrías ser un poco más específico?',
     ],
     UNKNOWN: [
-        'Te soy honesto, ahí no traigo suficiente para cantártela con seguridad.',
-        'A ver, no te quiero vender humo con eso.',
+        'Por el momento no cuento con la información necesaria para procesar esta solicitud.',
+        'No puedo darte una respuesta concluyente sobre este artículo.',
     ],
 };
 
 export const APPROXIMATE_STRATEGY_NOTES: Partial<Record<SupportedMatchStrategy, string>> = {
-    SEMANTIC: 'Te las estoy poniendo como cercanas, no como si ya te hubiera encontrado el exacto.',
-    TOKEN_RECOVERY: 'Van por nombre y cercanía, no como confirmación total.',
-    FEATURED_FALLBACK: 'Van como alternativas útiles, no como si fueran exactamente lo que pediste.',
-    OUT_OF_STOCK_ALTERNATIVE: 'Van como reemplazo cercano porque la original no está disponible.',
+    SEMANTIC: 'Estas opciones se muestran por similitud de características.',
+    TOKEN_RECOVERY: 'Estos resultados se muestran por similitud en el nombre.',
+    FEATURED_FALLBACK: 'Estas son sugerencias alternativas de nuestro catálogo.',
+    OUT_OF_STOCK_ALTERNATIVE: 'Sugerencias basadas en productos actualmente en existencia.',
 };
 
 const ESCALATION_PREFIXES = [
-    'Para no hacerte perder más tiempo, aquí ya te conviene que lo vea alguien del equipo.',
-    'Aquí sí prefiero no seguirte dando vueltas de más; mejor te paso a la salida real.',
-    'Ya para no inventarte otra aproximación floja, mejor te llevo con alguien del equipo.',
+    'Para brindarte un mejor servicio, te comunicaré con un ejecutivo de cuenta.',
+    'Te transferiré con nuestro equipo de atención para revisar este detalle a fondo.',
+    'Permíteme conectarte con un especialista que podrá asistirte de inmediato.',
 ];
 
 function normalizeForHash(value: string): string {
