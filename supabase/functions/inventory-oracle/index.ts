@@ -20,7 +20,7 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 if (!GEMINI_API_KEY) {
     console.error('[inventory-oracle] FATAL: GEMINI_API_KEY is not set in environment secrets.')
 }
-const MODEL = 'gemini-2.5-flash-lite'
+const MODEL = 'gemini-2.5-flash'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
