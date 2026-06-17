@@ -50,6 +50,9 @@ export interface ConciergeMessageItemProps {
     navigate: (path: string) => void;
 }
 
+/** Product with optional AI-enriched display fields from the suggestion pipeline. */
+type SuggestedProduct = Product & { status_signal?: string; badge_text?: string };
+
 export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
     message,
     latestCatalogGate,
@@ -69,8 +72,8 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
     navigate,
 }) => {
 
-    const turnAnalysis = (message as ConciergeMessage).turn_analysis ?? message.capsule_contract?.turn_analysis ?? null;
-    const catalogGate = latestCatalogGate ?? (message as ConciergeMessage).catalog_gate ?? buildConciergeCatalogGate({
+    const turnAnalysis = message.turn_analysis ?? message.capsule_contract?.turn_analysis ?? null;
+    const catalogGate = latestCatalogGate ?? message.catalog_gate ?? buildConciergeCatalogGate({
         query: message.content,
         turnAnalysis,
         intent: message.intent,
@@ -303,7 +306,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                         )}
                         <div className="flex flex-col gap-2">
                             {message.suggestedProducts?.map((p) => {
-                                const product = p as Product & { status_signal?: string; badge_text?: string };
+                                const product = p as SuggestedProduct;
                                 return (
                                 <motion.div
                                     key={product.id}
@@ -362,7 +365,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                         </p>
                         <div className="flex flex-col gap-2">
                             {message.suggestedProducts?.slice(0, 3).map((p) => {
-                                const product = p as Product & { status_signal?: string; badge_text?: string };
+                                const product = p as SuggestedProduct;
                                 return (
                                 <button
                                     key={`recovery-${product.id}`}
