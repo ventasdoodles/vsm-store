@@ -83,7 +83,7 @@ export class CustomerMemoryRepo {
         }
 
         const hasInterests = (mem?.detected_interests?.length ?? 0) > 0;
-        const hasSummary = Boolean(mem?.preference_summary && mem.preference_summary.trim().length > 0);
+        const hasSummary = Boolean(mem?.preference_summary && typeof mem.preference_summary === 'string' && mem.preference_summary.trim().length > 0);
         const hasInsights = Boolean(insights && (
             (insights.items_due_for_replenishment?.length ?? 0) > 0 || 
             (insights.owned_hardware_models?.length ?? 0) > 0 ||
