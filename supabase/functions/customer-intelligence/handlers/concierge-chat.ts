@@ -1046,13 +1046,15 @@ export async function handleConciergeChat(
             ];
 
 
+            const isPureGreetingBypass = intent === 'CHIT_CHAT' && analystReport.turn_decision === 'ASK_CLARIFYING_QUESTION' && analystConversationalPrefix && toolCalls.length === 0;
+
             const shouldShortCircuitClarification =
-                turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION'
+                (turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION'
                 && toolCalls.length === 0
-                && Boolean(analystConversationalPrefix);
+                && Boolean(analystConversationalPrefix)) || isPureGreetingBypass;
 
             
-            // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” SOMMELIER CALL WITH STREAMING SUPPORT â•â•â•
+            // --- HARDENING 2: GEMINI RESILIENCE --- SOMMELIER CALL WITH STREAMING SUPPORT --- 
             const isStreamingRequest = body.stream === true;
             
             let sommelierResult: Record<string, unknown> = {};
