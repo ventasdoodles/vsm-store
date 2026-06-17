@@ -148,10 +148,10 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
     >
         <div
             className={cn(
-                'relative rounded-2xl px-4 py-3 text-sm shadow-xl',
+                'relative rounded-2xl px-4 py-3 text-sm shadow-2xl backdrop-blur-md',
                 message.role === 'user'
-                    ? 'bg-vape-500 text-white font-medium rounded-tr-none'
-                    : 'bg-white/[0.03] text-white/90 border border-white/5 rounded-tl-none',
+                    ? 'bg-gradient-to-br from-vape-500 to-vape-600 text-white font-medium rounded-tr-sm border border-vape-400/20'
+                    : 'bg-[#1a1b26]/80 text-white/90 border border-white/10 rounded-tl-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)]',
             )}
         >
             {message.role === 'assistant' ? (
@@ -310,15 +310,19 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                 return (
                                 <motion.div
                                     key={product.id}
-                                    whileHover={{ x: 5 }}
-                                    className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group cursor-pointer"
+                                    layoutId={`suggested-product-${product.id}`}
+                                    whileHover={{ scale: 1.02, y: -2 }}
+                                    className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-vape-500/30 transition-all duration-300 group cursor-pointer shadow-lg hover:shadow-[0_8px_30px_rgba(168,85,247,0.15)] relative overflow-hidden"
                                     onClick={() => navigate(`/${product.section ?? 'vape'}/${product.slug}`)}
                                 >
-                                    <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
+                                    {/* Subtly animated glow behind the card on hover */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-vape-500/0 via-vape-500/5 to-vape-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none" />
+
+                                    <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5 relative z-10">
                                         <OptimizedImage
                                             src={product.cover_image || product.images?.[0] || ''}
                                             alt={product.name}
-                                            className="h-full w-full object-cover group-hover:scale-110 transition-transform"
+                                            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -348,9 +352,9 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                                 await handleAddProductToCart({ id: product.id, name: product.name, messageId: message.id });
                                             }
                                         }}
-                                        className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all shadow-lg"
+                                        className="h-9 w-9 rounded-xl bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all duration-300 shadow-lg hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] relative z-10 hover:-translate-y-0.5 active:scale-95 group/btn"
                                     >
-                                        <ShoppingBag className="h-4 w-4" />
+                                        <ShoppingBag className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
                                     </button>
                                 </motion.div>
                                 );

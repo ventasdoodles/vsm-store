@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, Loader2, Search, Mic, MicOff, RefreshCw } from 'lucide-react';
+import { X, Send, Bot, Search, Mic, MicOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAIConcierge } from '@/hooks/useAIConcierge';
 import { useCartStore } from '@/stores/cart.store';
@@ -283,22 +283,27 @@ export const AIConcierge: React.FC = () => {
                             initial={{ opacity: 0, scale: 0.8, y: 20, x: -20 }}
                             animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
                             exit={{ opacity: 0, scale: 0.8, y: 20, x: -20 }}
-                            className="pointer-events-auto mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[580px] max-h-[75vh] glass-premium rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/10 flex flex-col isolation-auto"
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            style={{ willChange: 'transform, opacity' }}
+                            className="pointer-events-auto mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[580px] max-h-[75vh] rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] border border-white/10 flex flex-col isolation-auto bg-[#0a0f1d]/60 backdrop-blur-3xl relative"
                         >
+                            {/* Inner border glow / highlight */}
+                            <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none" style={{ maskImage: 'linear-gradient(to bottom, white, transparent)' }} />
+                            
                             <div className="absolute inset-x-0 -top-20 -z-10 flex justify-center">
-                                <div className="h-40 w-full blur-[64px] rounded-full bg-vape-500/20" />
+                                <div className="h-40 w-full blur-[64px] rounded-full bg-vape-500/30 animate-pulse" style={{ animationDuration: '4s' }} />
                             </div>
 
-                            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                            <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-white/[0.03] backdrop-blur-md relative z-10">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <div className="h-10 w-10 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-vape-500 to-vape-600">
                                             <Bot className="h-5 w-5 text-white" />
                                         </div>
-                                        <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full border-2 border-[var(--concierge-bg-border)] bg-emerald-500 animate-pulse" />
+                                        <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full border-2 border-[var(--concierge-bg-border)] bg-emerald-400 ring-2 ring-emerald-400/20 animate-pulse" />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-black text-white uppercase tracking-[0.15em] italic">
+                                        <h3 className="text-sm font-black uppercase tracking-[0.15em] italic bg-clip-text text-transparent bg-gradient-to-r from-white via-vape-200 to-white bg-[length:200%_100%] animate-[gradient-x_3s_linear_infinite]">
                                             CESAR
                                         </h3>
                                         <div className="flex items-center gap-1.5">
@@ -345,12 +350,36 @@ export const AIConcierge: React.FC = () => {
                                 ))}
 
                                 {isLoading && (
-                                    <div className="flex items-center gap-2 text-vape-400/50">
-                                        <Loader2 className="h-4 w-4 animate-spin text-vape-400" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest animate-pulse">
-                                            {isSlowResponse ? 'Sigo pensando...' : 'Analizando...'}
-                                        </span>
-                                    </div>
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        className="flex items-start max-w-[85%]"
+                                    >
+                                        <div className="relative rounded-2xl px-4 py-3 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-[#1a1b26]/80 border border-white/10 rounded-tl-sm backdrop-blur-md">
+                                            <div className="flex items-center gap-1.5 h-5">
+                                                <motion.div 
+                                                    className="w-1.5 h-1.5 rounded-full bg-vape-400"
+                                                    animate={{ y: [0, -4, 0] }}
+                                                    transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0 }}
+                                                />
+                                                <motion.div 
+                                                    className="w-1.5 h-1.5 rounded-full bg-vape-400"
+                                                    animate={{ y: [0, -4, 0] }}
+                                                    transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                                                />
+                                                <motion.div 
+                                                    className="w-1.5 h-1.5 rounded-full bg-vape-400"
+                                                    animate={{ y: [0, -4, 0] }}
+                                                    transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                                                />
+                                            </div>
+                                            {isSlowResponse && (
+                                                <p className="text-[9px] font-medium text-white/40 mt-1.5 whitespace-nowrap">
+                                                    Sigo pensando...
+                                                </p>
+                                            )}
+                                        </div>
+                                    </motion.div>
                                 )}
                             </div>
 
@@ -395,7 +424,7 @@ export const AIConcierge: React.FC = () => {
                                             onChange={(event) => setInput(event.target.value)}
                                             placeholder="Preguntame lo que sea..."
                                             disabled={isLoading || !!error}
-                                            className="w-full bg-black/40 border border-white/5 focus:border-vape-500/50 rounded-2xl px-5 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none transition-all font-medium"
+                                            className="w-full bg-black/50 border border-white/10 focus:border-vape-500/50 focus:ring-1 focus:ring-vape-500/30 focus:shadow-[0_0_20px_rgba(168,85,247,0.15)] rounded-2xl px-5 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all duration-300 font-medium"
                                         />
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                                             <button
@@ -430,18 +459,30 @@ export const AIConcierge: React.FC = () => {
                     whileTap={{ scale: 0.9 }}
                     className="pointer-events-auto group relative h-16 w-16"
                 >
-                    <div className="absolute inset-0 blur-lg opacity-20 group-hover:opacity-40 transition-opacity bg-vape-500" />
+                    <motion.div 
+                        className="absolute inset-0 blur-xl bg-vape-500 rounded-full"
+                        animate={{ 
+                            opacity: isOpen ? 0.2 : [0.3, 0.6, 0.3],
+                            scale: isOpen ? 1 : [1, 1.15, 1]
+                        }}
+                        transition={{ 
+                            duration: 3, 
+                            repeat: Infinity, 
+                            ease: "easeInOut" 
+                        }}
+                    />
                     <div
                         className={cn(
-                            'relative h-full w-full rounded-[1.5rem] flex items-center justify-center shadow-2xl transition-all duration-500',
-                            isOpen ? 'bg-white text-slate-900 rotate-90' : 'bg-gradient-to-br from-vape-500 to-vape-600 text-white',
+                            'relative h-full w-full rounded-[1.5rem] flex items-center justify-center shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500 border border-white/10',
+                            isOpen ? 'bg-white text-slate-900 rotate-90' : 'bg-gradient-to-br from-vape-500 via-vape-600 to-vape-800 text-white',
                         )}
+                        style={{ willChange: 'transform' }}
                     >
                         {isOpen ? <X className="h-7 w-7" /> : <Bot className="h-7 w-7" />}
                     </div>
 
                     {!isOpen && messages.length > 1 && (
-                        <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 border-2 border-[var(--concierge-bg-border)] shadow-lg animate-bounce">
+                        <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400 border-2 border-[var(--concierge-bg-border)] shadow-[0_0_15px_rgba(52,211,153,0.4)] animate-bounce ring-2 ring-emerald-400/20">
                             <Bot className="h-3 w-3 text-white" />
                         </div>
                     )}
