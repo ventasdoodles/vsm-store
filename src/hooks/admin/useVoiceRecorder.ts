@@ -34,6 +34,13 @@ interface ISpeechRecognition {
  * Manages the lifecycle of a SpeechRecognition session, providing 
  * real-time transcription and error handling.
  */
+declare global {
+    interface Window {
+        SpeechRecognition?: new () => ISpeechRecognition;
+        webkitSpeechRecognition?: new () => ISpeechRecognition;
+    }
+}
+
 export function useVoiceRecorder() {
     const [isRecording, setIsRecording] = useState(false);
     const [transcript, setTranscript] = useState('');
@@ -44,8 +51,7 @@ export function useVoiceRecorder() {
 
     useEffect(() => {
         // Feature detection for various browser engines
-        // @ts-expect-error - SpeechRecognition is still experimental
-        const SpeechRecognitionClass = window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: new () => ISpeechRecognition }).webkitSpeechRecognition;
+        const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
         
         if (SpeechRecognitionClass) {
             recognitionRef.current = new SpeechRecognitionClass();

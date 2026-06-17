@@ -69,7 +69,7 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
             <label className={cn(
                 "absolute left-11 transition-all duration-300 pointer-events-none select-none z-10",
                 (focused || hasValue) 
-                    ? "-top-2 text-[10px] font-black text-vape-400 uppercase tracking-widest bg-[#0a0f1d] px-2 rounded-sm border border-white/10" 
+                    ? "-top-2 text-[10px] font-black text-vape-400 uppercase tracking-widest bg-[var(--concierge-bg-border)] px-2 rounded-sm border border-white/10" 
                     : "top-1/2 -translate-y-1/2 text-sm text-white/30"
             )}>
                 {label}

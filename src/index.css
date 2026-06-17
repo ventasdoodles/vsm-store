@@ -23,6 +23,7 @@
   --card-bg-premium: rgba(255, 255, 255, 0.04);
   --glass-border-premium: rgba(255, 255, 255, 0.10);
   --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --concierge-bg-border: #0a0f1d;
 
   /* -- Text -- */
   --text-primary: 252 252 252;

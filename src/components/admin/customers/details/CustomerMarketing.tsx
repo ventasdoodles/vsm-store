@@ -69,8 +69,9 @@ export function CustomerMarketing({ customer }: Props) {
             });
             notify.success('Cupón Generado', `El cupón ${coupon.code} ha sido creado. (Copiado al portapapeles)`);
             navigator.clipboard.writeText(coupon.code);
-        } catch (error: any) {
-            notify.error('Fallo', error.message || 'No se pudo generar el cupón');
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'No se pudo generar el cupón';
+            notify.error('Fallo', message);
         } finally {
             setIsGeneratingCoupon(false);
         }

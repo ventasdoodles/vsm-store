@@ -78,7 +78,9 @@ export const AIConcierge: React.FC = () => {
                     return changed ? next : current;
                 });
             })
-            .catch(() => {
+            .catch((err) => {
+                // eslint-disable-next-line no-console
+                console.warn('[AIConcierge] Failed to load cart assembly products:', err);
                 // The CTA will remain advisory until product truth can be loaded.
             });
 
@@ -293,7 +295,7 @@ export const AIConcierge: React.FC = () => {
                                         <div className="h-10 w-10 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-vape-500 to-vape-600">
                                             <Bot className="h-5 w-5 text-white" />
                                         </div>
-                                        <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full border-2 border-[#0a0f1d] bg-emerald-500 animate-pulse" />
+                                        <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full border-2 border-[var(--concierge-bg-border)] bg-emerald-500 animate-pulse" />
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-black text-white uppercase tracking-[0.15em] italic">
@@ -439,7 +441,7 @@ export const AIConcierge: React.FC = () => {
                     </div>
 
                     {!isOpen && messages.length > 1 && (
-                        <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 border-2 border-[#0a0f1d] shadow-lg animate-bounce">
+                        <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 border-2 border-[var(--concierge-bg-border)] shadow-lg animate-bounce">
                             <Bot className="h-3 w-3 text-white" />
                         </div>
                     )}

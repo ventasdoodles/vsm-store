@@ -624,7 +624,7 @@ export async function runCatalogGuidedRecoveryQuery(query: string, isAmbiguous: 
 
 
 export class SemanticSearchRepo {
-  static async searchExactMatch(query: string, limit: number = 5): Promise<any[]> {
+  static async searchExactMatch(query: string, limit: number = 5): Promise<ProductSearchRow[]> {
     const { data } = await supabase
       .from('products')
       .select(PRODUCT_SEARCH_SELECT)
@@ -634,7 +634,7 @@ export class SemanticSearchRepo {
     return data || [];
   }
 
-  static async semanticVectorMatch(query: string, requiresExpansion: boolean, memoryContext?: any): Promise<any[]> {
+  static async semanticVectorMatch(query: string, requiresExpansion: boolean, memoryContext?: { preference_summary?: string | null }): Promise<ProductSearchRow[]> {
     if (requiresExpansion === false) return [];
 
     let vectorQuery = query;
@@ -647,7 +647,7 @@ export class SemanticSearchRepo {
     });
 
     if (data?.matches && Array.isArray(data.matches)) {
-        const productIds = data.matches.map((m: any) => m.id);
+        const productIds = data.matches.map((m: { id: string }) => m.id);
         if (productIds.length > 0) {
             const { data: products } = await supabase
                 .from('products')
