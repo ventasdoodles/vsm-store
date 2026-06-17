@@ -92,7 +92,7 @@ serve(async (req: Request) => {
         };
 
         // Transformar eventos en el formato de nuestra UI
-        const events = (shipment.events ?? []).map((ev: any, i: number) => ({
+        const events = (shipment.events ?? []).map((ev: Record<string, unknown>, i: number) => ({
             id: String(i),
             date: ev.timestamp ?? new Date().toISOString(),
             status: ev.description ?? 'Actualización del envío',
@@ -116,7 +116,7 @@ serve(async (req: Request) => {
             { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('[track-shipment] Error:', err);
         return new Response(
             JSON.stringify({ error: 'Error interno. Intenta nuevamente.', code: 'SERVER_ERROR' }),

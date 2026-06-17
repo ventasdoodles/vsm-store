@@ -1,10 +1,12 @@
+import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
+
 export interface AIBehaviorRule {
     rule_text: string;
     type: 'MUST_DO' | 'NEVER_DO';
 }
 
 export class BehaviorRulesRepo {
-    constructor(private supabase: any) {}
+    constructor(private supabase: SupabaseClient) {}
 
     async getActiveRules(): Promise<AIBehaviorRule[]> {
         try {

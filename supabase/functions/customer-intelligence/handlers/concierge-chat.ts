@@ -29,7 +29,7 @@ const SAFETY_SETTINGS = [
  *   and gemini-embedding-001 embeddings so runtime behavior is explicit.
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import {
     geminiEmbedText,
     geminiGenerateContent,
@@ -91,13 +91,13 @@ const corsHeaders = {
 
 export async function handleConciergeChat(
     req: Request,
-    body: any,
-    supabase: any,
+    body: Record<string, unknown>,
+    supabase: SupabaseClient,
     _GEMINI_API_KEY: string,
     _SUPABASE_URL: string,
     _SUPABASE_SERVICE_ROLE_KEY: string,
-    noWriteSmoke: any,
-    noWriteSmokeForError: any
+    noWriteSmoke: boolean,
+    noWriteSmokeForError: boolean
 ) {
     const { customerId, action, context, query, history, customerContext: cContext, customer_context, product_ids, cart_product_ids } = body;
     const customerContext = cContext || customer_context;
@@ -111,7 +111,7 @@ export async function handleConciergeChat(
 
             let isAuthenticated = false;
             let authError: string | null = null;
-            let _authenticatedUser: any = null;
+            let _authenticatedUser: unknown = null;
 
             if (!bearerToken) {
                 authError = 'No JWT provided';
@@ -128,8 +128,9 @@ export async function handleConciergeChat(
                         _authenticatedUser = user;
                         console.warn(`[AUTH] Server-verified user: ${user.id}`);
                     }
-                } catch (e: any) {
-                    authError = `Auth verification error: ${e.message}`;
+                } catch (e: unknown) {
+                    const msg = e instanceof Error ? e.message : String(e);
+                    authError = `Auth verification error: ${msg}`;
                 }
             }
 
@@ -937,12 +938,12 @@ export async function handleConciergeChat(
             const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃƒÂ³ contexto de URL publica.';
             const publicWebSearchSources = Array.isArray((publicWebSearchResult as any)?.metadata?.sources)
                 ? (publicWebSearchResult as any).metadata.sources
-                    .map((source: any) => `- ${source.title || 'Fuente'}: ${source.url || 'sin_url'}`)
+                    .map((source: { title?: string; url?: string }) => `- ${source.title || 'Fuente'}: ${source.url || 'sin_url'}`)
                     .join('\n')
                 : 'Sin fuentes publicas registradas.';
             const publicUrlContextSources = Array.isArray((publicUrlContextResult as any)?.metadata?.urls)
                 ? (publicUrlContextResult as any).metadata.urls
-                    .map((entry: any) => `- ${entry.retrieved_url || entry.url || 'sin_url'} | ${entry.status || 'UNKNOWN'}`)
+                    .map((entry: { retrieved_url?: string; url?: string; status?: string }) => `- ${entry.retrieved_url || entry.url || 'sin_url'} | ${entry.status || 'UNKNOWN'}`)
                     .join('\n')
                 : 'Sin URLs recuperadas.';
             const compactPublicWebSearchSources = formatCompactSourceLines(
@@ -1026,7 +1027,7 @@ export async function handleConciergeChat(
             // ═══ HARDENING 2: GEMINI RESILIENCE — SOMMELIER CALL WITH STREAMING SUPPORT ═══
             const isStreamingRequest = body.stream === true;
             
-            let sommelierResult: any = {};
+            let sommelierResult: Record<string, unknown> = {};
             let sommelierResponse: Response | null = null;
             let sommelier_gemini_error: string | null = null;
             let rawText = '';
@@ -1035,7 +1036,7 @@ export async function handleConciergeChat(
             const postProcessAndTelemetry = async (
                 localRawText: string,
                 localSommelierResponse: Response | null,
-                localSommelierResult: any,
+                localSommelierResult: Record<string, unknown>,
                 localSommelierGeminiError: string | null,
                 shouldShortCircuitClarification: boolean
             ) => {
@@ -1055,7 +1056,7 @@ export async function handleConciergeChat(
                         http_status: localSommelierResponse?.status || 'no_response',
                         candidates_count: localSommelierResult?.candidates?.length || 0,
                         finish_reason: localSommelierResult?.candidates?.[0]?.finishReason || 'NONE',
-                        safety_ratings: localSommelierResult?.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
+                        safety_ratings: (localSommelierResult as any)?.candidates?.[0]?.safetyRatings?.map((r: { category: string; probability: string }) => `${r.category}:${r.probability}`) || [],
                         raw_text_length: localRawText.length,
                         raw_text_preview: localRawText.slice(0, 300),
                         prompt_feedback: localSommelierResult?.promptFeedback || null,
@@ -1064,7 +1065,7 @@ export async function handleConciergeChat(
                     };
                 console.warn(`[Sommelier] DIAG:`, JSON.stringify(sommelierDiag));
 
-                let aiData: any = {};
+                let aiData: Record<string, unknown> = {};
                 if (shouldShortCircuitClarification) {
                     const clarificationText = buildClarificationFirstFallbackText({
                         text: analystConversationalPrefix,
@@ -1122,7 +1123,7 @@ export async function handleConciergeChat(
                             aiData.conversational_prefix = compactedPrefix || null;
                         }
                         console.warn(`[Sommelier] Contract valid: parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${aiData.text.length}`);
-                    } catch (_e: any) {
+                    } catch (_e: unknown) {
                         console.error("[Sommelier] JSON parse error:", _e.message, "Raw:", localRawText.slice(0, 200));
                         aiData = {
                             text: compactCesarinResponseText(sommelier_fallback_on_error) || sommelier_fallback_on_error,
@@ -1305,7 +1306,7 @@ export async function handleConciergeChat(
                         assist_action_present: telemetryNextStep.assist_action_present,
                         source_context_present: Boolean(publicSourceContext),
                         retrieval_source: telemetryRetrievalSource,
-                        recommended_product_ids: Array.isArray(aiData.products) ? aiData.products.map((p: any) => p.id).filter(Boolean) : [],
+                        recommended_product_ids: Array.isArray(aiData.products) ? aiData.products.map((p: { id: string }) => p.id).filter(Boolean) : [],
                         ai_logic_debug: {
                             ...aiData.debug,
                             turn_profile: guardrailTelemetry.turn_profile,
@@ -1351,7 +1352,7 @@ export async function handleConciergeChat(
                                 const jt = setTimeout(() => jc.abort(), 5000);
                                 await fetch(`${_SUPABASE_URL}/functions/v1/cesarin-qa-judge`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_SUPABASE_SERVICE_ROLE_KEY}` }, body: JSON.stringify(judgePayload), signal: jc.signal });
                                 clearTimeout(jt);
-                            } catch (e: any) {}
+                            } catch (e: unknown) {}
                         })();
                     }
                 } else {
@@ -1366,7 +1367,7 @@ export async function handleConciergeChat(
             };
 
             const formattedSommelierHistory = Array.isArray(history) 
-                ? history.slice(-6).map((h: any) => ({
+                ? history.slice(-6).map((h: { role: string; content: string }) => ({
                     role: h.role === 'assistant' ? 'model' : 'user',
                     parts: [{ text: h.content }]
                 })) 
@@ -1422,7 +1423,7 @@ export async function handleConciergeChat(
 
                         let accumulatedString = '';
                         let lastSentIndex = 0;
-                        let sommelierJsonObj: any = {};
+                        let sommelierJsonObj: Record<string, unknown> = {};
 
                         if (!shouldShortCircuitClarification && streamRes.body) {
                             const reader = streamRes.body.getReader();
@@ -1474,7 +1475,7 @@ export async function handleConciergeChat(
                         delete finalMetadata.text;
                         await writer.write(encoder.encode(`event: metadata\ndata: ${JSON.stringify(finalMetadata)}\n\n`));
                         await writer.close();
-                    } catch (err: any) {
+                    } catch (err: unknown) {
                         await writer.abort(err);
                     }
                 })();
@@ -1500,8 +1501,10 @@ export async function handleConciergeChat(
                             sommelierResult = await sommelierResponse.json();
                             rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
                         }
-                    } catch (e: any) {
-                        sommelier_gemini_error = e.name === 'AbortError' ? 'Sommelier timeout' : e.message;
+                    } catch (e: unknown) {
+                        const msg = e instanceof Error ? e.message : String(e);
+                        const name = e instanceof Error ? e.name : 'UnknownError';
+                        sommelier_gemini_error = name === 'AbortError' ? 'Sommelier timeout' : msg;
                     }
                 }
 

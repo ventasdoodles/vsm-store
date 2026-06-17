@@ -114,7 +114,7 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         const errorMsg = `[Dashboard-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 

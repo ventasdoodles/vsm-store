@@ -155,7 +155,7 @@ serve(async (req) => {
 
         // 2. Construir items para Mercado Pago
         // Asegurar que prices sean números y titles strings
-        const items = order.items.map((item: any) => ({
+        const items = order.items.map((item: Record<string, unknown>) => ({
             title: item.name || 'Producto VSM',
             quantity: Number(item.quantity),
             unit_price: Number(item.price),

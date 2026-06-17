@@ -1,12 +1,12 @@
 export interface AnalystPromptContext {
     capabilitySummary: string;
     query: string;
-    customerContext: any;
-    customerMemory: any;
+    customerContext: Record<string, unknown>;
+    customerMemory: Record<string, unknown>;
     customerPreferencePromptSummary: string | null;
     customerCommercialMemoryGuidance: string | null;
     softContinuityPromptBlock: string | null;
-    customerProactiveInsights: any | null;
+    customerProactiveInsights: Record<string, unknown> | null;
 }
 
 export function buildAnalystSystemPrompt(capabilitySummary: string, behaviorRules: import('../infrastructure/behavior-rules.repo.ts').AIBehaviorRule[] = []): string {
@@ -85,7 +85,7 @@ export function buildAnalystUserPromptBlocks(context: AnalystPromptContext): str
         const insights = context.customerProactiveInsights;
         let proactiveText = '';
         if (insights.items_due_for_replenishment?.length) {
-            proactiveText += `- REPLENISHMENT: El cliente compró hace días líquidos/desechables que podrían estar por terminarse (${insights.items_due_for_replenishment.map((i:any) => i.product_name).join(', ')}). Si dice hola, sugiere cordialmente reponerlos.\n`;
+            proactiveText += `- REPLENISHMENT: El cliente compró hace días líquidos/desechables que podrían estar por terminarse (${(insights.items_due_for_replenishment as Array<{product_name: string}>).map(i => i.product_name).join(', ')}). Si dice hola, sugiere cordialmente reponerlos.\n`;
         }
         if (insights.owned_hardware_models?.length) {
             proactiveText += `- KITTING DE HARDWARE: El cliente es dueño de estos equipos: ${insights.owned_hardware_models.join(', ')}. Si pide consumibles (resistencias, pods, repuestos) y no especifica el modelo, ASUME que son para estos equipos directamente, sin hacerle perder tiempo preguntando.\n`;

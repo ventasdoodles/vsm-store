@@ -67,7 +67,7 @@ describe('customer-intelligence native public web tools', () => {
 
     const results = await executeTools(
       [{ name: 'public_web_search', args: { query: 'ese modelo ya salio este ano oficialmente?' } }],
-      {},
+      {} as any,
       'test-key',
     );
     expect(results).toHaveLength(1);
@@ -77,8 +77,8 @@ describe('customer-intelligence native public web tools', () => {
     expect(result!.name).toBe('public_web_search');
     expect(result!.status).toBe('success');
     expect(result!.output.length).toBeGreaterThan(10);
-    expect(result!.metadata.sources).toHaveLength(2);
-    expect(result!.metadata.queries).toEqual(['modelo lanzamiento oficial']);
+    expect(result!.metadata!.sources).toHaveLength(2);
+    expect(result!.metadata!.queries).toEqual(['modelo lanzamiento oficial']);
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/v1beta/models/gemini-2.5-flash:generateContent'),
       expect.objectContaining({
@@ -119,7 +119,7 @@ describe('customer-intelligence native public web tools', () => {
           urls: ['https://example.com/lanzamiento'],
         },
       }],
-      {},
+      {} as any,
       'test-key',
     );
     expect(results).toHaveLength(1);
@@ -129,7 +129,7 @@ describe('customer-intelligence native public web tools', () => {
     expect(result!.name).toBe('public_url_context');
     expect(result!.status).toBe('success');
     expect(result!.output).toContain('lanzamiento');
-    expect(result!.metadata.urls).toEqual([
+    expect(result!.metadata!.urls).toEqual([
       {
         retrieved_url: 'https://example.com/lanzamiento',
         status: 'URL_RETRIEVAL_STATUS_SUCCESS',
@@ -145,7 +145,7 @@ describe('customer-intelligence native public web tools', () => {
 
     const results = await executeTools(
       [{ name: 'get_inventory_outlook', args: { product_id: 'prod-1' } }],
-      supabase,
+      supabase as any,
       'test-key',
     );
 
@@ -168,7 +168,7 @@ describe('customer-intelligence native public web tools', () => {
 
     const results = await executeTools(
       [{ name: 'get_inventory_outlook', args: { product_id: 'prod-1' } }],
-      supabase,
+      supabase as any,
       'test-key',
     );
 

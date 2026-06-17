@@ -228,7 +228,7 @@ FORMATO:
 
         throw new Error(`Unknown action: ${action}`)
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         const errorMsg = `[Product-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 

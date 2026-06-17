@@ -86,15 +86,16 @@ async function fetchWithRetry(url: string, options: RequestInit, errorContext: s
         continue;
       }
       return response;
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         throw error; // Respect explicit abort signals (like caller timeouts) immediately
       }
+      const msg = error instanceof Error ? error.message : String(error);
       if (attempt >= MAX_RETRIES) {
-        console.error(`[Gemini API] Network fetch failed after ${MAX_RETRIES} retries for ${errorContext}: ${error.message}`);
+        console.error(`[Gemini API] Network fetch failed after ${MAX_RETRIES} retries for ${errorContext}: ${msg}`);
         throw error;
       }
-      console.warn(`[Gemini API] Network error for ${errorContext}: ${error.message}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
+      console.warn(`[Gemini API] Network error for ${errorContext}: ${msg}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
       const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
       const jitter = Math.random() * (backoff * 0.3);
       await sleepAbortAware(backoff + jitter, options.signal as AbortSignal | undefined);

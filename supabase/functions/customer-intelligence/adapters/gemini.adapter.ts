@@ -22,7 +22,7 @@ export interface AnalystReport {
     tool_calls: ToolCall[];
     customer_dna?: {
         interests?: string[];
-        preference_signals?: any[];
+        preference_signals?: Record<string, unknown>[];
     };
     conversational_prefix?: string;
 }
@@ -37,9 +37,9 @@ export class GeminiAnalystAdapter {
 
     constructor(private apiKey: string, private modelId: string) {}
 
-    async analyzeTurn(systemPrompt: string, userBlocks: string, history: any[]): Promise<{ report: AnalystReport, rawText: string, error: string | null }> {
+    async analyzeTurn(systemPrompt: string, userBlocks: string, history: { role: string; content: string }[]): Promise<{ report: AnalystReport, rawText: string, error: string | null }> {
         const formattedHistory = Array.isArray(history) 
-            ? history.slice(-6).map((h: any) => ({
+            ? history.slice(-6).map((h) => ({
                 role: h.role === 'assistant' ? 'model' : 'user',
                 parts: [{ text: h.content }]
             })) 
@@ -113,9 +113,10 @@ export class GeminiAnalystAdapter {
             if (analystUsage) {
                 console.warn('[Analyst Tokens]', JSON.stringify(analystUsage));
             }
-        } catch (e: any) {
-            console.error(`[Analyst] Gateway error: ${e.message}`);
-            geminiError = e.message;
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e);
+            console.error(`[Analyst] Gateway error: ${msg}`);
+            geminiError = msg;
         }
 
         if (rawAnalystText) {
@@ -134,8 +135,9 @@ export class GeminiAnalystAdapter {
                     analystReport = parsed as AnalystReport;
                     analystParseValid = true;
                 }
-            } catch (e: any) {
-                geminiError = geminiError || `Analyst parse error: ${e.message}`;
+            } catch (e: unknown) {
+                const msg = e instanceof Error ? e.message : String(e);
+                geminiError = geminiError || `Analyst parse error: ${msg}`;
             }
         }
 

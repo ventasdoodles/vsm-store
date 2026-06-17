@@ -11,7 +11,7 @@ export async function invokeLLMWithFallback(
     body: Record<string, any>,
     errorContext: string
 ): Promise<any> {
-    const errors: any[] = [];
+    const errors: unknown[] = [];
     
     for (const provider of providers) {
         if (!provider.apiKey) {
@@ -50,7 +50,7 @@ export async function invokeLLMWithFallback(
                 throw new Error("Anthropic not fully implemented");
             }
             
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.warn(`[LLM Gateway] Provider ${provider.name} failed: ${e.message}`);
             errors.push({ provider: provider.name, error: e.message });
             // Continue to the next provider in the fallback chain

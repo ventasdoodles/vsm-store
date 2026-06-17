@@ -44,7 +44,7 @@ serve(async (req) => {
         }
 
         // 1. Preparar las partes del contenido para Gemini
-        const parts: any[] = []
+        const parts: Record<string, unknown>[] = []
 
         if (audio) {
             parts.push({
@@ -101,7 +101,7 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error(`[Voice-Intelligence] Error: ${error.message}`);
         // Fallback: si falla la IA, devolvemos el texto original para no romper la experiencia
         return new Response(JSON.stringify({ 

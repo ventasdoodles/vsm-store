@@ -40,7 +40,7 @@ export async function handleParseAdminIntent(query: string, _GEMINI_API_KEY: str
     return new Response(rawText.trim(), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 }
 
-export async function handleGenerateSupplierCopy(body: any, _GEMINI_API_KEY: string) {
+export async function handleGenerateSupplierCopy(body: Record<string, unknown>, _GEMINI_API_KEY: string) {
     const { productName, currentStock, sku } = body
     const prompt = `
         Genera un mensaje profesional de WhatsApp para un proveedor de vapeo.
@@ -59,7 +59,7 @@ export async function handleGenerateSupplierCopy(body: any, _GEMINI_API_KEY: str
     return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 }
 
-export async function handleGenerateWhatsappCopy(body: any, supabase: SupabaseClient, _GEMINI_API_KEY: string) {
+export async function handleGenerateWhatsappCopy(body: Record<string, unknown>, supabase: SupabaseClient, _GEMINI_API_KEY: string) {
     const { customerId, context } = body;
     if (!customerId) throw new Error('Customer ID is required for WhatsApp copy')
     

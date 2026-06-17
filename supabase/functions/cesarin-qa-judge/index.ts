@@ -140,7 +140,7 @@ RESPONDE ESTRICTAMENTE EN JSON:
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
                 });
 
-            } catch (e: any) {
+            } catch (e: unknown) {
                 console.error(`[EVALUATE_TURN] Gemini or persistence error: ${e.message}`);
                 // Best-effort: evaluation failed, return error but don't fail the request
                 return new Response(JSON.stringify({
@@ -208,7 +208,7 @@ RESPONDE ESTRICTAMENTE EN JSON:
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         return new Response(JSON.stringify({ error: error.message }), { 
             status: 500, 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

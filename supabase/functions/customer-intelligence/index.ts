@@ -53,7 +53,7 @@ serve(async (req) => {
         }
 
         throw new Error(`Acción no soportada: ${action}`)
-    } catch (error: any) {
+    } catch (error: unknown) {
         const errorMsg = `[Customer-Intelligence] Error: ${error.message}`;
         console.error(errorMsg);
         const errorPayload: Record<string, unknown> = {

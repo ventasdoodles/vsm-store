@@ -150,7 +150,7 @@ describe('resolveStorefrontCompatibilityCheck', () => {
     const resolution = await resolveStorefrontCompatibilityCheck({
       query: 'le queda a mi caliburn g3 el pod g3?',
       cartProductIds: ['anchor'],
-      supabase,
+      supabase: supabase as any,
     });
 
     expect(resolution.kind).toBe('COMPATIBLE');
@@ -197,7 +197,7 @@ describe('resolveStorefrontCompatibilityCheck', () => {
     const resolution = await resolveStorefrontCompatibilityCheck({
       query: 'le queda a mi caliburn g3 el pod g3?',
       cartProductIds: ['anchor'],
-      supabase,
+      supabase: supabase as any,
     });
 
     expect(resolution.kind).toBe('INCOMPATIBLE');
@@ -216,7 +216,7 @@ describe('resolveStorefrontCompatibilityCheck', () => {
     const resolution = await resolveStorefrontCompatibilityCheck({
       query: 'sirve para mi equipo?',
       cartProductIds: [],
-      supabase,
+      supabase: supabase as any,
     });
 
     expect(resolution.kind).toBe('NEEDS_MORE_CONTEXT');

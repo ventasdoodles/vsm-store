@@ -201,7 +201,7 @@ function scoreProduct(product: ProductRow, query: string): number {
   return score;
 }
 
-async function fetchProductPool(supabase: any, query: string): Promise<ProductRow[]> {
+async function fetchProductPool(supabase: import("@supabase/supabase-js").SupabaseClient, query: string): Promise<ProductRow[]> {
   const base = supabase
     .from('products')
     .select(PRODUCT_SELECT)
@@ -266,7 +266,7 @@ function pickSecondProduct(pool: ProductRow[], query: string, anchorId: string):
 }
 
 async function resolveDirectProductMatch(input: {
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient;
   query: string;
   cartProductIds: string[];
 }): Promise<{ anchor: ProductRow | null; candidate: ProductRow | null; usedCartContext: boolean; productPool: ProductRow[] }> {
@@ -302,7 +302,7 @@ async function resolveDirectProductMatch(input: {
 }
 
 async function resolveConceptIds(input: {
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient;
   productId: string;
 }): Promise<string[]> {
   const { data, error } = await input.supabase
@@ -315,7 +315,7 @@ async function resolveConceptIds(input: {
 }
 
 async function resolveDirectRelations(input: {
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient;
   anchorConceptIds: string[];
   candidateConceptIds: string[];
 }): Promise<CompatibilityRelationRow[]> {
@@ -346,13 +346,13 @@ async function resolveDirectRelations(input: {
   if (forwardError && reverseError) return [];
 
   return [
-    ...((Array.isArray(forwardData) ? forwardData : []) as CompatibilityRelationRow[]),
-    ...((Array.isArray(reverseData) ? reverseData : []) as CompatibilityRelationRow[]),
+    ...((Array.isArray(forwardData) ? forwardData : []) as unknown as CompatibilityRelationRow[]),
+    ...((Array.isArray(reverseData) ? reverseData : []) as unknown as CompatibilityRelationRow[]),
   ];
 }
 
 async function resolveCompatibilitySuggestions(input: {
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient;
   anchorConceptIds: string[];
 }): Promise<{ products: ProductRow[]; relationCount: number; sampleRelation: CompatibilityRelationRow | null }> {
   if (input.anchorConceptIds.length === 0) {
@@ -378,7 +378,7 @@ async function resolveCompatibilitySuggestions(input: {
     return { products: [], relationCount: 0, sampleRelation: null };
   }
 
-  const relationRows = data as CompatibilityRelationRow[];
+  const relationRows = data as unknown as CompatibilityRelationRow[];
   const relatedProductIds = Array.from(new Set(
     relationRows
       .map((row) => row.concept_b?.product_id)
@@ -470,7 +470,7 @@ function buildCompatibilityMessage(input: {
 export async function resolveStorefrontCompatibilityCheck(input: {
   query: string;
   cartProductIds: string[];
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient;
 }): Promise<CompatibilityCheckResolution> {
   const directMatch = await resolveDirectProductMatch(input);
   const anchor = directMatch.anchor;

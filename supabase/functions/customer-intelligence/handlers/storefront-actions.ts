@@ -8,7 +8,7 @@ import {
 } from '../storefront-compatibility.ts'
 import { corsHeaders } from '../shared/cors.ts';
 
-export async function handleStorefrontAttachments(body: any, supabase: SupabaseClient) {
+export async function handleStorefrontAttachments(body: Record<string, unknown>, supabase: SupabaseClient) {
     const { product_ids } = body;
     const normalizedProductIds = Array.isArray(product_ids)
         ? product_ids.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
@@ -23,7 +23,7 @@ export async function handleStorefrontAttachments(body: any, supabase: SupabaseC
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 }
 
-export async function handleStorefrontCartDependencyOffer(body: any, supabase: SupabaseClient) {
+export async function handleStorefrontCartDependencyOffer(body: Record<string, unknown>, supabase: SupabaseClient) {
     const { cart_product_ids } = body;
     const normalizedCartProductIds = Array.isArray(cart_product_ids)
         ? cart_product_ids.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
@@ -38,7 +38,7 @@ export async function handleStorefrontCartDependencyOffer(body: any, supabase: S
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 }
 
-export async function handleStorefrontCompatibilityCheck(body: any, supabase: SupabaseClient) {
+export async function handleStorefrontCompatibilityCheck(body: Record<string, unknown>, supabase: SupabaseClient) {
     const { query, cart_product_ids } = body;
     if (!query) throw new Error('Query is required for compatibility checking');
     const normalizedCartProductIds = Array.isArray(cart_product_ids)

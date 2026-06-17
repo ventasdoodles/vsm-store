@@ -11,14 +11,14 @@ export interface ToolResult {
     status: 'success' | 'error';
     output: string;
     latency_ms: number;
-    args?: any;
+    args?: Record<string, unknown>;
     summary?: string;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
 }
 
 export interface ToolCall {
     name: string;
-    args: any;
+    args: Record<string, unknown>;
 }
 export function compactPublicToolText(input: string): string {
     const normalized = (input || '').replace(/\s+/g, ' ').trim();
@@ -42,7 +42,7 @@ export function extractPublicUrls(input: string): string[] {
     ).slice(0, 3);
 }
 
-export function collectWebSources(candidate: any): Array<{ title: string; url: string }> {
+export function collectWebSources(candidate: Record<string, any>): Array<{ title: string; url: string }> {
     const sources: Array<{ title: string; url: string }> = [];
 
     const groundingChunks = candidate?.groundingMetadata?.groundingChunks
@@ -68,10 +68,10 @@ export function collectWebSources(candidate: any): Array<{ title: string; url: s
     return sources.filter((source, index, list) => list.findIndex((entry) => entry.url === source.url) === index).slice(0, 5);
 }
 
-function extractGeminiText(result: any): string {
+function extractGeminiText(result: Record<string, any>): string {
     const parts = result?.candidates?.[0]?.content?.parts ?? [];
     const text = parts
-        .map((part: any) => typeof part?.text === 'string' ? part.text : '')
+        .map((part: Record<string, any>) => typeof part?.text === 'string' ? part.text : '')
         .filter(Boolean)
         .join(' ')
         .trim();
@@ -79,11 +79,11 @@ function extractGeminiText(result: any): string {
     return compactCesarinResponseText(compactPublicToolText(text));
 }
 
-function extractGroundingSources(result: any): Array<{ title: string; url: string }> {
+function extractGroundingSources(result: Record<string, any>): Array<{ title: string; url: string }> {
     return collectWebSources(result?.candidates?.[0] ?? {}).slice(0, 4);
 }
 
-function extractGroundingQueries(result: any): string[] {
+function extractGroundingQueries(result: Record<string, any>): string[] {
     const candidate = result?.candidates?.[0] ?? {};
     const queries = candidate?.groundingMetadata?.webSearchQueries
         ?? candidate?.grounding_metadata?.web_search_queries
@@ -94,7 +94,7 @@ function extractGroundingQueries(result: any): string[] {
         : [];
 }
 
-function extractUrlContextMetadata(result: any): Array<{ retrieved_url: string; status: string }> {
+function extractUrlContextMetadata(result: Record<string, any>): Array<{ retrieved_url: string; status: string }> {
     const candidate = result?.candidates?.[0] ?? {};
     const urlMetadata = candidate?.urlContextMetadata?.urlMetadata
         ?? candidate?.url_context_metadata?.url_metadata
@@ -102,7 +102,7 @@ function extractUrlContextMetadata(result: any): Array<{ retrieved_url: string; 
 
     return Array.isArray(urlMetadata)
         ? urlMetadata
-            .map((entry: any) => ({
+            .map((entry: Record<string, any>) => ({
                 retrieved_url: entry?.retrievedUrl || entry?.retrieved_url || '',
                 status: entry?.urlRetrievalStatus || entry?.url_retrieval_status || 'UNKNOWN',
             }))
@@ -145,7 +145,7 @@ async function runNativePublicGeminiTool(input: {
     });
 }
 
-export async function public_web_search(args: { query?: string }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: any }> {
+export async function public_web_search(args: { query?: string }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: Record<string, unknown> }> {
     const query = args.query?.trim();
     if (!query) {
         return {
@@ -180,7 +180,7 @@ export async function public_web_search(args: { query?: string }, geminiKey: str
     };
 }
 
-export async function public_url_context(args: { query?: string; url?: string; urls?: string[] }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: any }> {
+export async function public_url_context(args: { query?: string; url?: string; urls?: string[] }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: Record<string, unknown> }> {
     const urls = extractUrlsFromArgs(args);
     if (urls.length === 0) {
         return {
@@ -238,7 +238,7 @@ async function executePublicUrlContext(args: { query?: string; urls?: string[]; 
  * Formal Tool: search_products
  * Retrieves products via neural vector match, fallback to featured.
  */
-async function search_products(args: { query: string }, supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string }> {
+async function search_products(args: { query: string }, supabase: import("@supabase/supabase-js").SupabaseClient, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string }> {
     if (!args.query) return { output: "Error: No query provided.", summary: "Error: No query" };
 
     try {
@@ -293,7 +293,7 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
             return true;
         });
 
-        const output = filteredProducts.map((p: any) => `- ${p.name} ($${p.price}) | Stock: ${p.stock > 0 ? 'Disponible' : 'Agotado'}`).join('\n');
+        const output = filteredProducts.map((p: Record<string, any>) => `- ${p.name} ($${p.price}) | Stock: ${p.stock > 0 ? 'Disponible' : 'Agotado'}`).join('\n');
         return { 
             output: fallbackUsed ? `[FEATURED_FALLBACK]\n${output}` : output, 
             summary: `Encontrados ${filteredProducts.length} productos${fallbackUsed ? ' (incluye destacados)' : ''}` 
@@ -310,7 +310,7 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
  * Formal Tool: track_order
  * Resolves order_number -> tracking_number and fetches real-time carrier status.
  */
-async function track_order(args: { order_number?: string, tracking_number?: string }, supabase: any): Promise<{ output: string, summary: string, resolution_path: string, carrier?: string }> {
+async function track_order(args: { order_number?: string, tracking_number?: string }, supabase: import("@supabase/supabase-js").SupabaseClient): Promise<{ output: string, summary: string, resolution_path: string, carrier?: string }> {
     let trackingNumber = args.tracking_number?.trim();
     let orderNumber = args.order_number?.trim().toUpperCase();
     let resolutionPath = "initial";
@@ -448,7 +448,7 @@ function buildInventoryOutlookTruth(input: {
  * Formal Tool: get_inventory_outlook
  * Resolves product and fetches a stock depletion projection from the oracle.
  */
-async function get_inventory_outlook(args: { query?: string, product_id?: string }, supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string, signal_quality: string, resolution_path: string, velocity_30d?: number }> {
+async function get_inventory_outlook(args: { query?: string, product_id?: string }, supabase: import("@supabase/supabase-js").SupabaseClient, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string, signal_quality: string, resolution_path: string, velocity_30d?: number }> {
     let productId = args.product_id;
     let productName = "Producto desconocido";
     let resolutionPath = productId ? "direct_id" : "semantic_search";
@@ -565,7 +565,7 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
  * Formal Tool: check_compatibility
  * Resolves naming variants (aliases) to canonical concepts and fetches relations.
  */
-async function check_compatibility(args: { query: string }, supabase: any): Promise<{ output: string, summary: string, metadata?: any }> {
+async function check_compatibility(args: { query: string }, supabase: import("@supabase/supabase-js").SupabaseClient): Promise<{ output: string, summary: string, metadata?: Record<string, unknown> }> {
     if (!args.query) return { output: "Error: No se proporcionó una consulta de compatibilidad.", summary: "Sin consulta" };
 
     try {
@@ -581,7 +581,7 @@ async function check_compatibility(args: { query: string }, supabase: any): Prom
         if (aliasErr) throw aliasErr;
 
         const matchedConcepts = new Map<string, any>();
-        aliases?.forEach((a: any) => {
+        aliases?.forEach((a: Record<string, any>) => {
             if (query.includes(a.alias.toLowerCase())) {
                 matchedConcepts.set(a.concept_id, a.product_concepts);
             }
@@ -619,7 +619,7 @@ async function check_compatibility(args: { query: string }, supabase: any): Prom
         }
 
         // 3. Format output with scope-aware phrasing
-        const outputLines = relations.map((r: any) => {
+        const outputLines = relations.map((r: Record<string, any>) => {
             const prefix = r.scope === 'class_generalization' ? "[GENERALIZACION] " : "[ESPECIFICO] ";
             const statusLabel = r.status.replace('_', ' ').toUpperCase();
             return `${prefix}${r.concept_a.name} -> ${r.relation_type.replace('_', ' ')} -> ${r.concept_b.name} | STATUS: ${statusLabel} | NOTAS: ${r.notes || 'N/A'}`;
@@ -648,7 +648,7 @@ async function check_compatibility(args: { query: string }, supabase: any): Prom
 /**
  * Tool Orchestrator
  */
-export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<ToolResult[]> {
+export async function executeTools(toolCalls: ToolCall[], supabase: import("@supabase/supabase-js").SupabaseClient, geminiKey: string, precomputedEmbedding?: number[]): Promise<ToolResult[]> {
     const results: ToolResult[] = [];
     
     const executionPromises = toolCalls.map(async (call) => {
@@ -660,13 +660,13 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
         try {
             switch (call.name) {
                 case 'search_products': {
-                    const res = await search_products(call.args, supabase, geminiKey, precomputedEmbedding);
+                    const res = await search_products(call.args as unknown as { query: string }, supabase, geminiKey, precomputedEmbedding);
                     output = res.output;
                     summary = res.summary;
                     break;
                 }
                 case 'track_order': {
-                    const res = await track_order(call.args, supabase);
+                    const res = await track_order(call.args as unknown as { order_number?: string, tracking_number?: string }, supabase);
                     output = res.output;
                     summary = res.summary;
                     // Inject extra debug metadata if available
@@ -682,7 +682,7 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
                     };
                 }
                 case 'get_inventory_outlook': {
-                    const res = await get_inventory_outlook(call.args, supabase, geminiKey, precomputedEmbedding);
+                    const res = await get_inventory_outlook(call.args as unknown as { query?: string, product_id?: string }, supabase, geminiKey, precomputedEmbedding);
                     output = res.output;
                     summary = res.summary;
                     return {
@@ -697,7 +697,7 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
                     };
                 }
                 case 'check_compatibility': {
-                    const res = await check_compatibility(call.args, supabase);
+                    const res = await check_compatibility(call.args as unknown as { query: string }, supabase);
                     output = res.output;
                     summary = res.summary;
                     return {
@@ -711,7 +711,7 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
                     };
                 }
                 case 'public_web_search': {
-                    const res = await executePublicWebSearch(call.args || {}, geminiKey);
+                    const res = await executePublicWebSearch((call.args || {}) as unknown as { query?: string }, geminiKey);
                     output = res.output;
                     summary = res.summary;
                     return {
@@ -725,7 +725,7 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
                     };
                 }
                 case 'public_url_context': {
-                    const res = await executePublicUrlContext(call.args || {}, geminiKey);
+                    const res = await executePublicUrlContext((call.args || {}) as unknown as { query?: string; url?: string; urls?: string[] }, geminiKey);
                     output = res.output;
                     summary = res.summary;
                     return {

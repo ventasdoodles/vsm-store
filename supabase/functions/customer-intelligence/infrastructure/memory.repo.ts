@@ -1,13 +1,15 @@
+import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
+
 export interface ProactiveInsights {
     customer_tier?: string | null;
-    items_due_for_replenishment?: any[];
+    items_due_for_replenishment?: Record<string, unknown>[];
     owned_hardware_models?: string[];
 }
 
 export interface CustomerMemoryRecord {
     detected_interests?: string[];
     interests_metadata?: Record<string, { hits: number; last_at: string }>;
-    preference_signals?: Record<string, any>;
+    preference_signals?: Record<string, unknown>;
     preference_summary?: string | null;
     last_interaction_at?: string;
     prioritized_interests?: string[];
@@ -30,7 +32,7 @@ export interface MemoryTrace {
 }
 
 export class CustomerMemoryRepo {
-    constructor(private supabase: any) {}
+    constructor(private supabase: SupabaseClient) {}
 
     async getPrioritizedMemory(customerId: string | undefined): Promise<{ memory: CustomerMemoryRecord | null, trace: MemoryTrace }> {
         const trace: MemoryTrace = {
