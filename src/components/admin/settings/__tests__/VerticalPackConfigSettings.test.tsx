@@ -87,8 +87,8 @@ describe('VerticalPackConfigSettings', () => {
         fireEvent.click(addButton);
         
         expect(mockHandleChange).toHaveBeenCalledTimes(1);
-        let eventArg = mockHandleChange.mock.calls[0]![0];
-        let parsedValue = JSON.parse(eventArg.target.value);
+        const eventArg = mockHandleChange.mock.calls[0]![0];
+        const parsedValue = JSON.parse(eventArg.target.value);
         
         expect(parsedValue.sections?.length).toBe(1);
         expect(parsedValue.sections?.[0]?.label).toBe('Nueva Sección');
