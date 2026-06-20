@@ -8,7 +8,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Camera, Save, Package2, Loader2, FolderTree, X, Plus, Layers, Sparkles, LayoutDashboard, BrainCircuit, ShieldCheck, Zap, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Camera, Save, Package2, Loader2, FolderTree, X, Plus, Layers, Sparkles, LayoutDashboard, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
     getSuggestedSpecs, 
@@ -27,10 +27,11 @@ import { isTechnicalTag } from '@/services/admin/admin-tags.service';
 import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 import { ProductVariantsEditor } from './ProductVariantsEditor';
+import { ProductSpecsBuilder } from './ProductSpecsBuilder';
 import { z } from 'zod';
 import { buildAdminSectionCatalog, getAdminDefaultSectionSlug } from '@/config/productization';
 
-type EditorTab = 'comercial' | 'clasificacion' | 'configuracion' | 'inteligencia';
+import { ProductEditorTabs, type EditorTab } from './ProductEditorTabs';
 
 
 interface ProductEditorDrawerProps {
@@ -78,42 +79,7 @@ const getProductEditorSchema = (SECTION_LABELS: string[]) => z.object({
 /** Glassmorphism input style constant */
 const INPUT_CLS = 'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-white/25 backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20';
 
-// ─── Enrichment Review Helpers ─────────────────────────────────────────────
-
-interface EnrichmentFieldRowProps {
-    fieldKey: string;
-    label: string;
-    approved: boolean;
-    onToggle: (key: string) => void;
-    children: React.ReactNode;
-}
-
-function EnrichmentFieldRow({ fieldKey, label, approved, onToggle, children }: EnrichmentFieldRowProps) {
-    return (
-        <div className={cn(
-            'rounded-xl p-3.5 border transition-all',
-            approved ? 'border-violet-500/20 bg-violet-500/5' : 'border-white/5 bg-white/[0.01] opacity-40'
-        )}>
-            <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{label}</span>
-                <button
-                    type="button"
-                    onClick={() => onToggle(fieldKey)}
-                    className={cn(
-                        'h-5 w-5 rounded flex items-center justify-center border transition-all text-[10px] font-black',
-                        approved
-                            ? 'bg-violet-500 border-violet-500 text-white'
-                            : 'bg-transparent border-white/20 text-white/20'
-                    )}
-                >
-                    ✓
-                </button>
-            </div>
-            {children}
-        </div>
-    );
-}
-
+import { ProductEnrichmentReview } from './ProductEnrichmentReview';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ProductEditorDrawer({
@@ -334,28 +300,7 @@ export function ProductEditorDrawer({
         >
             <div className="flex flex-col h-full bg-theme-primary/50">
                 {/* ─── TAB NAVIGATION ─── */}
-                <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/5 rounded-2xl mb-8 mx-auto">
-                    {[
-                        { id: 'comercial', icon: Package2, label: 'Comercial' },
-                        { id: 'clasificacion', icon: FolderTree, label: 'Clasificación' },
-                        { id: 'configuracion', icon: Layers, label: 'Configuración' },
-                        { id: 'inteligencia', icon: BrainCircuit, label: 'Inteligencia' }
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as EditorTab)}
-                            className={cn(
-                                "flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                activeTab === tab.id 
-                                    ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" 
-                                    : "text-white/30 hover:bg-white/5 hover:text-white/60"
-                            )}
-                        >
-                            <tab.icon className="h-3.5 w-3.5" />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+                <ProductEditorTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
                 <div className="space-y-8 pb-32 overflow-y-auto px-1">
                     {/* ─── TAB: COMERCIAL ─── */}
@@ -481,101 +426,24 @@ export function ProductEditorDrawer({
                     {activeTab === 'configuracion' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                              {/* Fixed Specs JSON Editor */}
-                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
-                                    <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                                    Especificaciones Técnicas (Specs)
-                                </h3>
-                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-5">
-                                    {/* Sugerencias Guardrails */}
-                                    {specSuggestions.length > 0 && (
-                                        <div className="space-y-2">
-                                            <label className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] text-white/20">
-                                                <Sparkles className="h-3 w-3 text-violet-400" />
-                                                Sugerencias para {currentCategory?.name || 'esta sección'}
-                                            </label>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {specSuggestions.map(s => {
-                                                    const isUsed = !!formData.specs?.[s];
-                                                    return (
-                                                        <button
-                                                            key={s}
-                                                            type="button"
-                                                            onClick={() => handleAddSpec(s)}
-                                                            disabled={isUsed}
-                                                            className={cn(
-                                                                "px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all flex items-center gap-1.5",
-                                                                isUsed 
-                                                                    ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-500/40 cursor-default" 
-                                                                    : "border-white/5 bg-white/5 text-white/40 hover:border-violet-500/30 hover:text-white"
-                                                            )}
-                                                        >
-                                                            {isUsed && <CheckCircle2 className="h-2.5 w-2.5" />}
-                                                            {s}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
+                             <ProductSpecsBuilder
+                                specs={formData.specs || {}}
+                                specSuggestions={specSuggestions}
+                                categoryName={currentCategory?.name}
+                                onAddSpec={handleAddSpec}
+                                onUpdateSpec={(key, val) => {
+                                    const next = { ...formData.specs };
+                                    next[key] = val;
+                                    setFormData(p => ({ ...p, specs: next }));
+                                }}
+                                onRemoveSpec={(key) => {
+                                    const next = { ...formData.specs };
+                                    delete next[key];
+                                    setFormData(p => ({ ...p, specs: next }));
+                                }}
+                             />
 
-                                    <div className="grid grid-cols-2 gap-3 mb-2">
-                                        {Object.entries(formData.specs || {}).map(([key, val], idx) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <input 
-                                                    type="text" 
-                                                    value={key} 
-                                                    readOnly 
-                                                    className={cn(INPUT_CLS, "flex-1 opacity-50 cursor-not-allowed")} 
-                                                />
-                                                <input 
-                                                    type="text" 
-                                                    value={val} 
-                                                    onChange={(e) => {
-                                                        const next = { ...formData.specs };
-                                                        next[key] = e.target.value;
-                                                        setFormData(p => ({ ...p, specs: next }));
-                                                    }}
-                                                    className={cn(INPUT_CLS, "flex-1")} 
-                                                />
-                                                <button onClick={() => {
-                                                    const next = { ...formData.specs };
-                                                    delete next[key];
-                                                    setFormData(p => ({ ...p, specs: next }));
-                                                }} className="p-2 text-white/20 hover:text-red-400"><X className="h-4 w-4" /></button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex gap-2 border-t border-white/5 pt-4">
-                                        <input 
-                                            id="new-spec-key" 
-                                            type="text" 
-                                            placeholder="Nueva Propiedad (ej: Watts)" 
-                                            className={cn(INPUT_CLS, "flex-1")} 
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const input = e.currentTarget;
-                                                    if (handleAddSpec(input.value)) input.value = '';
-                                                }
-                                            }}
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={() => {
-                                                const keyInput = document.getElementById('new-spec-key') as HTMLInputElement;
-                                                if (handleAddSpec(keyInput.value)) keyInput.value = '';
-                                            }}
-                                            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all font-bold text-[10px] uppercase tracking-wider"
-                                        >
-                                            Añadir
-                                        </button>
-                                    </div>
-                                    <p className="text-[10px] text-white/20 italic">Las specs son propiedades técnicas fijas que no crean variaciones de stock.</p>
-                                </div>
-                            </section>
-
-                            {/* Variantes */}
+                             {/* Variantes */}
                             <section className="space-y-3">
                                 <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <Layers className="h-4 w-4 text-violet-400" />
@@ -706,156 +574,13 @@ export function ProductEditorDrawer({
 
                         {/* ─── ENRICHMENT REVIEW PANEL ─── */}
                         {enrichmentResult && (
-                            <section className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <div className="flex items-center justify-between px-2">
-                                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                                        <Sparkles className="h-4 w-4 text-violet-400" />
-                                        Sugerencias de Enriquecimiento
-                                    </h3>
-                                    <span className={cn(
-                                        'px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest',
-                                        enrichmentResult.confidence === 'high'
-                                            ? 'bg-emerald-500/20 text-emerald-400'
-                                            : enrichmentResult.confidence === 'medium'
-                                                ? 'bg-amber-500/20 text-amber-400'
-                                                : 'bg-rose-500/20 text-rose-400'
-                                    )}>
-                                        Confianza {enrichmentResult.confidence === 'high' ? 'Alta' : enrichmentResult.confidence === 'medium' ? 'Media' : 'Baja'}
-                                    </span>
-                                </div>
-
-                                <div className="rounded-[1.25rem] border border-violet-500/20 bg-violet-500/5 p-5 space-y-4">
-                                    {/* Warnings */}
-                                    {enrichmentResult.warnings.length > 0 && (
-                                        <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 space-y-2">
-                                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-amber-400">
-                                                <AlertTriangle className="h-3.5 w-3.5" />
-                                                Verificación Manual Requerida
-                                            </div>
-                                            <ul className="space-y-1">
-                                                {enrichmentResult.warnings.map((w, i) => (
-                                                    <li key={i} className="text-xs text-amber-300/80 flex gap-2">
-                                                        <span className="text-amber-500 shrink-0">•</span>
-                                                        {w}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {/* Short description */}
-                                    {enrichmentResult.short_description && (
-                                        <EnrichmentFieldRow
-                                            fieldKey="short_description"
-                                            label="Descripción Corta"
-                                            approved={approvedFields.has('short_description')}
-                                            onToggle={(k) => setApprovedFields(prev => {
-                                                const next = new Set(prev);
-                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
-                                                return next;
-                                            })}
-                                        >
-                                            <p className="text-xs text-white/60 italic">{enrichmentResult.short_description}</p>
-                                        </EnrichmentFieldRow>
-                                    )}
-
-                                    {/* AI Sales Note */}
-                                    {enrichmentResult.ai_sales_note && (
-                                        <EnrichmentFieldRow
-                                            fieldKey="ai_sales_note"
-                                            label="Nota de Venta"
-                                            approved={approvedFields.has('ai_sales_note')}
-                                            onToggle={(k) => setApprovedFields(prev => {
-                                                const next = new Set(prev);
-                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
-                                                return next;
-                                            })}
-                                        >
-                                            <p className="text-xs text-white/60 italic">{enrichmentResult.ai_sales_note}</p>
-                                        </EnrichmentFieldRow>
-                                    )}
-
-                                    {/* Long description */}
-                                    {enrichmentResult.description && (
-                                        <EnrichmentFieldRow
-                                            fieldKey="description"
-                                            label="Descripción Completa"
-                                            approved={approvedFields.has('description')}
-                                            onToggle={(k) => setApprovedFields(prev => {
-                                                const next = new Set(prev);
-                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
-                                                return next;
-                                            })}
-                                        >
-                                            <p className="text-xs text-white/60 italic line-clamp-3">{enrichmentResult.description}</p>
-                                        </EnrichmentFieldRow>
-                                    )}
-
-                                    {/* Specs */}
-                                    {Object.keys(enrichmentResult.specs).length > 0 && (
-                                        <EnrichmentFieldRow
-                                            fieldKey="specs"
-                                            label="Specs Sugeridos"
-                                            approved={approvedFields.has('specs')}
-                                            onToggle={(k) => setApprovedFields(prev => {
-                                                const next = new Set(prev);
-                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
-                                                return next;
-                                            })}
-                                        >
-                                            <div className="flex flex-wrap gap-1.5 mt-1">
-                                                {Object.entries(enrichmentResult.specs).map(([k, v]) => (
-                                                    <span key={k} className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-white/60 border border-white/5">
-                                                        {k}: <span className="text-white/80 font-semibold">{v}</span>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <p className="text-[9px] text-white/25 mt-1.5 italic">Solo se añaden llaves nuevas — no se sobreescriben specs ya ingresadas.</p>
-                                        </EnrichmentFieldRow>
-                                    )}
-
-                                    {/* Tags */}
-                                    {enrichmentResult.tags.length > 0 && (
-                                        <EnrichmentFieldRow
-                                            fieldKey="tags"
-                                            label="Tags Sugeridos"
-                                            approved={approvedFields.has('tags')}
-                                            onToggle={(k) => setApprovedFields(prev => {
-                                                const next = new Set(prev);
-                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
-                                                return next;
-                                            })}
-                                        >
-                                            <div className="flex flex-wrap gap-1.5 mt-1">
-                                                {enrichmentResult.tags.map(t => (
-                                                    <span key={t} className="px-2 py-0.5 rounded-full bg-violet-500/10 text-[10px] text-violet-400 ring-1 ring-inset ring-violet-500/20">
-                                                        {t}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </EnrichmentFieldRow>
-                                    )}
-
-                                    {/* Action buttons */}
-                                    <div className="flex items-center gap-3 border-t border-white/5 pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={handleApplyEnrichment}
-                                            disabled={approvedFields.size === 0}
-                                            className="flex-1 py-2.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/20 text-violet-300 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-30"
-                                        >
-                                            Aplicar Aprobadas ({approvedFields.size})
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setEnrichmentResult(null)}
-                                            className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/30 hover:text-white/60 text-xs font-bold uppercase tracking-wider transition-all"
-                                        >
-                                            Descartar
-                                        </button>
-                                    </div>
-                                </div>
-                            </section>
+                            <ProductEnrichmentReview
+                                enrichmentResult={enrichmentResult}
+                                approvedFields={approvedFields}
+                                setApprovedFields={setApprovedFields}
+                                handleApplyEnrichment={handleApplyEnrichment}
+                                setEnrichmentResult={setEnrichmentResult}
+                            />
                         )}
                         </div>
                     )}

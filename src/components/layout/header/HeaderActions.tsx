@@ -8,6 +8,9 @@ import { NotificationBell } from './NotificationBell';
 import { UserMenuDropdown } from './UserMenuDropdown';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { VisualScannerModal } from '@/components/ui/ai/VisualScannerModal';
+import { Scan } from 'lucide-react';
 
 interface HeaderActionsProps {
     menuOpen: boolean;
@@ -16,9 +19,20 @@ interface HeaderActionsProps {
 
 export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
     const { isAuthenticated } = useAuth();
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     return (
         <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4 xl:gap-5 ml-auto pl-2 xl:pl-4">
+            <button
+                onClick={() => setIsScannerOpen(true)}
+                className="p-2 sm:px-3 sm:py-2 rounded-full bg-vape-500/10 border border-vape-500/20 text-vape-400 hover:bg-vape-500/20 transition-all flex items-center gap-2"
+                title="Escáner Visual IA"
+            >
+                <Scan className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline text-xs font-bold uppercase tracking-widest">Scanner</span>
+            </button>
+            <VisualScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
+
             <NotificationBell />
 
             <Link

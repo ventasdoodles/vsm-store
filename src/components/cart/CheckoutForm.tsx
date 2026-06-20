@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Send, MapPin, Phone, User, CheckCircle,
     Award, Tag, Loader2,
-    ShoppingBag, ChevronRight, CreditCard, Building,
+    ShoppingBag, ChevronRight, CreditCard,
     Truck, Store as StoreIcon, AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,13 +19,14 @@ import { useCheckout } from '@/hooks/useCheckout';
 import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
-import { SITE_CONFIG } from '@/config/site';
 import { CheckoutSteps } from './CheckoutSteps';
 import { CheckoutTransitionStatus } from './CheckoutTransitionStatus';
-import type { CheckoutFormData, PaymentMethod } from '@/types/cart';
+import { useCheckoutValidation } from '@/hooks/useCheckoutValidation';
+import { ShippingAddressContent } from './ShippingAddressContent';
+import { PaymentMethodContent } from './PaymentMethodContent';
+import type { CheckoutFormData } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
 import type { OrderRecord } from '@/hooks/useOrders';
 
@@ -138,7 +139,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
 
     const [selectedAddressId, setSelectedAddressId] = useState<string>('');
     const [useNewAddress, setUseNewAddress] = useState(false);
-    const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
+    const { errors, validateStep } = useCheckoutValidation(isAuthenticated);
     const [couponCode, setCouponCode] = useState('');
     const [couponError, setCouponError] = useState('');
 
@@ -211,50 +212,8 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
         }
     };
 
-    const validateStep = (step: number): boolean => {
-        const dataToValidate = { ...formData };
-        if (isAuthenticated && !useNewAddress && selectedAddressId && formData.deliveryType === 'delivery') {
-            dataToValidate.address = 'saved-address';
-        }
-
-        const result = checkoutSchema.safeParse(dataToValidate);
-        const zodErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
-
-        if (!result.success) {
-            result.error.issues.forEach((issue) => {
-                const field = issue.path[0] as keyof CheckoutFormData;
-                zodErrors[field] = issue.message;
-            });
-        }
-
-        if (step === 1) {
-            if (zodErrors.customerName || zodErrors.customerPhone) {
-                setErrors(zodErrors);
-                return false;
-            }
-        }
-
-        if (step === 2 && formData.deliveryType === 'delivery') {
-            if (isAuthenticated && !useNewAddress && !selectedAddressId) {
-                setErrors({ address: 'Selecciona una dirección' });
-                return false;
-            }
-            if (useNewAddress && !formData.address) {
-                setErrors({ address: 'Ingresa tu dirección' });
-                return false;
-            }
-            if (!isAuthenticated && !formData.address) {
-                setErrors({ address: 'Ingresa tu dirección' });
-                return false;
-            }
-        }
-
-        setErrors({});
-        return true;
-    };
-
     const nextStep = () => {
-        if (validateStep(currentStep)) {
+        if (validateStep(currentStep, formData, useNewAddress, selectedAddressId)) {
             playTick();
             triggerHaptic(10);
             if (currentStep === 1 && formData.deliveryType === 'pickup') {
@@ -280,7 +239,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
 
     const onSubmit = async () => {
         if (!transitionView.canSubmitCheckout || hasOpenRecoverableOrder) return;
-        if (!validateStep(3)) return;
+        if (!validateStep(3, formData, useNewAddress, selectedAddressId)) return;
         playClick();
         triggerHaptic(40);
         await checkout.handleSubmit(formData, selectedAddressId, useNewAddress, shippingAddresses);
@@ -389,66 +348,17 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                         className="space-y-6"
                     >
                         <FormCard title="Dirección de Envío" icon={MapPin}>
-                            {isAuthenticated && shippingAddresses.length > 0 && !useNewAddress ? (
-                                <div className="space-y-4">
-                                    <div className="grid gap-3">
-                                        {shippingAddresses.map((a: Address) => (
-                                            <button
-                                                key={a.id}
-                                                onClick={() => setSelectedAddressId(a.id)}
-                                                className={cn(
-                                                    "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
-                                                    selectedAddressId === a.id
-                                                        ? "border-vape-500 bg-vape-500/10 text-white"
-                                                        : "border-white/5 text-theme-secondary hover:bg-white/5"
-                                                )}
-                                            >
-                                                <div className={cn(
-                                                    "flex h-8 w-8 items-center justify-center rounded-full border",
-                                                    selectedAddressId === a.id ? "border-vape-400 bg-vape-400/20" : "border-white/10"
-                                                )}>
-                                                    <Building className="h-4 w-4" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <p className="text-xs font-bold uppercase tracking-widest text-vape-400">{a.label}</p>
-                                                    <p className="text-[11px] text-theme-tertiary">{a.street} #{a.number}, {a.colony}</p>
-                                                </div>
-                                                {selectedAddressId === a.id && <CheckCircle className="h-5 w-5 text-vape-400" />}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <button
-                                        onClick={() => setUseNewAddress(true)}
-                                        className="text-xs font-bold text-vape-400 hover:text-vape-300 ml-2"
-                                    >
-                                        + Agregar nueva dirección
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <div className="relative group">
-                                        <textarea
-                                            value={formData.address}
-                                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            placeholder="Calle, número, colonia, código postal y referencias..."
-                                            rows={4}
-                                            className={cn(
-                                                "w-full rounded-2xl border border-white/5 bg-black/20 p-4 text-sm text-white transition-all focus:border-vape-500/50 focus:outline-none",
-                                                errors.address && "border-red-500/50"
-                                            )}
-                                        />
-                                        {errors.address && <p className="mt-2 text-[11px] text-red-500 ml-2">{errors.address}</p>}
-                                    </div>
-                                    {isAuthenticated && (
-                                        <button
-                                            onClick={() => setUseNewAddress(false)}
-                                            className="text-xs font-bold text-theme-tertiary hover:text-white"
-                                        >
-                                            ← Volver a mis direcciones
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+                            <ShippingAddressContent
+                                isAuthenticated={isAuthenticated}
+                                shippingAddresses={shippingAddresses}
+                                useNewAddress={useNewAddress}
+                                selectedAddressId={selectedAddressId}
+                                addressFormValue={formData.address}
+                                errors={errors as any}
+                                setSelectedAddressId={setSelectedAddressId}
+                                setUseNewAddress={setUseNewAddress}
+                                setAddressFormValue={(val) => setFormData({ ...formData, address: val })}
+                            />
                         </FormCard>
                     </motion.div>
                 )}
@@ -463,44 +373,12 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                     >
                         {/* Métodos de Pago */}
                         <FormCard title="Método de Pago" icon={CreditCard}>
-                            <div className="grid gap-3">
-                                {([
-                                    { value: 'transfer', label: 'Transferencia / Depósito', icon: Building, disabled: !(settings?.payment_methods?.transfer ?? true) },
-                                    ...(isAuthenticated ? [{ value: 'mercadopago', label: 'Tarjeta (Mercado Pago)', icon: CreditCard, disabled: !(settings?.payment_methods?.mercadopago ?? false) }] : []),
-                                    { value: 'cash', label: 'Efectivo contra entrega', icon: Send, disabled: !(settings?.payment_methods?.cash ?? false) },
-                                ] as { value: PaymentMethod; label: string; icon: React.ComponentType<{ className?: string }>; disabled: boolean }[]).filter(o => !o.disabled).map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
-                                        className={cn(
-                                            "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
-                                            formData.paymentMethod === option.value
-                                                ? "border-vape-500 bg-vape-500/10 text-white"
-                                                : "border-white/5 text-theme-tertiary flex-shrink-0"
-                                        )}
-                                    >
-                                        <option.icon className={cn("h-5 w-5", formData.paymentMethod === option.value ? "text-vape-400" : "text-white/20")} />
-                                        <span className="flex-1 text-xs font-bold uppercase tracking-widest">{option.label}</span>
-                                        {formData.paymentMethod === option.value && <CheckCircle className="h-5 w-5 text-vape-400" />}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {formData.paymentMethod === 'transfer' && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="mt-6 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5"
-                                >
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <Award className="h-4 w-4 text-blue-400" />
-                                        <span className="text-xs font-black uppercase text-blue-400 tracking-tighter">Cuenta Bancaria</span>
-                                    </div>
-                                    <pre className="text-[11px] font-mono text-theme-secondary whitespace-pre-wrap leading-relaxed">
-                                        {settings?.bank_account_info || SITE_CONFIG.bankAccount}
-                                    </pre>
-                                </motion.div>
-                            )}
+                            <PaymentMethodContent
+                                isAuthenticated={isAuthenticated}
+                                settings={settings}
+                                paymentMethod={formData.paymentMethod}
+                                setPaymentMethod={(method) => setFormData({ ...formData, paymentMethod: method })}
+                            />
                         </FormCard>
 
                         {/* Cupón */}

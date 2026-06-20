@@ -12,6 +12,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useProductBySlug } from '@/hooks/useProducts';
 import { ProductImages } from '@/components/products/ProductImages';
 import { ProductInfo } from '@/components/products/ProductInfo';
+import { ProductSmartKitting } from '@/components/products/ProductSmartKitting';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
 import { FrequentlyBoughtTogether } from '@/components/products/FrequentlyBoughtTogether';
 import { TrustBadges } from '@/components/home/TrustBadges';
@@ -129,6 +130,10 @@ export function ProductDetail() {
                             <div className="glass-premium rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/40">
                                 <ProductInfo product={product} />
                             </div>
+                        </SectionErrorBoundary>
+
+                        <SectionErrorBoundary name="ProductSmartKitting">
+                            <ProductSmartKitting product={product} />
                         </SectionErrorBoundary>
                     </div>
                 </div>
