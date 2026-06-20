@@ -47,7 +47,7 @@ describe('knowledge RAG capsule main message synthesis', () => {
 
   it('qualifies unsupported delivery guarantees when shipping policy support is present', () => {
     const fallback = buildDegradedPolicyInquiryFallback({
-      query: 'Â¿Me garantizas entrega maÃ±ana a domicilio?',
+      query: '¿Me garantizas entrega mañana a domicilio?',
       policyOutput: [
         '[Envios] Hacemos envios por DHL ocurre a sucursal en todo Mexico.',
         '[Costos] El costo del envio varia por peso y destino; se confirma antes de cerrar el pedido.',
@@ -257,7 +257,7 @@ describe('scoped RAG answer-quality harness', () => {
     expect(contract.resolved_chunks?.map((chunk) => chunk.category)).toEqual(['shipping', 'shipping', 'shipping']);
     expect(contract.ui_render_hint).not.toMatch(/si\s+.*domicilio/i);
     expect(contract.ui_render_hint).not.toMatch(/garantizamos/i);
-    expect(contract.ui_render_hint).not.toMatch(/entrega ma[Ã±n]ana a domicilio confirmada/i);
+    expect(contract.ui_render_hint).not.toMatch(/entrega ma[ñn]ana a domicilio confirmada/i);
   });
 
   it('preserves payment chunk while appending shipping qualification for combined queries', () => {

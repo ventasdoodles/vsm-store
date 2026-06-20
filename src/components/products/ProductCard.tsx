@@ -1,8 +1,8 @@
 /**
- * ProductCard Component â€” VSM Store
+ * ProductCard Component — VSM Store
  *
- * Componente core para la visualizaciÃ³n de productos en rejillas y rieles.
- * Incluye acciones rÃ¡pidas, animaciones premium y soporte para estados de carga.
+ * Componente core para la visualización de productos en rejillas y rieles.
+ * Incluye acciones rápidas, animaciones premium y soporte para estados de carga.
  *
  * @author VSM Store
  * @version 1.1.0
@@ -28,7 +28,7 @@ import { SITE_CONFIG } from '@/config/site';
 
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 
-// Lazy-load: QuickViewModal solo se descarga al abrir "Vista RÃ¡pida"
+// Lazy-load: QuickViewModal solo se descarga al abrir "Vista Rápida"
 const QuickViewModal = lazy(() => import('./QuickViewModal').then(m => ({ default: m.QuickViewModal })));
 
 interface ProductCardProps {
@@ -272,7 +272,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </div>
                             )}
 
-                            {/* Badges (Top-left) â€” Single source of truth */}
+                            {/* Badges (Top-left) — Single source of truth */}
                             <div className="absolute top-4 left-4 z-10">
                                 <ProductBadgeGroup product={product} />
                             </div>
@@ -438,7 +438,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                 </Link>
             </motion.div>
 
-            {/* Quick View Modal â€” lazy-loaded, solo se descarga al abrir */}
+            {/* Quick View Modal — lazy-loaded, solo se descarga al abrir */}
             {isQuickViewOpen && (
                 <Suspense fallback={null}>
                     <QuickViewModal

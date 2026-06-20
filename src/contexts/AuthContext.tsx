@@ -1,7 +1,7 @@
 /**
  * AuthContext.tsx - VSM Store
  * 
- * Contexto global de autenticaciÃ³n que gestiona el estado de Supabase Auth
+ * Contexto global de autenticación que gestiona el estado de Supabase Auth
  * y la carga del perfil extendido desde la tabla 'customer_profiles'.
  * 
  * @module contexts/AuthContext
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone?: string
     ) => {
         await authService.signUp(email, password, fullName, phone);
-        notifySuccess('Â¡Bienvenido!', 'Tu cuenta ha sido creada exitosamente.');
+        notifySuccess('¡Bienvenido!', 'Tu cuenta ha sido creada exitosamente.');
     }, [notifySuccess]);
 
     const handleSignIn = useCallback(async (email: string, password: string) => {
@@ -190,13 +190,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setProfile(null);
         }
 
-        notifyInfo('SesiÃ³n iniciada', 'Bienvenido de nuevo a VSM Store.');
+        notifyInfo('Sesión iniciada', 'Bienvenido de nuevo a VSM Store.');
     }, [loadProfile, notifyInfo]);
 
     const handleSignOut = useCallback(async () => {
         await authService.signOut();
         setProfile(null);
-        notifyInfo('SesiÃ³n cerrada', 'Has cerrado sesiÃ³n correctamente.');
+        notifyInfo('Sesión cerrada', 'Has cerrado sesión correctamente.');
     }, [notifyInfo]);
 
     const refreshProfile = useCallback(async () => {

@@ -29,23 +29,23 @@ export function HomeEditorSlotCard({
 
     return (
         <div className="p-5 rounded-xl border border-theme bg-theme-primary/50 relative">
-            {/* Badge numÃ©rico */}
+            {/* Badge numérico */}
             <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-vape-500 text-white flex items-center justify-center font-bold text-sm shadow-lg">
                 {index + 1}
             </div>
 
             <div className="space-y-4 mt-2">
-                {/* Selector de categorÃ­a de la BD */}
+                {/* Selector de categoría de la BD */}
                 <div>
                     <label className="mb-1 block text-sm font-medium text-theme-secondary">
-                        Seleccionar CategorÃ­a de la Base de Datos
+                        Seleccionar Categoría de la Base de Datos
                     </label>
                     <select
                         value={selectedCategoryId}
                         onChange={(e) => onCategorySelect(index, e.target.value)}
                         className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                     >
-                        <option value="">â€” Elegir categorÃ­a existente â€”</option>
+                        <option value="">— Elegir categoría existente —</option>
                         {storeCategories.map((cat) => (
                             <option key={cat.id} value={cat.id}>
                                 {cat.name} ({config ? getAdminSectionCatalogEntry(cat.section as Parameters<typeof getAdminSectionCatalogEntry>[0], config)?.shortLabel : cat.section})
@@ -78,7 +78,7 @@ export function HomeEditorSlotCard({
                     </div>
                 </div>
 
-                {/* Nombre + Ãcono */}
+                {/* Nombre + Ícono */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="mb-1 block text-sm font-medium text-theme-secondary">Etiqueta</label>
@@ -87,11 +87,11 @@ export function HomeEditorSlotCard({
                             value={slot.name}
                             onChange={(e) => onUpdateSlot(index, 'name', e.target.value)}
                             className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                            placeholder="Ej. LÃ­quidos"
+                            placeholder="Ej. Líquidos"
                         />
                     </div>
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Ãcono Decorativo</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Ícono Decorativo</label>
                         <div className="relative">
                             <select
                                 value={slot.iconName || 'Box'}
@@ -109,10 +109,10 @@ export function HomeEditorSlotCard({
                     </div>
                 </div>
 
-                {/* SecciÃ³n + Slug */}
+                {/* Sección + Slug */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-theme-secondary">SecciÃ³n Enlace</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Sección Enlace</label>
                         <select
                             value={slot.section}
                             onChange={(e) => onUpdateSlot(index, 'section', e.target.value)}

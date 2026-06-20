@@ -1,4 +1,4 @@
-// React Query â€” configuraciÃ³n central
+// React Query — configuración central
 // Exporta el QueryClient singleton con error handling global
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { useNotificationsStore } from '@/stores/notifications.store';
@@ -33,11 +33,11 @@ export const queryClient = new QueryClient({
                 queryKey: JSON.stringify(query.queryKey),
             });
 
-            // Solo mostrar toast si la query ya tenÃ­a datos antes (refetch fallido)
+            // Solo mostrar toast si la query ya tenía datos antes (refetch fallido)
             if (query.state.data !== undefined) {
                 useNotificationsStore.getState().addNotification({
                     type: 'error',
-                    title: 'Error de actualizaciÃ³n',
+                    title: 'Error de actualización',
                     message: getErrorMessage(error)
                 });
             }
@@ -50,7 +50,7 @@ export const queryClient = new QueryClient({
 
             useNotificationsStore.getState().addNotification({
                 type: 'error',
-                title: 'Error en la operaciÃ³n',
+                title: 'Error en la operación',
                 message: getErrorMessage(error)
             });
         },

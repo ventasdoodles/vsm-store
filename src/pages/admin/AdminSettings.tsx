@@ -61,7 +61,7 @@ export function AdminSettings() {
             await updateMutation.mutateAsync(
                 buildStoreSettingsUpdatePayload(formData, STORE_SETTINGS_ID) as unknown as Partial<StoreSettings>,
             );
-            success('ConfiguraciÃ³n guardada', 'Los cambios se han aplicado correctamente.');
+            success('Configuración guardada', 'Los cambios se han aplicado correctamente.');
         } catch (err) {
             if (import.meta.env.DEV) {
                 console.error(err);

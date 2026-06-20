@@ -23,7 +23,7 @@ export function LoyaltySimulator({ config }: { config: LoyaltyConfig }) {
                     Simulador V-Coins
                 </h3>
                 <p className="text-sm text-theme-secondary leading-relaxed">
-                    AsÃ­ funcionarÃ¡ el sistema para un cliente que realiza una compra promedio de <strong>${examplePurchase.toLocaleString('es-MX')} MXN</strong> hoy:
+                    Así funcionará el sistema para un cliente que realiza una compra promedio de <strong>${examplePurchase.toLocaleString('es-MX')} MXN</strong> hoy:
                 </p>
 
                 <div className="grid sm:grid-cols-2 gap-4 mt-6">
@@ -43,7 +43,7 @@ export function LoyaltySimulator({ config }: { config: LoyaltyConfig }) {
                 </div>
 
                 <div className="pt-4 flex items-center justify-between text-xs text-theme-secondary/50 font-medium">
-                    <p>El retorno de inversiÃ³n (ROI) otorgado es del <span className="text-amber-400 font-bold">{(config.points_per_currency * config.currency_per_point * 100).toFixed(1)}%</span></p>
+                    <p>El retorno de inversión (ROI) otorgado es del <span className="text-amber-400 font-bold">{(config.points_per_currency * config.currency_per_point * 100).toFixed(1)}%</span></p>
                     <a href="/loyalty" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
                         Ver frontend <ExternalLink className="w-3 h-3" />
                     </a>

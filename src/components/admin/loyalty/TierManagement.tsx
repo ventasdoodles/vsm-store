@@ -49,7 +49,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="h-4 w-1.5 rounded-full bg-indigo-500" />
-                    <h2 className="text-xl font-black text-theme-primary tracking-tight uppercase">ConfiguraciÃ³n de Tiers</h2>
+                    <h2 className="text-xl font-black text-theme-primary tracking-tight uppercase">Configuración de Tiers</h2>
                 </div>
                 {JSON.stringify(tiers) !== JSON.stringify(localTiers) && (
                     <button
@@ -109,7 +109,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                         </div>
                                     ))}
                                     {tier.benefits.length > 3 && (
-                                        <p className="text-[9px] text-indigo-400 font-bold pl-5">+ {tier.benefits.length - 3} beneficios mÃ¡s</p>
+                                        <p className="text-[9px] text-indigo-400 font-bold pl-5">+ {tier.benefits.length - 3} beneficios más</p>
                                     )}
                                 </div>
                             </div>
@@ -182,7 +182,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                         onClick={() => setEditingTier({ ...editingTier, benefits: [...editingTier.benefits, ''] })}
                                         className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest py-2"
                                     >
-                                        + AÃ±adir beneficio
+                                        + Añadir beneficio
                                     </button>
                                 </div>
                             </div>

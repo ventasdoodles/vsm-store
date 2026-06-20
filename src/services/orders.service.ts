@@ -1,8 +1,8 @@
 /**
  * // â”€â”€â”€ SERVICE: Orders â”€â”€â”€
  * // Arquitectura: Data Access Layer (Service)
- * // Proposito principal: GestiÃ³n de pedidos, creaciÃ³n y recuperaciÃ³n de historial.
- * // Regla / Notas: Selectores explÃ­citos en todas las consultas (Â§1.2). Desacoplamiento de infraestructura (Â§1.1).
+ * // Proposito principal: Gestión de pedidos, creación y recuperación de historial.
+ * // Regla / Notas: Selectores explícitos en todas las consultas (Â§1.2). Desacoplamiento de infraestructura (Â§1.1).
  */
 
 import { supabase } from '@/lib/supabase';
@@ -18,7 +18,7 @@ import type { OrderRecord, CreateOrderData, RealtimeOrderEvent, OrderItem } from
 const ORDER_SELECT = 'id, order_number, customer_id, items, subtotal, shipping_cost, discount, total, status, payment_method, payment_status, shipping_address_id, billing_address_id, tracking_number, tracking_notes, whatsapp_sent, whatsapp_sent_at, created_at, updated_at';
 
 /**
- * Crea un nuevo pedido con lÃ³gica de lealtad integrada.
+ * Crea un nuevo pedido con lógica de lealtad integrada.
  * @param data Datos del pedido
  * @returns El registro del pedido creado
  * @policy Data Integrity Â§1.2
@@ -102,7 +102,7 @@ export async function getCustomerOpenRecoverableOrder(customerId: string): Promi
 }
 
 /**
- * Obtiene un pedido especÃƒÂ­fico por su ID.
+ * Obtiene un pedido específico por su ID.
  */
 export async function getOrderById(id: string): Promise<OrderRecord | null> {
     const { data, error } = await supabase
@@ -117,7 +117,7 @@ export async function getOrderById(id: string): Promise<OrderRecord | null> {
 
 /**
  * Obtiene detalles enriquecidos para notificaciones Social Proof.
- * Â§1.1 Architecture: Mueve la lÃ³gica de infraestructura fuera de los hooks.
+ * Â§1.1 Architecture: Mueve la lógica de infraestructura fuera de los hooks.
  */
 export async function getOrderNotificationDetails(orderId: string): Promise<RealtimeOrderEvent | null> {
     const { data, error } = await supabase
@@ -144,14 +144,14 @@ export async function getOrderNotificationDetails(orderId: string): Promise<Real
     return {
         id: data.id,
         customer_name: profile?.full_name || 'Alguien',
-        city: address?.city || address?.colony || 'MÃ©xico',
+        city: address?.city || address?.colony || 'México',
         product_name: item.name || 'un producto',
         product_image: item.image || '',
     };
 }
 
 /**
- * Actualiza el estado de envÃ­o de WhatsApp para un pedido.
+ * Actualiza el estado de envío de WhatsApp para un pedido.
  */
 export async function markWhatsAppSent(orderId: string) {
     const { error } = await supabase

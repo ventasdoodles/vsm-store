@@ -1,6 +1,6 @@
 ﻿// â”€â”€â”€ SliderAdminCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Tarjeta visual que muestra una preview real del slider con su gradiente,
-// imagen, badges de estado y controles de acciÃ³n. Puramente presentacional.
+// imagen, badges de estado y controles de acción. Puramente presentacional.
 import { Pencil, Trash2, Eye, EyeOff, GripVertical } from 'lucide-react';
 import type { HeroSlider } from '@/services';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
@@ -82,10 +82,10 @@ export function SliderAdminCard({
             <div className="flex-1 p-6 flex flex-col">
                 <div className="flex-1">
                     <h3 className="text-xl font-black text-theme-primary mb-1 line-clamp-1">
-                        {slider.title || 'Sin tÃ­tulo'}
+                        {slider.title || 'Sin título'}
                     </h3>
                     <p className={`font-bold text-sm bg-gradient-to-r ${currentPreset.textGradient} bg-clip-text text-transparent line-clamp-1 mb-3`}>
-                        {slider.subtitle || 'Sin subtÃ­tulo'}
+                        {slider.subtitle || 'Sin subtítulo'}
                     </p>
                     
                     {slider.description && (

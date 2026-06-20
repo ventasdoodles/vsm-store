@@ -1157,7 +1157,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
           commercial_flag: 'STANDARD',
           ai_sales_note: 'menta fresca',
           description: 'perfil fresco',
-          specs: { 'ConcentraciÃ³n de nicotina': '5%' },
+          specs: { 'Concentración de nicotina': '5%' },
         },
       ],
     });
@@ -1188,7 +1188,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
         is_active: true,
         created_at: '2026-03-01T00:00:00.000Z',
         updated_at: '2026-03-01T00:00:00.000Z',
-        specs: { 'ConcentraciÃ³n de nicotina': '5%' },
+        specs: { 'Concentración de nicotina': '5%' },
         badges: [],
         ai_is_featured: false,
         ai_sales_note: null,
