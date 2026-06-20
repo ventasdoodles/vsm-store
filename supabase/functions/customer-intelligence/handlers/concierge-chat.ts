@@ -270,12 +270,12 @@ export async function handleConciergeChat(
             const guardrailOverrides: string[] = []; // A85: populated by each override that changes intent
 
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
-            // Las capsules ejecutan; el Analyst tiene autoridad semÃ¡ntica primaria.
+            // Las capsules ejecutan; el Analyst tiene autoridad semántica primaria.
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
 
             const normalizedQuery = (query || "").toLowerCase()
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[Â¿?Â¡!]/g, " ")
+                .replace(/[¿?¡!]/g, " ")
                 .trim();
 
             const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)\s+(a|al|con|para)\b|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
@@ -287,7 +287,7 @@ export async function handleConciergeChat(
             const isWarrantyMatch      = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|falla|defecto)\b/.test(normalizedQuery)
                 || (/\b(garantia|devolucion|rma)\b/.test(normalizedQuery) && /\b(mi|me|llego|vino|pedido|orden|compra|producto|equipo|vape|pod|cartucho|dispositivo|falla|roto|chorreado|prende|sirve|funciona)\b/.test(normalizedQuery));
             const isLoyaltyMatch       = /\b(cuantos puntos tengo|mis puntos|puntos|vcoins|v coins|v-coins|cuanto valen mis puntos|valor de mis puntos|equivalen mis puntos|descuento por puntos|me alcanza con mis puntos|me alcanza para algo con mis puntos|que nivel soy|mi nivel|soy vip|estatus vip|status vip|que tier soy|mi tier|nivel vip)\b/.test(normalizedQuery);
-            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|aÃ±ade|aÃ±adir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
+            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|añade|añadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
             const _hasTimeContext      = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isWarrantyMatch, isLoyaltyMatch, isCartMatch, initialIntent: analystReport.intent };
@@ -441,11 +441,11 @@ export async function handleConciergeChat(
                 });
             }
             
-            // EL DESVÃO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
+            // EL DESVÍO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
             // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
             // intent matches it. OR-arm conditions that used tool_call presence as a secondary
             // signal were swallowing CART_OPERATION / ORDER_TRACKING / INVENTORY_OUTLOOK whenever
-            // the Analyst emitted a search call alongside the primary tool â€” silent misroutes.
+            // the Analyst emitted a search call alongside the primary tool — silent misroutes.
             // Guardrail injections (lines 388-403) already guarantee tool call presence for every
             // routable intent, making the OR arms structurally redundant. (A83)
             if (catalogGate.is_open && intent === 'PRODUCT_SEARCH' && capabilityPlan.primaryCapability.name === 'product_search_integrity' && searchCapsuleCall) {
@@ -862,7 +862,7 @@ export async function handleConciergeChat(
 
             // --- OUT OF DOMAIN: Fast-path rejection (no Sommelier call, no product search) ---
             if (intent === 'OUT_OF_DOMAIN') {
-                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. Â¿Hay algo de nuestro catÃ¡logo en lo que pueda ayudarte?';
+                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. ¿Hay algo de nuestro catálogo en lo que pueda ayudarte?';
                 const { error: oodTelemetryErr } = await supabase.from('ai_analytics').insert({
                     query: query,
                     response_text: oodReplyText,
@@ -950,19 +950,19 @@ export async function handleConciergeChat(
 
             // Process specific tool outputs for Sommelier context
             const knowledgeResult = toolResults.find(r => r.name === 'knowledge_rag_foundation' || r.name === 'get_store_policy');
-            const knowledgeOutput = knowledgeResult?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
+            const knowledgeOutput = knowledgeResult?.output || 'No se consultaron políticas específicas.';
             const knowledgeMatchCount = (knowledgeResult as any)?.metadata?.chunks_found || 0;
-            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃ³ bÃºsqueda de productos.';
-            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultÃ³ el estado de ningÃºn pedido.';
+            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizó búsqueda de productos.';
+            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultó el estado de ningún pedido.';
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
-            const inventoryOutput = inventoryResult?.output || 'No se consultÃ³ la proyecciÃ³n de inventario.';
+            const inventoryOutput = inventoryResult?.output || 'No se consultó la proyección de inventario.';
             const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
-            const compatibilityOutput = toolResults.find(r => r.name === 'storefront_compatibility_check' || r.name === 'check_compatibility')?.output || 'No se consultÃ³ informaciÃ³n de compatibilidad.';
+            const compatibilityOutput = toolResults.find(r => r.name === 'storefront_compatibility_check' || r.name === 'check_compatibility')?.output || 'No se consultó información de compatibilidad.';
 
             const publicWebSearchResult = toolResults.find(r => r.name === 'public_web_search');
             const publicUrlContextResult = toolResults.find(r => r.name === 'public_url_context');
-            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultÃƒÂ³ web publica.';
-            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃƒÂ³ contexto de URL publica.';
+            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultó web publica.';
+            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultó contexto de URL publica.';
             const publicWebSearchSources = Array.isArray((publicWebSearchResult as any)?.metadata?.sources)
                 ? (publicWebSearchResult as any).metadata.sources
                     .map((source: { title?: string; url?: string }) => `- ${source.title || 'Fuente'}: ${source.url || 'sin_url'}`)

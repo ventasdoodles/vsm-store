@@ -80,7 +80,7 @@ function normalizeQueryFragment(value: string | null | undefined): string {
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
-        .replace(/[Â¿?Â¡!.,;:]/g, ' ')
+        .replace(/[¿?¡!.,;:]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 }
@@ -90,7 +90,7 @@ function isCutMessageFragment(input: string | null | undefined): boolean {
     const normalized = normalizeQueryFragment(input);
 
     if (!raw) return false;
-    if (/^[Â¿?]+$/.test(raw)) return true;
+    if (/^[¿?]+$/.test(raw)) return true;
     if (/^(q|qu|que|mmm)$/.test(normalized)) return true;
     if (/^[a-z0-9]{1,2}$/.test(normalized) && !/^(ok|va)$/.test(normalized)) return true;
 
