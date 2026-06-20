@@ -219,11 +219,10 @@ describe('customer-intelligence analyst degradation fallback', () => {
     expect(source).toContain("throw new Error('Analyst tool_calls not array')");
   });
 
-  it('keeps the Analyst model fallback on gemini-2.5-pro', () => {
+  it('keeps the Analyst model fallback on gemini-2.5-flash', () => {
     const source = readCustomerIntelligenceSource();
 
-    expect(source).toContain("const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-pro';");
-    expect(source).not.toContain("const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-flash';");
+    expect(source).toContain("const CONCIERGE_ANALYST_MODEL = Deno.env.get('CONCIERGE_ANALYST_MODEL') || 'gemini-2.5-flash';");
   });
 
   it('preserves JSON response MIME type on the Analyst Gemini request', () => {
@@ -319,7 +318,7 @@ describe('customer-intelligence analyst degradation fallback', () => {
 
     expect(source).toContain('function buildGeminiTokenUsageTelemetry(');
     expect(source).toContain('token_usage: {');
-    expect(source).toContain('analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, analystResult?.usageMetadata)');
+    expect(source).toContain('analyst: buildGeminiTokenUsageTelemetry(CONCIERGE_ANALYST_MODEL, null)');
     expect(source).toContain('sommelier: buildGeminiTokenUsageTelemetry(CONCIERGE_SOMMELIER_MODEL, localSommelierResult?.usageMetadata)');
     expect(source).not.toContain('analyst: analystResult?.usageMetadata ?? null');
     expect(source).not.toContain('sommelier: localSommelierResult?.usageMetadata ?? null');

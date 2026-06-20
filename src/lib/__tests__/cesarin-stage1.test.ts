@@ -30,7 +30,7 @@ describe('Cesarin Stage 1 storefront helpers', () => {
         });
 
         expect(message).toContain('No encontre "waka somatch mb6000" tal cual');
-        expect(message).toMatch(/te soy honesto|a ver|no te quiero inventar/i);
+        expect(message).toMatch(/No localicé ese término|Estos artículos comparten|Te presento los resultados/i);
         expect(message).not.toContain('Van por nombre y cercania');
     });
 
@@ -43,7 +43,7 @@ describe('Cesarin Stage 1 storefront helpers', () => {
         });
 
         expect(message).not.toMatch(/amarrad/i);
-        expect(message).toMatch(/No la ubico con suficiente certeza|esa no me qued[oó] cerrada/i);
+        expect(message).toMatch(/No pude confirmar|He seleccionado algunas/i);
     });
 
     it('offers approximate recovery only on bounded nearby-match strategies', () => {
