@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { ProductCard } from './ProductCard';
+import { ProductCardSkeleton } from './ProductCardSkeleton';
 import { getVape420StorefrontRenderabilityConfig } from '@/config/productization';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
@@ -31,18 +32,10 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
         return (
             <div className={cn('grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4', className)}>
                 {Array.from({ length: renderabilityConfig?.grid.loadingSkeletonCount ?? 8 }).map((_, i) => (
-                    <div
+                    <ProductCardSkeleton
                         key={i}
-                        className="overflow-hidden rounded-2xl border border-theme bg-theme-secondary/30"
                         style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
-                    >
-                        <div className="h-52 skeleton-shimmer" />
-                        <div className="p-4 space-y-3">
-                            <div className="h-4 w-3/4 rounded-lg skeleton-shimmer" />
-                            <div className="h-3 w-full rounded-lg skeleton-shimmer" />
-                            <div className="h-5 w-1/3 rounded-lg skeleton-shimmer" />
-                        </div>
-                    </div>
+                    />
                 ))}
             </div>
         );

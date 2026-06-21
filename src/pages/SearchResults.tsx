@@ -1,8 +1,9 @@
-﻿// Página de resultados de búsqueda - VSM Store
+// Página de resultados de búsqueda - VSM Store
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, SearchX } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch } from '@/hooks/useSearch';
+import { ProactiveAISuggestions } from '@/components/ui/ProactiveAISuggestions';
 import { getProducts } from '@/services/products.service';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { SEO } from '@/components/seo/SEO';
@@ -133,9 +134,14 @@ export function SearchResults() {
             {query.length < 3 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                     <SearchX className="mb-3 h-12 w-12 text-accent-primary" />
-                    <p className="text-sm text-theme-secondary">
+                    <p className="text-sm text-theme-secondary mb-8">
                         Escribe al menos 3 caracteres para buscar
                     </p>
+                    <ProactiveAISuggestions 
+                        title="¿No sabes qué buscar? Explorar Trends" 
+                        limit={4} 
+                        className="w-full max-w-lg mx-auto"
+                    />
                 </div>
             ) : (
                 <ProductGrid 

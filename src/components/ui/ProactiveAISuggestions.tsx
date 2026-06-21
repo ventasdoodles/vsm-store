@@ -8,9 +8,17 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 
-export const EmptyCartAISuggestions = memo(() => {
+export const ProactiveAISuggestions = memo(({ 
+    title = "Sugerencias Inteligentes",
+    limit = 2,
+    className = "mt-8 w-full max-w-[280px]"
+}: { 
+    title?: string, 
+    limit?: number,
+    className?: string 
+}) => {
     const { config } = useActiveVerticalPack();
-    const { data: bestsellers } = useBestsellerProducts({ section: config?.id as any || 'vape', limit: 2 });
+    const { data: bestsellers } = useBestsellerProducts({ section: config?.id as any || 'vape', limit });
     const closeCart = useCartStore(s => s.closeCart);
 
     if (!bestsellers || bestsellers.length === 0) return null;
@@ -20,14 +28,14 @@ export const EmptyCartAISuggestions = memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="mt-8 w-full max-w-[280px]"
+            className={className}
         >
             <div className="flex items-center gap-2 mb-4">
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
                     <Zap className="h-3 w-3 fill-current" />
                 </div>
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">
-                    Sugerencias Inteligentes
+                    {title}
                 </h4>
             </div>
 

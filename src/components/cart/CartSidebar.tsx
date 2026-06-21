@@ -16,7 +16,7 @@ import { useOpenRecoverableOrder } from '@/hooks/useOrders';
 import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 import { CartSmartUpsell } from './CartSmartUpsell';
 import { CartItemCard } from './CartItemCard';
-import { EmptyCartAISuggestions } from './EmptyCartAISuggestions';
+import { ProactiveAISuggestions } from '@/components/ui/ProactiveAISuggestions';
 /**
  * Sidebar deslizable premium con físicas realistas de Framer Motion
  * REDISEÑO VISUAL: App Feel v2.0 (Glassmorphism & Micro-animaciones)
@@ -305,7 +305,7 @@ export function CartSidebar() {
                                 </div>
                             </m.button>
 
-                            <EmptyCartAISuggestions />
+                            <ProactiveAISuggestions />
                         </m.div>
                     ) : (
                         <>
