@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import type { VerticalPackConfig } from '@/config/productization/types';
 import { activeVerticalPackConfig } from '@/config/productization/active';
@@ -18,8 +18,13 @@ export function VerticalPackProvider({ children }: { children: ReactNode }) {
 
     const config = settings?.vertical_pack_config ?? activeVerticalPackConfig;
 
+    const value = useMemo(() => ({
+        config,
+        isLoading
+    }), [config, isLoading]);
+
     return (
-        <VerticalPackContext.Provider value={{ config, isLoading }}>
+        <VerticalPackContext.Provider value={value}>
             {children}
         </VerticalPackContext.Provider>
     );
