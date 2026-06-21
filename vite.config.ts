@@ -1,12 +1,34 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import path from 'path'
 import { getBuildInfo } from './scripts/build-info.js'
 
 const { canonBaseBuild, runtimeBuildFingerprint, buildTimestamp } = getBuildInfo()
 
-export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    ViteImageOptimizer({
+      svg: {
+        multipass: true,
+        plugins: [
+          {
+            name: 'preset-default',
+            params: {
+              overrides: {
+                cleanupNumericValues: false,
+                removeViewBox: false,
+              },
+            },
+          },
+        ],
+      },
+      png: { quality: 80 },
+      jpeg: { quality: 80 },
+      jpg: { quality: 80 },
+      webp: { lossless: true },
+    }),
+  ],
   server: {
     host: true,
     port: 5173,

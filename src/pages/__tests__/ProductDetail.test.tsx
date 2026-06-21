@@ -159,6 +159,12 @@ vi.mock('@/components/products/FrequentlyBoughtTogether', () => ({
     ),
 }));
 
+vi.mock('@/components/products/ProductSmartKitting', () => ({
+    ProductSmartKitting: () => (
+        <div data-testid="product-smart-kitting" />
+    ),
+}));
+
 vi.mock('@/components/products/RelatedProducts', () => ({
     RelatedProducts: ({ product }: { product: Product }) => (
         <div data-testid="related-products">{product.slug}</div>

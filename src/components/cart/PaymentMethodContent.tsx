@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
 import type { PaymentMethod } from '@/types/cart';
+import type { StoreSettings } from '@/services/settings.service';
 
 interface PaymentMethodContentProps {
     isAuthenticated: boolean;
-    settings: any;
+    settings: StoreSettings | null | undefined;
     paymentMethod: PaymentMethod;
     setPaymentMethod: (method: PaymentMethod) => void;
 }

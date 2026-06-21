@@ -1,8 +1,9 @@
 import { Sparkles, Ticket, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { StrategicAIResponse } from '@/services/admin/admin-crm.service';
 
 interface IntelligenceToolRendererProps {
-    strategicAnalysis: any;
+    strategicAnalysis: StrategicAIResponse | null | undefined;
     loadingStrategic: boolean;
     loadStrategicAI: () => void;
 }
