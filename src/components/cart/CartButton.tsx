@@ -1,6 +1,6 @@
 // Botón del carrito para el header - VSM Store
 import { ShoppingCart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useCartStore, selectTotalItems } from '@/stores/cart.store';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,7 @@ export function CartButton() {
     const count = useCartStore(selectTotalItems);
 
     return (
-        <motion.button
+        <m.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleCart}
@@ -25,18 +25,18 @@ export function CartButton() {
             )}
             aria-label={`Carrito (${count} items)`}
         >
-            <motion.div
+            <m.div
                 key={count}
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 500, damping: 15 }}
             >
                 <ShoppingCart className={cn("h-5 w-5 sm:h-5 sm:w-5", count > 0 ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" : "")} />
-            </motion.div>
+            </m.div>
 
             <AnimatePresence>
                 {count > 0 && (
-                    <motion.span
+                    <m.span
                         key="cart-badge"
                         initial={{ scale: 0, y: 10 }}
                         animate={{ scale: 1, y: 0 }}
@@ -45,9 +45,9 @@ export function CartButton() {
                         className="absolute -top-2 -right-2 flex h-6 min-w-[24px] items-center justify-center rounded-full bg-gradient-to-tr from-accent-primary to-blue-400 px-1.5 text-[11px] font-black text-white shadow-lg shadow-accent-primary/40 border-2 border-theme-primary"
                     >
                         {count > 99 ? '99+' : count}
-                    </motion.span>
+                    </m.span>
                 )}
             </AnimatePresence>
-        </motion.button>
+        </m.button>
     );
 }

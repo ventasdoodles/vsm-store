@@ -6,7 +6,7 @@
  * // Regla / Notas: Sincronizado con hook useScrolled. Optimizado para CLS (Content Layout Shift).
  */
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useScrolled } from '@/hooks/useScrolled';
 import { SearchBar } from '@/components/search/SearchBar';
@@ -23,7 +23,7 @@ export function Header() {
     return (
         <>
             <TopBanner />
-            <motion.header
+            <m.header
                 initial={false}
                 className={cn(
                     'sticky top-0 z-40 w-full transition-all duration-300',
@@ -44,7 +44,7 @@ export function Header() {
                     {/* ✨ Aura de Neón en modo Pill */}
                     <AnimatePresence>
                         {scrolled && (
-                            <motion.div
+                            <m.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 0.4 }}
                                 exit={{ opacity: 0 }}
@@ -66,19 +66,19 @@ export function Header() {
                         {/* Nav compacta (solo iconos) en modo scrolled */}
                         <AnimatePresence>
                             {scrolled && (
-                                <motion.div 
+                                <m.div 
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     className="hidden xl:flex items-center justify-center flex-shrink-0"
                                 >
                                     <DesktopNav compact />
-                                </motion.div>
+                                </m.div>
                             )}
                         </AnimatePresence>
 
                         {/* Barra de búsqueda — protagonista en desktop */}
-                        <motion.div 
+                        <m.div 
                             layout
                             className={cn(
                                 "hidden md:flex transition-all duration-300 group justify-center",
@@ -108,7 +108,7 @@ export function Header() {
                                     )}
                                 />
                             </ErrorBoundary>
-                        </motion.div>
+                        </m.div>
 
                         <div className="flex-shrink-0">
                             <HeaderActions
@@ -121,7 +121,7 @@ export function Header() {
                     {/* Línea inferior (se oculta al scroll con fade-out) */}
                     <AnimatePresence>
                         {!scrolled && (
-                            <motion.div
+                            <m.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
@@ -131,13 +131,13 @@ export function Header() {
                                     <DesktopNav />
                                 </div>
 
-                            </motion.div>
+                            </m.div>
                         )}
                     </AnimatePresence>
                 </div>
 
                 <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-            </motion.header>
+            </m.header>
         </>
     );
 }

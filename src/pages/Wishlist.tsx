@@ -6,7 +6,7 @@
  */
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag, ShoppingCart, Trash2, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
@@ -79,7 +79,7 @@ export function Wishlist() {
 
             <AnimatePresence initial={false}>
                 {items.length === 0 ? (
-                    <motion.div 
+                    <m.div 
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
@@ -110,15 +110,15 @@ export function Wishlist() {
                                 </Link>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
                 ) : (
-                    <motion.div 
+                    <m.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="animate-in fade-in duration-1000"
                     >
                         <ProductGrid products={items} isLoading={false} />
-                    </motion.div>
+                    </m.div>
                 )}
             </AnimatePresence>
         </div>

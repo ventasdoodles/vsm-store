@@ -5,7 +5,7 @@
  * // Estilo: Premium Floating Label Input (§2.1).
  */
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Ticket, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppliedReferral, useApplyReferralCode } from '@/hooks/useLoyalty';
@@ -108,7 +108,7 @@ export function ApplyReferralForm() {
 
                     <AnimatePresence initial={false}>
                         {status === 'error' && (
-                            <motion.div
+                            <m.div
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 10 }}
@@ -116,7 +116,7 @@ export function ApplyReferralForm() {
                             >
                                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                                 <span className="text-[10px] font-black uppercase tracking-widest">{errorMsg}</span>
-                            </motion.div>
+                            </m.div>
                         )}
                     </AnimatePresence>
                 </form>

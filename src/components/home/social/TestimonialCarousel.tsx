@@ -4,7 +4,7 @@
  * @component
  */
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TestimonialCard } from './TestimonialCard';
@@ -58,7 +58,7 @@ export function TestimonialCarousel({ items }: TestimonialCarouselProps) {
             {/* Scroll Navigation Buttons */}
             <AnimatePresence>
                 {canScrollLeft && (
-                    <motion.button
+                    <m.button
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
@@ -67,13 +67,13 @@ export function TestimonialCarousel({ items }: TestimonialCarouselProps) {
                         aria-label="Anterior"
                     >
                         <ChevronLeft className="w-5 h-5 text-theme-primary" />
-                    </motion.button>
+                    </m.button>
                 )}
             </AnimatePresence>
 
             <AnimatePresence>
                 {canScrollRight && (
-                    <motion.button
+                    <m.button
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
@@ -82,7 +82,7 @@ export function TestimonialCarousel({ items }: TestimonialCarouselProps) {
                         aria-label="Siguiente"
                     >
                         <ChevronRight className="w-5 h-5 text-theme-primary" />
-                    </motion.button>
+                    </m.button>
                 )}
             </AnimatePresence>
 

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { MessageSquare, ThumbsUp, ThumbsDown, Save } from 'lucide-react';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
     const [activeInteractionId, setActiveInteractionId] = useState<string | null>(null);
 
     return (
-        <motion.div 
+        <m.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
@@ -84,6 +84,6 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
                     ))
                 )}
             </div>
-        </motion.div>
+        </m.div>
     );
 }

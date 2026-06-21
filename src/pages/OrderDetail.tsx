@@ -24,7 +24,7 @@ import {
     Zap,
     type LucideIcon
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useOrderWithCrossSurfaceReconciliation, ORDER_STATUS } from '@/hooks/useOrders';
 import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
@@ -243,7 +243,7 @@ export function OrderDetail() {
                                                 i < currentStepIndex ? 'bg-accent-primary' : 'bg-white/5'
                                             )}>
                                                 {isCurrent && (
-                                                    <motion.div 
+                                                    <m.div 
                                                         initial={{ x: '-100%' }}
                                                         animate={{ x: '100%' }}
                                                         transition={{ repeat: Infinity, duration: 1.5 }}

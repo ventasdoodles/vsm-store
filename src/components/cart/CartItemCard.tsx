@@ -1,5 +1,5 @@
 import { useRef, memo } from 'react';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -39,7 +39,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
     };
 
     return (
-        <motion.div
+        <m.div
             ref={cardRef}
             onMouseMove={handleMouseMove}
             layout="position"
@@ -49,7 +49,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
             className="group relative flex gap-4 rounded-[1.5rem] border border-white/5 bg-white/[0.04] p-4 shadow-xl backdrop-blur-xl transition-all hover:bg-white/[0.08] hover:border-white/20 hover:shadow-black/60 overflow-hidden"
         >
             {/* Spotlight Reveal */}
-            <motion.div
+            <m.div
                 className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 style={{
                     background: useMotionTemplate`radial-gradient(150px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.08), transparent 80%)`
@@ -94,7 +94,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
 
                 <div className="mt-3 flex items-end justify-between">
                     <div className="flex flex-col">
-                        <motion.span
+                        <m.span
                             key={itemTotal}
                             initial={{ opacity: 0.5, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -104,7 +104,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
                             )}
                         >
                             {formatPrice(itemTotal)}
-                        </motion.span>
+                        </m.span>
                         {item.quantity > 1 && (
                             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
                                 {formatPrice(item.product.price)} c/u
@@ -121,14 +121,14 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
                         >
                             <Minus className="h-3.5 w-3.5" />
                         </button>
-                        <motion.span
+                        <m.span
                             key={item.quantity}
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             className="w-8 text-center text-sm font-black text-white"
                         >
                             {item.quantity}
-                        </motion.span>
+                        </m.span>
                         <button
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1, item.variant_id)}
                             disabled={!purchaseability.canAddToCart || item.quantity >= maxQuantity}
@@ -139,6 +139,6 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </m.div>
     );
 });

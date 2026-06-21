@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, UploadCloud, Link2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -6,7 +6,7 @@ export function TabTraining() {
     const [dragActive, setDragActive] = useState(false);
 
     return (
-        <motion.div 
+        <m.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
@@ -94,6 +94,6 @@ export function TabTraining() {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </m.div>
     );
 }

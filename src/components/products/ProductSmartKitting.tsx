@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Plus, Sparkles, ChevronRight } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
@@ -37,7 +37,7 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
     };
 
     return (
-        <motion.div 
+        <m.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 mb-4 p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-vape-500/10 to-transparent border border-vape-500/20 relative overflow-hidden"
@@ -94,7 +94,7 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
                     </div>
                 </div>
 
-                <motion.button
+                <m.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddBundle}
@@ -103,8 +103,8 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
                     <span className="hidden sm:inline">Agregar Kit</span>
                     <span className="sm:hidden">Kit</span>
                     <ChevronRight className="w-4 h-4" />
-                </motion.button>
+                </m.button>
             </div>
-        </motion.div>
+        </m.div>
     );
 });

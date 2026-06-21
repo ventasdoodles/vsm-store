@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CreditCard, Loader2, Package, ShoppingBag, Sparkles } from 'lucide-react';
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { AnimatePresence, m, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthenticatedOrderReorder } from '@/hooks/useAuthenticatedOrderReorder';
@@ -74,7 +74,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
         : 0;
 
     return (
-        <motion.div
+        <m.div
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -83,7 +83,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
             className="group relative"
         >
             <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-3xl transition-all duration-700 hover:border-white/20 hover:bg-white/[0.04] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                <motion.div
+                <m.div
                     className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     style={{
                         background: useMotionTemplate`
@@ -226,7 +226,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
 
                 <div className="absolute inset-x-0 bottom-0 h-[2px] w-full scale-x-0 bg-gradient-to-r from-transparent via-accent-primary to-transparent transition-transform duration-1000 group-hover:scale-x-100" />
             </div>
-        </motion.div>
+        </m.div>
     );
 }
 
@@ -360,7 +360,7 @@ export function Orders() {
                     </div>
                 ) : filtered.length === 0 ? (
                     <AnimatePresence initial={false}>
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className="relative space-y-8 overflow-hidden rounded-[3rem] border border-dashed border-white/5 bg-white/[0.01] py-32 text-center"
@@ -382,7 +382,7 @@ export function Orders() {
                                     <Link to="/" className="vsm-button-primary px-10">Explorar catalogo</Link>
                                 </div>
                             </div>
-                        </motion.div>
+                        </m.div>
                     </AnimatePresence>
                 ) : (
                     <div className="grid gap-6">

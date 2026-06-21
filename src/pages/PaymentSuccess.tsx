@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
 import confetti from 'canvas-confetti';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
     AlertTriangle,
     CheckCircle2,
@@ -173,29 +173,29 @@ export function PaymentSuccess() {
             </div>
 
             <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-20">
-                <motion.div
+                <m.div
                     variants={container}
                     initial="hidden"
                     animate="show"
                     className="w-full max-w-2xl text-center space-y-8"
                 >
-                    <motion.div variants={item} className="relative inline-block">
+                    <m.div variants={item} className="relative inline-block">
                         <div className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br ${ui.iconWrap}`}>
                             <StatusIcon className="h-12 w-12 text-white" />
                         </div>
                         <div className={`absolute -inset-4 z-0 rounded-[2.5rem] blur-xl animate-pulse ${ui.iconGlow}`} />
-                    </motion.div>
+                    </m.div>
 
-                    <motion.div variants={item} className="space-y-3">
+                    <m.div variants={item} className="space-y-3">
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-white uppercase italic">
                             {headline}
                         </h1>
                         <p className={`text-lg font-bold uppercase tracking-[0.2em] ${ui.eyebrow}`}>
                             {eyebrow}
                         </p>
-                    </motion.div>
+                    </m.div>
 
-                    <motion.div variants={item} className="relative group">
+                    <m.div variants={item} className="relative group">
                         <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-r from-vape-500/20 to-herbal-500/20 opacity-50 blur transition duration-1000 group-hover:opacity-100" />
                         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-8 text-left backdrop-blur-2xl">
                             <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-white/5 pb-6 sm:flex-row sm:items-center">
@@ -252,19 +252,19 @@ export function PaymentSuccess() {
                                 </p>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
 
                     {order && lifecycleView && confidenceView && (
-                        <motion.div variants={item}>
+                        <m.div variants={item}>
                             <PostPurchaseReceiptCard
                                 order={order}
                                 lifecycleView={lifecycleView}
                                 confidenceView={confidenceView}
                             />
-                        </motion.div>
+                        </m.div>
                     )}
 
-                    <motion.div variants={item} className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
+                    <m.div variants={item} className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
                         {canContinuePayment && (
                             <button
                                 type="button"
@@ -311,8 +311,8 @@ export function PaymentSuccess() {
                                 Volver al inicio
                             </div>
                         </Link>
-                    </motion.div>
-                </motion.div>
+                    </m.div>
+                </m.div>
             </main>
         </div>
     );

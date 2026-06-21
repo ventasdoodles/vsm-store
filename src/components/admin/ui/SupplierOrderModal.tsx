@@ -3,7 +3,7 @@ import {
     X, ShoppingCart, MessageSquare, 
     Truck, Loader2, Copy 
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { adminNLPService } from '@/services/admin';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useNotification } from '@/hooks/useNotification';
@@ -66,7 +66,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -74,7 +74,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                     className="fixed inset-0 bg-black/80 backdrop-blur-md"
                 />
 
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -174,7 +174,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                             Este mensaje ha sido optimizado por Gemini para maxima tasa de respuesta
                         </span>
                     </div>
-                </motion.div>
+                </m.div>
             </div>
         </AnimatePresence>
     );

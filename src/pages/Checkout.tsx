@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
@@ -131,7 +131,7 @@ export function Checkout() {
 
                             <AnimatePresence>
                                 {showSummaryMobile && (
-                                    <motion.div
+                                    <m.div
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
@@ -161,7 +161,7 @@ export function Checkout() {
                                                 </p>
                                             )}
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 )}
                             </AnimatePresence>
                         </div>
@@ -189,7 +189,7 @@ export function Checkout() {
                                 openRecoverableOrder={openRecoverableOrder ?? null}
                             />
                         ) : (
-                            <motion.div 
+                            <m.div 
                                 initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
                                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -198,14 +198,14 @@ export function Checkout() {
                                 <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-red-600/10 blur-[80px] pointer-events-none" />
                                 <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-600/10 blur-[80px] pointer-events-none" />
                                 
-                                <motion.div 
+                                <m.div 
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ type: 'spring', damping: 15, delay: 0.2 }}
                                     className="relative mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 shadow-inner"
                                 >
                                     <ShoppingBag className="h-10 w-10 text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,0.5)]" />
-                                </motion.div>
+                                </m.div>
                                 
                                 <h2 className="relative z-10 text-2xl sm:text-3xl font-black tracking-tight text-white drop-shadow-sm">
                                     {transitionView.headline}
@@ -214,7 +214,7 @@ export function Checkout() {
                                     {transitionView.detail}
                                 </p>
                                 
-                                <motion.button
+                                <m.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => navigate('/')}
@@ -222,8 +222,8 @@ export function Checkout() {
                                 >
                                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12 rounded-2xl" />
                                     Volver al catálogo
-                                </motion.button>
-                            </motion.div>
+                                </m.button>
+                            </m.div>
                         )}
                     </div>
 
@@ -237,7 +237,7 @@ export function Checkout() {
 
                                 <div className="max-h-[40vh] overflow-y-auto scrollbar-thin px-8 py-6 space-y-6">
                                     {displayItems.length > 0 ? displayItems.map((item) => (
-                                        <motion.div
+                                        <m.div
                                             key={`${item.product.id}-${item.variant_id || 'base'}`}
                                             layout
                                             initial={{ opacity: 0, y: 10 }}
@@ -265,7 +265,7 @@ export function Checkout() {
                                                 <p className="text-xs font-medium text-theme-tertiary">{formatPrice(item.product.price)} c/u</p>
                                             </div>
                                             <span className="text-sm font-black text-white">{formatPrice(item.product.price * item.quantity)}</span>
-                                        </motion.div>
+                                        </m.div>
                                     )) : (
                                         <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4">
                                             <p className="text-sm font-medium text-theme-tertiary">

@@ -12,7 +12,7 @@ import {
     Package,
     ShoppingCart,
 } from 'lucide-react';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { formatPrice } from '@/lib/utils';
 import type { DashboardStats as StatsType } from '@/services/admin';
 import type { LucideIcon } from 'lucide-react';
@@ -48,7 +48,7 @@ function StatCard({ card }: { card: StatCardData }) {
             title={card.tooltip}
         >
             {/* 🔦 Spotlight Effect */}
-            <motion.div
+            <m.div
                 className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 style={{
                     background: useMotionTemplate`

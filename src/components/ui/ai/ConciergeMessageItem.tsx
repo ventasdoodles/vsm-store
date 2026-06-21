@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ShoppingBag, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TypewriterBubble } from './TypewriterBubble';
@@ -137,7 +137,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
     }).capsule_contract?.[CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_PUBLIC_BUNDLE_MARKERS.auditField] ?? null;
 
     return (
-    <motion.div
+    <m.div
         key={message.id}
         initial={{ opacity: 0, y: 10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -229,7 +229,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
         )}
 
         {message.action && (
-            <motion.button
+            <m.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
@@ -255,7 +255,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
             >
                 {message.action.type === 'whatsapp' && <Send className="h-3.5 w-3.5" />}
                 {message.action.label}
-            </motion.button>
+            </m.button>
         )}
 
         {message.capsule_contract?.capsule_name === 'knowledge_rag_foundation' &&
@@ -308,7 +308,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                             {message.suggestedProducts?.map((p) => {
                                 const product = p as SuggestedProduct;
                                 return (
-                                <motion.div
+                                <m.div
                                     key={product.id}
                                     layoutId={`suggested-product-${product.id}`}
                                     whileHover={{ scale: 1.02, y: -2 }}
@@ -356,7 +356,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                     >
                                         <ShoppingBag className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
                                     </button>
-                                </motion.div>
+                                </m.div>
                                 );
                             })}
                         </div>
@@ -532,6 +532,6 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                 )}
             </div>
         )}
-    </motion.div>
+    </m.div>
     );
 };

@@ -6,6 +6,7 @@ import { getBuildInfo } from './scripts/build-info.js'
 
 const { canonBaseBuild, runtimeBuildFingerprint, buildTimestamp } = getBuildInfo()
 
+export default defineConfig({
   plugins: [
     react(),
     ViteImageOptimizer({

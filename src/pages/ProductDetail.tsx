@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { SEO } from '@/components/seo/SEO';
 import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { SocialProof } from '@/components/home/SocialProof';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 import { getVape420SectionPresentationConfig } from '@/config/productization';
@@ -76,7 +76,7 @@ export function ProductDetail() {
     if (!productPresentationConfig) return null;
 
     return (
-        <motion.div
+        <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -165,6 +165,6 @@ export function ProductDetail() {
                     <RelatedProducts product={product} />
                 </SectionErrorBoundary>
             </div>
-        </motion.div>
+        </m.div>
     );
 }

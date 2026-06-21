@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, X, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 const PROMOS = [
     { 
@@ -38,7 +38,7 @@ export function TopBanner() {
     const currentPromo = PROMOS[currentIndex] || PROMOS[0];
 
     return (
-        <motion.div 
+        <m.div 
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -50,7 +50,7 @@ export function TopBanner() {
             <div className="container-vsm py-2 md:py-2.5 relative flex items-center justify-between">
                 <div className="flex-1 w-full relative h-6 overflow-hidden flex justify-center items-center">
                     <AnimatePresence mode="wait">
-                        <motion.div
+                        <m.div
                             key={currentIndex}
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -67,7 +67,7 @@ export function TopBanner() {
                                     <ChevronRight className="w-4 h-4 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                                 </Link>
                             )}
-                        </motion.div>
+                        </m.div>
                     </AnimatePresence>
                 </div>
 
@@ -78,6 +78,6 @@ export function TopBanner() {
                     <X className="w-3.5 h-3.5" />
                 </button>
             </div>
-        </motion.div>
+        </m.div>
     );
 }

@@ -9,7 +9,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Flame, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useFeaturedProducts, useNewProducts, useBestsellerProducts } from '@/hooks/useProducts';
@@ -123,7 +123,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     </Link>
                 </div>
 
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
                     whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                     viewport={{ once: true }}
@@ -134,7 +134,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     <div className={`absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-[80px] pointer-events-none`} />
 
                     <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center text-center">
-                        <motion.div 
+                        <m.div 
                             initial={{ scale: 0, rotate: -10 }}
                             whileInView={{ scale: 1, rotate: 0 }}
                             viewport={{ once: true }}
@@ -142,7 +142,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                             className={`mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br ${theme.gradient} shadow-lg ${theme.shadow}`}
                         >
                             <div className="scale-125">{theme.icon}</div>
-                        </motion.div>
+                        </m.div>
                         <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter drop-shadow-md">
                             {renderabilityConfig.rail.emptyStateTitle}
                         </h3>
@@ -150,7 +150,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                             {renderabilityConfig.rail.emptyStateDescription}
                         </p>
                         <Link to={renderabilityConfig.rail.emptyStateCtaHref}>
-                            <motion.button
+                            <m.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className={`mt-8 relative overflow-hidden inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r ${theme.gradient} px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:shadow-2xl ${theme.shadow}`}
@@ -158,10 +158,10 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                                 <span className="relative z-10">{renderabilityConfig.rail.emptyStateCtaLabel}</span>
                                 <ArrowRight className="relative z-10 h-5 w-5" />
-                            </motion.button>
+                            </m.button>
                         </Link>
                     </div>
-                </motion.div>
+                </m.div>
             </section>
         );
     }
@@ -169,7 +169,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
     return (
         <section id={type === 'bestseller' ? 'mas-vendidos' : undefined} className={cn('py-4 group/section', className)}>
             {/* Header */}
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-5%' }}
@@ -191,7 +191,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     {renderabilityConfig.rail.emptyStateCtaLabel}
                     <ArrowRight className={renderabilityConfig.rail.emptyStateDesktopActionIconClassName} />
                 </Link>
-            </motion.div>
+            </m.div>
 
             {/* Riel */}
             <div className="relative">
@@ -213,7 +213,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 </button>
 
                 {/* Lista de productos animada */}
-                <motion.div
+                <m.div
                     ref={scrollRef}
                     variants={railVariants}
                     initial="hidden"
@@ -223,13 +223,13 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     style={{ scrollbarWidth: 'none' }}
                 >
                     {products.map((product) => (
-                        <motion.div
+                        <m.div
                             key={product.id}
                             variants={itemVariants}
                             className="min-w-[200px] max-w-[200px] sm:min-w-[240px] sm:max-w-[240px] snap-start"
                         >
                             <ProductCard product={product} compact />
-                        </motion.div>
+                        </m.div>
                     ))}
 
                     {/* Botón ver más dinámico (Mobile) */}
@@ -246,7 +246,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                             </span>
                         </Link>
                     </div>
-                </motion.div>
+                </m.div>
             </div>
         </section>
     );

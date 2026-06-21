@@ -7,7 +7,7 @@
  */
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface SideDrawerProps {
@@ -52,7 +52,7 @@ export function SideDrawer({
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
                     {/* Backdrop */}
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -61,7 +61,7 @@ export function SideDrawer({
                     />
 
                     {/* Drawer Panel */}
-                    <motion.div
+                    <m.div
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
@@ -86,7 +86,7 @@ export function SideDrawer({
                         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar scroll-smooth">
                             {children}
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             )}
         </AnimatePresence>

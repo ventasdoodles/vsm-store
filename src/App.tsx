@@ -12,6 +12,7 @@ import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import {
     bootstrapPilotFromSearch,
@@ -220,6 +221,7 @@ function StorefrontApp() {
 
     return (
         <ErrorBoundary componentName="StorefrontRoot">
+            <LazyMotion features={domAnimation}>
             <TacticalProvider>
                 {/* 🍞 Notificaciones Globales (Toaster) */}
                 <Toaster
@@ -344,6 +346,7 @@ function StorefrontApp() {
 
 
             </TacticalProvider>
+            </LazyMotion>
         </ErrorBoundary>
     );
 }

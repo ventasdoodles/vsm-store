@@ -9,7 +9,7 @@
  */
 import { useMemo } from 'react';
 import { Award } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useBrands } from '@/hooks/useBrands';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { PublicBrand } from '@/hooks/useBrands';
@@ -17,7 +17,7 @@ import type { PublicBrand } from '@/hooks/useBrands';
 /** Tarjeta individual de marca con efecto glassmorphism + hover glow */
 function BrandCard({ brand }: { brand: PublicBrand }) {
     return (
-        <motion.div
+        <m.div
             whileHover={{ y: -8, scale: 1.05 }}
             className="flex-shrink-0 group cursor-pointer"
         >
@@ -63,7 +63,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
                 {/* Corner Accents */}
                 <div className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-white/5 group-hover:bg-white/40 transition-colors" />
             </div>
-        </motion.div>
+        </m.div>
     );
 }
 
@@ -83,7 +83,7 @@ export const BrandsCarousel = () => {
 
             {/* Header Premium */}
             <div className="container-vsm relative z-10 text-center mb-16">
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -108,7 +108,7 @@ export const BrandsCarousel = () => {
                     <p className="text-xs sm:text-sm font-black uppercase tracking-[0.5em] text-white/30 max-w-xl mx-auto leading-relaxed">
                         Curating the world's most innovative hardware & herbals
                     </p>
-                </motion.div>
+                </m.div>
             </div>
 
             {/* Carousel Track with Glass Track Effect */}
@@ -118,7 +118,7 @@ export const BrandsCarousel = () => {
 
                 <div className="flex overflow-hidden relative">
                     {/* Infinite Scrolling Container */}
-                    <motion.div
+                    <m.div
                         className="flex gap-6 sm:gap-8 py-10 px-4"
                         animate={{
                             x: [0, -100 * brands.length],
@@ -136,7 +136,7 @@ export const BrandsCarousel = () => {
                         {doubledBrands.map((brand, idx) => (
                             <BrandCard key={`${brand.id}-${idx}`} brand={brand} />
                         ))}
-                    </motion.div>
+                    </m.div>
 
                     {/* Gradient Masks */}
                     <div className="absolute inset-y-0 left-0 w-32 sm:w-64 bg-gradient-to-r from-theme-primary via-theme-primary/80 to-transparent pointer-events-none z-10" />
@@ -145,7 +145,7 @@ export const BrandsCarousel = () => {
             </div>
 
             {/* Bottom Counter */}
-            <motion.div
+            <m.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 className="text-center mt-12"
@@ -157,7 +157,7 @@ export const BrandsCarousel = () => {
                     </span>
                     <div className="h-px w-12 bg-white/10" />
                 </div>
-            </motion.div>
+            </m.div>
         </section>
     );
 };

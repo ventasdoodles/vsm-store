@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Gift, Copy, CheckCircle } from 'lucide-react';
 import { useLoyaltyIA, useClaimIAProposition } from '@/hooks/useLoyalty';
 import { useNotification } from '@/hooks/useNotification';
@@ -41,7 +41,7 @@ export function SmartRewardToast() {
     return (
         <AnimatePresence>
             {isVisible && (
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, x: 100, scale: 0.9 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
@@ -106,7 +106,7 @@ export function SmartRewardToast() {
                             </p>
                         </div>
                     </div>
-                </motion.div>
+                </m.div>
             )}
         </AnimatePresence>
     );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { SettingsChangeHandler, SettingsFormData } from './settings.types';
 import type { VerticalPackConfig } from '@/config/productization/types';
 import { Package, Settings, LayoutGrid, Terminal, Plus, Trash2, ChevronRight, Layers, Sparkles, Box, Info } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 interface Props {
     formData: SettingsFormData;
     handleChange: SettingsChangeHandler;
@@ -220,7 +220,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                     className={`relative flex items-center gap-4 w-full p-4 rounded-2xl text-left transition-all duration-300 group ${isDisabled ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/[0.04]'}`}
                                 >
                                     {isActive && (
-                                        <motion.div
+                                        <m.div
                                             layoutId="activeTabIndicator"
                                             className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-transparent border border-violet-500/20 rounded-2xl"
                                             initial={false}
@@ -250,7 +250,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                     <div className="p-8 lg:p-12 min-h-full">
                         
                         {parseError && activeTab !== 'advanced' && (
-                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-6 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-8 font-medium flex items-center gap-4 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
+                            <m.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-6 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-8 font-medium flex items-center gap-4 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
                                 <div className="p-2 bg-red-500/20 rounded-full">
                                     <Info className="h-5 w-5" />
                                 </div>
@@ -258,12 +258,12 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                     <strong className="block text-red-300 text-base mb-1">Error de parseo JSON</strong>
                                     La configuración actual está corrupta. Dirígete a "JSON Avanzado" para repararla.
                                 </div>
-                            </motion.div>
+                            </m.div>
                         )}
 
                         <AnimatePresence mode="wait">
                             {activeTab === 'general' && config && (
-                                <motion.div key="general" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-3xl">
+                                <m.div key="general" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-3xl">
                                     <div className="mb-10">
                                         <h3 className="text-2xl font-bold text-white mb-2">Identidad General</h3>
                                         <p className="text-white/50 text-sm">Define cómo el sistema identifica internamente tu tienda y el nombre base que se mostrará en lugares neutros.</p>
@@ -289,11 +289,11 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                         onChange={(e) => updateGeneral('description', e.target.value)} 
                                         rows={4}
                                     />
-                                </motion.div>
+                                </m.div>
                             )}
 
                             {activeTab === 'hero' && config?.marketing?.homeHero?.primaryCopy && (
-                                <motion.div key="hero" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-3xl">
+                                <m.div key="hero" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-3xl">
                                     <div className="mb-10 flex items-center justify-between bg-gradient-to-r from-violet-500/10 to-transparent p-6 rounded-2xl border border-violet-500/20">
                                         <div>
                                             <h3 className="text-2xl font-bold text-white mb-2">Impacto Visual Hero</h3>
@@ -330,11 +330,11 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                             placeholder="Ej. NUEVO, PROMO, HOT"
                                         />
                                     </div>
-                                </motion.div>
+                                </m.div>
                             )}
 
                             {activeTab === 'sections' && config && (
-                                <motion.div key="sections" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-5xl">
+                                <m.div key="sections" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-5xl">
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                                         <div>
                                             <h3 className="text-2xl font-bold text-white mb-2">Estructura de Secciones</h3>
@@ -354,15 +354,15 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                                         <AnimatePresence>
                                             {(!config.sections || config.sections.length === 0) && (
-                                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full p-12 text-center border-2 border-dashed border-white/5 rounded-3xl text-white/30 bg-white/[0.01]">
+                                                <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full p-12 text-center border-2 border-dashed border-white/5 rounded-3xl text-white/30 bg-white/[0.01]">
                                                     <LayoutGrid className="w-12 h-12 mx-auto mb-4 opacity-50" />
                                                     <p className="text-lg font-medium">No has definido ninguna sección todavía.</p>
                                                     <p className="text-sm mt-1">Crea tu primera sección para empezar a estructurar la tienda.</p>
-                                                </motion.div>
+                                                </m.div>
                                             )}
                                             
                                             {config.sections?.map((section, idx) => (
-                                                <motion.div 
+                                                <m.div 
                                                     key={idx} 
                                                     initial={{ opacity: 0, scale: 0.95, y: 20 }} 
                                                     animate={{ opacity: 1, scale: 1, y: 0 }} 
@@ -430,15 +430,15 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </motion.div>
+                                                </m.div>
                                             ))}
                                         </AnimatePresence>
                                     </div>
-                                </motion.div>
+                                </m.div>
                             )}
 
                             {activeTab === 'advanced' && (
-                                <motion.div key="advanced" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6 h-full flex flex-col">
+                                <m.div key="advanced" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6 h-full flex flex-col">
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
                                             <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
@@ -463,7 +463,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                             </div>
                                         )}
                                     </div>
-                                </motion.div>
+                                </m.div>
                             )}
                         </AnimatePresence>
                     </div>

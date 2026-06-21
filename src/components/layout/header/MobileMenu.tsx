@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/hooks/useAuth';
 import { SearchBar } from '@/components/search/SearchBar';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useState } from 'react';
 import { checkIsAdmin } from '@/services/admin';
 
@@ -143,7 +143,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 )}
 
                 {/* Vape con categorías */}
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
@@ -168,7 +168,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     {vapeRoots.length > 0 && (
                         <div className="grid grid-cols-2 gap-2.5">
                             {vapeRoots.map((cat, idx) => (
-                                <motion.div
+                                <m.div
                                     key={cat.id}
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -181,14 +181,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     >
                                         {cat.name}
                                     </Link>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </div>
                     )}
-                </motion.div>
+                </m.div>
 
                 {/* 420 con categorías */}
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
@@ -213,7 +213,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     {herbalRoots.length > 0 && (
                         <div className="grid grid-cols-2 gap-2.5">
                             {herbalRoots.map((cat, idx) => (
-                                <motion.div
+                                <m.div
                                     key={cat.id}
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -226,11 +226,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     >
                                         {cat.name}
                                     </Link>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </div>
                     )}
-                </motion.div>
+                </m.div>
 
                 {/* Auth: móvil */}
                 <div className="pt-2">

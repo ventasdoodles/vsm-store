@@ -2,7 +2,7 @@
 // Sidebar + Header + Content area
 import React, { useState, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
     Activity,
@@ -188,7 +188,7 @@ const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSys
             )}
         >
             {active && (
-                <motion.div
+                <m.div
                     layoutId="active-pill"
                     className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-full bg-vape-500 shadow-[0_0_15px_rgba(168,85,247,0.8)]"
                 />
@@ -290,7 +290,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 {/* Mobile overlay */}
                 <AnimatePresence>
                     {sidebarOpen && (
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

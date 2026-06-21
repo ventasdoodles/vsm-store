@@ -1,5 +1,5 @@
 import { Shield, Truck, Zap, RotateCcw, Star, CreditCard } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface Badge {
     id: string;
@@ -63,7 +63,7 @@ export const TrustBadges = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-12 gap-x-8 container-vsm relative z-10">
                 {BADGES.map((badge, index) => (
-                    <motion.div
+                    <m.div
                         key={badge.id}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export const TrustBadges = () => {
                         className="flex flex-col items-center text-center group/badge"
                     >
                         {/* Icon Container with Floating Animation */}
-                        <motion.div
+                        <m.div
                             animate={{ y: [0, -8, 0] }}
                             transition={{
                                 duration: 4,
@@ -101,7 +101,7 @@ export const TrustBadges = () => {
                                 className="absolute inset-0 blur-2xl opacity-0 group-hover/badge:opacity-20 transition-opacity"
                                 style={{ backgroundColor: badge.color }}
                             />
-                        </motion.div>
+                        </m.div>
 
                         {/* Text Content */}
                         <div className="space-y-2">
@@ -112,7 +112,7 @@ export const TrustBadges = () => {
                                 {badge.description}
                             </p>
                         </div>
-                    </motion.div>
+                    </m.div>
                 ))}
             </div>
         </section>

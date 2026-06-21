@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useConfirmStore } from '@/stores/confirm.store';
 import { AlertTriangle, Info, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,7 +42,7 @@ export function ConfirmDialog() {
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0">
                     {/* Backdrop */}
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -51,7 +51,7 @@ export function ConfirmDialog() {
                     />
 
                     {/* Dialog */}
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -98,7 +98,7 @@ export function ConfirmDialog() {
                                 {confirmText}
                             </button>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             )}
         </AnimatePresence>

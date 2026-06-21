@@ -10,7 +10,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useFlashDeals } from '@/hooks/useFlashDeals';
 import { formatPrice, cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
@@ -96,7 +96,7 @@ export const FlashDeals = () => {
         <section className="relative py-20 px-4 md:px-0">
             {/* Header with Luxury Timer */}
             <div className="max-w-7xl mx-auto mb-12 flex flex-col lg:flex-row items-end justify-between gap-8">
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -109,10 +109,10 @@ export const FlashDeals = () => {
                     <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
                         Ofertas <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">Relámpago</span>
                     </h2>
-                </motion.div>
+                </m.div>
 
                 {timeLeft && (
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-4 bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-6 rounded-[2rem] shadow-2xl relative overflow-hidden group"
@@ -129,7 +129,7 @@ export const FlashDeals = () => {
                                 <div key={i} className="flex flex-col items-center">
                                     <div className="flex gap-1">
                                         {String(t.val).padStart(2, '0').split('').map((digit, idx) => (
-                                            <motion.div
+                                            <m.div
                                                 key={`${idx}-${digit}`}
                                                 initial={{ y: 10, opacity: 0 }}
                                                 animate={{ y: 0, opacity: 1 }}
@@ -139,42 +139,42 @@ export const FlashDeals = () => {
                                                 )}
                                             >
                                                 {digit}
-                                            </motion.div>
+                                            </m.div>
                                         ))}
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-white/30">{t.label}</span>
                                 </div>
                             ))}
                         </div>
-                    </motion.div>
+                    </m.div>
                 )}
             </div>
 
             {/* Carousel Container */}
             <div className="relative group/carousel max-w-7xl mx-auto">
                 <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
-                    <motion.button
+                    <m.button
                         whileHover={{ scale: 1.1, x: -5 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => scroll('left')}
                         className="w-16 h-16 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center text-white shadow-2xl hover:bg-white/10 transition-colors"
                     >
                         <ChevronLeft className="w-8 h-8" />
-                    </motion.button>
+                    </m.button>
                 </div>
 
                 <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
-                    <motion.button
+                    <m.button
                         whileHover={{ scale: 1.1, x: 5 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => scroll('right')}
                         className="w-16 h-16 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center text-white shadow-2xl hover:bg-white/10 transition-colors"
                     >
                         <ChevronRight className="w-8 h-8" />
-                    </motion.button>
+                    </m.button>
                 </div>
 
-                <motion.div
+                <m.div
                     ref={scrollRef}
                     variants={containerVariants}
                     initial="hidden"
@@ -183,7 +183,7 @@ export const FlashDeals = () => {
                     className="flex gap-8 overflow-x-auto scrollbar-hide pb-12 pt-4 px-4 -mx-4 scroll-smooth"
                 >
                     {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (
-                        <motion.div
+                        <m.div
                             key={product.id}
                             variants={itemVariants}
                             className="flex-shrink-0 w-[300px] md:w-[340px] group/card relative"
@@ -239,7 +239,7 @@ export const FlashDeals = () => {
                                                 </span>
                                             </div>
                                             <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/10 relative shadow-inner">
-                                                <motion.div
+                                                <m.div
                                                     initial={{ width: 0 }}
                                                     whileInView={{ width: `${soldPercent}%` }}
                                                     transition={{ duration: 1.5, ease: "easeOut" }}
@@ -254,7 +254,7 @@ export const FlashDeals = () => {
                                                     <div className="absolute inset-0 bg-[length:200%_100%] animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent mix-blend-overlay" />
                                                     
                                                     {/* Burning particles/hot spot at the tip */}
-                                                    <motion.div 
+                                                    <m.div 
                                                         animate={{ 
                                                             opacity: [0.5, 1, 0.5],
                                                             scale: [1, 1.1, 1],
@@ -263,15 +263,15 @@ export const FlashDeals = () => {
                                                         transition={{ duration: 2, repeat: Infinity }}
                                                         className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-full bg-white/40 blur-md rounded-full"
                                                     />
-                                                </motion.div>
+                                                </m.div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </Link>
-                        </motion.div>
+                        </m.div>
                     ))}
-                </motion.div>
+                </m.div>
             </div>
         </section>
     );

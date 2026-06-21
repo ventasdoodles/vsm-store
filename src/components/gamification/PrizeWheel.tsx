@@ -7,7 +7,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Usa cn(), tema vape-500. exitBeforeEnter framer v6.
  */
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { m, AnimatePresence, useAnimation } from 'framer-motion';
 import { Zap, Gift, RefreshCcw, Trophy, Coins, Star, Ticket } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { usePrizeWheel } from '@/hooks/usePrizeWheel';
@@ -158,14 +158,14 @@ export function PrizeWheel() {
 
             {/* ── Header ── */}
             <div className="text-center space-y-2">
-                <motion.div
+                <m.div
                     animate={{ scale: [1, 1.04, 1] }}
                     transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-vape-600/30 to-orange-500/20 border border-vape-500/30"
                 >
                     <Zap className="w-3 h-3 text-vape-400 fill-current" />
                     <span className="text-[10px] font-black text-vape-300 uppercase tracking-[0.2em]">Giro Diario Gratis</span>
-                </motion.div>
+                </m.div>
 
                 <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
                     The Wheel of{' '}
@@ -190,7 +190,7 @@ export function PrizeWheel() {
                 <div className="absolute -inset-6 rounded-full border border-white/[0.04]" />
 
                 {/* Pointer con Físicas */}
-                <motion.div
+                <m.div
                     className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 z-30 origin-top"
                     animate={pointerControls}
                     initial={{ rotate: 0 }}
@@ -205,10 +205,10 @@ export function PrizeWheel() {
                         />
                         <div className="w-3 h-3 rounded-full bg-vape-500 border-2 border-white/40 -mt-0.5 shadow-[0_0_10px_rgba(234,88,12,1)]" />
                     </div>
-                </motion.div>
+                </m.div>
 
                 {/* SVG Wheel */}
-                <motion.div
+                <m.div
                     animate={{ rotate: rotation }}
                     transition={{ duration: 5.5, ease: [0.12, 0.88, 0.3, 1.0] }}
                     onUpdate={(latest) => {
@@ -296,18 +296,18 @@ export function PrizeWheel() {
 
                     {/* Trophy icon over center (DOM — absolute) */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <motion.div
+                        <m.div
                             animate={{ scale: [1, 1.08, 1] }}
                             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                         >
                             <Trophy className="w-6 h-6 text-yellow-400 drop-shadow-lg" />
-                        </motion.div>
+                        </m.div>
                     </div>
-                </motion.div>
+                </m.div>
 
                 {/* Orbital spinning dots when spinning */}
                 {isSpinning && (
-                    <motion.div
+                    <m.div
                         className="absolute inset-0 pointer-events-none rounded-full"
                         animate={{ rotate: 360 }}
                         transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
@@ -323,7 +323,7 @@ export function PrizeWheel() {
                                 }}
                             />
                         ))}
-                    </motion.div>
+                    </m.div>
                 )}
             </div>
 
@@ -345,7 +345,7 @@ export function PrizeWheel() {
 
                 <AnimatePresence mode="wait">
                     {error ? (
-                        <motion.div
+                        <m.div
                             key="error"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -354,9 +354,9 @@ export function PrizeWheel() {
                         >
                             <p className="text-red-400 text-sm font-bold">{error}</p>
                             <button onClick={reset} className="text-[10px] text-white/40 hover:text-white/60 underline">Cerrar</button>
-                        </motion.div>
+                        </m.div>
                     ) : result ? (
-                        <motion.div
+                        <m.div
                             key="result"
                             initial={{ opacity: 0, scale: 0.8, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -368,9 +368,9 @@ export function PrizeWheel() {
                                 boxShadow: `0 0 50px ${PRIZE_GLOW[result.type]}`,
                             }}
                         >
-                            <motion.div animate={{ rotate: [0, -8, 8, -8, 0], scale: [1, 1.25, 1.1, 1.2, 1] }} transition={{ duration: 0.5 }} className="flex justify-center">
+                            <m.div animate={{ rotate: [0, -8, 8, -8, 0], scale: [1, 1.25, 1.1, 1.2, 1] }} transition={{ duration: 0.5 }} className="flex justify-center">
                                 <ResultIcon className="w-12 h-12" style={{ color: result.color }} />
-                            </motion.div>
+                            </m.div>
                             <div>
                                 <div className="text-[10px] font-black uppercase tracking-widest text-white/35 mb-1">¡Felicidades!</div>
                                 <div className="text-2xl font-black text-white uppercase tracking-tight">{result.label}</div>
@@ -378,9 +378,9 @@ export function PrizeWheel() {
                             </div>
                             <div className="text-[10px] text-white/25 font-medium">Tu premio ha sido aplicado a tu perfil.</div>
                             <button onClick={reset} className="text-[10px] text-white/30 hover:text-white/60 underline">Volver</button>
-                        </motion.div>
+                        </m.div>
                     ) : (
-                        <motion.button
+                        <m.button
                             key="spin"
                             whileHover={{ scale: isSpinning ? 1 : 1.02 }}
                             whileTap={{ scale: isSpinning ? 1 : 0.97 }}
@@ -399,7 +399,7 @@ export function PrizeWheel() {
                         >
                             {/* Shimmer */}
                             {!isSpinning && (
-                                <motion.div
+                                <m.div
                                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                                     animate={{ x: ['-100%', '200%'] }}
                                     transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', repeatDelay: 1.2 }}
@@ -411,7 +411,7 @@ export function PrizeWheel() {
                                     : <><Zap className="w-5 h-5 fill-current" />¡Girar Ahora!</>
                                 }
                             </span>
-                        </motion.button>
+                        </m.button>
                     )}
                 </AnimatePresence>
 
@@ -423,20 +423,20 @@ export function PrizeWheel() {
             </div>
 
             {/* Stars decoration */}
-            <motion.div
+            <m.div
                 className="absolute top-32 left-4 pointer-events-none"
                 animate={{ opacity: [0.3, 0.8, 0.3], scale: [1, 1.2, 1] }}
                 transition={{ duration: 3, repeat: Infinity }}
             >
                 <Star className="w-4 h-4 text-yellow-400/40" />
-            </motion.div>
-            <motion.div
+            </m.div>
+            <m.div
                 className="absolute top-48 right-4 pointer-events-none"
                 animate={{ opacity: [0.2, 0.6, 0.2], scale: [1, 1.15, 1] }}
                 transition={{ duration: 4, repeat: Infinity, delay: 1 }}
             >
                 <Star className="w-3 h-3 text-blue-400/30" />
-            </motion.div>
+            </m.div>
         </div>
     );
 }

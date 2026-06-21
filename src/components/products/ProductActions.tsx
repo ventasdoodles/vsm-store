@@ -15,7 +15,7 @@ import { ShareButton } from './ShareButton';
 import { StickyAddToCart } from './StickyAddToCart';
 import type { Product } from '@/types/product';
 import type { ProductVariant } from '@/types/variant';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
 import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
@@ -183,7 +183,7 @@ export function ProductActions({ product }: ProductActionsProps) {
             <div className="grid grid-cols-12 gap-3">
                 <div className="col-span-12 flex items-center gap-3">
                     <div className="vsm-input-group shrink-0 h-14 px-2">
-                        <motion.button
+                        <m.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => {
@@ -193,10 +193,10 @@ export function ProductActions({ product }: ProductActionsProps) {
                             className="vsm-btn-icon text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary"
                         >
                             <Minus className="h-5 w-5" />
-                        </motion.button>
+                        </m.button>
                         <span className="w-10 text-center text-lg font-black text-theme-primary">
                             <AnimatePresence mode="wait">
-                                <motion.span
+                                <m.span
                                     key={quantity}
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -205,10 +205,10 @@ export function ProductActions({ product }: ProductActionsProps) {
                                     className="inline-block"
                                 >
                                     {quantity}
-                                </motion.span>
+                                </m.span>
                             </AnimatePresence>
                         </span>
-                        <motion.button
+                        <m.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => {
@@ -219,10 +219,10 @@ export function ProductActions({ product }: ProductActionsProps) {
                             className="vsm-btn-icon text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                             <Plus className="h-5 w-5" />
-                        </motion.button>
+                        </m.button>
                     </div>
 
-                    <motion.button
+                    <m.button
                         whileHover={{ scale: purchaseability.canAddToCart ? 1.02 : 1 }}
                         whileTap={{ scale: purchaseability.canAddToCart ? 0.95 : 1 }}
                         onClick={handleAddToCart}
@@ -238,7 +238,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                     >
                         <AnimatePresence mode="wait">
                             {justAdded ? (
-                                <motion.div
+                                <m.div
                                     key="added"
                                     initial={{ opacity: 0, scale: 0.5 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -247,9 +247,9 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 >
                                     <Check className="h-6 w-6 shrink-0" />
                                     <span className="font-black uppercase tracking-wider text-sm">¡Agregado!</span>
-                                </motion.div>
+                                </m.div>
                             ) : (
-                                <motion.div
+                                <m.div
                                     key="add"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -264,18 +264,18 @@ export function ProductActions({ product }: ProductActionsProps) {
                                     <span className="font-black uppercase tracking-wider text-sm whitespace-nowrap">
                                         {purchaseability.canAddToCart ? 'Añadir al Carrito' : purchaseability.ctaLabel}
                                     </span>
-                                </motion.div>
+                                </m.div>
                             )}
                         </AnimatePresence>
 
                         {!justAdded && purchaseability.canAddToCart && (
                             <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
                         )}
-                    </motion.button>
+                    </m.button>
                 </div>
 
                 <div className="col-span-12 sm:col-span-12 flex gap-3">
-                    <motion.button
+                    <m.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => {
@@ -298,7 +298,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                         <span className="text-xs font-bold uppercase tracking-widest leading-none">
                             {isWishlisted ? 'Guardado' : 'Favoritos'}
                         </span>
-                    </motion.button>
+                    </m.button>
 
                     <ShareButton
                         product={product}

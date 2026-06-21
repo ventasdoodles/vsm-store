@@ -7,7 +7,7 @@
 import { forwardRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { profileSchema, type ProfileFormData } from '@/lib/domain/validations/profile.schema';
 import { useAuth } from '@/hooks/useAuth';
 import { useUpdateProfile } from '@/hooks/useUpdateProfile';
@@ -187,13 +187,13 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     </label>
                 </div>
                 {error && (
-                    <motion.p
+                    <m.p
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="text-[9px] font-black uppercase tracking-widest text-red-400 px-4"
                     >
                         {error}
-                    </motion.p>
+                    </m.p>
                 )}
             </div>
         );

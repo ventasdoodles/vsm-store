@@ -8,7 +8,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
 
 interface ProductImagesProps {
     images: string[];
@@ -118,7 +118,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 onClick={() => !isZoomed && toggleZoom()}
             >
                 <AnimatePresence mode="sync" initial={false}>
-                    <motion.div
+                    <m.div
                         key={selectedIndex}
                         initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}
                         animate={{
@@ -146,11 +146,11 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                             containerClassName="h-full w-full aspect-square pointer-events-none"
                             className="object-cover"
                         />
-                    </motion.div>
+                    </m.div>
                 </AnimatePresence>
 
                 {/* 🔦 Spotlight Effect (Enhanced) */}
-                <motion.div
+                <m.div
                     className="pointer-events-none absolute -inset-px z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     style={{
                         background: useMotionTemplate`
@@ -167,14 +167,14 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 <div className="absolute top-4 right-4 z-20 flex gap-2">
                     <AnimatePresence>
                         {isZoomed && (
-                            <motion.div
+                            <m.div
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                                 className="vsm-pill bg-vape-500 text-slate-950 font-black text-[10px] uppercase tracking-tighter"
                             >
                                 Immersivo
-                            </motion.div>
+                            </m.div>
                         )}
                     </AnimatePresence>
                 </div>
@@ -182,14 +182,14 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 {/* Mobile dismiss hint */}
                 <AnimatePresence>
                     {isZoomed && (
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             className="absolute bottom-16 left-1/2 -translate-x-1/2 md:hidden vsm-pill bg-black/60 text-white border-white/10 backdrop-blur-md pointer-events-none z-30"
                         >
                             Doble toque para salir
-                        </motion.div>
+                        </m.div>
                     )}
                 </AnimatePresence>
 

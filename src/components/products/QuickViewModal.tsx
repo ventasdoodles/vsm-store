@@ -2,7 +2,7 @@ import { X, ShoppingCart, Heart, Package, Plus, Minus, ChevronRight, PackageX, T
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
@@ -122,7 +122,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         <AnimatePresence>
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-none">
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -130,7 +130,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         onClick={onClose}
                     />
 
-                    <motion.div
+                    <m.div
                         ref={modalRef}
                         role="dialog"
                         aria-modal="true"
@@ -145,19 +145,19 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-vape-500/10 blur-[120px] rounded-full -z-10" />
                         <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-herbal-500/10 blur-[120px] rounded-full -z-10" />
 
-                        <motion.button
+                        <m.button
                             whileHover={{ scale: 1.1, rotate: 90 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={onClose}
                             className="absolute top-6 right-6 z-50 w-12 h-12 bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center transition-colors shadow-xl"
                         >
                             <X className="w-6 h-6 text-white" />
-                        </motion.button>
+                        </m.button>
 
                         <div className="w-full md:w-[55%] p-6 md:p-10 flex flex-col gap-6">
                             <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-black/40 border border-white/5 group shadow-inner">
                                 <AnimatePresence mode="wait">
-                                    <motion.div
+                                    <m.div
                                         key={selectedImage}
                                         initial={{ opacity: 0, scale: 1.1 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -177,7 +177,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                 <Package className="w-24 h-24 text-white/5" />
                                             </div>
                                         )}
-                                    </motion.div>
+                                    </m.div>
                                 </AnimatePresence>
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                             </div>
@@ -185,7 +185,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                             {product.images && product.images.length > 1 && (
                                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
                                     {product.images.map((image, idx) => (
-                                        <motion.button
+                                        <m.button
                                             key={idx}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
@@ -202,7 +202,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                 className="w-full h-full object-cover"
                                                 alt=""
                                             />
-                                        </motion.button>
+                                        </m.button>
                                     ))}
                                 </div>
                             )}
@@ -316,28 +316,28 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 <div className="space-y-6 pt-4">
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center bg-white/[0.04] border border-white/10 rounded-2xl p-1.5 shadow-inner">
-                                            <motion.button
+                                            <m.button
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                                 disabled={quantity <= 1}
                                                 className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white disabled:opacity-20 transition-colors"
                                             >
                                                 <Minus className="w-5 h-5" />
-                                            </motion.button>
+                                            </m.button>
                                             <span className="w-10 text-center text-lg font-black text-white">
                                                 {quantity}
                                             </span>
-                                            <motion.button
+                                            <m.button
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
                                                 disabled={!purchaseability.canAddToCart || quantity >= maxQuantity}
                                                 className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white disabled:opacity-20 transition-colors"
                                             >
                                                 <Plus className="w-5 h-5" />
-                                            </motion.button>
+                                            </m.button>
                                         </div>
 
-                                        <motion.button
+                                        <m.button
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             onClick={handleWishlist}
@@ -349,10 +349,10 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             )}
                                         >
                                             <Heart className={cn('w-6 h-6', isWishlisted && 'fill-current')} />
-                                        </motion.button>
+                                        </m.button>
                                     </div>
 
-                                    <motion.button
+                                    <m.button
                                         whileHover={{ scale: purchaseability.canAddToCart ? 1.02 : 1, y: purchaseability.canAddToCart ? -4 : 0 }}
                                         whileTap={{ scale: purchaseability.canAddToCart ? 0.98 : 1 }}
                                         onClick={handleAddToCart}
@@ -372,7 +372,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                         {purchaseability.canAddToCart && (
                                             <div className="absolute inset-0 bg-gradient-to-r from-vape-400 to-herbal-400 opacity-0 group-hover:opacity-10 transition-opacity" />
                                         )}
-                                    </motion.button>
+                                    </m.button>
                                 </div>
                             </div>
 
@@ -391,7 +391,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </m.div>
                 </div>
             )}
         </AnimatePresence>

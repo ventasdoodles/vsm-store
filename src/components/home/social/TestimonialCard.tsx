@@ -3,7 +3,7 @@
  * 
  * @component
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Star, ShieldCheck, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Testimonial } from '@/types/testimonial';
@@ -33,7 +33,7 @@ export function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
     const timeAgo = getTimeAgo(testimonial.review_date);
 
     return (
-        <motion.article
+        <m.article
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -137,7 +137,7 @@ export function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
                     </span>
                 </div>
             )}
-        </motion.article>
+        </m.article>
     );
 }
 

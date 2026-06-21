@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface Step {
     id: number;
@@ -19,7 +19,7 @@ export function CheckoutSteps({ currentStep, steps }: CheckoutStepsProps) {
             <div className="absolute left-0 top-1/2 h-0.5 w-full -translate-y-1/2 bg-theme-secondary/20" />
 
             {/* Active Line (Animated) */}
-            <motion.div
+            <m.div
                 className="absolute left-0 top-1/2 h-0.5 -translate-y-1/2 bg-gradient-to-r from-vape-500 to-herbal-500"
                 initial={{ width: '0%' }}
                 animate={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
@@ -32,7 +32,7 @@ export function CheckoutSteps({ currentStep, steps }: CheckoutStepsProps) {
 
                 return (
                     <div key={step.id} className="relative z-10 flex flex-col items-center gap-2">
-                        <motion.div
+                        <m.div
                             initial={false}
                             animate={{
                                 scale: isActive ? 1.1 : 1,
@@ -55,7 +55,7 @@ export function CheckoutSteps({ currentStep, steps }: CheckoutStepsProps) {
                                     {step.id}
                                 </span>
                             )}
-                        </motion.div>
+                        </m.div>
                         <span className={cn(
                             "text-[10px] font-bold uppercase tracking-wider transition-colors",
                             isActive ? "text-theme-primary" : "text-theme-tertiary"

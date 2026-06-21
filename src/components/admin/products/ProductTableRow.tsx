@@ -6,7 +6,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState } from 'react';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import {
     Eye, FileEdit, Save, X, Trash2, Pencil, Copy,
     Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight,
@@ -79,7 +79,7 @@ export function ProductTableRow({
     };
 
     return (
-        <motion.tr
+        <m.tr
             onMouseMove={handleMouseMove}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -289,6 +289,6 @@ export function ProductTableRow({
                     </button>
                 </div>
             </td>
-        </motion.tr>
+        </m.tr>
     );
 }

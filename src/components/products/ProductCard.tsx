@@ -10,7 +10,7 @@
 import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle, PackageX } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { useNotification } from '@/hooks/useNotification';
@@ -204,7 +204,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
     return (
         <>
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -8 }}
@@ -237,7 +237,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             onMouseLeave={handleImageMouseLeave}
                         >
                             {/* Image */}
-                            <motion.div
+                            <m.div
                                 className="h-full w-full"
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ duration: 0.8, ease: "easeOut" }}
@@ -251,7 +251,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     className="object-cover"
                                     fallbackIcon={<Package className="w-16 h-16 text-white/10" />}
                                 />
-                            </motion.div>
+                            </m.div>
 
                             {/* Hover Overlay Gradient */}
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -260,7 +260,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             {shouldShowImageDots && (
                                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
                                     {product.images.slice(0, 4).map((_, idx) => (
-                                        <motion.span
+                                        <m.span
                                             key={idx}
                                             animate={{
                                                 width: currentImage === idx ? 16 : 6,
@@ -279,7 +279,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
                             {/* Wishlist Button (Top-right) */}
                             {!compact && (
-                                <motion.button
+                                <m.button
                                     onClick={handleWishlist}
                                     initial={{ x: 20, opacity: 0 }}
                                     whileHover={{ scale: 1.1 }}
@@ -295,7 +295,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     )}
                                 >
                                     <Heart className={cn("w-4 h-4 transition-all", isWishlisted && "fill-current")} />
-                                </motion.button>
+                                </m.button>
                             )}
 
                             {/* Quick actions desktop */}
@@ -408,7 +408,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     </div>
                                 </div>
 
-                                <motion.button
+                                <m.button
                                     whileHover={{ scale: 1.1, rotate: 8 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={handlePrimaryAction}
@@ -431,12 +431,12 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                             )
                                         )
                                     )}
-                                </motion.button>
+                                </m.button>
                             </div>
                         </div>
                     </div>
                 </Link>
-            </motion.div>
+            </m.div>
 
             {/* Quick View Modal — lazy-loaded, solo se descarga al abrir */}
             {isQuickViewOpen && (

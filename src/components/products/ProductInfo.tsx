@@ -12,7 +12,7 @@ import { ProductActions } from './ProductActions';
 import type { Product } from '@/types/product';
 import { useInventoryOracle } from '@/hooks/useInventoryOracle';
 import { StockOracleBadge } from './StockOracleBadge';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { getVape420ProductDetailPresentationConfig } from '@/config/productization';
 
 interface ProductInfoProps {
@@ -42,19 +42,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
     };
 
     return (
-        <motion.div 
+        <m.div 
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="vsm-stack-lg lg:pl-6"
         >
             {/* 1. BADGES */}
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
                 <ProductBadgeGroup product={product} />
-            </motion.div>
+            </m.div>
 
             {/* 2. HEADER: Name + SKU */}
-            <motion.div variants={itemVariants} className="space-y-2">
+            <m.div variants={itemVariants} className="space-y-2">
                 <h1 className="vsm-heading text-theme-primary">
                     {product.name}
                 </h1>
@@ -63,50 +63,50 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         SKU: {product.sku}
                     </p>
                 )}
-            </motion.div>
+            </m.div>
 
             {/* 3. SHORT DESCRIPTION */}
             {product.short_description && (
-                <motion.p variants={itemVariants} className="vsm-surface-inset text-base text-theme-secondary leading-relaxed bg-theme-secondary/5 shadow-inner">
+                <m.p variants={itemVariants} className="vsm-surface-inset text-base text-theme-secondary leading-relaxed bg-theme-secondary/5 shadow-inner">
                     {product.short_description}
-                </motion.p>
+                </m.p>
             )}
 
             {/* 4. PRICE & SHIPPING */}
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
                 <ProductPriceSection
                     price={product.price}
                     compareAtPrice={product.compare_at_price}
                     section={product.section}
                 />
-            </motion.div>
+            </m.div>
 
             {/* 5. URGENCY INDICATORS & ORACLE (Wave 24) */}
-            <motion.div variants={itemVariants} className="space-y-4">
+            <m.div variants={itemVariants} className="space-y-4">
                 <StockOracleBadge prediction={prediction} isLoading={isOracleLoading} />
                 <UrgencyIndicators stock={product.stock} />
-            </motion.div>
+            </m.div>
 
             {/* 6. ACTIONS (QTY + ADD TO CART + SHARE) */}
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
                 <ProductActions product={product} />
-            </motion.div>
+            </m.div>
 
             {/* 7. DESCRIPTION */}
             {product.description && (
-                <motion.div variants={itemVariants} className="vsm-divider">
+                <m.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
                         Descripción Detallada
                     </h2>
                     <p className="text-sm text-theme-secondary leading-loose whitespace-pre-line opacity-90">
                         {product.description}
                     </p>
-                </motion.div>
+                </m.div>
             )}
 
             {/* 8. TECHNICAL SPECS (Bridge Phase 2C) */}
             {product.specs && Object.keys(product.specs).length > 0 && (
-                <motion.div variants={itemVariants} className="vsm-divider">
+                <m.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
                         Especificaciones Técnicas
                     </h2>
@@ -134,12 +134,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             );
                         })}
                     </div>
-                </motion.div>
+                </m.div>
             )}
 
             {/* 9. TAGS (Legacy Coexistence) */}
             {(product.tags ?? []).length > 0 && (
-                <motion.div variants={itemVariants} className="vsm-divider">
+                <m.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
                         Etiquetas de Búsqueda
                     </h2>
@@ -156,8 +156,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             </span>
                         ))}
                     </div>
-                </motion.div>
+                </m.div>
             )}
-        </motion.div>
+        </m.div>
     );
 }

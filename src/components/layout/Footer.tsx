@@ -6,7 +6,7 @@
  */
 import { ElementType, memo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import {
     Facebook, Instagram, Twitter, Mail, Phone,
     ShieldCheck, HeartHandshake, CreditCard, Droplet, Truck,
@@ -93,7 +93,7 @@ function ColumnWithSpotlight({ title, icon: Icon, colorClass, children }: { titl
             onMouseMove={handleMouseMove}
             className="group relative p-8 rounded-[2rem] border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-700 overflow-hidden"
         >
-            <motion.div
+            <m.div
                 className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 transition duration-700 group-hover:opacity-100"
                 style={{
                     background: useMotionTemplate`
@@ -150,7 +150,7 @@ export const Footer = memo(function Footer() {
         <footer className="relative bg-[#02060c] pt-24 pb-12 overflow-hidden border-t border-white/5">
             {/* 🌌 Cinema Poly-Glow Orbs */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                <motion.div 
+                <m.div 
                     animate={{ 
                         scale: [1, 1.3, 1],
                         opacity: [0.05, 0.12, 0.05],
@@ -160,7 +160,7 @@ export const Footer = memo(function Footer() {
                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                     className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-primary rounded-full blur-[150px] opacity-10" 
                 />
-                <motion.div 
+                <m.div 
                     animate={{ 
                         scale: [1.3, 1, 1.3],
                         opacity: [0.03, 0.1, 0.03],
@@ -174,7 +174,7 @@ export const Footer = memo(function Footer() {
 
             <div className="container-vsm relative z-10">
                 {/* 🧧 Cinema Newsletter 3K */}
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -198,7 +198,7 @@ export const Footer = memo(function Footer() {
 
                         <form onSubmit={handleSubscribe} className="relative group/form">
                             {subscribed ? (
-                                <motion.div 
+                                <m.div 
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="flex flex-col items-center gap-4 text-emerald-400 p-8 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl"
@@ -207,7 +207,7 @@ export const Footer = memo(function Footer() {
                                         <ShieldCheck size={24} />
                                     </div>
                                     <p className="text-xs font-black uppercase tracking-[0.2em]">Enlace de acceso enviado</p>
-                                </motion.div>
+                                </m.div>
                             ) : (
                                 <div className="space-y-4">
                                     <div className="relative group/input">
@@ -237,7 +237,7 @@ export const Footer = memo(function Footer() {
                             )}
                         </form>
                     </div>
-                </motion.div>
+                </m.div>
 
                 {/* Grid Principal de Navegación 3K */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-24">

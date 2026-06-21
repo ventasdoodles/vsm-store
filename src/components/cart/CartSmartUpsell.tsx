@@ -1,5 +1,5 @@
 import { useEffect, memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Plus, Zap } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
@@ -31,7 +31,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
     const { bundleName, suggestedProduct, couponCode, discountPercentage } = bundleOffer;
 
     return (
-        <motion.div 
+        <m.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 border-t border-white/5 pt-6"
@@ -52,7 +52,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                 </div>
             </div>
 
-            <motion.div
+            <m.div
                 whileHover={{ y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-white/[0.05] to-transparent backdrop-blur-3xl rounded-[2rem] p-6 border border-white/10 group"
             >
@@ -92,7 +92,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                                 </span>
                             </div>
 
-                            <motion.button
+                            <m.button
                                 whileHover={{ scale: 1.05, filter: 'brightness(1.2)' }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => {
@@ -106,18 +106,18 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                                 className="px-4 py-2 rounded-xl bg-vape-500 text-white text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] border border-white/20"
                             >
                                 Armar Combo
-                            </motion.button>
+                            </m.button>
                         </div>
                     </div>
                 </div>
 
                 {/* Shimmer Effect */}
                 <div className="absolute inset-0 -translate-x-full group-hover:animate-shimmer-slow bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
-            </motion.div>
+            </m.div>
 
             <p className="mt-4 px-2 text-[9px] font-medium text-white/30 italic text-center">
                 * Basado en tus gustos y existencias actuales.
             </p>
-        </motion.div>
+        </m.div>
     );
 });

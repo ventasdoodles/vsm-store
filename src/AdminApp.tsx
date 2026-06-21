@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
+import { LazyMotion, domAnimation } from 'framer-motion';
 
 // ─── Admin lazy pages ─────────────────────────────────────────────────────────
 const AdminGuard = lazy(() => import('@/components/admin/AdminGuard').then(m => ({ default: m.AdminGuard })));
@@ -66,6 +67,7 @@ export function AdminApp() {
                     },
                 }}
             />
+            <LazyMotion features={domAnimation}>
             <ToastContainer />
             <Suspense fallback={<PageLoader />}>
                 <AdminGuard>
@@ -100,6 +102,7 @@ export function AdminApp() {
                     </AdminLayout>
                 </AdminGuard>
             </Suspense>
+        </LazyMotion>
         </>
     );
 }

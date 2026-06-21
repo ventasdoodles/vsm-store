@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Bot, Power, PowerOff, RefreshCcw, MessageSquare, Brain, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
@@ -147,7 +147,7 @@ export function AdminCesarinOS() {
                             )}
                         >
                             {isActive && (
-                                <motion.div
+                                <m.div
                                     layoutId="activeAdminTab"
                                     className="absolute inset-0 bg-indigo-500/20 backdrop-blur-md"
                                     transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}

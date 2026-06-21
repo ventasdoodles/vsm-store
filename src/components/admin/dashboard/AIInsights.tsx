@@ -4,7 +4,7 @@ import {
     Sparkles, RefreshCw, ChevronRight, 
     AlertCircle, TrendingUp, Zap, Target 
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { type CustomerInsight } from '@/services/admin';
 import { cn } from '@/lib/utils';
 
@@ -50,7 +50,7 @@ export function AIInsights() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <AnimatePresence>
                         {insights.map((insight: CustomerInsight, idx: number) => (
-                            <motion.div 
+                            <m.div 
                                 key={idx}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -85,7 +85,7 @@ export function AIInsights() {
                                         <ChevronRight className="h-3 w-3" />
                                     </button>
                                 )}
-                            </motion.div>
+                            </m.div>
                         ))}
                     </AnimatePresence>
 

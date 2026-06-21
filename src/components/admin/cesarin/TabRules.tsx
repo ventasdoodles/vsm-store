@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, ShieldCheck, Plus, Trash2, Power, AlertTriangle } from 'lucide-react';
 import { useBehaviorRules, useCreateBehaviorRule, useToggleBehaviorRule, useDeleteBehaviorRule } from '@/hooks/useBehaviorRules';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,7 @@ export function TabRules() {
     };
 
     return (
-        <motion.div 
+        <m.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
@@ -115,7 +115,7 @@ export function TabRules() {
                     ) : (
                         <AnimatePresence>
                             {rules.map((rule) => (
-                                <motion.div
+                                <m.div
                                     key={rule.id}
                                     layout
                                     initial={{ opacity: 0, scale: 0.95 }}
@@ -164,12 +164,12 @@ export function TabRules() {
                                             <Trash2 className="w-5 h-5" />
                                         </button>
                                     </div>
-                                </motion.div>
+                                </m.div>
                             ))}
                         </AnimatePresence>
                     )}
                 </div>
             </div>
-        </motion.div>
+        </m.div>
     );
 }

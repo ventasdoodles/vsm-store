@@ -6,7 +6,7 @@
  */
 import { forwardRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { 
     X, 
     Loader2, 
@@ -83,7 +83,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                             isShipping ? "text-white" : "text-theme-tertiary hover:text-white"
                         )}
                     >
-                        {isShipping && <motion.div layoutId="addr-type-bg" className="absolute inset-0 bg-accent-primary rounded-[1.75rem] -z-10 shadow-xl shadow-accent-primary/20" />}
+                        {isShipping && <m.div layoutId="addr-type-bg" className="absolute inset-0 bg-accent-primary rounded-[1.75rem] -z-10 shadow-xl shadow-accent-primary/20" />}
                         <MapPin className={cn("h-4 w-4", isShipping ? "text-white" : "text-theme-tertiary")} />
                         Envío
                     </button>
@@ -95,7 +95,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                             !isShipping ? "text-white" : "text-theme-tertiary hover:text-white"
                         )}
                     >
-                        {!isShipping && <motion.div layoutId="addr-type-bg" className="absolute inset-0 bg-herbal-500 rounded-[1.75rem] -z-10 shadow-xl shadow-herbal-500/20" />}
+                        {!isShipping && <m.div layoutId="addr-type-bg" className="absolute inset-0 bg-herbal-500 rounded-[1.75rem] -z-10 shadow-xl shadow-herbal-500/20" />}
                         <Building className={cn("h-4 w-4", !isShipping ? "text-white" : "text-theme-tertiary")} />
                         Facturación
                     </button>
@@ -306,13 +306,13 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     </label>
                 </div>
                 {error && (
-                    <motion.p
+                    <m.p
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="text-[9px] font-black uppercase tracking-widest text-red-400 px-4"
                     >
                         {error}
-                    </motion.p>
+                    </m.p>
                 )}
             </div>
         );

@@ -6,7 +6,7 @@ import {
     ShoppingBag, ChevronRight, CreditCard,
     Truck, Store as StoreIcon, AlertCircle
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
@@ -96,14 +96,14 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
             </div>
             <AnimatePresence>
                 {error && (
-                    <motion.p
+                    <m.p
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
                         className="absolute -bottom-5 left-4 text-[10px] font-black uppercase tracking-widest text-red-500/90 flex items-center gap-1.5"
                     >
                         <AlertCircle className="h-3 w-3" /> {error}
-                    </motion.p>
+                    </m.p>
                 )}
             </AnimatePresence>
         </div>
@@ -248,13 +248,13 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
     if (sent) {
         return (
             <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-                <motion.div
+                <m.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-herbal-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
                 >
                     <CheckCircle className="h-10 w-10 text-slate-900" strokeWidth={3} />
-                </motion.div>
+                </m.div>
                 <h3 className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</h3>
                 {handoffOnly ? (
                     <p className="text-theme-secondary">Tu solicitud fue enviada por WhatsApp. No se registro un pedido en el sistema.</p>
@@ -283,7 +283,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
             <ErrorBoundary>
             <AnimatePresence mode="wait">
                 {currentStep === 1 && (
-                    <motion.div
+                    <m.div
                         key="step1"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -336,11 +336,11 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 </button>
                             </div>
                         </FormCard>
-                    </motion.div>
+                    </m.div>
                 )}
 
                 {currentStep === 2 && (
-                    <motion.div
+                    <m.div
                         key="step2"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -360,11 +360,11 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 setAddressFormValue={(val) => setFormData({ ...formData, address: val })}
                             />
                         </FormCard>
-                    </motion.div>
+                    </m.div>
                 )}
 
                 {currentStep === 3 && (
-                    <motion.div
+                    <m.div
                         key="step3"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -406,9 +406,9 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                             </div>
                             {couponError && <p className="mt-2 text-[10px] text-red-500 font-bold uppercase text-center">{couponError}</p>}
                             {appliedCoupon?.valid && (
-                                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-center text-xs font-bold text-herbal-400">
+                                <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-center text-xs font-bold text-herbal-400">
                                     ¡Cupón aplicado exitosamente! -{formatPrice(appliedCoupon.discount)}
-                                </motion.p>
+                                </m.p>
                             )}
                         </FormCard>
 
@@ -438,7 +438,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 </div>
                             </FormCard>
                         </div>
-                    </motion.div>
+                    </m.div>
                 )}
             </AnimatePresence>
             </ErrorBoundary>
@@ -472,12 +472,12 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                     >
                         <AnimatePresence>
                             {sending ? (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
+                                <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                     <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Procesando</span>
-                                </motion.div>
+                                </m.div>
                             ) : (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
+                                <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
                                     <Send className="h-5 w-5 text-slate-900" />
                                     <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">
                                         {hasOpenRecoverableOrder
@@ -486,7 +486,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                                 ? 'Pagar Ahora'
                                                 : 'Confirmar Pedido'}
                                     </span>
-                                </motion.div>
+                                </m.div>
                             )}
                         </AnimatePresence>
                     </button>

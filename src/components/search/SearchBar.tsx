@@ -8,7 +8,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Search, X, History, ArrowRight, Sparkles, ChevronRight, Mic } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 import { useSearch } from '@/hooks/useSearch';
 import { useCategories } from '@/hooks/useCategories';
@@ -265,7 +265,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
             {/* Search Input */}
             <form onSubmit={handleSubmit} className="relative group flex items-center w-full h-full">
                 {/* ✨ Aura de Foco (Aura Effect) */}
-                <motion.div 
+                <m.div 
                     animate={isOpen ? {
                         opacity: [0.4, 0.7, 0.4],
                         scale: [1, 1.02, 1],
@@ -347,7 +347,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
             {/* Dropdown con Spring Physics */}
             <AnimatePresence>
                 {(showRecent || showResults || showEmpty) && (
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -524,7 +524,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             </button>
                         </div>
                     )}
-                    </motion.div>
+                    </m.div>
                 )}
             </AnimatePresence>
 

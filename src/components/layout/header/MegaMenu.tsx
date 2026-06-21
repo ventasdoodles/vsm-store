@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ArrowRight, Sparkles, TrendingUp, ChevronRight } from 'lucide-react';
 import { cn, optimizeImage } from '@/lib/utils';
 import { useCategoriesWithChildren } from '@/hooks/useCategories';
@@ -100,7 +100,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                     <>
                     {/* Invisible bridge to prevent mouse leave on gap - WIDER to cover diagonal movement */}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 h-8 w-[400px] bg-transparent z-40" />
-                    <motion.div
+                    <m.div
                         variants={MENU_VARIANTS}
                         initial="hidden"
                         animate="visible"
@@ -116,7 +116,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                 </div>
                                 <div className="space-y-1">
                                     {categories.map((cat) => (
-                                        <motion.div
+                                        <m.div
                                             key={cat.id}
                                             variants={ITEM_VARIANTS}
                                             onMouseEnter={() => {
@@ -137,11 +137,11 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                                 <span className="text-sm font-bold tracking-tight">{cat.name}</span>
                                             </div>
                                             {activeCategory?.id === cat.id && (
-                                                <motion.div layoutId="arrow" className="text-vape-400">
+                                                <m.div layoutId="arrow" className="text-vape-400">
                                                     <ArrowRight className="h-4 w-4" />
-                                                </motion.div>
+                                                </m.div>
                                             )}
-                                        </motion.div>
+                                        </m.div>
                                     ))}
                                 </div>
 
@@ -161,7 +161,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                             {/* COL 2: Subcategories (Dynamic) */}
                             <div className="flex-1 p-8">
                                 <AnimatePresence mode="wait">
-                                    <motion.div
+                                    <m.div
                                         key={activeCategory?.id}
                                         initial={{ opacity: 0, x: 10 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -201,7 +201,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                             <span className="text-xs font-black uppercase tracking-widest text-vape-400 group-hover:underline underline-offset-8 transition-all">Explorar {activeCategory?.name}</span>
                                             <ArrowRight className="h-4 w-4 text-vape-400 transition-transform group-hover:translate-x-1" />
                                         </Link>
-                                    </motion.div>
+                                    </m.div>
                                 </AnimatePresence>
                             </div>
 
@@ -228,7 +228,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                             </div>
 
                         </div>
-                    </motion.div>
+                    </m.div>
                     </>
                 )}
             </AnimatePresence>

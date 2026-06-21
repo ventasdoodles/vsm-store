@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Send, Bot, Search, Mic, MicOff, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAIConcierge } from '@/hooks/useAIConcierge';
@@ -279,7 +279,7 @@ export const AIConcierge: React.FC = () => {
             <div className="fixed bottom-6 left-6 z-50 pointer-events-none">
                 <AnimatePresence>
                     {isOpen && (
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, scale: 0.8, y: 20, x: -20 }}
                             animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
                             exit={{ opacity: 0, scale: 0.8, y: 20, x: -20 }}
@@ -350,7 +350,7 @@ export const AIConcierge: React.FC = () => {
                                 ))}
 
                                 {isLoading && (
-                                    <motion.div 
+                                    <m.div 
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         className="flex items-start max-w-[85%]"
@@ -358,17 +358,17 @@ export const AIConcierge: React.FC = () => {
                                     >
                                         <div className="relative rounded-2xl px-4 py-3 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-[#1a1b26]/80 border border-white/10 rounded-tl-sm backdrop-blur-md">
                                             <div className="flex items-center gap-1.5 h-5">
-                                                <motion.div 
+                                                <m.div 
                                                     className="w-1.5 h-1.5 rounded-full bg-vape-400"
                                                     animate={{ y: [0, -4, 0] }}
                                                     transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0 }}
                                                 />
-                                                <motion.div 
+                                                <m.div 
                                                     className="w-1.5 h-1.5 rounded-full bg-vape-400"
                                                     animate={{ y: [0, -4, 0] }}
                                                     transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
                                                 />
-                                                <motion.div 
+                                                <m.div 
                                                     className="w-1.5 h-1.5 rounded-full bg-vape-400"
                                                     animate={{ y: [0, -4, 0] }}
                                                     transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
@@ -380,7 +380,7 @@ export const AIConcierge: React.FC = () => {
                                                 </p>
                                             )}
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 )}
                             </div>
 
@@ -399,7 +399,7 @@ export const AIConcierge: React.FC = () => {
                             )}
 
                             {error && (
-                                <motion.div
+                                <m.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="mx-6 mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex flex-col items-center text-center backdrop-blur-md"
@@ -413,7 +413,7 @@ export const AIConcierge: React.FC = () => {
                                         <RefreshCw className="h-3.5 w-3.5" />
                                         Reintentar
                                     </button>
-                                </motion.div>
+                                </m.div>
                             )}
 
                             <form onSubmit={handleSubmit} className="p-6 bg-white/[0.02] border-t border-white/5">
@@ -450,17 +450,17 @@ export const AIConcierge: React.FC = () => {
                                     </button>
                                 </div>
                             </form>
-                        </motion.div>
+                        </m.div>
                     )}
                 </AnimatePresence>
 
-                <motion.button
+                <m.button
                     onClick={toggleOpen}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     whileTap={{ scale: 0.9 }}
                     className="pointer-events-auto group relative h-16 w-16"
                 >
-                    <motion.div 
+                    <m.div 
                         className="absolute inset-0 blur-xl bg-vape-500 rounded-full"
                         animate={{ 
                             opacity: isOpen ? 0.2 : [0.3, 0.6, 0.3],
@@ -487,7 +487,7 @@ export const AIConcierge: React.FC = () => {
                             <Bot className="h-3 w-3 text-white" />
                         </div>
                     )}
-                </motion.button>
+                </m.button>
             </div>
         </>
     );

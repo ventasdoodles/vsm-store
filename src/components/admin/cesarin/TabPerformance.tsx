@@ -1,9 +1,9 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, Users, MessageSquare, ThumbsUp } from 'lucide-react';
 
 export function TabPerformance() {
     return (
-        <motion.div 
+        <m.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
@@ -53,6 +53,6 @@ export function TabPerformance() {
             <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] h-64 flex items-center justify-center">
                 <p className="text-white/30 font-semibold">Aquí iría un gráfico de líneas súper limpio de los últimos 7 días</p>
             </div>
-        </motion.div>
+        </m.div>
     );
 }

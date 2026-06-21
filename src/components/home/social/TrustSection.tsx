@@ -3,7 +3,7 @@
  * 
  * @component
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ShieldCheck, TrendingUp, Users } from 'lucide-react';
 
 interface TrustSectionProps {
@@ -13,7 +13,7 @@ interface TrustSectionProps {
 
 export function TrustSection({ avgRating, totalCount }: TrustSectionProps) {
     return (
-        <motion.div
+        <m.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -32,6 +32,6 @@ export function TrustSection({ avgRating, totalCount }: TrustSectionProps) {
                 <Users className="w-3.5 h-3.5 text-accent-primary" />
                 +{totalCount} reseñas
             </span>
-        </motion.div>
+        </m.div>
     );
 }

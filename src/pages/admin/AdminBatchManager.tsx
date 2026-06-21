@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { SupplierOrderModal } from '@/components/admin/ui/SupplierOrderModal';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useNotification } from '@/hooks/useNotification';
 import {
     applyBatchProductFieldChange,
@@ -101,7 +101,7 @@ export function AdminBatchManager() {
 
                     <AnimatePresence>
                         {isDirty && (
-                            <motion.div 
+                            <m.div 
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
@@ -122,7 +122,7 @@ export function AdminBatchManager() {
                                     {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                                     Aplicar {countModifiedBatchRows(localProducts)} cambios
                                 </button>
-                            </motion.div>
+                            </m.div>
                         )}
                     </AnimatePresence>
                 </div>

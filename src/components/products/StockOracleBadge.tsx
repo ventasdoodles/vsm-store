@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Sparkles, TrendingDown } from 'lucide-react';
 import { OraclePrediction } from '@/services';
 import { cn } from '@/lib/utils';
@@ -27,7 +27,7 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
     const isCritical = prediction.urgencyLevel === 'critical' || prediction.urgencyLevel === 'high';
 
     return (
-        <motion.div
+        <m.div
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className={cn(
@@ -88,6 +88,6 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
 
             {/* Subtle bottom glint */}
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        </motion.div>
+        </m.div>
     );
 }

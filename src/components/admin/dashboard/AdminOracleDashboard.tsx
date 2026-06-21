@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Sparkles, ShoppingCart, Power } from 'lucide-react';
 import { 
     useAdminOracle, 
@@ -46,7 +46,7 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
     const isCritical = prediction.urgencyLevel === 'critical';
 
     return (
-        <motion.div
+        <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className={cn(
@@ -88,7 +88,7 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
                     <Power className="w-3.5 h-3.5" />
                 </button>
             </div>
-        </motion.div>
+        </m.div>
     );
 }
 

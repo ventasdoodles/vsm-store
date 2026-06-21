@@ -4,7 +4,7 @@
  * // Arquitectura: Orquestación modular de sub-módulos independientes (§1.3).
  * // Composición: ProfileHero, ProfileStats, ProfileQuickLinks, ProfileInfo, ProfileForm.
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { SEO } from '@/components/seo/SEO';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import {
@@ -33,7 +33,7 @@ const item = {
 
 export function Profile() {
     return (
-        <motion.div
+        <m.div
             variants={container}
             initial="hidden"
             animate="show"
@@ -42,48 +42,48 @@ export function Profile() {
             <SEO title="Mi perfil" description="Tu perfil de VSM Store" />
 
             {/* 1. HERO — Avatar + nombre + tier */}
-            <motion.div variants={item}>
+            <m.div variants={item}>
                 <SectionErrorBoundary name="ProfileHero">
                     <ProfileHero />
                 </SectionErrorBoundary>
-            </motion.div>
+            </m.div>
 
             {/* 2. STATS — 4 tarjetas de estadísticas */}
-            <motion.div variants={item}>
+            <m.div variants={item}>
                 <SectionErrorBoundary name="ProfileStats">
                     <ProfileStats />
                 </SectionErrorBoundary>
-            </motion.div>
+            </m.div>
 
             {/* 3. QUICK LINKS — Accesos rápidos */}
-            <motion.div variants={item}>
+            <m.div variants={item}>
                 <SectionErrorBoundary name="ProfileQuickLinks">
                     <ProfileQuickLinks />
                 </SectionErrorBoundary>
-            </motion.div>
+            </m.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* 4. INFO — Información personal (Solo lectura) */}
-                <motion.div variants={item}>
+                <m.div variants={item}>
                     <SectionErrorBoundary name="ProfileInfo">
                         <ProfileInfo />
                     </SectionErrorBoundary>
-                </motion.div>
+                </m.div>
 
                 {/* 5. FORM — Editar información personal */}
-                <motion.div variants={item}>
+                <m.div variants={item}>
                     <SectionErrorBoundary name="ProfileForm">
                         <ProfileForm />
                     </SectionErrorBoundary>
-                </motion.div>
+                </m.div>
             </div>
 
             {/* 6. ACTIONS — Cerrar sesión */}
-            <motion.div variants={item}>
+            <m.div variants={item}>
                 <SectionErrorBoundary name="ProfileActions">
                     <ProfileActions />
                 </SectionErrorBoundary>
-            </motion.div>
-        </motion.div>
+            </m.div>
+        </m.div>
     );
 }

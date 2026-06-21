@@ -45,3 +45,17 @@ vi.mock('@/contexts/VerticalPackContext', async (importOriginal) => {
         })),
     };
 });
+
+import React from 'react';
+vi.mock('framer-motion', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('framer-motion')>();
+    const mMock = new Proxy({}, {
+        get: (_, element) => {
+            return React.forwardRef((props: any, ref) => {
+                const { initial, animate, exit, transition, variants, whileHover, whileTap, whileInView, viewport, layoutId, layout, custom, onAnimationComplete, onHoverStart, onHoverEnd, drag, dragConstraints, ...rest } = props;
+                return React.createElement(element as string, { ...rest, ref });
+            });
+        }
+    });
+    return { ...actual, m: mMock, LazyMotion: ({ children }: any) => children, AnimatePresence: ({ children }: any) => children };
+});

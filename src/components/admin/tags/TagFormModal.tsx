@@ -6,7 +6,7 @@
  */
 import { useState, useEffect } from 'react';
 import { X, Loader2, Hash, Tag } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 export interface TagFormData {
     label: string;
@@ -73,7 +73,7 @@ export function TagFormModal({
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div
+                <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -82,7 +82,7 @@ export function TagFormModal({
                         if (e.target === e.currentTarget) onCancel();
                     }}
                 >
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -174,8 +174,8 @@ export function TagFormModal({
                                 {isEditing ? 'Guardar Cambios' : 'Crear Etiqueta'}
                             </button>
                         </div>
-                    </motion.div>
-                </motion.div>
+                    </m.div>
+                </m.div>
             )}
         </AnimatePresence>
     );

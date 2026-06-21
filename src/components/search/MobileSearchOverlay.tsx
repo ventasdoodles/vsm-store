@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Loader2, ChevronRight, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSearch } from '@/hooks/useSearch';
 import { useSearchOverlay } from '@/stores/search-overlay.store';
@@ -193,7 +193,7 @@ function SearchResultItem({ product, onClick }: { product: Product; onClick: (p:
     }
 
     return (
-        <motion.div
+        <m.div
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -202,7 +202,7 @@ function SearchResultItem({ product, onClick }: { product: Product; onClick: (p:
             className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/5 bg-theme-secondary/20 p-4 transition-all hover:border-white/20 active:scale-[0.98] active:bg-theme-secondary/60"
         >
             {/* 🔦 Spotlight */}
-            <motion.div
+            <m.div
                 className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 style={{
                     background: useMotionTemplate`
@@ -241,6 +241,6 @@ function SearchResultItem({ product, onClick }: { product: Product; onClick: (p:
                 </div>
             </div>
             <ChevronRight className="relative z-10 h-5 w-5 text-theme-secondary group-hover:translate-x-1 group-hover:text-vape-400 transition-all duration-300" />
-        </motion.div>
+        </m.div>
     );
 }

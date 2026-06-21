@@ -6,7 +6,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Glassmorphism puro.
  */
 import { Package } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ProductTableRow } from './ProductTableRow';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import type { Product } from '@/types/product';
@@ -106,7 +106,7 @@ export function ProductsTable({
                                 <th className="px-4 py-3.5 text-right text-[11px] font-bold text-white/30 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
-                        <motion.tbody
+                        <m.tbody
                             className="divide-y divide-white/5"
                             initial="hidden"
                             animate="visible"
@@ -139,7 +139,7 @@ export function ProductsTable({
                                     />
                                 ))}
                             </AnimatePresence>
-                        </motion.tbody>
+                        </m.tbody>
                     </table>
                 </div>
             </div>

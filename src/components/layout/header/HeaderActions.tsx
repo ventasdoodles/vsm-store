@@ -7,7 +7,7 @@ import { CartButton } from '@/components/cart/CartButton';
 import { NotificationBell } from './NotificationBell';
 import { UserMenuDropdown } from './UserMenuDropdown';
 import { useAuth } from '@/hooks/useAuth';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useState } from 'react';
 import { VisualScannerModal } from '@/components/ui/ai/VisualScannerModal';
 import { Scan } from 'lucide-react';
@@ -40,7 +40,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                 className="relative group flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-full bg-vape-500/10 border border-vape-500/20 text-vape-400 hover:bg-vape-500/20 transition-all"
                 title="Giro Diario Disponible"
             >
-                <motion.div
+                <m.div
                     animate={{ 
                         rotate: [0, -10, 10, -10, 10, 0],
                         scale: [1, 1.1, 1, 1.1, 1] 
@@ -52,7 +52,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                     }}
                 >
                     <Disc className="h-4 w-4 sm:h-5 sm:w-5" />
-                </motion.div>
+                </m.div>
                 <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-vape-500 rounded-full border-2 border-[#0f172a] animate-pulse" />
             </Link>
 

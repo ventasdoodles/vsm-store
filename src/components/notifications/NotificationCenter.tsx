@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { Bell, Check, Trash2, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { cn, formatTimeAgo } from '@/lib/utils';
 import { Link } from 'react-router-dom';
@@ -11,7 +11,7 @@ interface NotificationCenterProps {
 }
 
 const EmptyState = () => (
-    <motion.div 
+    <m.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center py-12 text-center"
@@ -23,7 +23,7 @@ const EmptyState = () => (
         <p className="mt-1 text-sm text-theme-secondary">
             Te avisaremos cuando haya actualizaciones importantes.
         </p>
-    </motion.div>
+    </m.div>
 );
 
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
@@ -53,7 +53,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div
+                <m.div
                     ref={ref}
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -67,17 +67,17 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                             <Bell className="h-4 w-4 text-theme-secondary" />
                             <h3 className="text-sm font-bold text-theme-primary tracking-wide">Notificaciones</h3>
                             {unreadCount > 0 && (
-                                <motion.span 
+                                <m.span 
                                     initial={{ scale: 0 }} 
                                     animate={{ scale: 1 }}
                                     className="rounded-full bg-accent-primary/20 vsm-border px-2 py-0.5 text-xs font-black tracking-widest uppercase text-blue-400"
                                 >
                                     {unreadCount} nuevas
-                                </motion.span>
+                                </m.span>
                             )}
                         </div>
                         <div className="flex items-center gap-1">
-                            <motion.button
+                            <m.button
                                 whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={markAllAsRead}
@@ -85,8 +85,8 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                 className="rounded-lg p-1.5 text-theme-secondary transition-colors"
                             >
                                 <Check className="h-4 w-4" />
-                            </motion.button>
-                            <motion.button
+                            </m.button>
+                            <m.button
                                 whileHover={{ scale: 1.1, backgroundColor: 'rgba(239,68,68,0.1)' }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={clearAll}
@@ -94,14 +94,14 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                 className="rounded-lg p-1.5 text-theme-secondary hover:text-red-400 transition-colors"
                             >
                                 <Trash2 className="h-4 w-4" />
-                            </motion.button>
-                            <motion.button
+                            </m.button>
+                            <m.button
                                 whileHover={{ scale: 1.1 }}
                                 onClick={onClose}
                                 className="rounded-lg p-1.5 text-theme-secondary sm:hidden"
                             >
                                 <X className="h-4 w-4" />
-                            </motion.button>
+                            </m.button>
                         </div>
                     </div>
 
@@ -113,7 +113,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                             <div className="divide-y divide-[rgb(var(--border-primary)/0.06)]">
                                 <AnimatePresence>
                                     {notifications.map((notification, index) => (
-                                        <motion.div
+                                        <m.div
                                             layout
                                             initial={{ opacity: 0, x: 20 }}
                                             animate={{ opacity: 1, x: 0 }}
@@ -167,7 +167,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                                     </div>
                                                 )}
                                             </div>
-                                        </motion.div>
+                                        </m.div>
                                     ))}
                                 </AnimatePresence>
                             </div>
@@ -180,7 +180,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                             <p className="text-xs font-bold tracking-widest uppercase text-theme-secondary/50">Mostrando últimas 50</p>
                         </div>
                     )}
-                </motion.div>
+                </m.div>
             )}
         </AnimatePresence>
     );

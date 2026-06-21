@@ -6,7 +6,7 @@
  * // Regla / Notas: Mantiene estado de rango de fechas. Delegación total a Legos de Dashboard.
  */
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useAdminDashboardStats, useAdminRecentOrders } from '@/hooks/admin/useAdminDashboard';
 
 // Importar Legos
@@ -83,7 +83,7 @@ export function AdminDashboard() {
     }
 
     return (
-        <motion.div
+        <m.div
             initial="hidden"
             animate="visible"
             variants={{
@@ -100,35 +100,35 @@ export function AdminDashboard() {
             <div className="pointer-events-none absolute -right-10 top-40 h-64 w-64 rounded-full bg-blue-500/10 blur-[100px]" />
 
             {/* Lego: Header con Presets y Exportación */}
-            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 <DashboardHeader
                     dateRange={dateRange}
                     setDateRange={setDateRange}
                     onExport={handleExport}
                 />
-            </motion.div>
+            </m.div>
 
             {/* Lego: AI Pulse Tracker */}
-            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 {stats && <DashboardPulse stats={stats} />}
-            </motion.div>
+            </m.div>
 
-            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 <AdminOracleDashboard />
-            </motion.div>
+            </m.div>
 
             {/* Lego: AI Proactive Insights (Wave 59) */}
-            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 <AIInsights />
-            </motion.div>
+            </m.div>
 
             {/* Lego: Tarjetas de Estadísticas */}
-            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 <StatsCards stats={stats} />
-            </motion.div>
+            </m.div>
 
             {/* Legos: Gráficas y Top Productos */}
-            <motion.div
+            <m.div
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                 className="grid grid-cols-1 gap-6 lg:grid-cols-2"
             >
@@ -139,12 +139,12 @@ export function AdminDashboard() {
                 <TopProducts
                     products={stats?.topProducts ?? []}
                 />
-            </motion.div>
+            </m.div>
 
             {/* Lego: Pedidos Recientes */}
-            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 <RecentOrders orders={recentOrders ?? []} />
-            </motion.div>
-        </motion.div>
+            </m.div>
+        </m.div>
     );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Activity, TrendingUp, ShoppingBag, Zap } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAdminPulse } from '@/hooks/admin';
 
@@ -12,7 +12,7 @@ export const AdminPulse = React.memo(() => {
     return (
         <AnimatePresence>
             {!isLoading && (
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-lg"
@@ -61,7 +61,7 @@ export const AdminPulse = React.memo(() => {
                         <Activity className="h-3 w-3 text-white/20" />
                         <span className="text-[8px] font-black text-white/10 uppercase tracking-tighter">PULSE ADM</span>
                     </div>
-                </motion.div>
+                </m.div>
             )}
         </AnimatePresence>
     );

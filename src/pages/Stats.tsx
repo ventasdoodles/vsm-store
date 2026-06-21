@@ -6,7 +6,7 @@
  */
 import { useEffect } from 'react';
 import { BarChart3, Loader2, ShoppingBag, TrendingUp, Flame, Leaf, Sparkles, Target, Zap, CreditCard, Package } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useCustomerStats, useTopProducts, useSpendingHistory } from '@/hooks/useStats';
@@ -84,7 +84,7 @@ export function Stats() {
                     { label: 'Ticket Óptimo', value: formatPrice(stats.averageTicket), color: 'text-yellow-400', icon: <Target size={14} />, gradient: 'bg-yellow-500/10 border-yellow-500/20' },
                     { label: 'Sección Predominante', value: stats.favoriteSection === '420' ? 'Herbal' : 'Vape', color: 'text-accent-primary', icon: <Zap size={14} />, gradient: 'bg-accent-primary/10 border-accent-primary/20' },
                 ].map((item, idx) => (
-                    <motion.div 
+                    <m.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
@@ -101,7 +101,7 @@ export function Stats() {
                         <p className={cn('text-2xl font-black italic tracking-tighter uppercase drop-shadow-sm', item.color)}>{item.value}</p>
                         
                         <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-                    </motion.div>
+                    </m.div>
                 ))}
             </div>
 
@@ -126,16 +126,16 @@ export function Stats() {
                                 <div key={s.month} className="flex flex-1 flex-col items-center group/bar h-full justify-end gap-4">
                                     <AnimatePresence initial={false}>
                                         {s.total > 0 && (
-                                            <motion.span 
+                                            <m.span 
                                                 initial={{ opacity: 0, scale: 0 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 className="text-[8px] font-black text-white opacity-0 group-hover/bar:opacity-100 transition-opacity bg-black border border-white/5 px-2 py-1 rounded-md"
                                             >
                                                 {formatPrice(s.total)}
-                                            </motion.span>
+                                            </m.span>
                                         )}
                                     </AnimatePresence>
-                                    <motion.div
+                                    <m.div
                                         initial={{ height: 0 }}
                                         animate={{ height: `${height}%` }}
                                         transition={{ duration: 1, delay: i * 0.1 }}
@@ -145,7 +145,7 @@ export function Stats() {
                                         )}
                                     >
                                          <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-white/20 to-transparent" />
-                                    </motion.div>
+                                    </m.div>
                                     <span className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest">{s.label}</span>
                                 </div>
                             );
@@ -166,7 +166,7 @@ export function Stats() {
 
                      <div className="space-y-4">
                         {topProducts.map((p, i) => (
-                            <motion.div 
+                            <m.div 
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.1 }}
@@ -197,7 +197,7 @@ export function Stats() {
                                         </p>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </m.div>
                         ))}
                      </div>
                 </section>

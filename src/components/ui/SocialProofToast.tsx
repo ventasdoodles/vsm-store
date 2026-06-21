@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, X } from 'lucide-react';
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
 import type { RealtimeOrderEvent } from '@/types/order';
@@ -27,7 +27,7 @@ export const SocialProofToast = () => {
     return (
         <AnimatePresence>
             {event && (
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, x: -100, scale: 0.8 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
@@ -79,14 +79,14 @@ export const SocialProofToast = () => {
                         </div>
 
                         {/* Progress bar timer */}
-                        <motion.div
+                        <m.div
                             initial={{ scaleX: 0 }}
                             animate={{ scaleX: 1 }}
                             transition={{ duration: 6, ease: "linear" }}
                             className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-vape-500 to-herbal-500 origin-left"
                         />
                     </div>
-                </motion.div>
+                </m.div>
             )}
         </AnimatePresence>
     );

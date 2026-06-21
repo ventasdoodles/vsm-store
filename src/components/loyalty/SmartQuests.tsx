@@ -5,7 +5,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin datos mock. Usa hooks de lealtad existentes.
  */
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, Zap, CheckCircle2, Lock, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -126,7 +126,7 @@ export const SmartQuests: React.FC = () => {
 
             <div className="grid gap-3">
                 {quests.map((quest, idx) => (
-                    <motion.div
+                    <m.div
                         key={quest.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -199,7 +199,7 @@ export const SmartQuests: React.FC = () => {
                                 </span>
                             </div>
                         )}
-                    </motion.div>
+                    </m.div>
                 ))}
             </div>
         </div>

@@ -7,7 +7,7 @@
  * Design: Premium Glassmorphism with holographic gradients.
  */
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, Zap, Gift, Heart } from 'lucide-react';
 import { useCustomerIQ } from '@/hooks/useCustomerIQ';
@@ -24,7 +24,7 @@ export const SmartBanner: React.FC = () => {
 
     return (
         <AnimatePresence>
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, y: -20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -44,7 +44,7 @@ export const SmartBanner: React.FC = () => {
                     </div>
 
                     {/* ── High-Speed Shine Sweep ── */}
-                    <motion.div
+                    <m.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-20deg]"
                         animate={{ x: ['-150%', '300%'] }}
                         transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
@@ -55,21 +55,21 @@ export const SmartBanner: React.FC = () => {
                     
                     <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-5">
-                            <motion.div 
+                            <m.div 
                                 whileHover={{ scale: 1.1, rotate: 5 }}
                                 className="flex-shrink-0 w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/40 shadow-xl"
                             >
                                 <Icon className="w-10 h-10 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
-                            </motion.div>
+                            </m.div>
                             
                             <div className="text-center md:text-left space-y-1">
-                                <motion.h3 
+                                <m.h3 
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     className="text-2xl md:text-4xl font-black text-white tracking-tighter uppercase italic leading-[0.9]"
                                 >
                                     {banner.title}
-                                </motion.h3>
+                                </m.h3>
                                 <p className="text-white/80 text-sm md:text-lg font-bold uppercase tracking-wider">
                                     {banner.subtitle}
                                 </p>
@@ -94,7 +94,7 @@ export const SmartBanner: React.FC = () => {
                         <span className="text-[9px] text-white/60 font-black tracking-[0.2em] uppercase">Hyper-Personalized Content</span>
                     </div>
                 </div>
-            </motion.div>
+            </m.div>
         </AnimatePresence>
     );
 };

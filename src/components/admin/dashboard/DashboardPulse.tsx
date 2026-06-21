@@ -5,7 +5,7 @@ import React from 'react';
  * // Propósito: Mostrar un resumen narrativo de la salud del negocio usando IA.
  */
 import { Sparkles, TrendingUp, AlertTriangle, Activity, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useAdminAIInsights } from '@/hooks/admin/useAdminDashboard';
 import { type DashboardStats } from '@/services/admin';
 import { cn } from '@/lib/utils';
@@ -57,7 +57,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
 
                 <AnimatePresence>
                     {isLoading ? (
-                        <motion.div 
+                        <m.div 
                             key="loading"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -66,9 +66,9 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                         >
                             <div className="h-4 w-3/4 animate-pulse rounded bg-white/5" />
                             <div className="h-4 w-1/2 animate-pulse rounded bg-white/5" />
-                        </motion.div>
+                        </m.div>
                     ) : pulse ? (
-                        <motion.div
+                        <m.div
                             key="content"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -107,7 +107,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                                         {pulse.health_score}%
                                     </div>
                                     <div className="w-full h-1.5 bg-white/5 rounded-full mt-3 overflow-hidden">
-                                        <motion.div 
+                                        <m.div 
                                             initial={{ width: 0 }}
                                             animate={{ width: `${pulse.health_score}%` }}
                                             transition={{ duration: 1, ease: 'easeOut' }}
@@ -119,7 +119,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </m.div>
                     ) : (
                         <div className="py-6 text-center border-2 border-dashed border-white/5 rounded-2xl">
                             <Activity className="h-8 w-8 text-white/10 mx-auto mb-2" />

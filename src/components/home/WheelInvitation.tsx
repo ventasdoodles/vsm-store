@@ -5,7 +5,7 @@
  *    Redirige a /loyalty (registrado) o /login (no registrado).
  * // Regla / Notas: Sin `any`. Sin lógica de negocio. Usa useAuth hook. exitBeforeEnter framer v6.
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChevronRight, Zap, Star, Dices } from 'lucide-react';
 
 
@@ -30,7 +30,7 @@ export function WheelInvitation() {
                 
                 {/* ── Cinematic Particles [Wave 125] ── */}
                 {[...Array(6)].map((_, i) => (
-                    <motion.div
+                    <m.div
                         key={i}
                         className="absolute w-1 h-1 bg-white/40 rounded-full"
                         animate={{
@@ -62,12 +62,12 @@ export function WheelInvitation() {
 
                     {/* Multi-layered orbit rings */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <motion.div
+                        <m.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
                             className="absolute w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-white/5 border-dashed"
                         />
-                        <motion.div
+                        <m.div
                             animate={{ rotate: -360 }}
                             transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
                             className="absolute w-40 h-40 sm:w-48 sm:h-48 rounded-full border border-vape-500/10"
@@ -75,7 +75,7 @@ export function WheelInvitation() {
                     </div>
 
                     {/* Main Icon Energy Core */}
-                    <motion.div
+                    <m.div
                         animate={{
                             rotate: [0, 10, -10, 10, 0],
                             scale: [1, 1.05, 1],
@@ -87,7 +87,7 @@ export function WheelInvitation() {
                         }}
                     >
                         <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
-                        <motion.div
+                        <m.div
                              animate={{ 
                                 scale: [1, 1.15, 1],
                                 rotate: [0, 15, -15, 0]
@@ -95,18 +95,18 @@ export function WheelInvitation() {
                              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         >
                             <Dices className="w-16 h-16 sm:w-20 sm:h-20 text-white drop-shadow-[0_0_20px_rgba(255,255,255,1)] relative z-10" />
-                        </motion.div>
+                        </m.div>
                         
                         {/* Shimmer sweep inside wheel */}
-                        <motion.div
+                        <m.div
                             className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent"
                             animate={{ translateY: ['100%', '-100%'] }}
                             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                         />
-                    </motion.div>
+                    </m.div>
 
                     {/* Energy Pulse Aura */}
-                    <motion.div
+                    <m.div
                         animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                         className="absolute w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-vape-400 bg-vape-400/20"
@@ -143,7 +143,7 @@ export function WheelInvitation() {
 
                     {/* Action CTA */}
                     <div className="flex flex-col sm:flex-row items-center gap-6 pt-2">
-                        <motion.div
+                        <m.div
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                             className="group/btn relative inline-flex items-center gap-4 px-10 py-5 rounded-full font-black uppercase text-sm tracking-widest bg-[rgb(var(--border-primary))] shadow-[0_20px_40px_rgba(255,255,255,0.15)] transition-all duration-300 overflow-hidden cursor-pointer"
@@ -152,7 +152,7 @@ export function WheelInvitation() {
                             <Zap className="w-5 h-5 fill-current" />
                             <span>{isAuthenticated ? 'Girar Ahora' : 'Comenzar Aventura'}</span>
                             <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-</motion.div>
+</m.div>
                         
                         <div className="hidden sm:flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
                             <Dices className="w-3 h-3" />

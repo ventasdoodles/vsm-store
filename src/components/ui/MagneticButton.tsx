@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MagneticButtonProps {
@@ -28,7 +28,7 @@ export function MagneticButton({ children, className, strength = 0.2 }: Magnetic
     const { x, y } = position;
 
     return (
-        <motion.div
+        <m.div
             ref={ref}
             onMouseMove={handleMouse}
             onMouseLeave={reset}
@@ -37,6 +37,6 @@ export function MagneticButton({ children, className, strength = 0.2 }: Magnetic
             className={cn("inline-block", className)}
         >
             {children}
-        </motion.div>
+        </m.div>
     );
 }

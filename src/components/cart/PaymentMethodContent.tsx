@@ -1,5 +1,5 @@
 import { Building, CreditCard, Send, CheckCircle, Award } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
 import type { PaymentMethod } from '@/types/cart';
@@ -46,7 +46,7 @@ export function PaymentMethodContent({
             </div>
 
             {paymentMethod === 'transfer' && (
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     className="mt-6 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5"
@@ -58,7 +58,7 @@ export function PaymentMethodContent({
                     <pre className="text-[11px] font-mono text-theme-secondary whitespace-pre-wrap leading-relaxed">
                         {settings?.bank_account_info || SITE_CONFIG.bankAccount}
                     </pre>
-                </motion.div>
+                </m.div>
             )}
         </>
     );

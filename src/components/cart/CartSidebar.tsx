@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, ChevronRight, Truck, Zap } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
@@ -16,6 +16,7 @@ import { useOpenRecoverableOrder } from '@/hooks/useOrders';
 import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 import { CartSmartUpsell } from './CartSmartUpsell';
 import { CartItemCard } from './CartItemCard';
+import { EmptyCartAISuggestions } from './EmptyCartAISuggestions';
 /**
  * Sidebar deslizable premium con físicas realistas de Framer Motion
  * REDISEÑO VISUAL: App Feel v2.0 (Glassmorphism & Micro-animaciones)
@@ -162,7 +163,7 @@ export function CartSidebar() {
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div
+                <m.div
                     key="overlay"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -173,7 +174,7 @@ export function CartSidebar() {
                 />
             )}
             {isOpen && (
-                <motion.aside
+                <m.aside
                     key="sidebar"
                     initial={{ x: '100%' }}
                     animate={{ x: 0 }}
@@ -208,16 +209,16 @@ export function CartSidebar() {
                         <h2 id="cart-title" className="text-2xl font-black text-white flex items-center gap-3 tracking-tight drop-shadow-md">
                             Carrito
                             {itemCount > 0 && (
-                                <motion.span
+                                <m.span
                                     initial={{ scale: 0 }} animate={{ scale: 1 }}
                                     key={`badge-${itemCount}`}
                                     className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-vape-500 text-sm font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.5)]"
                                 >
                                     {itemCount}
-                                </motion.span>
+                                </m.span>
                             )}
                         </h2>
-                        <motion.button
+                        <m.button
                             whileHover={{ scale: 1.1, rotate: 90 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={closeCart}
@@ -225,11 +226,11 @@ export function CartSidebar() {
                             className="rounded-full p-2.5 text-white/50 bg-white/5 border border-white/10 hover:text-white hover:bg-white/10 transition-all shadow-inner"
                         >
                             <X className="h-5 w-5" />
-                        </motion.button>
+                        </m.button>
                     </div>
                     {/* Contenido Vacío Transcendental */}
                     {items.length === 0 ? (
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="flex flex-1 flex-col items-center justify-center px-10 text-center relative overflow-hidden"
@@ -239,7 +240,7 @@ export function CartSidebar() {
                             
                             <div className="relative mb-12 group">
                                 {/* Floating Orbs */}
-                                <motion.div 
+                                <m.div 
                                     animate={{ 
                                         y: [0, -15, 0],
                                         rotate: [0, 5, -5, 0],
@@ -248,7 +249,7 @@ export function CartSidebar() {
                                     transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                                     className="absolute -top-6 -left-6 w-12 h-12 bg-vape-500/20 blur-xl rounded-full"
                                 />
-                                <motion.div 
+                                <m.div 
                                     animate={{ 
                                         y: [0, 15, 0],
                                         rotate: [0, -5, 5, 0]
@@ -259,7 +260,7 @@ export function CartSidebar() {
 
                                 <div className="absolute inset-0 blur-[60px] bg-gradient-to-tr from-vape-500/30 to-herbal-500/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                                 
-                                <motion.div
+                                <m.div
                                     whileHover={{ scale: 1.05, rotateY: 10 }}
                                     className="relative rounded-[2.5rem] bg-white/[0.03] p-10 border border-white/10 backdrop-blur-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5)] preserve-3d"
                                 >
@@ -267,43 +268,45 @@ export function CartSidebar() {
                                     
                                     {/* Liquid Glow Ring */}
                                     <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-                                </motion.div>
+                                </m.div>
                             </div>
 
-                            <motion.h3 
+                            <m.h3 
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.2 }}
                                 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40 tracking-tighter"
                             >
                                 Espacio de Lujo Vacío
-                            </motion.h3>
+                            </m.h3>
                             
-                            <motion.p 
+                            <m.p 
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.3 }}
                                 className="mt-4 text-sm text-gray-400 font-medium leading-relaxed max-w-[280px]"
                             >
                                 Tu selección premium aguarda. Inicia tu viaje visual explorando nuestra curaduría exclusiva.
-                            </motion.p>
+                            </m.p>
 
-                            <motion.button
+                            <m.button
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={closeCart}
-                                className="mt-12 group relative"
+                                className="mt-8 group relative"
                             >
                                 <div className="absolute inset-0 bg-vape-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
                                 <div className="relative rounded-2xl px-10 py-4 bg-white text-slate-900 text-xs font-black uppercase tracking-[0.25em] flex items-center justify-center gap-3 shadow-2xl">
                                     Explorar Catálogo
                                     <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                                 </div>
-                            </motion.button>
-                        </motion.div>
+                            </m.button>
+
+                            <EmptyCartAISuggestions />
+                        </m.div>
                     ) : (
                         <>
                             {/* Lista de items con scroll */}
@@ -327,7 +330,7 @@ export function CartSidebar() {
                                     </div>
 
                                     <div className="h-3 w-full bg-black/40 rounded-full shadow-inner border border-white/5 relative overflow-hidden z-10">
-                                        <motion.div
+                                        <m.div
                                             initial={{ width: `${items.length > 0 ? 100 : 0}%` }}
                                             animate={{ width: `${items.length > 0 ? 100 : 0}%` }}
                                             transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
@@ -336,7 +339,7 @@ export function CartSidebar() {
                                             {/* Sparkle effect on progress end */}
                                             <div className="absolute right-0 top-1/2 -translate-y-1/2 h-full w-4 bg-white/40 blur-sm rounded-full" />
                                             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-                                        </motion.div>
+                                        </m.div>
                                     </div>
 
                                     {/* Micro-label for progress */}
@@ -402,7 +405,7 @@ export function CartSidebar() {
                                         </div>
 
                                         {/* Odometer Price Effect */}
-                                        <motion.div
+                                        <m.div
                                             key={cartTotal}
                                             initial={{ y: -10, opacity: 0, filter: 'blur(4px)' }}
                                             animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
@@ -410,11 +413,11 @@ export function CartSidebar() {
                                             className="text-3xl font-black text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                                         >
                                             {formatPrice(cartTotal)}
-                                        </motion.div>
+                                        </m.div>
                                     </div>
                                 </div>
 
-                                <motion.button
+                                <m.button
                                     whileHover={{ scale: 1.02, y: -4 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleProceedToCheckout}
@@ -441,7 +444,7 @@ export function CartSidebar() {
                                             <ChevronRight className="h-5 w-5" />
                                         </div>
                                     </div>
-                                </motion.button>
+                                </m.button>
 
 
                                 <div className="mt-5 flex items-center justify-center gap-4 text-[10px] font-bold text-white/30 uppercase tracking-widest">
@@ -452,7 +455,7 @@ export function CartSidebar() {
                             </div>
                         </>
                     )}
-                </motion.aside>
+                </m.aside>
             )}
         </AnimatePresence>
     );

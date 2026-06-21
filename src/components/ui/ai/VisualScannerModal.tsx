@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Camera, X, Scan, Zap, AlertTriangle, CheckCircle2, Plus } from 'lucide-react';
 import { useVisualScanner } from '@/hooks/useVisualScanner';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -42,14 +42,14 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
     return (
         <AnimatePresence>
             {isOpen && (
-                <motion.div
+                <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
                     onClick={onClose}
                 >
-                    <motion.div
+                    <m.div
                         initial={{ scale: 0.95, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -204,8 +204,8 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                 onChange={handleFileChange}
                             />
                         </div>
-                    </motion.div>
-                </motion.div>
+                    </m.div>
+                </m.div>
             )}
         </AnimatePresence>
     );

@@ -7,7 +7,7 @@
 import { useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { CATEGORY_GRADIENTS_MAP, CATEGORY_ICONS, getFallbackCategories, CATEGORY_GRADIENTS } from '@/constants/category-showcase';
@@ -75,7 +75,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
     const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] ?? CATEGORY_ICONS['Box']!;
 
     return (
-        <motion.div
+        <m.div
             ref={cardRef}
             variants={itemVariants}
             className="block relative group/card cursor-pointer"
@@ -86,7 +86,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                 className="group relative block h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] vsm-border bg-slate-900/40 backdrop-blur-3xl spotlight-container"
             >
                 {/* Spotlight Reveal */}
-                <motion.div
+                <m.div
                     className="absolute inset-0 z-10 pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"
                     style={{
                         background: useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.08), transparent 80%)`
@@ -115,7 +115,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-90" />
 
                 <div className="relative h-full flex flex-col justify-end p-8 z-20">
-                    <motion.div
+                    <m.div
                         whileHover={{ y: -5, scale: 1.1 }}
                         transition={{ type: 'spring' as const, stiffness: 400, damping: 10 }}
                         className="mb-6 w-fit"
@@ -124,7 +124,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover/icon:opacity-100 transition-opacity" />
                             <IconComponent className="w-8 h-8 relative z-10" />
                         </div>
-                    </motion.div>
+                    </m.div>
 
                     <div className="space-y-2">
                         <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tighter uppercase italic line-clamp-2 leading-[0.9] pb-1 pt-1 group-hover:text-vape-400 transition-colors">
@@ -143,7 +143,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                     </div>
                 </div>
             </Link>
-        </motion.div>
+        </m.div>
     );
 }
 
@@ -168,7 +168,7 @@ export const CategoryShowcase = () => {
 
     return (
         <section className="space-y-8">
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-10%' }}
@@ -180,9 +180,9 @@ export const CategoryShowcase = () => {
                         Explora Categorías
                     </h2>
                 </div>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="show"
@@ -192,7 +192,7 @@ export const CategoryShowcase = () => {
                 {displayCategories.map((category: FeaturedCategory, index: number) => (
                     <CategoryCard key={`${category.id}-${index}`} category={category} />
                 ))}
-            </motion.div>
+            </m.div>
         </section>
     );
 };

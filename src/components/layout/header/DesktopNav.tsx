@@ -6,7 +6,7 @@
  * // Regla / Notas: Recibe `compact` para modo pill.
  */
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck } from 'lucide-react';
 import { MegaMenu } from './MegaMenu';
 import { DeliveryLocation } from './DeliveryLocation';
@@ -64,7 +64,7 @@ function NavLinkWithSpotlight({ item, compact }: { item: Extract<NavItem, { type
             title={item.label}
         >
             {/* 🔦 Spotlight Effect */}
-            <motion.div
+            <m.div
                 className="pointer-events-none absolute -inset-px rounded-full opacity-0 transition duration-300 group-hover:opacity-100"
                 style={{
                     background: useMotionTemplate`

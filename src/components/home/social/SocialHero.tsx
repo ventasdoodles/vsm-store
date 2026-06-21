@@ -3,7 +3,7 @@
  * 
  * @component
  */
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ interface SocialHeroProps {
 export function SocialHero({ avgRating, totalCount }: SocialHeroProps) {
     return (
         <div className="text-center space-y-4">
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -29,10 +29,10 @@ export function SocialHero({ avgRating, totalCount }: SocialHeroProps) {
                 <h2 className="text-2xl md:text-4xl font-bold text-theme-primary">
                     Lo Que Dicen Nuestros Clientes
                 </h2>
-            </motion.div>
+            </m.div>
 
             {/* Rating Badge */}
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -59,7 +59,7 @@ export function SocialHero({ avgRating, totalCount }: SocialHeroProps) {
                 <span className="text-sm text-theme-secondary">
                     de {totalCount} reseñas
                 </span>
-            </motion.div>
+            </m.div>
         </div>
     );
 }

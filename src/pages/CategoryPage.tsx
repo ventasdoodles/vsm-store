@@ -21,7 +21,7 @@ import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { FilterSidebar } from '@/components/products/FilterSidebar';
 import { getAvailableFilters, applyFilters, type FilterState } from '@/lib/product-filtering';
@@ -195,7 +195,7 @@ export function CategoryPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute bottom-6 left-8 sm:bottom-10 sm:left-12">
-                        <motion.div
+                        <m.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
@@ -208,7 +208,7 @@ export function CategoryPage() {
                                     {category.description}
                                 </p>
                             )}
-                        </motion.div>
+                        </m.div>
                     </div>
                 </div>
             )}

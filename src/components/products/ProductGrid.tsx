@@ -1,7 +1,7 @@
 // Grid de productos - VSM Store
 import { PackageOpen, RotateCcw, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { ProductCard } from './ProductCard';
@@ -51,7 +51,7 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
     // Estado: sin productos
     if (products.length === 0) {
         return (
-            <motion.div 
+            <m.div 
                 initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -60,14 +60,14 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                 aria-live="polite"
             >
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-theme-secondary/20 rounded-full blur-[60px] pointer-events-none" />
-                <motion.div 
+                <m.div 
                     initial={{ scale: 0, rotate: -15 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', damping: 12, delay: 0.1 }}
                     className="relative z-10 mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-theme-secondary/20 to-transparent border border-white/10 shadow-inner"
                 >
                     <PackageOpen className="h-10 w-10 text-white drop-shadow-md" />
-                </motion.div>
+                </m.div>
                 
                 <h3 className="relative z-10 text-xl font-black text-white uppercase tracking-tight drop-shadow-sm">
                     {emptyStateTitle || renderabilityConfig.grid.emptyStateTitle}
@@ -77,7 +77,7 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                 </p>
                 
                 {onClearFilter ? (
-                    <motion.button
+                    <m.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onClearFilter}
@@ -85,10 +85,10 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                     >
                         <RotateCcw className="h-4 w-4" />
                         Limpiar filtro
-                    </motion.button>
+                    </m.button>
                 ) : (
                     <Link to={renderabilityConfig.grid.emptyStateCtaHref}>
-                        <motion.button
+                        <m.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="relative z-10 mt-8 overflow-hidden inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-accent-primary/80 to-accent-primary px-6 py-3 text-xs font-black uppercase tracking-[0.15em] text-black shadow-xl transition-all hover:shadow-[0_0_30px_rgba(var(--accent-primary-rgb),0.4)]"
@@ -96,10 +96,10 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                             <ShoppingBag className="h-4 w-4 relative z-10" />
                             <span className="relative z-10">{renderabilityConfig.grid.emptyStateCtaLabel}</span>
-                        </motion.button>
+                        </m.button>
                     </Link>
                 )}
-            </motion.div>
+            </m.div>
         );
     }
 

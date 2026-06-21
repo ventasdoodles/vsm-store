@@ -5,7 +5,7 @@
  * // Estilo: High-Contrast Premium Glass with dynamic accents.
  */
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
     Copy,
     Users,
@@ -85,7 +85,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                                 <span className="text-3xl font-black text-white tracking-[0.25em] italic uppercase">{referralCode}</span>
                             </div>
                             <div className="flex gap-3">
-                                <motion.button
+                                <m.button
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleCopy}
                                     className={cn(
@@ -97,23 +97,23 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                                 >
                                     <AnimatePresence initial={false}>
                                         {copied ? (
-                                            <motion.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                                            <m.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
                                                 <CheckCircle className="h-6 w-6" />
-                                            </motion.div>
+                                            </m.div>
                                         ) : (
-                                            <motion.div key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                                            <m.div key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
                                                 <Copy className="h-6 w-6" />
-                                            </motion.div>
+                                            </m.div>
                                         )}
                                     </AnimatePresence>
-                                </motion.button>
-                                <motion.button
+                                </m.button>
+                                <m.button
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleShare}
                                     className="flex h-14 w-14 items-center justify-center rounded-xl bg-accent-primary text-white shadow-2xl shadow-accent-primary/30 hover:bg-accent-primary/90 transition-all duration-500"
                                 >
                                     <Share2 className="h-6 w-6" />
-                                </motion.button>
+                                </m.button>
                             </div>
                         </div>
                     </div>

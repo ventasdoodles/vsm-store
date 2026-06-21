@@ -5,7 +5,7 @@ import {
     Users, Settings, ArrowRight, X, Sparkles,
     Mic, MicOff
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useVoiceRecorder } from '@/hooks/admin/useVoiceRecorder';
 import { useAdminSearch, useAdminNLP } from '@/hooks/admin/useAdminDashboard';
@@ -160,7 +160,7 @@ export function AdminCommandPalette() {
         <AnimatePresence>
             <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4">
                 {/* Backdrop */}
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -169,7 +169,7 @@ export function AdminCommandPalette() {
                 />
 
                 {/* Palette Container */}
-                <motion.div 
+                <m.div 
                     initial={{ opacity: 0, scale: 0.95, y: -20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -20 }}
@@ -206,7 +206,7 @@ export function AdminCommandPalette() {
                                 )}
                             >
                                 {isRecording && (
-                                    <motion.div 
+                                    <m.div 
                                         layoutId="mic-pulse"
                                         initial={{ scale: 0.8, opacity: 0 }}
                                         animate={{ scale: 1.5, opacity: 0 }}
@@ -294,7 +294,7 @@ export function AdminCommandPalette() {
                             <span className="text-[9px] font-black text-white/20 uppercase tracking-tighter">VSM COMMAND ENGINE v1.0</span>
                         </div>
                     </div>
-                </motion.div>
+                </m.div>
             </div>
         </AnimatePresence>
     );

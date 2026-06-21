@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useAdminPulse } from '@/hooks/admin';
 import { cn } from '@/lib/utils';
 
@@ -49,7 +49,7 @@ export const AnimatedAtmosphere = React.memo(() => {
     return (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
             <AnimatePresence>
-                <motion.div
+                <m.div
                     key={(metrics?.status || 'optimal') + '-glow'}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -58,7 +58,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                     className="absolute inset-0 will-change-opacity"
                 >
                     {/* Primary Atmospheric Glow (Top Right) */}
-                    <motion.div
+                    <m.div
                         animate={{
                             scale: [1, 1.05, 1],
                             opacity: [0.3, 0.4, 0.3],
@@ -76,7 +76,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                     />
 
                     {/* Secondary Atmospheric Glow (Bottom Left) */}
-                    <motion.div
+                    <m.div
                         animate={{
                             scale: [1, 1.1, 1],
                             opacity: [0.2, 0.3, 0.2],
@@ -95,7 +95,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                     />
 
                     {/* Accent Atmospheric Floating Entity (Center) */}
-                    <motion.div
+                    <m.div
                         animate={{
                             x: [0, 20, -20, 0],
                             y: [0, -20, 20, 0],
@@ -111,7 +111,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                             colors.accent
                         )}
                     />
-                </motion.div>
+                </m.div>
             </AnimatePresence>
             
             {/* Grainy Noise Overlay (Low Opacity for high-performance feel) */}
