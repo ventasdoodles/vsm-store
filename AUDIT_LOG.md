@@ -271,3 +271,16 @@
  -   * * S t a t u s : * *   A C C E P T E D   A N D   P U S H E D . 
   
  
+## 2026-06-24: Refactorizacion Estetica UI y Gamificacion (VSM Acceptance Audit & Canon Reconciliation Lane)
+- **Phase:** Acceptance & Canon Reconciliation
+- **Actor:** Antigravity
+- **Action:** Limpieza de CSS, extraccion de colores en duro, y limpieza de hacks nativos (translateZ).
+- **Details:**
+  - Se eliminaron colores HEX hardcodeados en UI de ordenes y tablero Kanban.
+  - Se creo src/utils/theme-mapper.ts para resolver colores en duro hacia clases semanticas (Tailwind cn).
+  - Se reemplazaron instancias de style={{ transform: 'translateZ(0)' }} por clase .transform-gpu en AnimatedAtmosphere.
+  - Los colores HEX en Gamificacion se validaron como datos funcionales requeridos por la API de canvas y SVG.
+- **Validation:** npm run typecheck sin errores. Cambios alineados al workflow VSM.
+- **Risk:** LOW
+- **Status:** ACCEPTED AND PUSHED (Commit 7bb0387)
+
