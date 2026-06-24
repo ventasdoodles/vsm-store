@@ -11,6 +11,7 @@ import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { addLoyaltyPoints } from './loyalty.service';
 
 import type { OrderRecord, CreateOrderData, RealtimeOrderEvent, OrderItem } from '@/types/order';
+import { CreateOrderRequestSchema } from '@/lib/contracts/storefront-orders-contract';
 
 // Redundant re-exports removed to resolve barrel ambiguity and circularity
 
@@ -24,19 +25,22 @@ const ORDER_SELECT = 'id, order_number, customer_id, items, subtotal, shipping_c
  * @policy Data Integrity Â§1.2
  */
 export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
+    // === CONTRACT ENFORCEMENT ===
+    const validatedData = CreateOrderRequestSchema.parse(data);
+
     const { data: result, error } = await supabase
         .from('orders')
         .insert({
-            customer_id: data.customer_id,
-            items: data.items,
-            subtotal: data.subtotal,
-            shipping_cost: data.shipping_cost ?? 0,
-            discount: data.discount ?? 0,
-            total: data.total,
-            payment_method: data.payment_method,
-            shipping_address_id: data.shipping_address_id ?? null,
-            billing_address_id: data.billing_address_id ?? null,
-            tracking_notes: data.tracking_notes ?? null,
+            customer_id: validatedData.customer_id,
+            items: validatedData.items,
+            subtotal: validatedData.subtotal,
+            shipping_cost: validatedData.shipping_cost ?? 0,
+            discount: validatedData.discount ?? 0,
+            total: validatedData.total,
+            payment_method: validatedData.payment_method,
+            shipping_address_id: validatedData.shipping_address_id ?? null,
+            billing_address_id: validatedData.billing_address_id ?? null,
+            tracking_notes: validatedData.tracking_notes ?? null,
         })
         .select(ORDER_SELECT)
         .single();
@@ -45,11 +49,11 @@ export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
     const order = result as unknown as OrderRecord;
 
     // Calcular y agregar puntos de lealtad
-    const points = data.earned_points ?? calculateLoyaltyPoints(data.total);
+    const points = validatedData.earned_points ?? calculateLoyaltyPoints(validatedData.total);
     if (points > 0) {
         try {
             await addLoyaltyPoints(
-                data.customer_id,
+                validatedData.customer_id,
                 points,
                 order.id,
                 `Compra #${order.order_number}`

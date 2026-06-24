@@ -1,5 +1,6 @@
 // ─── Admin Coupons Service ───────────────────────
 import { supabase } from '@/lib/supabase';
+import { AdminCouponRequestSchema } from '@/lib/contracts/admin-coupons-contract';
 
 export interface AdminCoupon {
     code: string;
@@ -50,9 +51,12 @@ export async function getAllCoupons() {
 }
 
 export async function createCoupon(coupon: CouponFormData) {
+    // === CONTRACT ENFORCEMENT ===
+    const validatedData = AdminCouponRequestSchema.parse(coupon);
+
     const { data, error } = await supabase
         .from('coupons')
-        .insert({ ...coupon, used_count: 0 })
+        .insert({ ...validatedData, used_count: 0 })
         .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at, customer_id')
         .single();
 
@@ -61,9 +65,13 @@ export async function createCoupon(coupon: CouponFormData) {
 }
 
 export async function updateCoupon(code: string, coupon: Partial<CouponFormData>) {
+    // Solo validamos lo que nos pasen en Partial, por lo que usamos un Partial schema
+    const PartialSchema = AdminCouponRequestSchema.partial();
+    const validatedData = PartialSchema.parse(coupon);
+
     const { data, error } = await supabase
         .from('coupons')
-        .update(coupon)
+        .update(validatedData)
         .eq('code', code)
         .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at, customer_id')
         .single();
