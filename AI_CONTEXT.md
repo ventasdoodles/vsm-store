@@ -23,6 +23,7 @@
   - `docs/archive/STORE_FRONT_AI_PILOT_CONTEXT_ARCHIVE_2026-05-16.md`.
 
 ## Current Repository Baseline
+- **Real-System E2E QA & Penetration Testing Suite**: A complete suite of 4 backend Node.js scripts exists in `scripts/` (`e2e_db_smoke_qa.mjs`, `e2e_db_smoke_qa_loyalty.mjs`, `e2e_security_pentest.mjs`, `e2e_ai_stress_test.mjs`). These scripts validate CRUD constraints, checkout data pipelines, V-Coins loyalty assignments, and act as automated penetration testers against Supabase RLS (Anon key) and Gemini Edge Functions (Jailbreak protection via SSE). Testing outputs are maintained in `e2e_qa_report.md`.
 - **Edge Error Parsing:** Error handling for `fetch` invocations toward Supabase Edge Functions requires explicitly parsing the error body (e.g. `await res.text()`) to recover structured metadata (such as `no_write_smoke`) before throwing the generic Error. This ensures that telemetry and test harnesses receive the necessary propagation data rather than a flattened error string.
 
 ## V-Coins / Loyalty System Overhaul (`78c41b0`)
