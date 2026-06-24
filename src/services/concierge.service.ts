@@ -23,6 +23,7 @@ import {
     isCustomerIntelligenceNoWriteSmokeActive,
     type CustomerIntelligenceNoWriteSmokeMetadata,
 } from '@/lib/customer-intelligence-no-write-smoke';
+import { CustomerIntelligenceRequestSchema } from '@/lib/contracts/ai-edge-contract';
 import { getProductsByIds } from '@/services/products.service';
 import { resolveStorefrontAttachmentOffers } from '@/services/storefront-attachments.service';
 import type { Product } from '@/types/product';
@@ -742,13 +743,17 @@ export const conciergeService = {
                 ...(options?.noWriteSmoke ? buildCustomerIntelligenceNoWriteSmokeRequestFields() : {}),
             };
 
+            // === CONTRACT ENFORCEMENT: Schema-First Validation ===
+            // This prevents the frontend from sending broken shapes to the Edge Function.
+            const validatedRequestBody = CustomerIntelligenceRequestSchema.parse(requestBody);
+
             const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-intelligence`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify(validatedRequestBody)
             });
 
             if (!res.ok) {
