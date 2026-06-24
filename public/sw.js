@@ -90,6 +90,11 @@ self.addEventListener('fetch', (event) => {
     // NO cachear extensiones de Chrome u otros protocolos
     if (!url.protocol.startsWith('http')) return;
 
+    // Bypass Vite dev server (HMR, modules, etc) to prevent blank pages in development
+    if (url.pathname.startsWith('/@vite') || url.pathname.startsWith('/@fs') || url.pathname.startsWith('/src/')) {
+        return;
+    }
+
     // ── Google Fonts: Cache First (raramente cambian) ──
     if (FONT_DOMAINS.some((d) => url.hostname.includes(d))) {
         event.respondWith(cacheThenNetwork(event.request, FONT_CACHE));
@@ -142,7 +147,12 @@ async function cacheThenNetwork(request, cacheName) {
     } catch (err) {
         // Do not return text 'Offline' for JS chunks, it causes SyntaxError in React dynamic imports
         if (request.destination === 'document') {
-            return caches.match('/offline.html');
+            const offlinePage = await caches.match('/offline.html');
+            if (offlinePage) return offlinePage;
+            return new Response('<html><body><h1>Sin Conexión</h1><p>Revisa tu internet.</p></body></html>', { 
+                status: 503, 
+                headers: { 'Content-Type': 'text/html; charset=utf-8' }
+            });
         }
         return new Response('', { status: 503, statusText: 'Service Unavailable' });
     }
