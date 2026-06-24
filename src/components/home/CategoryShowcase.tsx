@@ -58,7 +58,7 @@ const normalizeFeaturedCategory = (category: FeaturedCategory): FeaturedCategory
 };
 
 /** Subcomponent que maneja el estado de carga/error de la imagen con React state */
-function CategoryCard({ category }: { category: FeaturedCategory }) {
+function CategoryCard({ category, priority }: { category: FeaturedCategory, priority?: boolean }) {
     const cardRef = useRef<HTMLDivElement>(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -98,6 +98,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                         <OptimizedImage
                             src={category.image}
                             alt={category.name}
+                            priority={priority}
                             width={400}
                             containerClassName="w-full h-full"
                             className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110 opacity-60 group-hover:opacity-80"
@@ -190,7 +191,7 @@ export const CategoryShowcase = () => {
                 className="grid grid-cols-2 lg:grid-cols-4 gap-6"
             >
                 {displayCategories.map((category: FeaturedCategory, index: number) => (
-                    <CategoryCard key={`${category.id}-${index}`} category={category} />
+                    <CategoryCard key={`${category.id}-${index}`} category={category} priority={index < 4} />
                 ))}
             </m.div>
         </section>

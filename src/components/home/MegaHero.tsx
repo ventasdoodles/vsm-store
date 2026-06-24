@@ -21,6 +21,7 @@ import {
     normalizeHomeHeroSlide,
 } from '@/constants/homeHero';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
+import { activeVerticalPackConfig } from '@/config/productization/active';
 import type { HeroSlider } from '@/services';
 import type { PresetGradient } from '@/constants/slider';
 
@@ -89,22 +90,22 @@ export const MegaHero = () => {
 
     /** Mapeo de slides desde settings o fallback local */
     const activeSlides = useMemo(() => {
-        if (!config) return [];
-
-        const FALLBACK_SLIDES: ActiveSlide[] = getHomeHeroSliderFallbacks(config)
+        const safeConfig = config || activeVerticalPackConfig;
+        
+        const FALLBACK_SLIDES: ActiveSlide[] = getHomeHeroSliderFallbacks(safeConfig)
             .map(mapHeroSliderToActiveSlide)
-            .map(slide => normalizeHomeHeroSlide(slide, config));
+            .map(slide => normalizeHomeHeroSlide(slide, safeConfig));
 
         const slides = settings?.hero_sliders && settings.hero_sliders.length > 0
             ? settings.hero_sliders
                 .filter(s => s.active)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map(mapHeroSliderToActiveSlide)
-                .map(slide => normalizeHomeHeroSlide(slide, config))
+                .map(slide => normalizeHomeHeroSlide(slide, safeConfig))
             : FALLBACK_SLIDES;
 
         if (personalizedSlide) {
-            return [normalizeHomeHeroSlide(personalizedSlide, config), ...slides];
+            return [normalizeHomeHeroSlide(personalizedSlide, safeConfig), ...slides];
         }
         return slides;
     }, [settings?.hero_sliders, personalizedSlide, config]);

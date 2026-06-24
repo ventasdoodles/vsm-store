@@ -284,3 +284,16 @@
 - **Risk:** LOW
 - **Status:** ACCEPTED AND PUSHED (Commit 7bb0387)
 
+
+## 2026-06-24: Storefront Core Web Vitals Optimization (VSM Readiness & Implementation Lane)
+- **Phase:** Implementation
+- **Actor:** Antigravity
+- **Action:** Optimizacion del LCP y carga Above The Fold del Storefront.
+- **Details:**
+  - Pre-resolucion de activeSlides en MegaHero para evitar el layout shift del skeleton mientras carga useStoreSettings.
+  - Inyeccion de <link rel="preload"> para la imagen LCP principal de fallback en index.html.
+  - Modificacion de ProductRail y CategoryShowcase para pasar la propiedad priority a los primeros elementos visibles de OptimizedImage, evitando el loading="lazy" bloqueante para items on-screen.
+- **Validation:** npm run typecheck sin errores. Optimizacion pura del frontend sin cambios de negocio.
+- **Risk:** LOW
+- **Status:** ACCEPTED AND PUSHED
+

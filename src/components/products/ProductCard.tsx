@@ -35,9 +35,10 @@ interface ProductCardProps {
     product: Product;
     className?: string;
     compact?: boolean;
+    priority?: boolean;
 }
 
-export const ProductCard = memo(function ProductCard({ product, className, compact = false }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, className, compact = false, priority = false }: ProductCardProps) {
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
     const [isAdded, setIsAdded] = useState(false);
@@ -236,7 +237,6 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             onMouseEnter={handleImageMouseEnter}
                             onMouseLeave={handleImageMouseLeave}
                         >
-                            {/* Image */}
                             <m.div
                                 className="h-full w-full"
                                 whileHover={{ scale: 1.1 }}
@@ -245,6 +245,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <OptimizedImage
                                     src={product.images?.[currentImage] || product.cover_image || ''}
                                     alt={product.name}
+                                    priority={priority}
                                     width={400}
                                     height={400}
                                     containerClassName="h-full w-full"
