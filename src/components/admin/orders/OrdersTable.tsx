@@ -5,6 +5,7 @@
 // ───────────────────────────────────────────────────────────────────────────────────
 
 import { ChevronDown, Loader2 } from 'lucide-react';
+import { getSolidBackgroundClass, getBorderHighlightClass } from '@/utils/theme-mapper';
 import { cn, formatPrice } from '@/lib/utils';
 import { type AdminOrder, type OrderStatus } from '@/services/admin';
 import { ADMIN_ORDER_STATUSES_LIST, canTransitionTo, type AdminOrderStatus } from '@/lib/domain/orders';
@@ -160,14 +161,12 @@ export function OrdersTable({
                                         ) : (
                                             <div className="relative inline-flex items-center">
                                                 <div
-                                                    className="h-2 w-2 rounded-full shrink-0 absolute left-2.5 z-10 pointer-events-none"
-                                                    style={{ backgroundColor: statusInfo?.color }}
+                                                    className={cn("h-2 w-2 rounded-full shrink-0 absolute left-2.5 z-10 pointer-events-none", getSolidBackgroundClass(statusInfo?.color))}
                                                 />
                                                 <select
                                                     value={order.status}
                                                     onChange={e => handleStatusChange(order, e.target.value)}
-                                                    className="appearance-none rounded-lg border border-white/10 bg-[#1a1c29] pl-7 pr-6 py-1.5 text-xs font-bold text-theme-primary focus:outline-none focus:border-accent-primary/40 cursor-pointer transition-colors hover:border-white/20"
-                                                    style={{ borderLeftColor: statusInfo?.color, borderLeftWidth: '2px' }}
+                                                    className={cn("appearance-none rounded-lg border border-white/10 bg-[#1a1c29] pl-7 pr-6 py-1.5 text-xs font-bold text-theme-primary focus:outline-none focus:border-accent-primary/40 cursor-pointer transition-colors hover:border-white/20 border-l-[2px]", getBorderHighlightClass(statusInfo?.color))}
                                                 >
                                                     {ADMIN_ORDER_STATUSES_LIST.map(s => {
                                                         const isCurrent = s.value === order.status;

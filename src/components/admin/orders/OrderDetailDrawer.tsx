@@ -13,10 +13,11 @@ import {
 } from 'lucide-react';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
-import { ADMIN_ORDER_STATUSES_LIST, canTransitionTo, type AdminOrderStatus } from '@/lib/domain/orders';
-import { formatPrice } from '@/lib/utils';
-import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { canTransitionTo, ADMIN_ORDER_STATUSES_LIST, type AdminOrderStatus } from '@/lib/domain/orders';
 import { useNotification } from '@/hooks/useNotification';
+import { getSolidBackgroundClass, getBorderHighlightClass } from '@/utils/theme-mapper';
+import { cn, formatPrice } from '@/lib/utils';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface OrderDetailDrawerProps {
     order: AdminOrder | null;
@@ -112,15 +113,14 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                     {/* ── Status Badge + Selector ───────────────────── */}
                     <section className="rounded-2xl border border-white/5 bg-white/[0.02] p-5">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="h-5 w-1 rounded-full shrink-0" style={{ backgroundColor: statusInfo?.color }} />
+                            <div className={cn("h-5 w-1 rounded-full shrink-0", getSolidBackgroundClass(statusInfo?.color))} />
                             <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60">Estado del Pedido</span>
                         </div>
                         <div className="relative">
                             <select
                                 value={order.status}
                                 onChange={(e) => handleStatusChange(e.target.value)}
-                                style={{ borderLeftColor: statusInfo?.color, borderLeftWidth: '3px' }}
-                                className="w-full appearance-none rounded-xl border border-white/10 bg-[#1a1c29] px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20"
+                                className={cn("w-full appearance-none rounded-xl border border-white/10 bg-[#1a1c29] px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20 border-l-[3px]", getBorderHighlightClass(statusInfo?.color))}
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.filter(s => s.value !== 'cancelled').map(s => {
                                     const isCurrent = s.value === order.status;

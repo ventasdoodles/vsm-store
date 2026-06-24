@@ -18,6 +18,7 @@ import {
     type DragStartEvent,
     type DragEndEvent,
 } from '@dnd-kit/core';
+import { cn } from '@/utils/theme-mapper';
 import {
     SortableContext,
     sortableKeyboardCoordinates,
@@ -29,6 +30,7 @@ import { type AdminOrder, type OrderStatus } from '@/services/admin';
 import { ADMIN_ORDER_STATUSES_LIST, canTransitionTo, type AdminOrderStatus } from '@/lib/domain/orders';
 import { OrderBoardCard } from './OrderBoardCard';
 import { useNotification } from '@/hooks/useNotification';
+import { getStatusDotClass } from '@/utils/theme-mapper';
 
 // ─── Sortable wrapper ────────────────────────────────────────────────────────
 interface SortableOrderCardProps {
@@ -73,7 +75,7 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
             {/* Column Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-black/20 px-5 py-4 rounded-t-[1.5rem] relative z-10">
                 <div className="flex items-center gap-3">
-                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: status.color, boxShadow: `0 0 10px ${status.color}80` }} />
+                    <div className={cn("h-2.5 w-2.5 rounded-full", getStatusDotClass(status.color))} />
                     <h3 className="text-sm font-black text-theme-primary tracking-wide">{status.label}</h3>
                 </div>
                 <span className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-0.5 text-xs font-bold text-theme-secondary/60">

@@ -1,6 +1,8 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LoyaltyTier } from '@/services';
 import { Edit2, Shield, TrendingUp, Star, Award, Zap, CheckCircle, Save, X } from 'lucide-react';
+import { getSolidBackgroundClass, getTextHighlightClass } from '@/utils/theme-mapper';
+import { cn } from '@/lib/utils';
 
 interface TierManagementProps {
     tiers: LoyaltyTier[];
@@ -71,15 +73,13 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                     >
                         {/* Gradient Backdrop */}
                         <div
-                            className="absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-10 blur-3xl transition-opacity group-hover:opacity-20"
-                            style={{ backgroundColor: tier.color }}
+                            className={cn("absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-10 blur-3xl transition-opacity group-hover:opacity-20", getSolidBackgroundClass(tier.color))}
                         />
 
                         <div className="relative z-10 space-y-4">
                             <div className="flex items-center justify-between">
                                 <div
-                                    className="p-2.5 rounded-2xl bg-white/5 vsm-border-subtle group-hover:scale-110 transition-transform duration-500"
-                                    style={{ color: tier.color }}
+                                    className={cn("p-2.5 rounded-2xl bg-white/5 vsm-border-subtle group-hover:scale-110 transition-transform duration-500", getTextHighlightClass(tier.color))}
                                 >
                                     {getIcon(tier.id)}
                                 </div>

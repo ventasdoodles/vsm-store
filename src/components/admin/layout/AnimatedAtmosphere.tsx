@@ -68,9 +68,8 @@ export const AnimatedAtmosphere = React.memo(() => {
                             repeat: Infinity,
                             ease: "easeInOut"
                         }}
-                        style={{ transform: 'translateZ(0)' }}
                         className={cn(
-                            "absolute top-[-15%] right-[-10%] h-[50%] w-[50%] rounded-full blur-[80px] will-change-transform",
+                            "absolute top-[-15%] right-[-10%] h-[50%] w-[50%] rounded-full blur-[80px] will-change-transform transform-gpu",
                             colors.primary
                         )}
                     />
@@ -87,9 +86,8 @@ export const AnimatedAtmosphere = React.memo(() => {
                             ease: "easeInOut",
                             delay: 1
                         }}
-                        style={{ transform: 'translateZ(0)' }}
                         className={cn(
-                            "absolute bottom-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[70px] will-change-transform",
+                            "absolute bottom-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[70px] will-change-transform transform-gpu",
                             colors.secondary
                         )}
                     />
@@ -105,9 +103,8 @@ export const AnimatedAtmosphere = React.memo(() => {
                             repeat: Infinity,
                             ease: "linear"
                         }}
-                        style={{ transform: 'translateZ(0)' }}
                         className={cn(
-                            "absolute top-[25%] left-[20%] h-[25%] w-[25%] rounded-full blur-[90px] will-change-transform",
+                            "absolute top-[25%] left-[20%] h-[25%] w-[25%] rounded-full blur-[90px] will-change-transform transform-gpu",
                             colors.accent
                         )}
                     />
@@ -116,8 +113,7 @@ export const AnimatedAtmosphere = React.memo(() => {
             
             {/* Grainy Noise Overlay (Low Opacity for high-performance feel) */}
             <div 
-                className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" 
-                style={{ transform: 'translateZ(0)' }}
+                className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat transform-gpu" 
             />
         </div>
     );

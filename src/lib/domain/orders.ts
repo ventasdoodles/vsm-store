@@ -15,23 +15,23 @@ export const STOREFRONT_ORDER_STATUS = {
 export type StorefrontOrderStatus = keyof typeof STOREFRONT_ORDER_STATUS;
 
 export const ADMIN_ORDER_STATUS = {
-    pending: { label: 'Pendiente', color: '#f59e0b' },
-    confirmed: { label: 'Confirmado', color: '#3b82f6' },
-    processing: { label: 'Preparando', color: '#8b5cf6' },
-    shipped: { label: 'Enviado', color: '#06b6d4' },
-    delivered: { label: 'Entregado', color: '#10b981' },
-    cancelled: { label: 'Cancelado', color: '#ef4444' },
+    pending: { label: 'Pendiente', color: 'warning' },
+    confirmed: { label: 'Confirmado', color: 'info' },
+    processing: { label: 'Preparando', color: 'accent' },
+    shipped: { label: 'Enviado', color: 'vape' },
+    delivered: { label: 'Entregado', color: 'success' },
+    cancelled: { label: 'Cancelado', color: 'destructive' },
 } as const;
 
 export type AdminOrderStatus = keyof typeof ADMIN_ORDER_STATUS;
 
 export const ADMIN_ORDER_STATUSES_LIST: { value: AdminOrderStatus; label: string; color: string }[] = [
-    { value: 'pending', label: 'Pendiente', color: '#f59e0b' },
-    { value: 'confirmed', label: 'Confirmado', color: '#3b82f6' },
-    { value: 'processing', label: 'Preparando', color: '#8b5cf6' },
-    { value: 'shipped', label: 'Enviado', color: '#06b6d4' },
-    { value: 'delivered', label: 'Entregado', color: '#10b981' },
-    { value: 'cancelled', label: 'Cancelado', color: '#ef4444' },
+    { value: 'pending', label: 'Pendiente', color: 'warning' },
+    { value: 'confirmed', label: 'Confirmado', color: 'info' },
+    { value: 'processing', label: 'Preparando', color: 'accent' },
+    { value: 'shipped', label: 'Enviado', color: 'vape' },
+    { value: 'delivered', label: 'Entregado', color: 'success' },
+    { value: 'cancelled', label: 'Cancelado', color: 'destructive' },
 ];
 
 export const ORDER_STATUS_TRANSITIONS: Record<AdminOrderStatus, AdminOrderStatus[]> = {

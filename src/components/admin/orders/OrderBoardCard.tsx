@@ -1,7 +1,8 @@
 import { CreditCard } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, cn } from '@/lib/utils';
 import { type AdminOrder } from '@/services/admin';
 import { ADMIN_ORDER_STATUSES_LIST, canTransitionTo, type AdminOrderStatus } from '@/lib/domain/orders';
+import { getSolidBackgroundClass } from '@/utils/theme-mapper';
 
 interface OrderBoardCardProps {
     order: AdminOrder;
@@ -34,7 +35,7 @@ export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoard
 
             <div className="flex items-center justify-between pt-2 border-t border-white/5">
                 <div className="flex items-center gap-1.5">
-                    <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: statusInfo?.color }} />
+                    <div className={cn("h-1.5 w-1.5 rounded-full", getSolidBackgroundClass(statusInfo?.color))} />
                     {order.payment_method === 'transfer' && (
                         <CreditCard className="h-3 w-3 text-amber-400/70" />
                     )}

@@ -11,6 +11,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
 import { canTransitionTo, ADMIN_ORDER_STATUSES_LIST, type AdminOrderStatus } from '@/lib/domain/orders';
 import { useNotification } from '@/hooks/useNotification';
+import { getSubtleBadgeClasses } from '@/utils/theme-mapper';
 
 interface OrderListCardProps {
     order: AdminOrder;
@@ -78,8 +79,10 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                             #{order.id?.slice(-6).toUpperCase()}
                         </span>
                         <span
-                            className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide"
-                            style={{ backgroundColor: `${statusInfo?.color}18`, color: statusInfo?.color, border: `1px solid ${statusInfo?.color}30` }}
+                            className={cn(
+                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide border",
+                                getSubtleBadgeClasses(statusInfo?.color)
+                            )}
                         >
                             {statusInfo?.label ?? order.status}
                         </span>
