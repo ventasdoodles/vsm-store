@@ -5,6 +5,7 @@
  * // Regla / Notas: Generacion de links de pago seguros.
  */
 import { supabase } from '@/lib/supabase';
+import { CreatePaymentRequestSchema } from '@/lib/contracts/payments-contract';
 
 interface CreatePaymentResponse {
     init_point: string;
@@ -17,9 +18,12 @@ export const mercadopagoService = {
      * @param orderId ID de la orden en Supabase.
      */
     async createPayment(orderId: string): Promise<CreatePaymentResponse> {
-        const { data, error } = await supabase.functions.invoke<CreatePaymentResponse>('create-payment', {
+        // === CONTRACT ENFORCEMENT ===
+        const requestPayload = CreatePaymentRequestSchema.parse({
             body: { order_id: orderId }
         });
+
+        const { data, error } = await supabase.functions.invoke<CreatePaymentResponse>('create-payment', requestPayload);
 
         if (error || !data) {
             console.error('[Payments] Error creating payment:', error);

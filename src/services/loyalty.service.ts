@@ -16,6 +16,7 @@ import {
     getNextTierProgress as calculateProgress,
     TierDefinition
 } from '@/lib/domain/loyalty';
+import { ProcessLoyaltyPointsRequestSchema } from '@/lib/contracts/loyalty-contract';
 
 // ─── Re-exports de tipos de dominio (para compatibilidad) ──────────
 export type Tier = TierId;
@@ -102,13 +103,16 @@ export async function addLoyaltyPoints(
     orderId: string,
     description: string
 ) {
-    const { error } = await supabase.rpc('process_loyalty_points', {
+    // === CONTRACT ENFORCEMENT ===
+    const payload = ProcessLoyaltyPointsRequestSchema.parse({
         p_user_id: customerId,
         p_amount: points,
         p_type: 'earned',
         p_description: description,
         p_order_id: orderId
     });
+
+    const { error } = await supabase.rpc('process_loyalty_points', payload);
 
     if (error) {
         console.error('Error agregando puntos (RPC):', error);
@@ -156,13 +160,16 @@ export async function redeemPoints(
     const maxPoints = Math.min(points, config.max_points_per_order);
     const discount = maxPoints * config.currency_per_point;
 
-    const { error } = await supabase.rpc('process_loyalty_points', {
+    // === CONTRACT ENFORCEMENT ===
+    const payload = ProcessLoyaltyPointsRequestSchema.parse({
         p_user_id: customerId,
         p_amount: -maxPoints,
         p_type: 'spent',
         p_description: `Canje de ${maxPoints} puntos (-$${discount})`,
         p_order_id: orderId ?? null
     });
+
+    const { error } = await supabase.rpc('process_loyalty_points', payload);
 
     if (error) throw error;
     return { discount };
@@ -174,13 +181,16 @@ export async function adjustPoints(
     points: number,
     description: string
 ): Promise<void> {
-    const { error } = await supabase.rpc('process_loyalty_points', {
+    // === CONTRACT ENFORCEMENT ===
+    const payload = ProcessLoyaltyPointsRequestSchema.parse({
         p_user_id: customerId,
         p_amount: points,
         p_type: points >= 0 ? 'earned' : 'spent',
         p_description: description,
         p_order_id: null
     });
+
+    const { error } = await supabase.rpc('process_loyalty_points', payload);
 
     if (error) throw error;
 }
