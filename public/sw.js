@@ -139,8 +139,12 @@ async function cacheThenNetwork(request, cacheName) {
             cache.put(request, response.clone());
         }
         return response;
-    } catch {
-        return new Response('Offline', { status: 503, statusText: 'Offline' });
+    } catch (err) {
+        // Do not return text 'Offline' for JS chunks, it causes SyntaxError in React dynamic imports
+        if (request.destination === 'document') {
+            return caches.match('/offline.html');
+        }
+        return new Response('', { status: 503, statusText: 'Service Unavailable' });
     }
 }
 
@@ -169,7 +173,7 @@ async function staleWhileRevalidate(request, cacheName) {
     // Retornar cache si está disponible, sino esperar red
     const result = cached || await fetchPromise;
     if (!result) {
-        return new Response('Offline', { status: 503, statusText: 'Offline' });
+        return new Response('', { status: 503, statusText: 'Service Unavailable' });
     }
     return result;
 }
@@ -194,10 +198,17 @@ async function networkFirstWithOffline(request) {
         if (request.mode === 'navigate') {
             const offlinePage = await caches.match('/offline.html');
             if (offlinePage) return offlinePage;
+            
+            // Fallback de emergencia si offline.html no está cacheado
+            return new Response('<html><body><h1>Sin Conexión</h1><p>Revisa tu internet.</p></body></html>', { 
+                status: 503, 
+                statusText: 'Service Unavailable',
+                headers: { 'Content-Type': 'text/html; charset=utf-8' }
+            });
         }
 
         console.error('[SW] All fallbacks failed for:', request.url);
-        return new Response('VSM Critical Offline Fallback', { 
+        return new Response('', { 
             status: 503, 
             statusText: 'Service Unavailable',
             headers: { 'Content-Type': 'text/plain' }
