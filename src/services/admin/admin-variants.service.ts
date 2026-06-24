@@ -8,6 +8,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Section } from '@/types/constants';
 import type { ProductAttribute, ProductAttributeValue, ProductVariant } from '@/types/variant';
+import { SyncVariantsRequestSchema } from '@/lib/contracts/admin-variants-contract';
 
 /**
  * Obtiene todos los atributos globales con sus valores
@@ -166,6 +167,9 @@ export interface VariantInput {
 }
 
 export async function syncProductVariants(productId: string, variants: VariantInput[]): Promise<void> {
+    // === CONTRACT ENFORCEMENT ===
+    const validatedVariants = SyncVariantsRequestSchema.parse(variants);
+
     // 1. Delete existing variant options first (FK constraint) then variants
     const { data: existingVariants } = await supabase
         .from('product_variants')
@@ -189,12 +193,12 @@ export async function syncProductVariants(productId: string, variants: VariantIn
 
     if (deleteError) throw deleteError;
 
-    if (!variants.length) return;
+    if (!validatedVariants.length) return;
 
     // 2. Insert new variants with unique SKU handling
     const shortPid = productId.slice(0, 8);
     let variantIdx = 0;
-    for (const v of variants) {
+    for (const v of validatedVariants) {
         // If SKU is empty, generate a unique one; PostgreSQL UNIQUE rejects duplicate empty strings
         const sku = v.sku && v.sku.trim() !== '' 
             ? v.sku 

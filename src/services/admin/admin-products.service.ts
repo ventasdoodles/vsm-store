@@ -3,11 +3,13 @@ import { supabase } from '@/lib/supabase';
 import { 
     GenerateProductCopyRequestSchema, 
     EnrichProductRequestSchema, 
-    EmbeddingsProcessorRequestSchema 
+    EmbeddingsProcessorRequestSchema,
+    AdminProductRequestSchema
 } from '@/lib/contracts/admin-products-contract';
 
 import type { Section, ProductStatus } from '@/types/constants';
 import type { ProductVariant } from '@/types/variant';
+import type { Product } from '@/types/product';
 
 export interface ProductFormData {
     name: string;
@@ -251,11 +253,15 @@ async function syncProductEmbedding(id: string, name: string, description: strin
     await supabase.from('products').update({ embedding: embedData.embedding }).eq('id', id);
 }
 
-export async function createProduct(product: ProductFormData) {
+export async function createProduct(product: ProductFormData): Promise<Product> {
+    const validatedData = AdminProductRequestSchema.parse(product);
     const { data, error } = await supabase
         .from('products')
-        .insert(product)
-        .select('id, name, slug, price, stock, sku, section, category_id, is_active')
+        .insert({
+            ...validatedData,
+            is_active: validatedData.status === 'active'
+        })
+        .select()
         .single();
 
     if (error) throw error;
@@ -266,18 +272,27 @@ export async function createProduct(product: ProductFormData) {
     return data;
 }
 
-export async function updateProduct(id: string, product: Partial<ProductFormData>) {
+export async function updateProduct(id: string, updates: Partial<ProductFormData>): Promise<Product> {
+    const PartialSchema = AdminProductRequestSchema.partial();
+    const validatedData = PartialSchema.parse(updates);
+    
+    // Si cambia status, mantener sincronizado is_active
+    const payload = { ...validatedData } as any;
+    if (validatedData.status) {
+        payload.is_active = validatedData.status === 'active';
+    }
+
     const { data, error } = await supabase
         .from('products')
-        .update(product)
+        .update(payload)
         .eq('id', id)
-        .select('id, name, slug, price, stock, sku, section, category_id, is_active, description')
+        .select()
         .single();
 
     if (error) throw error;
 
     // Re-sync AI embedding only if text fields changed
-    if (product.name !== undefined || product.description !== undefined || product.section !== undefined) {
+    if (updates.name !== undefined || updates.description !== undefined || updates.section !== undefined) {
         syncProductEmbedding(data.id, data.name || '', data.description || '', data.section || '').catch(console.error);
     }
 

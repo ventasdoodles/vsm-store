@@ -3,6 +3,8 @@ import { CreateOrderRequestSchema } from '../src/lib/contracts/storefront-orders
 import { AdminCouponRequestSchema } from '../src/lib/contracts/admin-coupons-contract.ts';
 import { FlashDealRequestSchema } from '../src/lib/contracts/admin-flash-deals-contract.ts';
 import { WheelPrizeRequestSchema } from '../src/lib/contracts/admin-wheel-contract.ts';
+import { AdminProductRequestSchema } from '../src/lib/contracts/admin-products-contract.ts';
+import { SyncVariantsRequestSchema } from '../src/lib/contracts/admin-variants-contract.ts';
 
 console.log("=== VSM Store Financial Guards Tests ===");
 
@@ -133,6 +135,55 @@ try {
         console.log("✅ Admin Wheel Prizes Guard REJECTED economy destruction as expected");
     } else {
         console.error("❌ ERROR: Wheel Prizes Guard failed with unexpected error:", e);
+        process.exit(1);
+    }
+}
+
+// Test 7: Admin Products Guard (Negative Price)
+try {
+    AdminProductRequestSchema.parse({
+        name: "Test Product",
+        slug: "test-product-123",
+        price: -50, // Invalid negative price
+        stock: 10,
+        category_id: "123e4567-e89b-12d3-a456-426614174000",
+        section: "vape",
+        status: "active"
+    });
+    console.error("❌ ERROR: Admin Products Guard FAILED to catch negative price");
+    process.exit(1);
+} catch (e) {
+    const errorStr = String(e);
+    if (errorStr.includes("no puede ser negativo")) {
+        console.log("✅ Admin Products Guard REJECTED negative price as expected");
+    } else {
+        console.error("❌ ERROR: Admin Products Guard failed with unexpected error:", e);
+        process.exit(1);
+    }
+}
+
+// Test 8: Admin Variants Guard (Negative Price in Sync Array)
+try {
+    SyncVariantsRequestSchema.parse([
+        {
+            sku: "VAR-1",
+            price: 100,
+            stock: 10
+        },
+        {
+            sku: "VAR-2",
+            price: -10, // Invalid negative variant price
+            stock: 5
+        }
+    ]);
+    console.error("❌ ERROR: Admin Variants Guard FAILED to catch negative price in variant array");
+    process.exit(1);
+} catch (e) {
+    const errorStr = String(e);
+    if (errorStr.includes("no puede ser negativo")) {
+        console.log("✅ Admin Variants Guard REJECTED negative variant price as expected");
+    } else {
+        console.error("❌ ERROR: Admin Variants Guard failed with unexpected error:", e);
         process.exit(1);
     }
 }
