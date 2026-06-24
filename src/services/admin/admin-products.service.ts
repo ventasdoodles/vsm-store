@@ -1,5 +1,10 @@
 // ─── Admin Products Service ──────────────────────
 import { supabase } from '@/lib/supabase';
+import { 
+    GenerateProductCopyRequestSchema, 
+    EnrichProductRequestSchema, 
+    EmbeddingsProcessorRequestSchema 
+} from '@/lib/contracts/admin-products-contract';
 
 import type { Section, ProductStatus } from '@/types/constants';
 import type { ProductVariant } from '@/types/variant';
@@ -163,9 +168,11 @@ export async function getAllProducts() {
  */
 export async function generateProductCopy(name: string, currentDesc?: string): Promise<{ description: string; short_description: string; tags: string[] }> {
     try {
-        const { data, error } = await supabase.functions.invoke('product-intelligence', {
+        const payload = GenerateProductCopyRequestSchema.parse({
             body: { name, description: currentDesc, action: 'generate_copy' }
         });
+
+        const { data, error } = await supabase.functions.invoke('product-intelligence', payload);
 
         if (error) throw error;
         return data;
@@ -204,7 +211,7 @@ export async function enrichProduct(
     description?: string
 ): Promise<EnrichmentPackage> {
     try {
-        const { data, error } = await supabase.functions.invoke('product-intelligence', {
+        const payload = EnrichProductRequestSchema.parse({
             body: {
                 action: 'enrich_product',
                 name,
@@ -214,6 +221,8 @@ export async function enrichProduct(
                 description: description ?? '',
             }
         });
+
+        const { data, error } = await supabase.functions.invoke('product-intelligence', payload);
 
         if (error) throw error;
         return data as EnrichmentPackage;
@@ -227,9 +236,12 @@ export async function enrichProduct(
 
 async function syncProductEmbedding(id: string, name: string, description: string, section: string) {
     const textToEmbed = `Producto: ${name}. Categoría: ${section}. Descripción: ${description}`.trim();
-    const { data: embedData, error: embedError } = await supabase.functions.invoke('embeddings-processor', {
+    
+    const payload = EmbeddingsProcessorRequestSchema.parse({
         body: { text: textToEmbed }
     });
+
+    const { data: embedData, error: embedError } = await supabase.functions.invoke('embeddings-processor', payload);
     
     if (embedError || !embedData?.embedding) {
         console.error('Error generating product embedding:', embedError);

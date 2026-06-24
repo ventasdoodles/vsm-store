@@ -1,5 +1,6 @@
 // ─── Admin Orders Service ────────────────────────
 import { supabase } from '@/lib/supabase';
+import { CancelAdminUnpaidOrderRequestSchema } from '@/lib/contracts/admin-orders-contract';
 import {
     type AdminOrderStatus,
     ADMIN_ORDER_STATUSES_LIST,
@@ -104,10 +105,12 @@ export async function cancelAdminOrder(orderId: string, reason: string): Promise
         throw new Error('El motivo de cancelacion debe tener al menos 5 caracteres.');
     }
 
-    const { data, error } = await supabase.rpc('cancel_admin_unpaid_order_with_audit', {
+    const payload = CancelAdminUnpaidOrderRequestSchema.parse({
         p_order_id: orderId,
         p_reason: trimmedReason,
     });
+
+    const { data, error } = await supabase.rpc('cancel_admin_unpaid_order_with_audit', payload);
 
     if (error) {
         throw error;

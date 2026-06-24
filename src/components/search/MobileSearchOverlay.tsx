@@ -1,48 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Loader2, ChevronRight, Mic } from 'lucide-react';
+import { Search, X, Loader2, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSearch } from '@/hooks/useSearch';
 import { useSearchOverlay } from '@/stores/search-overlay.store';
 import { formatPrice, cn, optimizeImage } from '@/lib/utils';
-import { useVoiceSearch } from '@/hooks/useVoiceSearch';
-import { VoiceSearchOverlay } from './VoiceSearchOverlay';
-import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
 import { useStorefrontTactical } from '@/hooks/useStorefrontTactical';
 import type { Product } from '@/types/product';
 
 export function MobileSearchOverlay() {
     const { isOpen, close } = useSearchOverlay();
     const [query, setQuery] = useState('');
-    const [isVoiceOpen, setIsVoiceOpen] = useState(false);
-    
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const { trigger } = useHaptic();
     const { triggerSensory } = useStorefrontTactical();
-    const { mutateAsync: processTranscript } = useVoiceIntelligence();
-
-    // Gestión de Voz
-    const { isListening, isDiagnosing, transcript, error: voiceError, startListening, stopListening } = useVoiceSearch({
-        onResult: async (text) => {
-            const shouldAIProcess = text.split(' ').length > 2;
-            if (shouldAIProcess) {
-                setTimeout(async () => {
-                    const { searchQuery } = await processTranscript(text);
-                    setQuery(searchQuery);
-                    setIsVoiceOpen(false);
-                    setTimeout(() => handleSubmitForm(searchQuery), 200);
-                }, 800);
-            } else {
-                setQuery(text);
-                setTimeout(() => {
-                    setIsVoiceOpen(false);
-                    handleSubmitForm(text);
-                }, 800);
-            }
-        }
-    });
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
     const { data: searchData, isLoading: isSearching } = useSearch(query);
@@ -97,18 +70,6 @@ export function MobileSearchOverlay() {
                         className="w-full rounded-2xl border-none bg-white/5 py-3 pl-10 pr-12 text-theme-primary placeholder:text-theme-secondary focus:bg-white/10 focus:ring-2 focus:ring-vape-500/30 transition-all font-medium"
                     />
                     
-                    <button
-                        type="button"
-                        onClick={() => {
-                            triggerSensory('voice-listen');
-                            setIsVoiceOpen(true);
-                            startListening();
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full text-vape-400 hover:bg-vape-500/10 active:scale-90 transition-all"
-                    >
-                        <Mic className="h-5 w-5" />
-                    </button>
-
                     {isSearching && (
                         <Loader2 className="absolute right-12 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-vape-500" />
                     )}
@@ -166,18 +127,7 @@ export function MobileSearchOverlay() {
                 )}
             </div>
 
-            {/* Voice Search Overlay (Wave 133) */}
-            <VoiceSearchOverlay
-                isOpen={isVoiceOpen}
-                onClose={() => {
-                    setIsVoiceOpen(false);
-                    stopListening();
-                }}
-                transcript={transcript}
-                isListening={isListening}
-                isDiagnosing={isDiagnosing}
-                error={voiceError}
-            />
+
         </div>
     );
 }
