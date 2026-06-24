@@ -5,6 +5,7 @@
  * // Regla / Notas: Sin `any`. Funciones puras async. Tipado estricto.
  */
 import { supabase } from '@/lib/supabase';
+import { FlashDealRequestSchema } from '@/lib/contracts/admin-flash-deals-contract';
 
 /* ─── Tipos ─── */
 
@@ -100,16 +101,19 @@ export async function getActiveFlashDeals(): Promise<FlashDeal[]> {
 /* ─── Mutations ─── */
 
 export async function createFlashDeal(formData: FlashDealFormData): Promise<FlashDeal> {
+    // === CONTRACT ENFORCEMENT ===
+    const validatedData = FlashDealRequestSchema.parse(formData);
+
     const { data, error } = await supabase
         .from('flash_deals')
         .insert({
-            product_id: formData.product_id,
-            flash_price: formData.flash_price,
-            max_qty: formData.max_qty,
-            starts_at: formData.starts_at,
-            ends_at: formData.ends_at,
-            is_active: formData.is_active,
-            priority: formData.priority,
+            product_id: validatedData.product_id,
+            flash_price: validatedData.flash_price,
+            max_qty: validatedData.max_qty,
+            starts_at: validatedData.starts_at,
+            ends_at: validatedData.ends_at,
+            is_active: validatedData.is_active,
+            priority: validatedData.priority,
         })
         .select('id, product_id, flash_price, max_qty, sold_count, starts_at, ends_at, is_active, priority, created_at, updated_at')
         .single();
@@ -119,9 +123,12 @@ export async function createFlashDeal(formData: FlashDealFormData): Promise<Flas
 }
 
 export async function updateFlashDeal(id: string, formData: Partial<FlashDealFormData>): Promise<FlashDeal> {
+    const PartialSchema = FlashDealRequestSchema.partial();
+    const validatedData = PartialSchema.parse(formData);
+
     const { data, error } = await supabase
         .from('flash_deals')
-        .update(formData)
+        .update(validatedData)
         .eq('id', id)
         .select('id, product_id, flash_price, max_qty, sold_count, starts_at, ends_at, is_active, priority, created_at, updated_at')
         .single();

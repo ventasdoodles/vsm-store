@@ -6,6 +6,7 @@
  * // Regla / Notas: Sin `any`. Selectores explícitos. Named exports. Sin console.log producción.
  */
 import { supabase } from '@/lib/supabase';
+import { WheelPrizeRequestSchema } from '@/lib/contracts/admin-wheel-contract';
 
 /* ─── Tipos ─── */
 
@@ -51,12 +52,14 @@ export async function getAllWheelPrizes(): Promise<WheelPrizeAdmin[]> {
 }
 
 export async function createWheelPrize(formData: WheelPrizeFormData): Promise<void> {
-    const { error } = await supabase.from('wheel_config').insert(formData);
+    const validatedData = WheelPrizeRequestSchema.parse(formData);
+    const { error } = await supabase.from('wheel_config').insert(validatedData);
     if (error) throw error;
 }
 
 export async function updateWheelPrize(id: string, formData: WheelPrizeFormData): Promise<void> {
-    const { error } = await supabase.from('wheel_config').update(formData).eq('id', id);
+    const validatedData = WheelPrizeRequestSchema.parse(formData);
+    const { error } = await supabase.from('wheel_config').update(validatedData).eq('id', id);
     if (error) throw error;
 }
 

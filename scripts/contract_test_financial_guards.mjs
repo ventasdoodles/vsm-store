@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { CreateOrderRequestSchema } from '../src/lib/contracts/storefront-orders-contract.ts';
 import { AdminCouponRequestSchema } from '../src/lib/contracts/admin-coupons-contract.ts';
+import { FlashDealRequestSchema } from '../src/lib/contracts/admin-flash-deals-contract.ts';
+import { WheelPrizeRequestSchema } from '../src/lib/contracts/admin-wheel-contract.ts';
 
 console.log("=== VSM Store Financial Guards Tests ===");
 
@@ -88,6 +90,51 @@ try {
 } catch (e) {
     console.error("❌ ERROR: Order Guard rejected valid payload:", e);
     process.exit(1);
+}
+
+// Test 5: Admin Flash Deals Guard (Invalid Date Range & Negative Price)
+try {
+    FlashDealRequestSchema.parse({
+        product_id: "123e4567-e89b-12d3-a456-426614174000",
+        flash_price: -10, // Invalid negative price
+        max_qty: 0, // Invalid max qty (min 1)
+        starts_at: "2027-01-02T00:00:00Z",
+        ends_at: "2027-01-01T00:00:00Z", // Invalid ends_at before starts_at
+        is_active: true,
+        priority: 1
+    });
+    console.error("❌ ERROR: Flash Deals Guard FAILED to catch negative prices and inverted dates");
+    process.exit(1);
+} catch (e) {
+    const errorStr = String(e);
+    if (errorStr.includes("posterior") || errorStr.includes("positivo")) {
+        console.log("✅ Admin Flash Deals Guard REJECTED destructive payload as expected");
+    } else {
+        console.error("❌ ERROR: Flash Deals Guard failed with unexpected error:", e);
+        process.exit(1);
+    }
+}
+
+// Test 6: Admin Wheel Prizes Guard (1,000,000 Points)
+try {
+    WheelPrizeRequestSchema.parse({
+        label: "Jackpot Infinito",
+        type: "points",
+        value: { amount: 1000000 }, // Invalid amount > 1000
+        probability: 5,
+        color: "#FFD700",
+        is_active: true
+    });
+    console.error("❌ ERROR: Wheel Prizes Guard FAILED to catch destructive points amount");
+    process.exit(1);
+} catch (e) {
+    const errorStr = String(e);
+    if (errorStr.includes("entre 1 y 1000")) {
+        console.log("✅ Admin Wheel Prizes Guard REJECTED economy destruction as expected");
+    } else {
+        console.error("❌ ERROR: Wheel Prizes Guard failed with unexpected error:", e);
+        process.exit(1);
+    }
 }
 
 console.log("\n✅ [SUCCESS] All Financial Guards verified successfully!");
