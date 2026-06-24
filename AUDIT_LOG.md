@@ -20,18 +20,35 @@
 - `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`
 - `docs/audits/2026-05/github-actions-runtime-verification.md`
 - `docs/audits/2026-05/admin-rpc-cancellation.md`
+# VSM STORE - AUDIT INDEX
+
+> Compact chronological index of accepted audits and canon lanes.
+> Full pre-split historical detail is preserved in `docs/archive/AUDIT_LOG_ARCHIVE_2026-05-16.md`.
+> Focused current audit details live under `docs/audits/`.
+> Do not turn this file back into a full audit transcript.
+
+## Archive Rules
+- Each new accepted lane gets one compact index entry here.
+- Detailed evidence goes in `docs/audits/YYYY-MM/<lane>.md`.
+- Current technical truth is summarized in `AI_CONTEXT.md`.
+- Tactical storefront/Cesarin truth remains in `STORE_FRONT_AI_PILOT_CONTEXT.md`.
+- No `AUDIT_LOG2.md` continuation file is allowed.
+
+## Current Detailed Audit Files
+- `docs/audits/README.md`
+- `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`
+- `docs/audits/2026-05/seed-runner-typecheck-strictness.md`
+- `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md`
+- `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`
+- `docs/audits/2026-05/github-actions-runtime-verification.md`
+- `docs/audits/2026-05/admin-rpc-cancellation.md`
 - `docs/audits/2026-05/productization-config-boundary.md`
+- `docs/audits/2026-06/contract-testing-ai-edge.md`
 
 ## Chronological Audit Index
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
-| 2026-06-22 | VSM Store E2E Smoke QA & Security/AI Stress Testing | ACCEPT | Bounded GOD MODE implementation of four independent Node.js E2E test scripts (`e2e_db_smoke_qa.mjs`, `e2e_db_smoke_qa_loyalty.mjs`, `e2e_security_pentest.mjs`, `e2e_ai_stress_test.mjs`). Validated CRUD operations, full checkout/loyalty data pipeline, ironclad RLS Anon-key penetration testing, and Edge Function AI Jailbreak defense via Server-Sent Events. All scripts verified as passing securely against local Supabase. Reconciled output matrix into `e2e_qa_report.md`. | current canon | n/a |
-| 2026-06-20 | Concierge Architecture & Model Stack Repair (Lane 4) | ACCEPT | Bounded GOD MODE implementation removing the `isPureGreeting` hardcoded logic from `supabase/functions/customer-intelligence/handlers/concierge-chat.ts`. Restored the conversational handling entirely back to the native `GeminiAnalystAdapter`, preventing the bypass that was degrading AI intelligence and causing awkward static responses to greetings. Validated with `npm run typecheck` returning zero errors. | current canon | n/a |
-| 2026-06-20 | Source Code Presentation Healing (src/ mojibake) | ACCEPT | Bounded GOD MODE implementation fixing hardcoded UTF-8 presentation errors (mojibake) across 19 components in `src/`. Replaced corrupted bytes with proper Spanish characters globally without altering React or TypeScript logic. Validated with `npm run typecheck` returning zero errors globally. | current canon | n/a |
-| 2026-06-20 | Inventory Oracle AI Restoration (Lane 3) | ACCEPT | Bounded GOD MODE implementation restoring the full Gemini LLM capabilities of the `inventory-oracle` Edge Function. Replaced the defanged deterministic division logic with the original context-aware LLM prompt, while keeping the newly hardened error boundaries and explicit type casting. | current canon | n/a |
-| 2026-06-17 | AI System Recovery Lanes 1 & 2 | ACCEPT WITH RESIDUAL RISK | Acceptance Audit for AI System Recovery Lanes 1 & 2. Recovered dashboards and UTF-8 encoding across supabase/functions. Residual risk: 15 lines of mojibake remaining in concierge-chat.ts and response-shaping.ts (which were immediately cleaned up in this prep lane). | current canon | n/a |
-| 2026-06-17 | AI API Modernization & Front-to-Back AI Ecosystem Audit | ACCEPT | Bounded GOD MODE implementation tracing all AI interventions inside VSM Store. Validated and upgraded `product-intelligence`, `bundle-intelligence`, `inventory-oracle`, `dashboard-intelligence`, `customer-narrative`, `loyalty-intelligence`, and `voice-intelligence` to drop `v1beta` deprecated REST endpoints in favor of the unified `v1` endpoint targeting `gemini-2.5-flash-lite`. Erradicated unguarded `unknown` error stack references in all the aforementioned endpoints. Solved deep UTF-8 encoding regressions inside `AdminOracleDashboard.tsx` where Spanish accents were corrupting AI presentation layers. Validated `CustomerIntelligencePanel.tsx` dynamic tag suggestions and AI routing safely executing via the frontend API bindings. Validation: `npm run typecheck` 0 errors. `vitest` achieved a 100% pass rate (147 files, 933 tests). | current canon | n/a |
 | 2026-06-17 | AI Architecture Hardening & Error Handling Sweep | ACCEPT | Bounded GOD MODE implementation over all remaining AI boundaries (Storefront AI Search, Admin Cesarin OS, Edge Functions). Cleaned `error: unknown` blind object accesses across `customer-intelligence`, `cesarin-qa-judge`, `embeddings-processor`, and `voice-intelligence` by strictly casting exceptions via `error instanceof Error ? error : new Error(String(error))`, definitively closing Deno/TypeScript compiler gaps. Typecheck passed successfully globally, ensuring type safety. Identified deep typescript `any` usages in `concierge.service.ts` test files and preserved them to prevent legacy test suites from cascading failures, resolving architectural scope. Validation: `npm run typecheck` 0 errors. | current canon | n/a |
 | 2026-06-17 | Edge Functions Type Safety & AI Architecture Optimization | ACCEPT | Bounded implementation strictly eliminating 78 instances of explicit `any` typings across `supabase/functions/customer-intelligence`, `cesarin-qa-judge`, `embeddings-processor`, and all AI LLM gateways. Replaced generic typings with explicit boundaries, `unknown` error trapping, and hardcasted mock resolutions in testing suites (`customer-intelligence-web-tools.test.ts`, `storefront-compatibility-resolver.test.ts`) using the `import("@supabase/supabase-js").SupabaseClient` format safely compatible with Deno and local TSC. Validation: `npm run typecheck` returned zero errors globally. Non-claims: no business logic mutated, no DB schema changed, no runtime production test conducted. | current canon | n/a |
 | 2026-06-16 | Vertical Pack Productization Logic Audit | ACCEPT | Bounded implementation to complete remaining 100% test coverage for `VerticalPackConfigSettings.test.tsx` by adding edge-case validations for section removal, uncontrolled manual JSON edits inside the developer mode, and correct value emission for stringified JSON. Verified there are no hidden business logic defects in config processing. Validation: `vitest` passed 6/6 tests, `npm run typecheck` returned zero errors. | current canon | n/a |

@@ -38,7 +38,7 @@ export type CustomerIntelligenceRequest = z.infer<typeof CustomerIntelligenceReq
  */
 export const CustomerIntelligenceResponseSchema = z.object({
   response: z.string(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
   error: z.string().optional()
 });
 
