@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase';
 import type { VerticalPackConfig } from '@/config/productization/types';
+import { StoreSettingsUpdateSchema } from '@/lib/contracts/store-settings-contract';
 
 export interface HeroSlider {
     id: string;
@@ -125,8 +126,11 @@ export async function getStoreSettings() {
 }
 
 export async function updateStoreSettings(settings: Partial<StoreSettings>) {
+    // === CONTRACT ENFORCEMENT ===
+    const validatedSettings = StoreSettingsUpdateSchema.parse(settings);
+
     // Strip id from payload — it's the primary key used in the WHERE, not a column to update
-    const { ...payload } = settings;
+    const { ...payload } = validatedSettings as any;
     delete payload.id;
     const { data, error } = await supabase
         .from('store_settings')

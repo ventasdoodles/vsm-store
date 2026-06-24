@@ -5,6 +5,7 @@ import { FlashDealRequestSchema } from '../src/lib/contracts/admin-flash-deals-c
 import { WheelPrizeRequestSchema } from '../src/lib/contracts/admin-wheel-contract.ts';
 import { AdminProductRequestSchema } from '../src/lib/contracts/admin-products-contract.ts';
 import { SyncVariantsRequestSchema } from '../src/lib/contracts/admin-variants-contract.ts';
+import { StoreSettingsUpdateSchema } from '../src/lib/contracts/store-settings-contract.ts';
 
 console.log("=== VSM Store Financial Guards Tests ===");
 
@@ -184,6 +185,40 @@ try {
         console.log("✅ Admin Variants Guard REJECTED negative variant price as expected");
     } else {
         console.error("❌ ERROR: Admin Variants Guard failed with unexpected error:", e);
+        process.exit(1);
+    }
+}
+
+// Test 9: Global Infrastructure Guard (Store Settings)
+try {
+    StoreSettingsUpdateSchema.parse({
+        loyalty_tiers_config: [
+            {
+                id: "platinum",
+                name: "Platinum",
+                threshold: 10000,
+                multiplier: 50, // Invalid multiplier (max 5)
+                color: "#000",
+                benefits: []
+            }
+        ],
+        loyalty_config: {
+            points_per_currency: 1000, // Invalid rate (max 10)
+            currency_per_point: 1,
+            min_points_to_redeem: 10,
+            max_points_per_order: 1000,
+            points_expiry_days: 30,
+            enable_loyalty: true
+        }
+    });
+    console.error("❌ ERROR: Global Infrastructure Guard FAILED to catch destructive loyalty settings");
+    process.exit(1);
+} catch (e) {
+    const errorStr = String(e);
+    if (errorStr.includes("irracional") || errorStr.includes("destructiva")) {
+        console.log("✅ Global Infrastructure Guard REJECTED logic bomb in global settings as expected");
+    } else {
+        console.error("❌ ERROR: Global Infrastructure Guard failed with unexpected error:", e);
         process.exit(1);
     }
 }
