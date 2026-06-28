@@ -11,7 +11,7 @@ Database/API → services → hooks/state → components/pages
 - Domain helpers: estados, pricing, assignment, validation.
 - Services: IO externo, DB/API, providers.
 - Hooks/state: consumo UI.
-- Components: presentación.
+- Components: presentación. (Data Grids/Tablas deben usar arquitectura Headless vía TanStack Table).
 - Pages/routes: composición.
 - Config: settings/toggles/zonas.
 
