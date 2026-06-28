@@ -30,6 +30,33 @@ export function buildGeminiTokenUsageTelemetry(
     };
 }
 
+/**
+ * Emits a structured JSON log for observability platforms (Datadog, Supabase Logs).
+ */
+export function logTelemetryEvent(event: string, payload: Record<string, unknown>) {
+    console.info(JSON.stringify({
+        event,
+        timestamp: new Date().toISOString(),
+        ...payload
+    }));
+}
+
+/**
+ * Emits a structured JSON error log.
+ */
+export function logTelemetryError(event: string, error: unknown, context?: Record<string, unknown>) {
+    const errObj = error instanceof Error 
+        ? { message: error.message, stack: error.stack, name: error.name } 
+        : { message: String(error) };
+        
+    console.error(JSON.stringify({
+        event,
+        timestamp: new Date().toISOString(),
+        error: errObj,
+        ...context
+    }));
+}
+
 export type TelemetryContractReason = 'capsule_handoff' | 'edge_logged' | 'edge_insert_failed';
 
 export function buildTelemetryContract(input: {

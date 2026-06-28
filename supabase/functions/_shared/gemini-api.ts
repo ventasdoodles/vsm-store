@@ -67,17 +67,32 @@ async function sleepAbortAware(ms: number, signal?: AbortSignal | null) {
 async function fetchWithRetry(url: string, options: RequestInit, errorContext: string): Promise<Response> {
   let attempt = 0;
   while (true) {
+    const startTime = Date.now();
     try {
       const response = await fetch(url, options);
+      const latency_ms = Date.now() - startTime;
 
       // Retry on 429 (Rate Limit) or 50x (Server Error)
       if (!response.ok && (response.status === 429 || response.status >= 500)) {
         if (attempt >= MAX_RETRIES) {
-          console.warn(`[Gemini API] Max retries (${MAX_RETRIES}) reached for ${errorContext}. Final HTTP status: ${response.status}`);
+          console.error(JSON.stringify({
+            event: 'gemini_api_exhausted',
+            errorContext,
+            status: response.status,
+            latency_ms,
+            timestamp: new Date().toISOString()
+          }));
           return response; // Return failing response so honest degradation can trigger
         }
         const is429 = response.status === 429;
-        console.warn(`[Gemini API] ${is429 ? 'Rate limited (429)' : `Server error (${response.status})`} for ${errorContext}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
+        console.warn(JSON.stringify({
+            event: 'gemini_api_retry',
+            errorContext,
+            status: response.status,
+            attempt: attempt + 1,
+            latency_ms,
+            timestamp: new Date().toISOString()
+        }));
         
         const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
         const jitter = Math.random() * (backoff * 0.3); // 30% jitter to prevent thundering herd
@@ -85,17 +100,44 @@ async function fetchWithRetry(url: string, options: RequestInit, errorContext: s
         attempt++;
         continue;
       }
+
+      // Success or non-retriable client error
+      console.info(JSON.stringify({
+          event: 'gemini_api_call',
+          errorContext,
+          status: response.ok ? 'success' : 'client_error',
+          http_status: response.status,
+          latency_ms,
+          timestamp: new Date().toISOString()
+      }));
+
       return response;
     } catch (error: unknown) {
+      const latency_ms = Date.now() - startTime;
       if (error instanceof Error && error.name === 'AbortError') {
         throw error; // Respect explicit abort signals (like caller timeouts) immediately
       }
       const msg = error instanceof Error ? error.message : String(error);
       if (attempt >= MAX_RETRIES) {
-        console.error(`[Gemini API] Network fetch failed after ${MAX_RETRIES} retries for ${errorContext}: ${msg}`);
+        console.error(JSON.stringify({
+            event: 'gemini_api_network_failure',
+            errorContext,
+            error: msg,
+            latency_ms,
+            timestamp: new Date().toISOString()
+        }));
         throw error;
       }
-      console.warn(`[Gemini API] Network error for ${errorContext}: ${msg}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
+      
+      console.warn(JSON.stringify({
+          event: 'gemini_api_network_retry',
+          errorContext,
+          error: msg,
+          attempt: attempt + 1,
+          latency_ms,
+          timestamp: new Date().toISOString()
+      }));
+      
       const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
       const jitter = Math.random() * (backoff * 0.3);
       await sleepAbortAware(backoff + jitter, options.signal as AbortSignal | undefined);

@@ -1,4 +1,5 @@
 import { geminiGenerateContent } from '../../_shared/gemini-api.ts';
+import { logTelemetryEvent, logTelemetryError } from './telemetry-utils.ts';
 
 export type LLMProviderConfig = {
     name: 'gemini' | 'anthropic';
@@ -15,13 +16,12 @@ export async function invokeLLMWithFallback(
     
     for (const provider of providers) {
         if (!provider.apiKey) {
-            console.warn(`[LLM Gateway] Skipping ${provider.name} due to missing API key.`);
+            logTelemetryEvent('llm_skip', { provider: provider.name, reason: 'missing_api_key' });
             continue;
         }
 
+        const startTime = Date.now();
         try {
-            console.log(`[LLM Gateway] Attempting with ${provider.name} (${provider.model})...`);
-            
             if (provider.name === 'gemini') {
                 const response = await geminiGenerateContent({
                     apiKey: provider.apiKey,
@@ -30,6 +30,8 @@ export async function invokeLLMWithFallback(
                 });
 
                 const result = await response.json();
+                const latency_ms = Date.now() - startTime;
+
                 if (!response.ok) {
                     if (response.status === 429 || response.status >= 500) {
                         throw new Error(`Rate limit or Server Error from Gemini: HTTP ${response.status}`);
@@ -38,26 +40,46 @@ export async function invokeLLMWithFallback(
                     throw new Error(result?.error?.message || errorContext);
                 }
                 
-                console.log(`[LLM Gateway] Success with ${provider.name}.`);
+                logTelemetryEvent('llm_invoke', {
+                    provider: provider.name,
+                    model: provider.model,
+                    latency_ms,
+                    tokens: {
+                        prompt: result?.usageMetadata?.promptTokenCount,
+                        candidates: result?.usageMetadata?.candidatesTokenCount,
+                        total: result?.usageMetadata?.totalTokenCount
+                    },
+                    status: 'success'
+                });
+                
                 return result;
             } 
             else if (provider.name === 'anthropic') {
                 // Future Implementation for Claude
-                // Adapter: Transform Gemini `body` to Anthropic `body`
-                // Fetch Claude API
-                // Adapter: Transform Claude response to Gemini `result` format
-                console.warn(`[LLM Gateway] Anthropic adapter not fully implemented yet, skipping.`);
                 throw new Error("Anthropic not fully implemented");
             }
             
         } catch (e: unknown) {
-            console.warn(`[LLM Gateway] Provider ${provider.name} failed: ${e.message}`);
-            errors.push({ provider: provider.name, error: e.message });
+            const latency_ms = Date.now() - startTime;
+            const msg = e instanceof Error ? e.message : String(e);
+            
+            logTelemetryError('llm_invoke_failed', e, {
+                provider: provider.name,
+                model: provider.model,
+                latency_ms,
+                errorContext
+            });
+            
+            errors.push({ provider: provider.name, error: msg });
             // Continue to the next provider in the fallback chain
         }
     }
 
     // If all providers failed
-    console.error(`[LLM Gateway] All LLM providers failed for ${errorContext}. Errors:`, errors);
-    throw new Error(`LLM Gateway Exhausted: ${errors.map(e => `${e.provider}=${e.error}`).join(' | ')}`);
+    logTelemetryError('llm_gateway_exhausted', new Error(`All LLM providers failed for ${errorContext}`), {
+        errors,
+        errorContext
+    });
+    
+    throw new Error(`LLM Gateway Exhausted: ${errors.map((e: any) => `${e.provider}=${e.error}`).join(' | ')}`);
 }

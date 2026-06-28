@@ -241,7 +241,7 @@ export async function handleConciergeChat(
             rawAnalystText = result.rawText;
             geminiError = result.error;
             
-            let analystParseValid = !geminiError;
+            const analystParseValid = !geminiError;
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
             const analystIntent = intent; // A85: captured before any guardrail override

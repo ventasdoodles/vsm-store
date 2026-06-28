@@ -46,7 +46,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                 setDebugInfo(result ? 'Admin confirmado ✓' : 'No es admin ✗');
             })
             .catch((err) => {
-                // eslint-disable-next-line no-console
+                 
                 console.error('[AdminGuard] checkIsAdmin error:', err);
                 setIsAdmin(false);
                 setDebugInfo(`Error: ${err?.message ?? 'desconocido'}`);

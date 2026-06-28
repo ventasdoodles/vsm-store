@@ -52,7 +52,7 @@ vi.mock('framer-motion', async (importOriginal) => {
     const mMock = new Proxy({}, {
         get: (_, element) => {
             return React.forwardRef((props: any, ref) => {
-                const { initial, animate, exit, transition, variants, whileHover, whileTap, whileInView, viewport, layoutId, layout, custom, onAnimationComplete, onHoverStart, onHoverEnd, drag, dragConstraints, ...rest } = props;
+                const { __initial, __animate, __exit, __transition, __variants, __whileHover, __whileTap, __whileInView, __viewport, __layoutId, __layout, __custom, __onAnimationComplete, __onHoverStart, __onHoverEnd, __drag, __dragConstraints, ...rest } = props;
                 return React.createElement(element as string, { ...rest, ref });
             });
         }

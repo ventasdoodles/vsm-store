@@ -19,7 +19,7 @@ vi.mock('framer-motion', () => {
 
     return {
         motion: new Proxy({}, {
-            get: (_target, tag: string) => MotionElement(tag as keyof JSX.IntrinsicElements),
+            get: (_target, tag: any) => MotionElement(tag as any),
         }),
     };
 });

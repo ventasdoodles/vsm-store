@@ -79,7 +79,7 @@ export const AIConcierge: React.FC = () => {
                 });
             })
             .catch((err) => {
-                // eslint-disable-next-line no-console
+                 
                 console.warn('[AIConcierge] Failed to load cart assembly products:', err);
                 // The CTA will remain advisory until product truth can be loaded.
             });

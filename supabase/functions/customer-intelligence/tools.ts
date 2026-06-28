@@ -451,7 +451,7 @@ function buildInventoryOutlookTruth(input: {
 async function get_inventory_outlook(args: { query?: string, product_id?: string }, supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string, signal_quality: string, resolution_path: string, velocity_30d?: number }> {
     let productId = args.product_id;
     let productName = "Producto desconocido";
-    let resolutionPath = productId ? "direct_id" : "semantic_search";
+    const resolutionPath = productId ? "direct_id" : "semantic_search";
     
     try {
         // 1. Resolve Product ID if not provided

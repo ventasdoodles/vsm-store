@@ -21,7 +21,7 @@ export const ChatHistoryItemSchema = z.object({
  */
 export const CustomerIntelligenceRequestSchema = z.object({
   action: z.literal('concierge_chat'),
-  message: z.string().min(1, "El mensaje no puede estar vacío"),
+  query: z.string(),
   history: z.array(ChatHistoryItemSchema).optional().default([]),
   stream: z.boolean().optional().default(true),
   visitorId: z.string().optional(),
