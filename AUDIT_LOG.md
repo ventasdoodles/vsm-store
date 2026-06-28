@@ -35,6 +35,7 @@
 - No `AUDIT_LOG2.md` continuation file is allowed.
 
 ## Current Detailed Audit Files
+- `docs/audits/2026-06-28/god-classes-modularization.md` (Modularization of `orders.ts` and `product-search-capsule.ts` using zero-token AST extraction)
 - `docs/audits/README.md`
 - `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`
 - `docs/audits/2026-05/seed-runner-typecheck-strictness.md`
