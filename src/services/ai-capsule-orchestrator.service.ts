@@ -1,49 +1,29 @@
-import { supabase } from '../lib/supabase';
-import { productSearchToolSchema } from '../lib/ai-capsule-schemas';
-import { 
-  evaluateProductSearchFallbackTree, 
-  ProductSearchContext 
-} from '../lib/domain/product-search';
-import { InternalCapsuleContract, InternalResolvedProduct } from '../types/ai-capsule';
-import { knowledgeToolSchema } from '../lib/ai-capsule-schemas';
-import { 
-  evaluateKnowledgeRAGTree, 
-  buildDegradedKnowledgeContract 
-} from '../lib/knowledge-rag-capsule';
-import { InternalKnowledgeContractType } from '../types/ai-capsule';
-import { cartOperatorToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalCartOperatorContractType } from '../types/ai-capsule';
-import { orderTrackingToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalOrderTrackingContractType } from '../types/ai-capsule';
-import { warrantyTriageToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalWarrantyTriageContractType } from '../types/ai-capsule';
-import { loyaltyStatusToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalLoyaltyStatusContractType } from '../types/ai-capsule';
-import { checkoutReadinessToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalCheckoutReadinessContractType } from '../types/ai-capsule';
-import { inventoryOutlookToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalInventoryOutlookContractType } from '../types/ai-capsule';
-import { storefrontCompatibilityCheckToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalCompatibilityCheckContractType } from '../types/ai-capsule';
-import { storefrontBudgetRescueToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalBudgetRescueContractType } from '../types/ai-capsule';
-import { storefrontKittingToolSchema } from '../lib/ai-capsule-schemas';
-import { InternalKittingBasketContractType } from '../types/ai-capsule';
-import { 
-  evaluateCartOperatorCapsule,
-  buildDegradedCartContract 
-} from '../lib/cart-operator-capsule';
+import { cartOperatorToolSchema, checkoutReadinessToolSchema, inventoryOutlookToolSchema, knowledgeToolSchema, loyaltyStatusToolSchema, orderTrackingToolSchema, productSearchToolSchema, storefrontBudgetRescueToolSchema, storefrontCompatibilityCheckToolSchema, storefrontKittingToolSchema, warrantyTriageToolSchema } from '@/lib/ai-capsule-schemas';
+import {
+    buildDegradedCartContract,
+    evaluateCartOperatorCapsule
+} from '@/lib/cart-operator-capsule';
+import {
+    evaluateProductSearchFallbackTree,
+    ProductSearchContext
+} from '@/lib/domain/product-search';
+import {
+    buildDegradedKnowledgeContract,
+    evaluateKnowledgeRAGTree
+} from '@/lib/knowledge-rag-capsule';
+import { supabase } from '@/lib/supabase';
+import { InternalBudgetRescueContractType, InternalCapsuleContract, InternalCartOperatorContractType, InternalCheckoutReadinessContractType, InternalCompatibilityCheckContractType, InternalInventoryOutlookContractType, InternalKittingBasketContractType, InternalKnowledgeContractType, InternalLoyaltyStatusContractType, InternalOrderTrackingContractType, InternalResolvedProduct, InternalWarrantyTriageContractType } from '@/types/ai-capsule';
+import type { Product } from '@/types/product';
+import { resolveStorefrontBudgetRescue } from './storefront-budget-rescue.service';
+import { resolveStorefrontCheckoutReadiness } from './storefront-checkout-readiness.service';
+import { resolveStorefrontCompatibilityCheck } from './storefront-compatibility-check.service';
+import { resolveStorefrontInventoryOutlook } from './storefront-inventory-outlook.service';
+import { resolveStorefrontKittingBasket } from './storefront-kitting-basket.service';
+import { resolveStorefrontAuthenticatedLoyaltyStatus } from './storefront-loyalty-status.service';
+import { resolveStorefrontAuthenticatedOrderTracking } from './storefront-order-tracking.service';
 import { resolveStorefrontPromotionSignal } from './storefront-promotions.service';
 import { resolveStorefrontReplenishmentSignal } from './storefront-replenishment.service';
-import { resolveStorefrontAuthenticatedOrderTracking } from './storefront-order-tracking.service';
 import { resolveStorefrontAuthenticatedWarrantyTriage } from './storefront-warranty-triage.service';
-import { resolveStorefrontAuthenticatedLoyaltyStatus } from './storefront-loyalty-status.service';
-import { resolveStorefrontCheckoutReadiness } from './storefront-checkout-readiness.service';
-import { resolveStorefrontInventoryOutlook } from './storefront-inventory-outlook.service';
-import { resolveStorefrontCompatibilityCheck } from './storefront-compatibility-check.service';
-import { resolveStorefrontBudgetRescue } from './storefront-budget-rescue.service';
-import { resolveStorefrontKittingBasket } from './storefront-kitting-basket.service';
-import type { Product } from '@/types/product';
 
 type ProductSearchRow = {
   id: string;

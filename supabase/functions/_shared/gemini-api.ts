@@ -84,7 +84,7 @@ async function fetchWithRetry(url: string, options: RequestInit, errorContext: s
           }));
           return response; // Return failing response so honest degradation can trigger
         }
-        const is429 = response.status === 429;
+        
         console.warn(JSON.stringify({
             event: 'gemini_api_retry',
             errorContext,
