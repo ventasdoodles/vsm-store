@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { getAdminSectionCatalogEntry, vape420VerticalPackConfig } from '@/config/productization';
 import { VerticalPackContext } from '@/contexts/VerticalPackContext';
 import type { Product } from '@/types/product';
-import { ProductTableRow } from '../ProductTableRow';
+import { ProductsTable } from '../ProductsTable';
 
 vi.mock('framer-motion', () => {
     const MotionElement =
@@ -80,20 +80,20 @@ describe('ProductTableRow', () => {
 
         render(
             <VerticalPackContext.Provider value={{ config: vape420VerticalPackConfig, isLoading: false }}>
-                <table>
-                    <tbody>
-                    <ProductTableRow
-                        product={product}
-                        onToggle={vi.fn()}
-                        onDelete={vi.fn()}
-                        onQuickSave={vi.fn()}
-                        onEdit={vi.fn()}
-                        onDuplicate={vi.fn()}
-                        isSelected={false}
-                        onSelect={vi.fn()}
-                    />
-                    </tbody>
-                </table>
+                <ProductsTable
+                    products={[product]}
+                    isLoading={false}
+                    currentPage={1}
+                    pageSize={10}
+                    onPageChange={vi.fn()}
+                    onToggle={vi.fn()}
+                    onDelete={vi.fn()}
+                    onQuickSave={vi.fn()}
+                    onEdit={vi.fn()}
+                    onDuplicate={vi.fn()}
+                    selectedIds={[]}
+                    onSelectionChange={vi.fn()}
+                />
             </VerticalPackContext.Provider>,
         );
 

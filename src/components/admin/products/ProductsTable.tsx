@@ -1,15 +1,23 @@
 /**
  * // ─── COMPONENTE: ProductsTable ───
  * // Arquitectura: Dumb Component (Visual)
- * // Proposito principal: Contenedor glassmorphism de tabla de productos con skeletons premium,
- *    empty state con orbe, cabeceras tipograficas tracking-wider, y paginacion integrada.
- * // Regla / Notas: Props tipadas. Sin `any`. Glassmorphism puro.
+ * // Proposito principal: Contenedor glassmorphism de tabla de productos con skeletons premium.
+ * // Refactor TanStack Table: Integracion completa headless UI.
  */
+import { useMemo } from 'react';
 import { Package } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
+import {
+    useReactTable,
+    getCoreRowModel,
+    getPaginationRowModel,
+    flexRender,
+} from '@tanstack/react-table';
 import { ProductTableRow } from './ProductTableRow';
-import { Pagination, paginateItems } from '@/components/admin/Pagination';
+import { Pagination } from '@/components/admin/Pagination';
 import type { Product } from '@/types/product';
+import { columns } from './ProductsTableColumns';
+import type { TableMetaType } from './ProductsTableContext';
 
 interface ProductsTableProps {
     products: Product[];
@@ -46,11 +54,60 @@ export function ProductsTable({
     selectedIds,
     onSelectionChange,
 }: ProductsTableProps) {
-    const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
-    const safePage = Math.min(currentPage, totalPages);
-    const paginated = paginateItems(products, safePage, pageSize);
-    const startItem = (safePage - 1) * pageSize + 1;
-    const endItem = Math.min(safePage * pageSize, products.length);
+    
+    // We synchronize TanStack selection with external selection state
+    const rowSelection = useMemo(() => {
+        const sel: Record<string, boolean> = {};
+        products.forEach((p) => {
+            if (selectedIds.includes(p.id)) {
+                // TanStack uses row index or id for selection. By default getRowId is index unless specified
+                // Let's specify getRowId in useReactTable so it matches our product.id
+                sel[p.id] = true;
+            }
+        });
+        return sel;
+    }, [products, selectedIds]);
+
+    const table = useReactTable({
+        data: products,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getRowId: row => row.id,
+        state: {
+            pagination: {
+                pageIndex: currentPage - 1,
+                pageSize,
+            },
+            rowSelection,
+        },
+        onRowSelectionChange: (updaterOrValue) => {
+            // Convert back to external state
+            const newSelection = typeof updaterOrValue === 'function' 
+                ? updaterOrValue(rowSelection) 
+                : updaterOrValue;
+            onSelectionChange(Object.keys(newSelection));
+        },
+        // We handle pagination change via onPageChange
+        onPaginationChange: (updater) => {
+            if (typeof updater === 'function') {
+                const newState = updater({ pageIndex: currentPage - 1, pageSize });
+                onPageChange(newState.pageIndex + 1);
+            } else {
+                onPageChange(updater.pageIndex + 1);
+            }
+        },
+        meta: {
+            onToggle,
+            onDelete,
+            onQuickSave,
+            onEdit,
+            onDuplicate,
+            isTogglingId: togglingId,
+            isDeletingId: deletingId,
+            isSavingId: savingId,
+        } as TableMetaType,
+    });
 
     /* ── Loading Skeletons ── */
     if (isLoading) {
@@ -81,30 +138,28 @@ export function ProductsTable({
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-white/5">
-                                <th className="w-10 px-4 py-3.5">
-                                    <input
-                                        type="checkbox"
-                                        checked={paginated.length > 0 && paginated.every(p => selectedIds.includes(p.id))}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                const newIds = Array.from(new Set([...selectedIds, ...paginated.map(p => p.id)]));
-                                                onSelectionChange(newIds);
-                                            } else {
-                                                const filteredIds = selectedIds.filter(id => !paginated.some(p => p.id === id));
-                                                onSelectionChange(filteredIds);
-                                            }
-                                        }}
-                                        className="h-4 w-4 rounded border-white/10 bg-white/5 text-vape-500 focus:ring-vape-500/20"
-                                    />
-                                </th>
-                                <th className="px-4 py-3.5 text-left text-[11px] font-bold text-white/30 uppercase tracking-wider">Producto</th>
-                                <th className="px-4 py-3.5 text-left text-[11px] font-bold text-white/30 uppercase tracking-wider">Precio</th>
-                                <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Stock</th>
-                                <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider hidden sm:table-cell">Flags</th>
-                                <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Activo</th>
-                                <th className="px-4 py-3.5 text-right text-[11px] font-bold text-white/30 uppercase tracking-wider">Acciones</th>
-                            </tr>
+                            {table.getHeaderGroups().map(headerGroup => (
+                                <tr key={headerGroup.id} className="border-b border-white/5">
+                                    {headerGroup.headers.map(header => (
+                                        <th 
+                                            key={header.id} 
+                                            className="px-4 py-3.5 text-left text-[11px] font-bold text-white/30 uppercase tracking-wider"
+                                            style={{
+                                                width: header.column.id === 'select' ? '40px' : 'auto',
+                                                textAlign: ['stock', 'is_active', 'flags'].includes(header.column.id) ? 'center' : 
+                                                           header.column.id === 'actions' ? 'right' : 'left'
+                                            }}
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                  )}
+                                        </th>
+                                    ))}
+                                </tr>
+                            ))}
                         </thead>
                         <m.tbody
                             className="divide-y divide-white/5"
@@ -119,23 +174,10 @@ export function ProductsTable({
                             }}
                         >
                             <AnimatePresence initial={false}>
-                                {paginated.map((product) => (
+                                {table.getRowModel().rows.map((row) => (
                                     <ProductTableRow
-                                        key={product.id}
-                                        product={product}
-                                        isSelected={selectedIds.includes(product.id)}
-                                        onSelect={(selected) => {
-                                            if (selected) onSelectionChange([...selectedIds, product.id]);
-                                            else onSelectionChange(selectedIds.filter(id => id !== product.id));
-                                        }}
-                                        onToggle={onToggle}
-                                        onDelete={onDelete}
-                                        onQuickSave={onQuickSave}
-                                        onEdit={onEdit}
-                                        onDuplicate={onDuplicate}
-                                        isTogglingId={togglingId}
-                                        isDeletingId={deletingId}
-                                        isSavingId={savingId}
+                                        key={row.id}
+                                        row={row}
                                     />
                                 ))}
                             </AnimatePresence>
@@ -144,13 +186,13 @@ export function ProductsTable({
                 </div>
             </div>
 
-            {products.length > pageSize && (
+            {table.getPageCount() > 1 && (
                 <div className="mt-2">
                     <Pagination
-                        currentPage={safePage}
-                        totalPages={totalPages}
+                        currentPage={table.getState().pagination.pageIndex + 1}
+                        totalPages={table.getPageCount()}
                         onPageChange={onPageChange}
-                        itemsLabel={`${startItem}–${endItem} de ${products.length}`}
+                        itemsLabel={`${table.getState().pagination.pageIndex * pageSize + 1}–${Math.min((table.getState().pagination.pageIndex + 1) * pageSize, products.length)} de ${products.length}`}
                     />
                 </div>
             )}
