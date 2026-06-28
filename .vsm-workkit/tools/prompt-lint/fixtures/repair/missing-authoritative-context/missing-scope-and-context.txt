@@ -1,0 +1,15 @@
+STRICT MODE.
+
+Mission objective:
+Repair the prompt and make it ready for execution.
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Success condition:
+Repair blocks when authoritative context is missing.
+
+Non-claims and residual risks:
+No invented scope, no invented validation commands, no invented proof claims.
+
+PROMPT QUALITY GATE CHECK: PASS

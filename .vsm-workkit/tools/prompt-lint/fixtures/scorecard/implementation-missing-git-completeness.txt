@@ -1,0 +1,31 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+IMPLEMENTATION AUTHORIZED.
+Target tool:
+Codex, rol Anty.
+
+Mission objective:
+Implement Prompt Scorecard v0 as a local/manual reporter.
+
+Scope:
+- C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\scorecard.mjs
+- C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\scorecard-evals.mjs
+- C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\fixtures\scorecard\**
+
+Required baseline checks:
+* git status -sb
+* git rev-list --left-right --count origin/main...HEAD
+* git log -1 --oneline
+
+Validation:
+* node tools/prompt-lint/scorecard.mjs tools/prompt-lint/fixtures/scorecard/excellent-prompt.txt
+
+Commit/push:
+* Commit the changes
+* Push to origin/main
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+PROMPT QUALITY GATE CHECK: PASS

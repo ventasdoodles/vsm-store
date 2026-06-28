@@ -1,0 +1,20 @@
+Skill System v2 - Prompt Lint Helper v0
+
+Target tool: Codex
+
+Mission objective:
+Implement a local prompt lint helper.
+
+USE REPO PROCEDURE:
+skills/vsm-implementation/SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Forbidden actions:
+- Do not touch secrets or browser storage.
+
+Success condition:
+Helper is documented and testable.
+
+PROMPT QUALITY GATE CHECK: PASS

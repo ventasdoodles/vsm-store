@@ -1,0 +1,640 @@
+{
+  "version": "0.1.0",
+  "status": "local-manual",
+  "nonClaims": [
+    "No hook integration.",
+    "No CI integration.",
+    "No automation or deterministic enforcement beyond this local/manual reporter.",
+    "No semantic AI judging.",
+    "No repair implementation.",
+    "No acceptance automation.",
+    "No product/runtime/source/test behavior changes.",
+    "No DB/Auth/Supabase/browser/provider proof."
+  ],
+  "failCodes": [
+    {
+      "code": "FAIL_STALE_EXTERNAL_TOOL_NAME",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/stale-external-tool-target.txt",
+        "tools/prompt-lint/fixtures/fail/stale-active-external-tool-wording.txt",
+        "tools/prompt-lint/fixtures/repair/stale-external-target/anty-target.txt"
+      ],
+      "laneType": "implementation",
+      "notes": "Covers stale non-Codex target wording in prompt-lint and repair classification fixtures."
+    },
+    {
+      "code": "FAIL_RELATIVE_SKILL_PATH",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/relative-skill-path.txt"
+      ],
+      "laneType": "procedure invocation",
+      "notes": "Covers repo procedure prompts that use relative skill paths instead of the required absolute path."
+    },
+    {
+      "code": "FAIL_TARGET_TOOL_NOT_CODEX",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/stale-external-tool-target.txt",
+        "tools/prompt-lint/fixtures/repair/stale-external-target/anty-target.txt"
+      ],
+      "laneType": "implementation",
+      "notes": "Covers explicit non-Codex target tool declarations."
+    },
+    {
+      "code": "FAIL_TARGET_TOOL_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/repair/context-required-blocked/missing-target-tool.txt",
+        "tools/prompt-lint/fixtures/fail/missing-target-tool.txt",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt",
+        "tools/prompt-lint/fixtures/scorecard/repair-context-required.txt"
+      ],
+      "laneType": "repair eval classification",
+      "notes": "Covered through direct fail, repair, and scorecard fixtures."
+    },
+    {
+      "code": "FAIL_SKILL_PATH_NOT_FOUND",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/skill-path-not-found.txt",
+        "tools/prompt-lint/fixtures/fail/procedure-path-missing.txt"
+      ],
+      "laneType": "procedure invocation",
+      "notes": "Covers absolute repo procedure paths that point to nonexistent or unsupported skill files, plus repo procedure invocations missing the absolute path."
+    },
+    {
+      "code": "FAIL_MISSING_STRICT_MODE",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/canon-missing-strict-mode.txt",
+        "tools/prompt-lint/fixtures/fail/quality-gate-pass-without-structure.txt",
+        "tools/prompt-lint/fixtures/repair/template-repairable/missing-strict-mode.txt",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt"
+      ],
+      "laneType": "canon reconciliation",
+      "notes": "Covers missing strict-mode marker in prompt-lint, repair, and scorecard surfaces."
+    },
+    {
+      "code": "FAIL_LANE_DECLARATION_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-lane-declaration.txt",
+        "tools/prompt-lint/fixtures/fail/quality-gate-pass-without-structure.txt",
+        "tools/prompt-lint/fixtures/repair/missing-authoritative-context/missing-scope-and-context.txt",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covers missing lane declarations across direct lint, repair, and scorecard fixtures."
+    },
+    {
+      "code": "FAIL_PROCEDURE_OUTPUT_FORMAT_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/procedure-output-format-missing.txt"
+      ],
+      "laneType": "procedure invocation",
+      "notes": "Covers repo procedure prompts that omit the required Output section and procedure output contract."
+    },
+    {
+      "code": "FAIL_READONLY_CONSTRAINTS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-no-commit.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-no-push.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-no-implementation.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-no-doc-canon-changes.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt",
+        "tools/prompt-lint/fixtures/scorecard/repair-context-required.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covers missing read-only markers and acceptance-audit-only constraints."
+    },
+    {
+      "code": "FAIL_READONLY_WITH_COMMIT_PUSH",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/readonly-with-commit-push.txt",
+        "tools/prompt-lint/fixtures/repair/unsafe-blocked/readiness-with-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/lane-mixing.txt"
+      ],
+      "laneType": "readiness / roadmap",
+      "notes": "Covers read-only lane prompts that leak commit/push instructions."
+    },
+    {
+      "code": "FAIL_BASELINE_CHECKS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/canon-missing-baseline-git-checks.txt",
+        "tools/prompt-lint/fixtures/fail/canon-missing-final-repo-checks.txt",
+        "tools/prompt-lint/fixtures/repair/lane-mixing-blocked/readiness-and-implementation.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "laneType": "implementation",
+      "notes": "Covers missing baseline git checks in implementation/canon-style prompts."
+    },
+    {
+      "code": "FAIL_GIT_COMPLETENESS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/implementation-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/fail/canon-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/repair/implementation-git-completeness/missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt"
+      ],
+      "laneType": "implementation",
+      "notes": "Covers missing validation/staging/commit/push completeness for write lanes."
+    },
+    {
+      "code": "FAIL_FINAL_REPO_CHECKS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/canon-missing-final-repo-checks.txt",
+        "tools/prompt-lint/fixtures/repair/canon-git-completeness/missing-final-checks.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "laneType": "canon reconciliation",
+      "notes": "Covers missing final repo state checks in write-lane prompts."
+    },
+    {
+      "code": "FAIL_IMPLEMENTATION_WITHOUT_COMMIT_PUSH",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/implementation-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/repair/implementation-git-completeness/missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt"
+      ],
+      "laneType": "implementation",
+      "notes": "Covers implementation prompts that omit validation/commit/push obligations."
+    },
+    {
+      "code": "FAIL_CANON_WITHOUT_COMMIT_PUSH",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/canon-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/fail/canon-with-no-commit-no-push.txt",
+        "tools/prompt-lint/fixtures/fail/canon-with-no-commit-only.txt",
+        "tools/prompt-lint/fixtures/fail/canon-with-no-push-only.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "laneType": "canon reconciliation",
+      "notes": "Covers canon prompts missing commit/push and canon prompts with contradictory NO COMMIT/NO PUSH markers."
+    },
+    {
+      "code": "FAIL_LANE_MIXING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/repair/lane-mixing-blocked/readiness-and-implementation.txt",
+        "tools/prompt-lint/fixtures/scorecard/lane-mixing.txt",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt"
+      ],
+      "laneType": "mixed",
+      "notes": "Covered by repair and scorecard fixtures for mixed or under-scoped prompts."
+    },
+    {
+      "code": "FAIL_FRAGILE_INLINE_COMMAND",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/fragile-inline-command.txt"
+      ],
+      "laneType": "command discipline",
+      "notes": "Covers fragile inline command patterns with a safe Invoke-Expression fixture."
+    },
+    {
+      "code": "FAIL_SECRET_INSPECTION_RISK",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/secret-session-storage-inspection.txt",
+        "tools/prompt-lint/fixtures/repair/credential-browser-state-blocked/inspect-storage.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt"
+      ],
+      "laneType": "real-system QA / read-only QA",
+      "notes": "Covers prompts that ask for secret/session/storage inspection."
+    },
+    {
+      "code": "FAIL_NON_CLAIMS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/readonly-with-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/lane-mixing.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "laneType": "scorecard reporting",
+      "notes": "Covers missing non-claims in direct lint and scorecard fixtures."
+    },
+    {
+      "code": "FAIL_PROMPT_GATE_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt",
+        "tools/prompt-lint/fixtures/scorecard/lane-mixing.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "laneType": "scorecard reporting",
+      "notes": "Covered through scorecard fixtures that omit success condition or prompt quality gate structure."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_COMMIT_IDENTITY_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-commit-check.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing commit identity."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_SCOPE_VERDICT_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-scope-check.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing scope verdict."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_VALIDATION_EVIDENCE_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-validation-check.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing validation evidence."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_UNAUTHORIZED_FILES_UNCHECKED",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-scope-check.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing unauthorized-file review."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_REPO_STATE_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-repo-state-check.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing final repo state/alignment."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_RESIDUAL_RISKS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-residual-risks.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing residual risks."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_NON_CLAIMS_MISSING",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-non-claims.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for missing non-claims."
+    },
+    {
+      "code": "FAIL_ACCEPTANCE_EMBEDDED_CANON_PROMPT_INCOMPLETE",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-bad-incomplete-canon-prompt.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-report-incomplete-canon-prompt.txt"
+      ],
+      "laneType": "acceptance audit",
+      "notes": "Covered by Acceptance Scorecard v0 fixture for an incomplete embedded exact canon prompt."
+    }
+  ],
+  "lanes": [
+    {
+      "id": "readiness-roadmap",
+      "label": "readiness / roadmap",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/pass/read-only-safe.txt",
+        "tools/prompt-lint/fixtures/fail/readonly-with-commit-push.txt",
+        "tools/prompt-lint/fixtures/repair/unsafe-blocked/readiness-with-commit-push.txt"
+      ],
+      "knownResiduals": [
+        "Coverage is deterministic text-pattern coverage, not semantic readiness judgment.",
+        "Readiness lane quality still depends on human scoping and residual-risk wording."
+      ],
+      "nonClaims": [
+        "No read-only execution is automated.",
+        "No GO/NO-GO decision is generated by this registry."
+      ]
+    },
+    {
+      "id": "implementation",
+      "label": "implementation",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/pass/implementation-safe.txt",
+        "tools/prompt-lint/fixtures/fail/implementation-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/fail/skill-path-not-found.txt",
+        "tools/prompt-lint/fixtures/fail/procedure-output-format-missing.txt",
+        "tools/prompt-lint/fixtures/repair/implementation-git-completeness/missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt"
+      ],
+      "knownResiduals": [
+        "Coverage checks prompt obligations, not implementation correctness.",
+        "No product runtime or repo mutation is performed by the registry."
+      ],
+      "nonClaims": [
+        "No implementation automation.",
+        "No source/test behavior proof."
+      ]
+    },
+    {
+      "id": "acceptance-audit",
+      "label": "acceptance audit",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/pass/acceptance-audit-safe.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-lane-declaration.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-audit-missing-no-commit.txt",
+        "tools/prompt-lint/fixtures/scorecard/acceptance-good-report.txt",
+        "tools/prompt-lint/fixtures/scorecard/acceptance-bad-incomplete-canon-prompt.txt",
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-validation-check.txt"
+      ],
+      "knownResiduals": [
+        "Acceptance report scoring is deterministic text-pattern checking only.",
+        "It does not decide whether the accepted implementation is correct."
+      ],
+      "nonClaims": [
+        "No independent acceptance execution.",
+        "No semantic AI judging."
+      ]
+    },
+    {
+      "id": "canon-reconciliation",
+      "label": "canon reconciliation",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/pass/canon-safe.txt",
+        "tools/prompt-lint/fixtures/fail/canon-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/fail/canon-with-no-commit-no-push.txt",
+        "tools/prompt-lint/fixtures/repair/canon-git-completeness/missing-final-checks.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "knownResiduals": [
+        "Coverage checks canon-lane prompt shape, not canon truth quality.",
+        "No AI_CONTEXT, AUDIT_LOG, or audit detail content is edited by this registry."
+      ],
+      "nonClaims": [
+        "No canon automation.",
+        "No historical truth reconciliation."
+      ]
+    },
+    {
+      "id": "real-system-qa-read-only-qa",
+      "label": "real-system QA / read-only QA",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/pass/real-system-qa-safe.txt",
+        "tools/prompt-lint/fixtures/fail/secret-session-storage-inspection.txt",
+        "tools/prompt-lint/fixtures/repair/credential-browser-state-blocked/inspect-storage.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt"
+      ],
+      "knownResiduals": [
+        "Coverage catches explicit secret/session/storage inspection wording only.",
+        "It does not perform browser, provider, DB, Auth, or Supabase QA."
+      ],
+      "nonClaims": [
+        "No browser/runtime proof.",
+        "No credential or storage inspection."
+      ]
+    },
+    {
+      "id": "repair-eval-classification",
+      "label": "repair eval classification",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/repair/manifest.json",
+        "tools/prompt-lint/fixtures/repair/pass-no-op/implementation-clean.txt",
+        "tools/prompt-lint/fixtures/repair/missing-authoritative-context/missing-scope-and-context.txt",
+        "tools/prompt-lint/fixtures/repair/lane-mixing-blocked/readiness-and-implementation.txt"
+      ],
+      "knownResiduals": [
+        "Repair evals classify findings and no-invention boundaries but do not generate repaired prompts.",
+        "Coverage does not imply future --repair behavior is implemented."
+      ],
+      "nonClaims": [
+        "No --repair.",
+        "No generated repaired prompt text."
+      ]
+    },
+    {
+      "id": "scorecard-reporting",
+      "label": "scorecard reporting",
+      "coveredFixtureFiles": [
+        "tools/prompt-lint/fixtures/scorecard/manifest.json",
+        "tools/prompt-lint/fixtures/scorecard/excellent-prompt.txt",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt",
+        "tools/prompt-lint/fixtures/scorecard/acceptance-good-report.txt",
+        "tools/prompt-lint/fixtures/scorecard/acceptance-bad-incomplete-canon-prompt.txt"
+      ],
+      "knownResiduals": [
+        "Scorecard output is deterministic reporting only.",
+        "Scorecard scores do not prove semantic quality, production readiness, or runtime behavior."
+      ],
+      "nonClaims": [
+        "No semantic score guarantee.",
+        "No CI enforcement."
+      ]
+    }
+  ],
+  "historicalRegressions": [
+    {
+      "id": "relative-skill-paths",
+      "label": "relative skill paths",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/relative-skill-path.txt"
+      ],
+      "notes": "Covers prompts that invoke repo procedures through relative skill paths."
+    },
+    {
+      "id": "stale-external-tool-names",
+      "label": "stale external tool names",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/stale-external-tool-target.txt",
+        "tools/prompt-lint/fixtures/fail/stale-active-external-tool-wording.txt",
+        "tools/prompt-lint/fixtures/repair/stale-external-target/anty-target.txt"
+      ],
+      "notes": "Covers active target wording and stale active external-tool instructions instead of Codex."
+    },
+    {
+      "id": "readonly-commit-push-leakage",
+      "label": "read-only lane with commit/push leakage",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/readonly-with-commit-push.txt",
+        "tools/prompt-lint/fixtures/repair/unsafe-blocked/readiness-with-commit-push.txt"
+      ],
+      "notes": "Covers read-only lanes that accidentally include commit/push requirements."
+    },
+    {
+      "id": "implementation-missing-validation-commit-push",
+      "label": "implementation missing validation/commit/push",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/implementation-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/repair/implementation-git-completeness/missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt"
+      ],
+      "notes": "Covers write-lane prompts without validation, stage-only-authorized-files, commit, push, or final checks."
+    },
+    {
+      "id": "canon-missing-validation-commit-push",
+      "label": "canon missing validation/commit/push",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/canon-missing-validation-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "notes": "Covers canon prompts that omit write-lane git completeness."
+    },
+    {
+      "id": "canon-no-commit-or-no-push",
+      "label": "canon prompt with NO COMMIT and/or NO PUSH",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/canon-with-no-commit-no-push.txt",
+        "tools/prompt-lint/fixtures/fail/canon-with-no-commit-only.txt",
+        "tools/prompt-lint/fixtures/fail/canon-with-no-push-only.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-with-no-commit-no-push.txt"
+      ],
+      "notes": "Covers canon write-lane prompts with contradictory read-only markers."
+    },
+    {
+      "id": "quality-gate-pass-missing-structure",
+      "label": "quality gate PASS with missing structure",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/quality-gate-pass-without-structure.txt",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt"
+      ],
+      "notes": "Covers prompts that include the PASS marker while missing required structure."
+    },
+    {
+      "id": "secret-session-storage-inspection-risk",
+      "label": "secret/session/storage inspection risk",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/secret-session-storage-inspection.txt",
+        "tools/prompt-lint/fixtures/repair/credential-browser-state-blocked/inspect-storage.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt"
+      ],
+      "notes": "Covers prompts that ask for credential or browser storage inspection."
+    },
+    {
+      "id": "fragile-inline-powershell",
+      "label": "fragile inline PowerShell / parsing-heavy commands",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/fragile-inline-command.txt"
+      ],
+      "notes": "Covers fragile inline command detection with a safe fixture that does not inspect secrets or external surfaces."
+    },
+    {
+      "id": "missing-non-claims",
+      "label": "missing non-claims",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/fail/readonly-with-commit-push.txt",
+        "tools/prompt-lint/fixtures/scorecard/lane-mixing.txt",
+        "tools/prompt-lint/fixtures/scorecard/secret-inspection-risk.txt",
+        "tools/prompt-lint/fixtures/scorecard/canon-missing-commit-push.txt"
+      ],
+      "notes": "Covers prompts/reports that omit required non-claims or residual-risk language."
+    },
+    {
+      "id": "repair-expected-finding-drift",
+      "label": "repair expected-finding subset/extra-code drift",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/repair/manifest.json"
+      ],
+      "notes": "repair-evals.mjs compares exact finding sets and fails on missing or extra codes."
+    },
+    {
+      "id": "hard-fail-scorecard-high-score",
+      "label": "hard-fail scorecard score appearing deceptively high",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/manifest.json",
+        "tools/prompt-lint/fixtures/scorecard/missing-structure.txt",
+        "tools/prompt-lint/fixtures/scorecard/implementation-missing-git-completeness.txt"
+      ],
+      "notes": "scorecard-evals.mjs asserts hard-fail fixtures remain capped at 49/100."
+    },
+    {
+      "id": "acceptance-report-missing-commit-identity",
+      "label": "acceptance report missing commit identity",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-commit-check.txt"
+      ],
+      "notes": "Covered by Acceptance Scorecard v0."
+    },
+    {
+      "id": "acceptance-report-missing-scope-check",
+      "label": "acceptance report missing scope check",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-scope-check.txt"
+      ],
+      "notes": "Covered by Acceptance Scorecard v0."
+    },
+    {
+      "id": "acceptance-report-missing-validation-evidence",
+      "label": "acceptance report missing validation evidence",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-validation-check.txt"
+      ],
+      "notes": "Covered by Acceptance Scorecard v0."
+    },
+    {
+      "id": "acceptance-report-missing-repo-state",
+      "label": "acceptance report missing repo state/alignment",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-repo-state-check.txt"
+      ],
+      "notes": "Covered by Acceptance Scorecard v0."
+    },
+    {
+      "id": "acceptance-report-missing-residual-risks",
+      "label": "acceptance report missing residual risks",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-residual-risks.txt"
+      ],
+      "notes": "Covered by Acceptance Scorecard v0."
+    },
+    {
+      "id": "acceptance-report-missing-non-claims",
+      "label": "acceptance report missing non-claims",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-missing-non-claims.txt"
+      ],
+      "notes": "Covered by Acceptance Scorecard v0."
+    },
+    {
+      "id": "acceptance-report-incomplete-embedded-canon-prompt",
+      "label": "acceptance report emits incomplete embedded canon prompt",
+      "status": "covered",
+      "fixturePaths": [
+        "tools/prompt-lint/fixtures/scorecard/acceptance-bad-incomplete-canon-prompt.txt",
+        "tools/prompt-lint/fixtures/fail/acceptance-report-incomplete-canon-prompt.txt"
+      ],
+      "notes": "Covers acceptance reports whose verdict is structurally acceptable while the embedded exact canon prompt is incomplete, through scorecard and direct prompt-lint fixtures."
+    }
+  ]
+}

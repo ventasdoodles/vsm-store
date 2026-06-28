@@ -1,0 +1,37 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+STRICT MODE.
+Target tool: Codex
+
+ROADMAP / READINESS ONLY.
+
+Mission objective:
+Review the next prompt draft for readiness and lane purity.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-readiness\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit`.
+
+Authorized files/surfaces:
+- `docs/workkit/README_WORKKIT.md`
+- `docs/workkit/PROMPT_LINT_SPEC.md`
+
+Forbidden actions:
+- NO COMMIT
+- NO PUSH
+- Do not modify source, runtime, DB, auth, or browser state.
+- Do not inspect secrets, cookies, tokens, localStorage, or sessionStorage.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Success condition:
+Produce a readiness report with explicit non-claims and residual risk.
+
+Read-only lane:
+NO COMMIT
+NO PUSH
+
+PROMPT QUALITY GATE CHECK: PASS

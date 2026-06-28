@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { evaluateProductSearchFallbackTree } from '../product-search-capsule';
+import { evaluateProductSearchFallbackTree } from '../domain/product-search';
 import type { InternalResolvedProduct } from '../../types/ai-capsule';
 
 function makeProduct(overrides?: Partial<InternalResolvedProduct>): InternalResolvedProduct {

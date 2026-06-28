@@ -1,0 +1,32 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+STRICT MODE.
+Target tool: Codex
+
+Mission objective:
+Review the implementation handoff for acceptance and residual risk.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-acceptance-audit\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Authorized files/surfaces:
+- `docs/workkit/README_WORKKIT.md`
+- `docs/workkit/PROMPT_LINT_SPEC.md`
+
+Forbidden actions:
+- NO IMPLEMENTATION
+- NO DOC/CANON CHANGES
+- NO COMMIT
+- NO PUSH
+- Do not inspect secrets, cookies, tokens, localStorage, or sessionStorage.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Success condition:
+Produce an acceptance verdict with explicit non-claims and residual risk.
+
+PROMPT QUALITY GATE CHECK: PASS

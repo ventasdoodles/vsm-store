@@ -1,0 +1,85 @@
+# Acceptance Audit Report
+
+## Verdict
+
+ACCEPT WITH RESIDUAL RISK
+
+## Commit Identity
+
+Implemented commit `abc1234` was inspected and matched the requested change.
+
+## Scope Verdict
+
+In scope. Modified files were reviewed and only authorized files were touched.
+Unauthorized files check: none observed.
+
+## Validation Evidence
+
+Validation evidence checked and passed:
+- scorecard evals passed 17/17
+- repair evals passed 11/11
+- git diff --check passed
+
+## Repo State
+
+Repo is clean and aligned with origin/main. Ahead/behind: 0 0.
+
+## Non-Claims
+
+- No repair behavior.
+- No hooks, CI, automation, or runtime enforcement.
+- No product/runtime proof.
+
+## Residual Risks
+
+- Tooling remains local/manual.
+- Coverage remains bounded to current fixtures.
+
+## Exact Canon Prompt If Accepted
+
+```text
+Skill System v2 - Canonize Accepted Lane
+
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-canon-reconciliation\SKILL.md
+CANON / DOC RECONCILIATION ONLY.
+VALIDATION + COMMIT + PUSH REQUIRED.
+NO SOURCE/RUNTIME/TEST CHANGES.
+
+Target tool:
+Codex, rol Codex.
+
+Mission objective:
+Canonize the accepted implementation lane.
+
+Scope:
+- C:\dev\vsm-store-fresh\.vsm-workkit\AI_CONTEXT.md
+- C:\dev\vsm-store-fresh\.vsm-workkit\AUDIT_LOG.md
+
+Forbidden actions:
+- Do not modify source/runtime/test files.
+- Do not inspect secrets.
+
+Validation:
+- Confirm current HEAD.
+- Run repo-procedure-required validation.
+- Run git diff --check.
+
+Commit/push:
+- Stage only authorized canon files.
+- Commit and push.
+
+Final repo checks:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Canon is updated with accepted facts, non-claims, residual risks, validation evidence, and final repo alignment.
+
+PROMPT QUALITY GATE CHECK: PASS
+```

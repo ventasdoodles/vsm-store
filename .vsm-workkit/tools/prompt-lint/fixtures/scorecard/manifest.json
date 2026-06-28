@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "fixtures": [
+    {
+      "id": "excellent-prompt",
+      "inputPromptFile": "excellent-prompt.txt",
+      "expectedScoreMin": 95,
+      "expectedScoreMax": 100,
+      "expectedHardFailCodes": [],
+      "expectedRepairability": "no-op",
+      "expectedStrictExit": 0,
+      "notes": "Fully structured implementation prompt with no hard fail codes."
+    },
+    {
+      "id": "acceptance-good-report",
+      "inputPromptFile": "acceptance-good-report.txt",
+      "expectedScoreMin": 95,
+      "expectedScoreMax": 100,
+      "expectedHardFailCodes": [],
+      "expectedRepairability": "no-op",
+      "expectedStrictExit": 0,
+      "notes": "Acceptance report includes commit identity, scope, validation evidence, repo state, non-claims, and residual risks."
+    },
+    {
+      "id": "acceptance-good-with-valid-canon-prompt",
+      "inputPromptFile": "acceptance-good-with-valid-canon-prompt.txt",
+      "expectedScoreMin": 95,
+      "expectedScoreMax": 100,
+      "expectedHardFailCodes": [],
+      "expectedRepairability": "no-op",
+      "expectedStrictExit": 0,
+      "notes": "Acceptance report includes a structurally valid embedded exact canon prompt."
+    },
+    {
+      "id": "acceptance-bad-incomplete-canon-prompt",
+      "inputPromptFile": "acceptance-bad-incomplete-canon-prompt.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_EMBEDDED_CANON_PROMPT_INCOMPLETE"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report itself is complete, but the embedded exact canon prompt is structurally incomplete."
+    },
+    {
+      "id": "acceptance-report-no-canon-prompt",
+      "inputPromptFile": "acceptance-report-no-canon-prompt.txt",
+      "expectedScoreMin": 95,
+      "expectedScoreMax": 100,
+      "expectedHardFailCodes": [],
+      "expectedRepairability": "no-op",
+      "expectedStrictExit": 0,
+      "notes": "Acceptance report has no embedded exact canon prompt and must not false-positive."
+    },
+    {
+      "id": "acceptance-missing-commit-check",
+      "inputPromptFile": "acceptance-missing-commit-check.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_COMMIT_IDENTITY_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report reaches a verdict without verifying commit identity."
+    },
+    {
+      "id": "acceptance-missing-scope-check",
+      "inputPromptFile": "acceptance-missing-scope-check.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_SCOPE_VERDICT_MISSING",
+        "FAIL_ACCEPTANCE_UNAUTHORIZED_FILES_UNCHECKED"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report reaches a verdict without scope or unauthorized-file verification."
+    },
+    {
+      "id": "acceptance-missing-validation-check",
+      "inputPromptFile": "acceptance-missing-validation-check.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_VALIDATION_EVIDENCE_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report reaches a verdict without validation evidence checks."
+    },
+    {
+      "id": "acceptance-missing-repo-state-check",
+      "inputPromptFile": "acceptance-missing-repo-state-check.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_REPO_STATE_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report reaches a verdict without final repo cleanliness/alignment."
+    },
+    {
+      "id": "acceptance-missing-residual-risks",
+      "inputPromptFile": "acceptance-missing-residual-risks.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_RESIDUAL_RISKS_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report reaches a verdict without residual risks."
+    },
+    {
+      "id": "acceptance-missing-non-claims",
+      "inputPromptFile": "acceptance-missing-non-claims.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_ACCEPTANCE_NON_CLAIMS_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Acceptance report reaches a verdict without non-claims."
+    },
+    {
+      "id": "missing-structure",
+      "inputPromptFile": "missing-structure.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_LANE_DECLARATION_MISSING",
+        "FAIL_LANE_MIXING",
+        "FAIL_MISSING_STRICT_MODE",
+        "FAIL_PROMPT_GATE_MISSING",
+        "FAIL_TARGET_TOOL_MISSING"
+      ],
+      "expectedRepairability": "context-required",
+      "expectedStrictExit": 1,
+      "notes": "Deliberately under-specified prompt missing core structure."
+    },
+    {
+      "id": "lane-mixing",
+      "inputPromptFile": "lane-mixing.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_BASELINE_CHECKS_MISSING",
+        "FAIL_FINAL_REPO_CHECKS_MISSING",
+        "FAIL_GIT_COMPLETENESS_MISSING",
+        "FAIL_IMPLEMENTATION_WITHOUT_COMMIT_PUSH",
+        "FAIL_NON_CLAIMS_MISSING",
+        "FAIL_PROMPT_GATE_MISSING",
+        "FAIL_READONLY_WITH_COMMIT_PUSH"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Mixed readiness and implementation obligations with read-only conflict."
+    },
+    {
+      "id": "secret-inspection-risk",
+      "inputPromptFile": "secret-inspection-risk.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_NON_CLAIMS_MISSING",
+        "FAIL_PROMPT_GATE_MISSING",
+        "FAIL_READONLY_CONSTRAINTS_MISSING",
+        "FAIL_SECRET_INSPECTION_RISK"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Prompt asks for forbidden secret/session/storage inspection."
+    },
+    {
+      "id": "implementation-missing-git-completeness",
+      "inputPromptFile": "implementation-missing-git-completeness.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_BASELINE_CHECKS_MISSING",
+        "FAIL_FINAL_REPO_CHECKS_MISSING",
+        "FAIL_GIT_COMPLETENESS_MISSING",
+        "FAIL_IMPLEMENTATION_WITHOUT_COMMIT_PUSH",
+        "FAIL_LANE_MIXING",
+        "FAIL_PROMPT_GATE_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Implementation prompt omits git completeness requirements."
+    },
+    {
+      "id": "canon-missing-commit-push",
+      "inputPromptFile": "canon-missing-commit-push.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_BASELINE_CHECKS_MISSING",
+        "FAIL_CANON_WITHOUT_COMMIT_PUSH",
+        "FAIL_FINAL_REPO_CHECKS_MISSING",
+        "FAIL_GIT_COMPLETENESS_MISSING",
+        "FAIL_LANE_MIXING",
+        "FAIL_NON_CLAIMS_MISSING",
+        "FAIL_PROMPT_GATE_MISSING"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Canon prompt omits commit/push obligations."
+    },
+    {
+      "id": "canon-with-no-commit-no-push",
+      "inputPromptFile": "canon-with-no-commit-no-push.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_CANON_WITHOUT_COMMIT_PUSH"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Canon prompt incorrectly includes both NO COMMIT and NO PUSH markers."
+    },
+    {
+      "id": "canon-with-no-commit-only",
+      "inputPromptFile": "canon-with-no-commit-only.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_CANON_WITHOUT_COMMIT_PUSH"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Canon prompt incorrectly includes NO COMMIT."
+    },
+    {
+      "id": "canon-with-no-push-only",
+      "inputPromptFile": "canon-with-no-push-only.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_CANON_WITHOUT_COMMIT_PUSH"
+      ],
+      "expectedRepairability": "unsafe-blocked",
+      "expectedStrictExit": 1,
+      "notes": "Canon prompt incorrectly includes NO PUSH."
+    },
+    {
+      "id": "repair-context-required",
+      "inputPromptFile": "repair-context-required.txt",
+      "expectedScoreMin": 49,
+      "expectedScoreMax": 49,
+      "expectedHardFailCodes": [
+        "FAIL_LANE_MIXING",
+        "FAIL_NON_CLAIMS_MISSING",
+        "FAIL_PROMPT_GATE_MISSING",
+        "FAIL_READONLY_CONSTRAINTS_MISSING",
+        "FAIL_TARGET_TOOL_MISSING"
+      ],
+      "expectedRepairability": "context-required",
+      "expectedStrictExit": 1,
+      "notes": "Repair context is missing authoritative context and must block."
+    }
+  ]
+}

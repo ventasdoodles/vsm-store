@@ -3,7 +3,7 @@ import { productSearchToolSchema } from '../lib/ai-capsule-schemas';
 import { 
   evaluateProductSearchFallbackTree, 
   ProductSearchContext 
-} from '../lib/product-search-capsule';
+} from '../lib/domain/product-search';
 import { InternalCapsuleContract, InternalResolvedProduct } from '../types/ai-capsule';
 import { knowledgeToolSchema } from '../lib/ai-capsule-schemas';
 import { 

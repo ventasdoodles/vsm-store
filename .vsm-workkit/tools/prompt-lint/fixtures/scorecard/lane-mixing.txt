@@ -1,0 +1,24 @@
+STRICT MODE.
+ROADMAP / READINESS ONLY.
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+Target tool:
+Codex, rol Anty.
+
+Mission objective:
+Review the prompt scorecard lane while also implementing the scorecard reporter v0.
+
+Scope:
+Only Ya VOY prompt reliability/work-kit surfaces.
+
+Forbidden actions:
+
+* Do not modify `tools/prompt-lint/prompt-lint.mjs`.
+* Do not add hooks, CI, automation, or runtime integration.
+* No commit.
+* No push.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+PROMPT QUALITY GATE CHECK: PASS

@@ -1,0 +1,42 @@
+Skill System v2 - Missing Target Tool
+
+STRICT MODE.
+IMPLEMENTATION AUTHORIZED.
+
+Mission objective:
+Run a bounded implementation lane.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Forbidden actions:
+- Do not inspect secrets.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Baseline:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+
+Validation:
+- git diff --check
+- git diff --stat
+- git diff --name-only
+- stage only authorized files
+- commit
+- push
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+Success condition:
+The implementation is validated, committed, and pushed.
+
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+PROMPT QUALITY GATE CHECK: PASS

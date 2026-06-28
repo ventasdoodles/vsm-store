@@ -1,0 +1,17 @@
+Skill System v2 - Prompt Lint Helper v0
+
+Target tool: Anty
+
+Mission objective:
+Review a prompt lint draft.
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Forbidden actions:
+- Do not modify product files.
+
+Success condition:
+Structured report.
+
+PROMPT QUALITY GATE CHECK: PASS

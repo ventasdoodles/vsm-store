@@ -1,0 +1,18 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-readiness\SKILL.md
+ROADMAP / READINESS ONLY.
+
+Mission objective:
+Repair the prompt scorecard lane without enough authoritative context.
+
+Scope:
+- missing authoritative context
+
+Blocked repair code:
+REPAIR_BLOCKED_MISSING_AUTHORITATIVE_CONTEXT
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+PROMPT QUALITY GATE CHECK: PASS

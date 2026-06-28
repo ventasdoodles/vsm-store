@@ -1,0 +1,42 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+Target tool: Codex
+
+CANON / DOC RECONCILIATION ONLY.
+
+Mission objective:
+Reconcile canon docs after acceptance.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-canon-reconciliation\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Authorized files/folders:
+- `docs/workkit/README_WORKKIT.md`
+
+Forbidden actions:
+- Do not modify product/runtime/source/test behavior.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Success condition:
+Produce canon updates that preserve accepted facts and residual risk.
+
+Validation:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+- git diff --check
+- git diff --stat
+- git diff --name-only
+- stage only authorized files
+- commit
+- push
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+PROMPT QUALITY GATE CHECK: PASS

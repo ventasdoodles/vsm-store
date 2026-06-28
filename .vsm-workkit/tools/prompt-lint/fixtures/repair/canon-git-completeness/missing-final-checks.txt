@@ -1,0 +1,46 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-canon-reconciliation\SKILL.md
+CANON / DOC RECONCILIATION ONLY.
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+Target tool:
+Codex, rol Codex.
+
+Mission objective:
+Canonize an accepted prompt reliability lane.
+
+Scope:
+Only work-kit docs.
+
+Authorized files/surfaces:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit\README_WORKKIT.md`
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Baseline:
+- `git status -sb`
+- `git rev-list --left-right --count origin/main...HEAD`
+- `git log -1 --oneline`
+
+Validation:
+- `git diff --check`
+- `git diff --stat`
+- `git diff --name-only`
+
+Commit/push:
+- Stage only authorized files.
+- Commit with a concise message.
+- Push to `origin/main`.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Canon final-check omissions are detected.
+
+Non-claims and residual risks:
+No invented canon facts, no runtime proof, no `--repair`.
+
+PROMPT QUALITY GATE CHECK: PASS

@@ -1,0 +1,51 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+Target tool:
+Anty.
+
+Mission objective:
+Implement a bounded prompt reliability fixture.
+
+Scope:
+Only prompt reliability surfaces.
+
+Authorized files/surfaces:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\fixtures\repair\stale-external-target\anty-target.txt`
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Baseline:
+- `git status -sb`
+- `git rev-list --left-right --count origin/main...HEAD`
+- `git log -1 --oneline`
+
+Validation:
+- `git diff --check`
+- `git diff --stat`
+- `git diff --name-only`
+
+Commit/push:
+- Stage only authorized files.
+- Commit with a concise message.
+- Push to `origin/main`.
+
+Final repo checks:
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Stale external target wording is detected.
+
+Non-claims and residual risks:
+No target-tool invention, no runtime integration, no `--repair`.
+
+PROMPT QUALITY GATE CHECK: PASS

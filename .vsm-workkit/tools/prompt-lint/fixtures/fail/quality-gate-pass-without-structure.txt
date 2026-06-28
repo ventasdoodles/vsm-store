@@ -1,0 +1,21 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+Target tool: Codex
+
+Mission objective:
+Review the next prompt draft for quality.
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit`.
+
+Authorized files/surfaces:
+- `docs/workkit/README_WORKKIT.md`
+
+Forbidden actions:
+- NO COMMIT
+- NO PUSH
+
+Success condition:
+Produce a brief read-only report.
+
+PROMPT QUALITY GATE CHECK: PASS

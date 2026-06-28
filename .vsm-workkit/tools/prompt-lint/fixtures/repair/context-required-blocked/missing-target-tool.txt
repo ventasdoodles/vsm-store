@@ -1,0 +1,31 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-readiness\SKILL.md
+ROADMAP / READINESS ONLY.
+NO IMPLEMENTATION.
+NO COMMIT.
+NO PUSH.
+
+Mission objective:
+Determine the next safe prompt reliability lane.
+
+Scope:
+Only inspect prompt reliability files.
+
+Authorized files/surfaces:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit\PROMPT_REPAIR_CONTRACT.md`
+
+Forbidden actions:
+- Do not edit files.
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Missing target tool blocks repair instead of being inferred.
+
+Non-claims and residual risks:
+No `--repair`, no invented target tool, no invented role, no runtime integration.
+
+PROMPT QUALITY GATE CHECK: PASS

@@ -1,0 +1,36 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+Target tool:
+Codex, rol Anty.
+
+Mission objective:
+Implement a bounded prompt reliability fixture.
+
+Scope:
+Only prompt reliability surfaces.
+
+Authorized files/surfaces:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\fixtures\repair\implementation-git-completeness\missing-validation-commit-push.txt`
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Baseline:
+- `git status -sb`
+- `git rev-list --left-right --count origin/main...HEAD`
+- `git log -1 --oneline`
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Implementation git-completeness omissions are detected.
+
+Non-claims and residual risks:
+No invented validation commands, no invented commit status, no `--repair`.
+
+PROMPT QUALITY GATE CHECK: PASS

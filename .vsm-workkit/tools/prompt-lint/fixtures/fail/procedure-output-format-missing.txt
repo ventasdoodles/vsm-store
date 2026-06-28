@@ -1,0 +1,46 @@
+Skill System v2 - Procedure Output Format Fixture
+
+STRICT MODE.
+Target tool: Codex
+
+IMPLEMENTATION AUTHORIZED.
+
+Mission objective:
+Verify that repo procedure prompts must include the required output contract.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Authorized files/folders:
+- `tools/prompt-lint/fixtures/fail/`
+
+Forbidden actions:
+- Do not modify product/runtime/source/test files.
+- Do not inspect secrets, cookies, tokens, localStorage, sessionStorage, or auth headers.
+
+Baseline:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+
+Validation:
+- git diff --check
+- git diff --stat
+- git diff --name-only
+- stage only authorized files
+- commit
+- push
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+Success condition:
+The helper reports `FAIL_PROCEDURE_OUTPUT_FORMAT_MISSING` when the required output format is omitted.
+
+Implementation authorized:
+VALIDATION + COMMIT + PUSH REQUIRED
+
+PROMPT QUALITY GATE CHECK: PASS

@@ -1,0 +1,53 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+Target tool:
+Codex, rol Anty.
+
+Mission objective:
+Implement a bounded prompt reliability helper fixture.
+
+Scope:
+Only touch authorized prompt reliability files.
+
+Authorized files/surfaces:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\fixtures\repair\pass-no-op\implementation-clean.txt`
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+- Do not claim product/runtime behavior.
+
+Baseline:
+- `git status -sb`
+- `git rev-list --left-right --count origin/main...HEAD`
+- `git log -1 --oneline`
+
+Validation:
+- `node tools\prompt-lint\prompt-lint.mjs tools\prompt-lint\fixtures\pass\implementation-safe.txt --strict`
+- `git diff --check`
+- `git diff --stat`
+- `git diff --name-only`
+
+Commit/push:
+- Stage only authorized files.
+- Commit with a concise message.
+- Push to `origin/main`.
+
+Final repo checks:
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+The bounded fixture is validated and pushed.
+
+Non-claims and residual risks:
+No `--repair`, no helper behavior change, no hook, no CI, no automation, no runtime integration, no product/runtime proof, and no DB/Auth/Supabase/browser/provider proof.
+
+PROMPT QUALITY GATE CHECK: PASS

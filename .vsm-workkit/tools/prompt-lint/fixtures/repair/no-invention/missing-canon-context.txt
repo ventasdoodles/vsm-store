@@ -1,0 +1,45 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+Mission objective:
+Repair this prompt using the current accepted canon facts and latest commit hash.
+
+Authorized files/surfaces:
+- current accepted canon files are intentionally missing.
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Baseline:
+- `git status -sb`
+- `git rev-list --left-right --count origin/main...HEAD`
+- `git log -1 --oneline`
+
+Validation:
+- `git diff --check`
+- `git diff --stat`
+- `git diff --name-only`
+
+Commit/push:
+- Stage only authorized files.
+- Commit with a concise message.
+- Push to `origin/main`.
+
+Final repo checks:
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Repair refuses to invent missing scope or canon facts.
+
+Non-claims and residual risks:
+No invented canon facts, no invented commit hashes, no invented file paths, no product/runtime proof.
+
+PROMPT QUALITY GATE CHECK: PASS

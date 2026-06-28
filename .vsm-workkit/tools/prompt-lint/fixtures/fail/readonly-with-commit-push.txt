@@ -1,0 +1,27 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+STRICT MODE.
+Target tool: Codex
+
+ACCEPTANCE AUDIT ONLY.
+
+Mission objective:
+Review a read-only prompt.
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit`.
+
+Authorized files/surfaces:
+- `docs/workkit/README_WORKKIT.md`
+
+Forbidden actions:
+- Do not modify files.
+- Do commit and push the docs change after validation.
+
+Success condition:
+Read-only review is complete.
+
+Read-only lane:
+NO COMMIT
+
+PROMPT QUALITY GATE CHECK: PASS

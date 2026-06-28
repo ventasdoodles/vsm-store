@@ -1,0 +1,125 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+DO NOT REDESIGN FROM ZERO.
+DO NOT OPEN NEW FRONTS.
+
+Target tool:
+Codex, rol Anty.
+
+Mission objective:
+Implement Prompt Scorecard v0 as a local/manual reporter for prompt quality, built on existing prompt-lint and repair-eval concepts, without implementing repair behavior or automation.
+
+Scope:
+Only Ya VOY prompt reliability/work-kit surfaces.
+
+Authorized files/surfaces:
+
+* `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\scorecard.mjs`
+* `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\scorecard-evals.mjs`
+* `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\fixtures\scorecard\**`
+
+Baseline:
+
+* `git status -sb`
+* `git rev-list --left-right --count origin/main...HEAD`
+* `git log -1 --oneline`
+
+Required implementation:
+
+* Create `tools/prompt-lint/scorecard.mjs` as a local/manual reporter that evaluates prompt quality with deterministic category scoring.
+* Create `tools/prompt-lint/scorecard-evals.mjs` and a compact scorecard fixture manifest.
+* Keep all repair behavior out of scope.
+
+Validation:
+
+* `git diff --check`
+* `git diff --stat`
+* `git diff --name-only`
+* `node tools/prompt-lint/scorecard.mjs tools/prompt-lint/fixtures/scorecard/excellent-prompt.txt`
+* `node tools/prompt-lint/scorecard.mjs tools/prompt-lint/fixtures/scorecard/excellent-prompt.txt --json`
+* `node tools/prompt-lint/scorecard.mjs tools/prompt-lint/fixtures/scorecard/excellent-prompt.txt --strict`
+* `node tools/prompt-lint/scorecard-evals.mjs`
+* `node tools/prompt-lint/repair-evals.mjs --strict`
+* `node tools/prompt-lint/prompt-lint.mjs tools/prompt-lint/fixtures/pass/implementation-safe.txt --strict`
+
+Commit/push:
+
+* Stage only authorized files.
+* Commit with concise message.
+* Push to origin/main.
+
+Final repo checks:
+
+* `final git status -sb`
+* `final git rev-list --left-right --count origin/main...HEAD`
+* `final git log -1 --oneline`
+
+Forbidden actions:
+
+* Do not modify `tools/prompt-lint/prompt-lint.mjs`.
+* Do not modify `tools/prompt-lint/repair-evals.mjs`.
+* Do not implement `--repair`.
+* Do not generate repaired prompt text.
+* Do not add dry-run repair.
+* Do not add hooks.
+* Do not add CI.
+* Do not add automation.
+* Do not add runtime integration.
+* Do not touch client repo `F:\ivoy\ivoy1.6`.
+* Do not touch admin repo `F:\ivoy\ivoy-admin`.
+* Do not touch DB/Auth/Supabase/browser/provider/runtime surfaces.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+1. PRE-IMPLEMENTATION REPO STATE
+2. FILES INSPECTED
+3. FILES MODIFIED
+4. EXACT CHANGES MADE
+5. VALIDATION PERFORMED
+6. COMMIT HASH + MESSAGE
+7. PUSH RESULT
+8. NON-CLAIMS
+9. RESIDUAL RISKS
+10. STATUS
+
+Non-claims:
+
+* No `--repair`.
+* No generated repaired prompt text.
+* No helper behavior change in `prompt-lint.mjs`.
+* No hooks, CI, automation, or runtime integration.
+* No deterministic enforcement beyond the local/manual harness.
+* No browser proof.
+* No DB/Auth/Supabase proof.
+* No production readiness.
+* No payment/GPS/notification proof.
+* No real rider/courier proof.
+* No deploy readiness.
+* No compliance proof.
+
+Residual risks:
+
+* The reporter is local/manual.
+* Scorecard v0 is bounded to current fixtures.
+* Future reporter hardening may still be needed.
+
+Success condition:
+Prompt Scorecard v0 exists as a local/manual reporter, produces deterministic human/json output, validates against bounded fixtures, preserves existing repair eval behavior, repo is clean/aligned after push, and no repair behavior, automation, runtime integration, or product/runtime proof is introduced.
+
+PROMPT QUALITY GATE CHECK: PASS
+1. PRE-IMPLEMENTATION REPO STATE
+2. FILES INSPECTED
+3. FILES MODIFIED
+4. EXACT CHANGES MADE
+5. VALIDATION PERFORMED
+6. COMMIT HASH + MESSAGE
+7. PUSH RESULT
+8. NON-CLAIMS
+9. RESIDUAL RISKS
+10. STATUS
+
+PROMPT QUALITY GATE CHECK: PASS

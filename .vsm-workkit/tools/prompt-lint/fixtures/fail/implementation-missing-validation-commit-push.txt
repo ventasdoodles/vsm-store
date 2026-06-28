@@ -1,0 +1,39 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+STRICT MODE.
+Target tool: Codex
+
+IMPLEMENTATION AUTHORIZED.
+
+Mission objective:
+Implement a local prompt lint helper.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Authorized files/folders:
+- `tools/prompt-lint/prompt-lint.mjs`
+
+Forbidden actions:
+- Do not modify product/runtime/source/test files.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Baseline:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+
+Success condition:
+The helper is implemented and verified locally.
+
+Validation:
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+PROMPT QUALITY GATE CHECK: PASS

@@ -1,0 +1,54 @@
+Skill System v2 - Prompt Lint Helper v0.1
+
+STRICT MODE.
+Target tool: Codex, rol Codex.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-canon-reconciliation\SKILL.md
+CANON / DOC RECONCILIATION ONLY.
+NO COMMIT.
+NO PUSH.
+VALIDATION + COMMIT + PUSH REQUIRED.
+
+Mission objective:
+Canonize the accepted prompt scorecard reporter v0 state.
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Authorized files/folders:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\scorecard.mjs`
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\scorecard-evals.mjs`
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\fixtures\scorecard\**`
+- `C:\dev\vsm-store-fresh\.vsm-workkit\tools\prompt-lint\README.md`
+- `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit\README_WORKKIT.md`
+
+Forbidden actions:
+- NO SOURCE/RUNTIME/TEST CHANGES.
+- Do not inspect secrets, cookies, tokens, localStorage, or sessionStorage.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Baseline:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+
+Validation:
+- stage only authorized files
+- node tools/prompt-lint/scorecard.mjs tools/prompt-lint/fixtures/scorecard/excellent-prompt.txt
+- node tools/prompt-lint/scorecard-evals.mjs
+- git diff --check
+- git diff --stat
+- git diff --name-only
+
+Success condition:
+Preserve accepted facts, residual risk, and lane boundaries.
+
+Final repo requirements:
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+PROMPT QUALITY GATE CHECK: PASS

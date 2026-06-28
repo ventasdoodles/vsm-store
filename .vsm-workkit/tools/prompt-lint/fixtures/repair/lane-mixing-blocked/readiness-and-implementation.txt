@@ -1,0 +1,35 @@
+STRICT MODE.
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-readiness\SKILL.md
+ROADMAP / READINESS ONLY.
+IMPLEMENTATION AUTHORIZED.
+VALIDATION + COMMIT + PUSH REQUIRED.
+NO IMPLEMENTATION.
+NO COMMIT.
+NO PUSH.
+
+Target tool:
+Codex, rol Codex.
+
+Mission objective:
+Assess readiness and implement the selected fix in the same lane.
+
+Scope:
+Only prompt reliability surfaces.
+
+Authorized files/surfaces:
+- `C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit\PROMPT_REPAIR_CONTRACT.md`
+
+Forbidden actions:
+- Do not inspect secrets, sessions, storage, DB, Auth, Supabase, browser, provider, or runtime surfaces.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT.
+
+Success condition:
+Lane mixing blocks repair.
+
+Non-claims and residual risks:
+No lane conversion, no `--repair`, no runtime proof.
+
+PROMPT QUALITY GATE CHECK: PASS

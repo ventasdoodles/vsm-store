@@ -1,0 +1,50 @@
+Skill System v2 - Fragile Inline Command Fixture
+
+STRICT MODE.
+Target tool: Codex
+
+IMPLEMENTATION AUTHORIZED.
+
+Mission objective:
+Verify that fragile inline command patterns are reported.
+
+USE REPO PROCEDURE ABSOLUTE PATH:
+C:\dev\vsm-store-fresh\.vsm-workkit\skills\vsm-implementation\SKILL.md
+
+Scope:
+Work only inside `C:\dev\vsm-store-fresh\.vsm-workkit`.
+
+Authorized files/folders:
+- `tools/prompt-lint/fixtures/fail/`
+
+Forbidden actions:
+- Do not modify product/runtime/source/test files.
+- Do not inspect secrets, cookies, tokens, localStorage, sessionStorage, or auth headers.
+
+Output:
+FOLLOW THE PROCEDURE'S REQUIRED OUTPUT FORMAT
+
+Baseline:
+- git status -sb
+- git rev-list --left-right --count origin/main...HEAD
+- git log -1 --oneline
+
+Validation:
+- Invoke-Expression "git status -sb"
+- git diff --check
+- git diff --stat
+- git diff --name-only
+- stage only authorized files
+- commit
+- push
+- final git status -sb
+- final git rev-list --left-right --count origin/main...HEAD
+- final git log -1 --oneline
+
+Success condition:
+The helper reports `FAIL_FRAGILE_INLINE_COMMAND` for the fragile inline command.
+
+Implementation authorized:
+VALIDATION + COMMIT + PUSH REQUIRED
+
+PROMPT QUALITY GATE CHECK: PASS
