@@ -8,8 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const canonRoot = path.resolve(__dirname, '..', '..');
 const workspaceRoot = path.resolve(canonRoot, '..');
-const clientRoot = path.join(workspaceRoot, 'ivoy1.6');
-const adminRoot = path.join(workspaceRoot, 'ivoy-admin');
+// Monorepo: canon, client, and admin are all in workspaceRoot
 
 const args = process.argv.slice(2);
 const jsonMode = args.includes('--json');
@@ -102,17 +101,13 @@ function check(id, label, runResult, ok, details = {}) {
 }
 
 function addRepoBaseline(checks) {
-  checks.push(repoStatus('canon', canonRoot));
-  checks.push(repoStatus('client', clientRoot, {
+  checks.push(repoStatus('monorepo', workspaceRoot, {
     allowedStatusLine: (line) => line === '?? qa-temp/',
   }));
-  checks.push(repoStatus('admin', adminRoot));
 }
 
 function addWorkspaceSync(checks) {
-  checks.push(repoStatus('canon', canonRoot));
-  checks.push(repoStatus('client', clientRoot));
-  checks.push(repoStatus('admin', adminRoot));
+  checks.push(repoStatus('monorepo', workspaceRoot));
 }
 
 function addPromptReliability(checks) {
@@ -140,7 +135,7 @@ function addPromptReliability(checks) {
 }
 
 function addQaPreflight(checks) {
-  const contractPath = path.join(clientRoot, 'scripts', 'qa-runtime-contract-check.cjs');
+  const contractPath = path.join(workspaceRoot, 'scripts', 'qa-runtime-contract-check.cjs');
   if (!fs.existsSync(contractPath)) {
     checks.push({
       id: 'qa-runtime-contract',
@@ -152,7 +147,7 @@ function addQaPreflight(checks) {
     return;
   }
 
-  const contract = run(process.execPath, ['scripts/qa-runtime-contract-check.cjs'], clientRoot);
+  const contract = run(process.execPath, ['scripts/qa-runtime-contract-check.cjs'], workspaceRoot);
   checks.push(check(
     'qa-runtime-contract',
     'QA runtime contract checker passes before harness execution',
@@ -172,7 +167,7 @@ function addQaPreflight(checks) {
 function addCanonChecks(checks) {
   addRepoBaseline(checks);
   addPromptReliability(checks);
-  const diffCheck = run('git', ['diff', '--check'], canonRoot);
+  const diffCheck = run('git', ['diff', '--check'], workspaceRoot);
   checks.push(check(
     'canon-diff-check',
     'Canon repo diff has no whitespace errors',
