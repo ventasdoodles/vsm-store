@@ -11,9 +11,14 @@ Database/API → services → hooks/state → components/pages
 - Domain helpers: estados, pricing, assignment, validation.
 - Services: IO externo, DB/API, providers.
 - Hooks/state: consumo UI.
-- Components: presentación. (Data Grids/Tablas deben usar arquitectura Headless vía TanStack Table).
+- Components: presentación.
 - Pages/routes: composición.
 - Config: settings/toggles/zonas.
+
+## Standard Libraries
+
+- **Routing:** `@tanstack/react-router` (Type-safe routing). Do not use `react-router-dom`.
+- **Tables/Data Grids:** `@tanstack/react-table` (Headless UI). Do not use other table libraries as the standard.
 
 ## No hacer
 
