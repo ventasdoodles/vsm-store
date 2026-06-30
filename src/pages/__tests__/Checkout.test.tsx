@@ -21,8 +21,8 @@ const useStorefrontCartDependencyOfferMock = vi.fn();
 const emitConversationConversionEventMock = vi.fn();
 const getCesarinSessionIdMock = vi.fn();
 
-vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+vi.mock('@tanstack/react-router', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');
     return {
         ...actual,
         useNavigate: () => navigateMock,

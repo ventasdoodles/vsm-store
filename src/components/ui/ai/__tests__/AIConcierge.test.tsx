@@ -46,10 +46,14 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
 }));
 
-vi.mock('react-router-dom', () => ({
-    useLocation: () => ({ pathname: '/vape/waka-somatch-menta' }),
-    useNavigate: () => navigateMock,
-}));
+vi.mock('@tanstack/react-router', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');
+    return {
+        ...actual,
+        useLocation: () => ({ pathname: '/vape/waka-somatch-menta' }),
+        useNavigate: () => navigateMock,
+    };
+});
 
 vi.mock('@/hooks/useAIConcierge', () => ({
     useAIConcierge: () => useAIConciergeMock(),

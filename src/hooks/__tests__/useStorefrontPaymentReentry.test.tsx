@@ -8,9 +8,13 @@ const errorMock = vi.fn();
 const getOrderByIdMock = vi.fn();
 const createPaymentMock = vi.fn();
 
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => navigateMock,
-}));
+vi.mock('@tanstack/react-router', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');
+    return {
+        ...actual,
+        useNavigate: () => navigateMock,
+    };
+});
 
 vi.mock('@/hooks/useNotification', () => ({
     useNotification: () => ({

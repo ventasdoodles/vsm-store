@@ -27,9 +27,13 @@ let authStateMock: { user: { id: string } | null; isAuthenticated: boolean } = {
     isAuthenticated: true,
 };
 
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => navigateMock,
-}));
+vi.mock('@tanstack/react-router', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');
+    return {
+        ...actual,
+        useNavigate: () => navigateMock,
+    };
+});
 
 vi.mock('@/stores/cart.store', () => ({
     selectSubtotal: (state: { items: CartItem[] }) =>

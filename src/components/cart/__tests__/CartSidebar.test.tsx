@@ -11,9 +11,13 @@ const runValidationMock = vi.fn();
 const useOpenRecoverableOrderMock = vi.fn();
 const useStorefrontCartDependencyOfferMock = vi.fn();
 
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => navigateMock,
-}));
+vi.mock('@tanstack/react-router', async () => {
+    const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');
+    return {
+        ...actual,
+        useNavigate: () => navigateMock,
+    };
+});
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy(
