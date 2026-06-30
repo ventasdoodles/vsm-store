@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Package, AlertTriangle, ExternalLink } from 'lucide-react';
 import { getOracleLowStockProducts } from '@/services/admin';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 export function InventoryAlertsPanel() {
     const { data: lowStockProducts = [], isLoading } = useQuery({
@@ -43,7 +43,7 @@ export function InventoryAlertsPanel() {
                                     </div>
                                 </div>
                                 <Link 
-                                    to={`/admin/products`}
+                                    to={`/admin/products` as any}
                                     className="p-2 rounded-lg hover:bg-white/10 transition-colors text-theme-secondary hover:text-white"
                                 >
                                     <ExternalLink className="h-4 w-4" />

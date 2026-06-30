@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearch } from '@tanstack/react-router';
 import { AlertTriangle, CheckCircle2, Clock, CreditCard, Home, RefreshCw, ShoppingBag, XCircle, type LucideIcon } from 'lucide-react';
 import { useOrderWithCrossSurfaceReconciliation } from '@/hooks/useOrders';
 import { getStorefrontOrderLifecycleView, getStorefrontPaymentReentryView, getStorefrontPostPurchaseConfidenceView } from '@/lib/domain/orders';
@@ -46,8 +46,8 @@ const TONE_UI: Record<
 };
 
 export function PaymentFailure() {
-    const [searchParams] = useSearchParams();
-    const orderId = searchParams.get('order_id');
+    const search: any = useSearch({ strict: false });
+    const orderId = search.order_id;
     const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
     const { data: order, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId ?? undefined);
     const lifecycleView = order ? getStorefrontOrderLifecycleView(order) : null;
@@ -121,7 +121,7 @@ export function PaymentFailure() {
 
                 {order ? (
                     <Link
-                        to={`/orders/${order.id}`}
+                        to={`/orders/${order.id}` as any}
                         className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 ${ui.primaryLink}`}
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -129,7 +129,7 @@ export function PaymentFailure() {
                     </Link>
                 ) : (
                     <Link
-                        to="/orders"
+                        to={"/orders" as any}
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:-translate-y-0.5 hover:bg-red-500"
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -138,7 +138,7 @@ export function PaymentFailure() {
                 )}
 
                 <Link
-                    to="/"
+                    to={"/" as any}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
                 >
                     <Home className="h-4 w-4" />

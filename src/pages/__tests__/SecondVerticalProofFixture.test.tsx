@@ -1,4 +1,4 @@
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
@@ -8,9 +8,9 @@ import { SecondVerticalProofFixture } from '../SecondVerticalProofFixture';
 
 function renderFixture(pathname = '/__qa/second-vertical-proof') {
     return render(
-        <MemoryRouter initialEntries={[pathname]}>
+        <TestRouter initialEntries={[pathname]}>
             <SecondVerticalProofFixture />
-        </MemoryRouter>,
+        </TestRouter>,
     );
 }
 

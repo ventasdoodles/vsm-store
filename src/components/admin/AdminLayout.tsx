@@ -1,7 +1,7 @@
 // Layout principal del Admin Panel - VSM Store
 // Sidebar + Header + Content area
 import React, { useState, useMemo } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { m, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
@@ -133,7 +133,7 @@ const Breadcrumbs = React.memo(() => {
 
     return (
         <nav className="flex items-center gap-2 mb-6 text-xs font-bold animate-in fade-in slide-in-from-left-2 duration-500">
-            <Link to="/admin" className="flex items-center gap-1.5 text-theme-secondary hover:text-vape-400 transition-colors">
+            <Link to={"/admin" as any} className="flex items-center gap-1.5 text-theme-secondary hover:text-vape-400 transition-colors">
                 <HomeIcon className="h-3 w-3" />
                 <span>Admin</span>
             </Link>
@@ -249,9 +249,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         if (!searchQuery.trim()) return;
         const q = searchQuery.trim();
         if (q.length > 5 && (q.includes('-') || !isNaN(Number(q)))) {
-            navigate(`/admin/orders?search=${q}`);
+            navigate({ to: `/admin/orders?search=${q}` as any });
         } else {
-            navigate(`/admin/customers?search=${q}`);
+            navigate({ to: `/admin/customers?search=${q}` as any });
         }
         setSearchQuery('');
         triggerSensory('click-heavy');
@@ -270,7 +270,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     const handleSignOut = async () => {
         await signOut();
-        navigate('/login');
+        navigate({ to: '/login' });
     };
 
     const isActive = (path: string) => {
@@ -312,7 +312,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     }}
                 >
                     <div className="flex items-center justify-between border-b border-white/5 px-6 py-6">
-                        <Link to="/admin" className="flex items-center gap-3 transition-transform hover:scale-[1.02] active:scale-95">
+                        <Link to={"/admin" as any} className="flex items-center gap-3 transition-transform hover:scale-[1.02] active:scale-95">
                             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-vape-500 to-vape-600 shadow-[0_0_20px_rgba(168,85,247,0.3)] border border-white/10">
                                 <Store className="h-5 w-5 text-white" />
                             </div>
@@ -359,7 +359,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                     <div className="mt-auto border-t border-white/5 p-5 space-y-3">
                         <Link
-                            to="/"
+                            to={"/" as any}
                             className="flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold text-theme-secondary hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5"
                         >
                             <Store className="h-4 w-4" />

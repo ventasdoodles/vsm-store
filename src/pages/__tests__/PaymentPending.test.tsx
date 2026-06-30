@@ -1,4 +1,4 @@
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaymentPending } from '../PaymentPending';
@@ -51,11 +51,7 @@ describe('PaymentPending continuity', () => {
             isFetching: false,
         });
         render(
-            <MemoryRouter initialEntries={['/payment/pending?order_id=order-1']}>
-                <Routes>
-                    <Route path="/payment/pending" element={<PaymentPending />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/pending?order_id=order-1']} path="/payment/pending"><PaymentPending /></TestRouter>,
         );
 
         expect(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i })).toBeInTheDocument();
@@ -88,11 +84,7 @@ describe('PaymentPending continuity', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/pending?order_id=order-2']}>
-                <Routes>
-                    <Route path="/payment/pending" element={<PaymentPending />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/pending?order_id=order-2']} path="/payment/pending"><PaymentPending /></TestRouter>,
         );
 
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
@@ -115,11 +107,7 @@ describe('PaymentPending continuity', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/pending?order_id=order-3']}>
-                <Routes>
-                    <Route path="/payment/pending" element={<PaymentPending />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/pending?order_id=order-3']} path="/payment/pending"><PaymentPending /></TestRouter>,
         );
 
         expect(screen.getByRole('heading', { name: /Pago confirmado/i })).toBeInTheDocument();

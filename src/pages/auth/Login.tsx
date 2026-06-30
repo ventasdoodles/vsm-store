@@ -1,6 +1,6 @@
 // Página de Login - VSM Store
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -15,13 +15,13 @@ export function Login() {
 
     // Si ya está loggeado, redirigir al perfil
     useEffect(() => {
-        if (isAuthenticated) navigate('/profile', { replace: true });
+        if (isAuthenticated) navigate({ to: '/profile',  replace: true  });
     }, [isAuthenticated, navigate]);
 
     return (
         <div className="container-vsm flex min-h-[70vh] items-center justify-center py-12">
             <div className="w-full max-w-md rounded-2xl border border-theme bg-theme-secondary/20 p-8">
-                <LoginForm onSuccess={() => navigate('/')} />
+                <LoginForm onSuccess={() => navigate({ to: '/' })} />
             </div>
         </div>
     );

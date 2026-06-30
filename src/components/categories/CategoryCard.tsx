@@ -1,5 +1,5 @@
 // Card de subcategoría - VSM Store
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getVape420ProductSurfacePresentationConfig } from '@/config/productization';
@@ -22,7 +22,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
 
     return (
         <Link
-            to={`/${section}/${category.slug}`}
+            to={`/${section}/${category.slug}` as any}
             className={cn(
                 'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl border p-10 text-center glass-premium',
                 'transition-all duration-500 cursor-pointer spotlight-container',

@@ -9,7 +9,7 @@
  */
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { m } from 'framer-motion';
 import { useFlashDeals } from '@/hooks/useFlashDeals';
 import { formatPrice, cn } from '@/lib/utils';
@@ -188,7 +188,7 @@ export const FlashDeals = () => {
                             variants={itemVariants}
                             className="flex-shrink-0 w-[300px] md:w-[340px] group/card relative"
                         >
-                            <Link to={`/${product.section}/${product.slug}`} className="block h-full cursor-none lg:cursor-default">
+                            <Link to={`/${product.section}/${product.slug}` as any} className="block h-full cursor-none lg:cursor-default">
                                 <div className="relative h-full bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(239,68,68,0.3)] flex flex-col group/inner spotlight-container">
                                     {/* Spotlight logic - managed by global class if available, else local CSS is enough */}
                                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--x,50%)_var(--y,50%),rgba(239,68,68,0.15)_0%,transparent_50%)] opacity-0 group-hover/card:opacity-100 transition-opacity pointer-events-none" />

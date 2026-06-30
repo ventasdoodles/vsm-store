@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it } from 'vitest';
 
 import { getVape420SectionRouteManifest, resolveSectionFromRouteManifest, vape420VerticalPackConfig } from '@/config/productization';
@@ -16,7 +16,7 @@ vi.mock('@/hooks/useStoreSettings', () => ({
 function renderUseSectionFromPath(initialPath: string) {
     const wrapper = ({ children }: { children: ReactNode }) => (
         <VerticalPackProvider>
-            <MemoryRouter initialEntries={[initialPath]}>{children}</MemoryRouter>
+            <TestRouter initialEntries={[initialPath]}>{children}</TestRouter>
         </VerticalPackProvider>
     );
 

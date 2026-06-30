@@ -1,5 +1,5 @@
-﻿// Página 404 - VSM Store
-import { Link, useNavigate } from 'react-router-dom';
+// Página 404 - VSM Store
+import { Link, useNavigate } from '@tanstack/react-router';
 import { Home, ArrowLeft } from 'lucide-react';
 
 export function NotFound() {
@@ -17,14 +17,14 @@ export function NotFound() {
             </p>
             <div className="flex gap-3">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate({ to: '..' })}
                     className="inline-flex items-center gap-2 rounded-xl bg-theme-secondary px-6 py-3 text-sm font-semibold text-theme-primary transition-all hover:bg-theme-secondary hover:-translate-y-0.5"
                 >
                     <ArrowLeft className="h-4 w-4" />
                     Volver
                 </button>
                 <Link
-                    to="/"
+                    to={"/" as any}
                     className="inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-500/25 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
                 >
                     <Home className="h-4 w-4" />

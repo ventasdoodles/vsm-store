@@ -8,7 +8,7 @@
  */
 import React from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Sparkles, ArrowRight, Zap, Gift, Heart } from 'lucide-react';
 import { useCustomerIQ } from '@/hooks/useCustomerIQ';
 import { cn } from '@/lib/utils';

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it } from 'vitest';
 import { CategoryCard } from '../CategoryCard';
 import type { Category } from '@/types/category';
@@ -24,9 +24,9 @@ function makeCategory(overrides: Partial<Category> = {}): Category {
 describe('CategoryCard', () => {
     it('applies vape presentation classes from shared product surface config', () => {
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <CategoryCard category={makeCategory()} section="vape" />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         const link = screen.getByRole('link', { name: 'Pods' });
@@ -39,9 +39,9 @@ describe('CategoryCard', () => {
 
     it('applies herbal presentation classes from shared product surface config', () => {
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <CategoryCard category={makeCategory({ section: '420', slug: 'flores' })} section="420" />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         const link = screen.getByRole('link', { name: 'Pods' });

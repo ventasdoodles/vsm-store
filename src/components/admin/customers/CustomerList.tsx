@@ -9,7 +9,7 @@
  */
 import { useMemo } from 'react';
 import { Phone, Calendar, MessageCircle, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import {
     useReactTable,
     getCoreRowModel,
@@ -184,7 +184,7 @@ export function CustomerList({ customers }: Props) {
                     {table.getRowModel().rows.map(row => (
                         <tr
                             key={row.id}
-                            onClick={() => navigate(`/admin/customers/${row.original.id}`)}
+                            onClick={() => navigate({ to: `/admin/customers/${row.original.id}` as any })}
                             className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
                         >
                             {row.getVisibleCells().map(cell => (

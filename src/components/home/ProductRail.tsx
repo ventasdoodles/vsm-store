@@ -7,7 +7,7 @@
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ArrowRight, Sparkles, Flame, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';

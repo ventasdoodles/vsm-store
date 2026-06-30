@@ -5,7 +5,7 @@
  * // Estilo: High-Contrast Danger State (§2.1).
  */
 import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/hooks/useAuth';
 
 export function ProfileActions() {
@@ -14,7 +14,7 @@ export function ProfileActions() {
 
     const handleSignOut = async () => {
         await signOut();
-        navigate('/');
+        navigate({ to: '/' });
     };
 
     return (

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { m, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, ChevronRight, Truck, Zap } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -136,7 +136,7 @@ export function CartSidebar() {
         if (openRecoverableOrder && openOrderRecoveryView?.shouldRecover) {
             notify.warning('Ya existe una orden pendiente', openOrderRecoveryView.detail);
             closeCart();
-            navigate(`/orders/${openRecoverableOrder.id}`);
+            navigate({ to: `/orders/${openRecoverableOrder.id}` as any });
             return;
         }
 
@@ -152,12 +152,12 @@ export function CartSidebar() {
         }
 
         closeCart();
-        navigate('/checkout');
+        navigate({ to: '/checkout' });
     };
 
     const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
         closeCart();
-        navigate(`/${missingProduct.section}/${missingProduct.slug}`);
+        navigate({ to: `/${missingProduct.section}/${missingProduct.slug}` as any });
     };
 
     return (

@@ -1,6 +1,6 @@
 import { createElement, forwardRef, type PropsWithChildren, type ReactNode } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Wishlist } from '../Wishlist';
 import type { Product } from '@/types/product';
@@ -102,9 +102,9 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
 
 function renderWishlist() {
     return render(
-        <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+        <TestRouter>
             <Wishlist />
-        </MemoryRouter>,
+        </TestRouter>,
     );
 }
 

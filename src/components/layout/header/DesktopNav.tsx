@@ -5,7 +5,7 @@
  *    Design: Glassmorphism suave, Haz de luz mouse-following, Transiciones Spring.
  * // Regla / Notas: Recibe `compact` para modo pill.
  */
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck } from 'lucide-react';
 import { MegaMenu } from './MegaMenu';

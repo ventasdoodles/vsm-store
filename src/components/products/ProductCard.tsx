@@ -8,7 +8,7 @@
  * @version 1.1.0
  */
 import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle, PackageX } from 'lucide-react';
 import { m } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';

@@ -1,5 +1,5 @@
 // Página de resultados de búsqueda - VSM Store
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearch as useRouterSearch } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, SearchX } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearch } from '@/hooks/useSearch';
@@ -64,8 +64,8 @@ function getBroadSectionSearch(query: string): BroadSectionSearch | null {
 }
 
 export function SearchResults() {
-    const [searchParams] = useSearchParams();
-    const query = searchParams.get('q') ?? '';
+    const search: any = useRouterSearch({ strict: false });
+    const query = search.q ?? '';
     const broadSectionSearch = getBroadSectionSearch(query);
 
     const { data: searchProducts = [], isLoading: isSearchLoading } = useSearch(broadSectionSearch ? '' : query);
@@ -85,7 +85,7 @@ export function SearchResults() {
             {/* Header */}
             <div className="mb-8">
                 <Link
-                    to="/"
+                    to={"/" as any}
                     className="mb-4 inline-flex items-center gap-1.5 text-xs text-theme-secondary hover:text-theme-secondary transition-colors"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />

@@ -6,7 +6,7 @@
  * @removable Quitar de Profile.tsx sin consecuencias para el resto de la página.
  */
 import { ShoppingBag, Wallet, Star, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance, useTierProgress } from '@/hooks/useLoyalty';
@@ -74,7 +74,7 @@ export function ProfileStats() {
                 label="Pedidos"
                 value={stats?.totalOrders ?? 0}
                 gradient="from-blue-500 to-cyan-400"
-                to="/orders"
+                to={"/orders" as any}
                 isLoading={isLoading}
             />
             <StatCard
@@ -82,7 +82,7 @@ export function ProfileStats() {
                 label="Total gastado"
                 value={formatPrice(stats?.totalSpent ?? 0)}
                 gradient="from-emerald-500 to-teal-400"
-                to="/stats"
+                to={"/stats" as any}
                 isLoading={isLoading}
             />
             <StatCard
@@ -90,7 +90,7 @@ export function ProfileStats() {
                 label="V-Coins"
                 value={points.toLocaleString()}
                 gradient="from-yellow-500 to-amber-400"
-                to="/loyalty"
+                to={"/loyalty" as any}
                 isLoading={isLoading}
             />
             <StatCard
@@ -98,7 +98,7 @@ export function ProfileStats() {
                 label="Nivel"
                 value={tierLabel}
                 gradient="from-violet-500 to-purple-400"
-                to="/loyalty"
+                to={"/loyalty" as any}
                 isLoading={isLoading}
             />
         </section>

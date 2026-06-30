@@ -8,7 +8,7 @@
  * @module admin/customers/details
  */
 import { ArrowLeft, Phone, Mail, Link as LinkIcon, ExternalLink, CalendarDays, ShieldCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import type { AdminCustomerDetail } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 
@@ -49,7 +49,7 @@ export function CustomerHeader({ customer }: Props) {
                 
                 {/* Back Button (Floating) */}
                 <button 
-                    onClick={() => navigate('/admin/customers')} 
+                    onClick={() => navigate({ to: '/admin/customers' })} 
                     className="absolute -top-2 -left-2 md:static md:top-auto md:left-auto flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-theme-secondary hover:text-white transition-colors border border-white/5 hover:border-white/10"
                     title="Volver al directorio"
                 >

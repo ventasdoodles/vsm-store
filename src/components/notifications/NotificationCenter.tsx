@@ -3,7 +3,7 @@ import { Bell, Check, Trash2, X } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { cn, formatTimeAgo } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 interface NotificationCenterProps {
     isOpen: boolean;

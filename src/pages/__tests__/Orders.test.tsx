@@ -1,4 +1,4 @@
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -168,9 +168,9 @@ describe('Orders storefront visibility and self-service', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Orders />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText(/Historial con estado de pago y acciones disponibles/i)).toBeInTheDocument();
@@ -223,9 +223,9 @@ describe('Orders storefront visibility and self-service', () => {
             error: null,
         });
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Orders />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
@@ -265,9 +265,9 @@ describe('Orders storefront visibility and self-service', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Orders />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
@@ -308,9 +308,9 @@ describe('Orders storefront visibility and self-service', () => {
         reorderOrderMock.mockResolvedValue(null);
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Orders />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Reordenar con catalogo actual/i }));
@@ -353,9 +353,9 @@ describe('Orders storefront visibility and self-service', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Orders />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.queryByRole('button', { name: /Reordenar con catalogo actual/i })).not.toBeInTheDocument();
@@ -375,9 +375,9 @@ describe('Orders storefront visibility and self-service', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Orders />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.queryByRole('button', { name: /Reordenar con catalogo actual/i })).not.toBeInTheDocument();

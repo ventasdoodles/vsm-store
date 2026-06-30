@@ -1,10 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from '@tanstack/react-router';
 import { Toaster } from 'react-hot-toast';
 // ─── Componentes críticos (no lazy — necesarios en primer render) ─────────────
 import { Layout } from '@/components/layout/Layout';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
 import { SEO } from '@/components/seo/SEO';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -20,12 +19,8 @@ import {
     PILOT_ACTIVATION_EVENT,
     resolveStorefrontAIExposure,
 } from '@/lib/pilot-activation';
-import { getVape420PublicSectionRouteDeclarations } from '@/config/productization';
-
-
-
 import { TacticalProvider } from '@/contexts/TacticalContext';
-import { VerticalPackProvider, useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { VerticalPackProvider } from '@/contexts/VerticalPackContext';
 
 
 // ─── Admin entry point (completely isolated lazy bundle) ──────────────────────
@@ -41,33 +36,6 @@ const SmartRewardToast = lazy(() => import('@/components/loyalty/SmartRewardToas
 import { PilotDebugBadge } from '@/components/ui/ai/PilotDebugBadge';
 
 
-// ─── Páginas lazy (storefront) ────────────────────────────────────────────────
-const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));
-const Privacy = lazy(() => import('@/pages/legal/Privacy').then(m => ({ default: m.Privacy })));
-const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
-const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
-const SectionSlugResolver = lazy(() => import('@/pages/SectionSlugResolver').then(m => ({ default: m.SectionSlugResolver })));
-const SectionPage = lazy(() => import('@/pages/SectionPage').then(m => ({ default: m.SectionPage })));
-const Login = lazy(() => import('@/pages/auth/Login').then(m => ({ default: m.Login })));
-const SignUp = lazy(() => import('@/pages/auth/SignUp').then(m => ({ default: m.SignUp })));
-const Profile = lazy(() => import('@/pages/Profile').then(m => ({ default: m.Profile })));
-const Addresses = lazy(() => import('@/pages/Addresses').then(m => ({ default: m.Addresses })));
-const Orders = lazy(() => import('@/pages/Orders').then(m => ({ default: m.Orders })));
-const OrderDetail = lazy(() => import('@/pages/OrderDetail').then(m => ({ default: m.OrderDetail })));
-const Loyalty = lazy(() => import('@/pages/Loyalty').then(m => ({ default: m.Loyalty })));
-const Stats = lazy(() => import('@/pages/Stats').then(m => ({ default: m.Stats })));
-const Notifications = lazy(() => import('@/pages/user/Notifications').then(m => ({ default: m.Notifications })));
-const Contact = lazy(() => import('@/pages/Contact').then(m => ({ default: m.Contact })));
-const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess').then(m => ({ default: m.PaymentSuccess })));
-const PaymentFailure = lazy(() => import('@/pages/PaymentFailure').then(m => ({ default: m.PaymentFailure })));
-const PaymentPending = lazy(() => import('@/pages/PaymentPending').then(m => ({ default: m.PaymentPending })));
-const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
-const Checkout = lazy(() => import('@/pages/Checkout').then(m => ({ default: m.Checkout })));
-const TrackOrder = lazy(() => import('@/pages/TrackOrder').then(m => ({ default: m.TrackOrder })));
-const Wishlist = lazy(() => import('@/pages/Wishlist').then(m => ({ default: m.Wishlist })));
-const NewArrivals = lazy(() => import('@/pages/NewArrivals').then(m => ({ default: m.NewArrivals })));
-const BestsellersPage = lazy(() => import('@/pages/BestsellersPage').then(m => ({ default: m.BestsellersPage })));
-const OffersPage = lazy(() => import('@/pages/OffersPage').then(m => ({ default: m.OffersPage })));
 const ProductSurfaceFixture = import.meta.env.DEV
     ? lazy(() => import('@/pages/ProductSurfaceFixture').then(m => ({ default: m.ProductSurfaceFixture })))
     : null;
@@ -125,11 +93,6 @@ function StorefrontApp() {
     const { pathname, search } = useLocation();
     const { user } = useAuth();
     const { data: settings } = useStoreSettings();
-    const { config, isLoading } = useActiveVerticalPack();
-
-    const publicSectionRouteDeclarations = config 
-        ? getVape420PublicSectionRouteDeclarations(config)
-        : [];
 
     // Pilot Gate: durable client-side exposure flag shared across storefront contexts
     const [isPilotAuthorized, setIsPilotAuthorized] = useState(() => {
@@ -150,7 +113,7 @@ function StorefrontApp() {
 
     // Detect pilot activation via ?pilot=cesarin and persist durably before cleaning the URL
     useEffect(() => {
-        if (bootstrapPilotFromSearch(search)) {
+        if (bootstrapPilotFromSearch(window.location.search)) {
             setIsPilotAuthorized(true);
             console.warn('[Pilot Gate] Activated via route change.');
 
@@ -252,54 +215,7 @@ function StorefrontApp() {
                 <Layout>
                     <Suspense fallback={<PageLoader />}>
                         <ErrorBoundary>
-                            {isLoading ? <PageLoader /> : (
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/nuevo" element={<NewArrivals />} />
-                                <Route path="/mas-vendidos" element={<BestsellersPage />} />
-                                <Route path="/ofertas" element={<OffersPage />} />
-
-                                <Route path="/buscar" element={<SearchResults />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/signup" element={<SignUp />} />
-                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                                <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-                                <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-                                <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-                                <Route path="/loyalty" element={<ProtectedRoute><Loyalty /></ProtectedRoute>} />
-                                <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
-
-                                {/* Legal Pages */}
-                                <Route path="/legal/terms" element={<Terms />} />
-                                <Route path="/legal/privacy" element={<Privacy />} />
-                                <Route path="/privacy" element={<Privacy />} />
-
-                                <Route path="/contact" element={<Contact />} />
-                                {publicSectionRouteDeclarations.map((route) =>
-                                    route.elementName === 'SectionPage' ? (
-                                        <Route
-                                            key={route.path}
-                                            path={route.path}
-                                            element={<SectionPage />}
-                                        />
-                                    ) : (
-                                        <Route
-                                            key={route.path}
-                                            path={route.path}
-                                            element={<SectionSlugResolver />}
-                                        />
-                                    ),
-                                )}
-                                <Route path="/payment/success" element={<PaymentSuccess />} />
-                                <Route path="/payment/failure" element={<PaymentFailure />} />
-                                <Route path="/payment/pending" element={<PaymentPending />} />
-                                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-                                <Route path="/checkout" element={<Checkout />} />
-                                <Route path="/rastreo" element={<TrackOrder />} />
-                                <Route path="/wishlist" element={<Wishlist />} />
-                                <Route path="*" element={<NotFound />} />
-                            </Routes>
-                            )}
+                            <Outlet />
                         </ErrorBoundary>
                     </Suspense>
                 </Layout>

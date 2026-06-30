@@ -1,7 +1,7 @@
 // Hook para validar el carrito contra la API al cargar la app
 // Muestra notificaciones para items removidos o ajustados
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 import { useCartStore, type CartValidationIssue } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 

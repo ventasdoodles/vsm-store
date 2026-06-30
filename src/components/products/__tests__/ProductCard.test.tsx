@@ -1,6 +1,6 @@
 import { createElement, forwardRef, type PropsWithChildren, type ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it, vi } from 'vitest';
 import { ProductCard } from '../ProductCard';
 import { makeProductSurfaceFixture } from '../productSurfaceFixture';
@@ -90,9 +90,9 @@ describe('ProductCard', () => {
         });
 
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductCard product={product} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('Stock limitado: 3 unidades')).toBeInTheDocument();
@@ -106,9 +106,9 @@ describe('ProductCard', () => {
         });
 
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductCard product={product} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('Disponibilidad limitada: 4 unidades')).toBeInTheDocument();
@@ -120,18 +120,18 @@ describe('ProductCard', () => {
         const herbalProduct = makeProductSurfaceFixture({ section: '420' });
 
         const { rerender } = render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductCard product={vapeProduct} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getAllByText('vape')[0]).toHaveClass('bg-vape-500/10', 'text-vape-400', 'border-vape-500/20');
         expect(screen.getByText(vapeProduct.name)).toHaveClass('group-hover:text-vape-400');
 
         rerender(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductCard product={herbalProduct} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getAllByText('420')[0]).toHaveClass('bg-herbal-500/10', 'text-herbal-400', 'border-herbal-500/20');

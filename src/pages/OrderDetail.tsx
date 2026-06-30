@@ -5,7 +5,7 @@
  * // Estilo: High-End Premium Receipt & Cinematic Timeline (§2.1).
  */
 import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from '@tanstack/react-router';
 import { 
     ArrowLeft, 
     Loader2, 
@@ -52,7 +52,7 @@ const STATUS_ICONS: Record<OrderStatus, LucideIcon> = {
 };
 
 export function OrderDetail() {
-    const { orderId } = useParams<{ orderId: string }>();
+    const { orderId } = useParams({ strict: false }) as any;
     const { data: order, isLoading, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId);
     const { reorderOrder, reorderingOrderId } = useAuthenticatedOrderReorder();
     const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
@@ -79,7 +79,7 @@ export function OrderDetail() {
                     <Package size={40} />
                 </div>
                 <h2 className="text-2xl font-black text-white uppercase italic">Adquisición No Encontrada</h2>
-                <Link to="/orders" className="vsm-button-primary inline-flex">
+                <Link to={"/orders" as any} className="vsm-button-primary inline-flex">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Volver a Bitácora
                 </Link>
@@ -130,7 +130,7 @@ export function OrderDetail() {
             {/* Header Cinemático Detalle */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 animate-in fade-in slide-in-from-top-4 duration-700">
                 <div className="flex items-center gap-6">
-                    <Link to="/orders" className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all shadow-xl">
+                    <Link to={"/orders" as any} className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all shadow-xl">
                         <ArrowLeft size={20} />
                     </Link>
                     <div>
@@ -494,7 +494,7 @@ export function OrderDetail() {
                     </div>
 
                     <Link
-                        to="/orders"
+                        to={"/orders" as any}
                         className="flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-all duration-500 hover:bg-white/5 hover:text-white"
                     >
                         <ShoppingBag className="h-4 w-4" />

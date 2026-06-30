@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotification } from '@/hooks/useNotification';
@@ -155,7 +155,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
 
                 if (openRecoverableOrder && recoveryView?.shouldRecover) {
                     warning('Ya existe una orden pendiente', recoveryView.submitBlockedDetail);
-                    navigate(`/orders/${openRecoverableOrder.id}`);
+                    navigate({ to: `/orders/${openRecoverableOrder.id}` as any });
                     setSending(false);
                     return;
                 }
@@ -233,7 +233,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                                 result.message || 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago.'
                             );
                         }
-                        navigate(`/orders/${dbOrderId}`);
+                        navigate({ to: `/orders/${dbOrderId}` as any });
                         setSending(false);
                         return;
                     }
@@ -244,7 +244,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                         'Ya existe una orden pendiente',
                         result.message || 'Continua con esa orden y revisa su estado antes de enviar otro pedido.'
                     );
-                    navigate(`/orders/${dbOrderId}`);
+                    navigate({ to: `/orders/${dbOrderId}` as any });
                     setSending(false);
                     return;
                 }
@@ -288,7 +288,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             setTimeout(() => {
                 clearCart();
                 closeCart();
-                if (dbOrderId) navigate(`/payment/success?order_id=${dbOrderId}`);
+                if (dbOrderId) navigate({ to: `/payment/success?order_id=${dbOrderId}` as any });
                 onSuccess();
                 setSending(false);
             }, 2000);

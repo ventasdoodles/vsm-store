@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Checkout } from '../Checkout';
@@ -135,9 +135,9 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Checkout />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
@@ -157,9 +157,9 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Checkout />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getAllByText(/Producto checkout/i).length).toBeGreaterThan(0);
@@ -189,9 +189,9 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Checkout />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getAllByText(/Revisa tu carrito actualizado/i).length).toBeGreaterThan(0);
@@ -204,9 +204,9 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Checkout />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText(/Calculado al confirmar/i)).toBeInTheDocument();
@@ -222,9 +222,9 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Checkout />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByTestId('seo')).toHaveAttribute('data-title', 'Finalizar Compra');
@@ -248,9 +248,9 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Checkout />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getAllByText('open-order-recovery-notice').length).toBeGreaterThan(0);

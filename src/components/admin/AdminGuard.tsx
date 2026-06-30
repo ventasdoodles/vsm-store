@@ -2,7 +2,7 @@
 // Verifica auth + rol admin antes de renderizar
 
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from '@tanstack/react-router';
 import { useAuth } from '@/hooks/useAuth';
 import { checkIsAdmin } from '@/services/admin';
 import { ShieldX, Loader2 } from 'lucide-react';
@@ -105,7 +105,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
     // Not logged in
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to={"/login" as any} replace />;
     }
 
     // Not admin

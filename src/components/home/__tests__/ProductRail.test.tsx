@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ProductRail } from '../ProductRail';
 
@@ -41,9 +41,9 @@ describe('ProductRail render states', () => {
         useFeaturedProductsMock.mockReturnValue({ data: [], isLoading: true });
 
         const { container } = render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProductRail type="featured" title="Destacados" />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(container.querySelectorAll('.skeleton-shimmer')).toHaveLength(4);
@@ -54,9 +54,9 @@ describe('ProductRail render states', () => {
         useFeaturedProductsMock.mockReturnValue({ data: [], isLoading: false });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProductRail type="featured" title="Destacados" section="vape" />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('Catálogo en rotación')).toBeInTheDocument();
@@ -79,9 +79,9 @@ describe('ProductRail render states', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProductRail type="featured" title="Destacados" />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('Producto rail')).toBeInTheDocument();

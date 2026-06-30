@@ -9,7 +9,7 @@ import { m } from 'framer-motion';
 import { ChevronRight, Zap, Star, Dices } from 'lucide-react';
 
 
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useAuth } from '@/hooks/useAuth';
 
 /**

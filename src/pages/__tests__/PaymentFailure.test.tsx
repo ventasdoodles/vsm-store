@@ -1,4 +1,4 @@
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaymentFailure } from '../PaymentFailure';
@@ -51,11 +51,7 @@ describe('PaymentFailure continuity', () => {
             isFetching: false,
         });
         render(
-            <MemoryRouter initialEntries={['/payment/failure?order_id=order-1']}>
-                <Routes>
-                    <Route path="/payment/failure" element={<PaymentFailure />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/failure?order_id=order-1']} path="/payment/failure"><PaymentFailure /></TestRouter>,
         );
 
         expect(screen.getByText(/Resumen persistido/i)).toBeInTheDocument();
@@ -86,11 +82,7 @@ describe('PaymentFailure continuity', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/failure?order_id=order-2']}>
-                <Routes>
-                    <Route path="/payment/failure" element={<PaymentFailure />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/failure?order_id=order-2']} path="/payment/failure"><PaymentFailure /></TestRouter>,
         );
 
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
@@ -114,11 +106,7 @@ describe('PaymentFailure continuity', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/failure?order_id=order-4']}>
-                <Routes>
-                    <Route path="/payment/failure" element={<PaymentFailure />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/failure?order_id=order-4']} path="/payment/failure"><PaymentFailure /></TestRouter>,
         );
 
         expect(screen.getByRole('heading', { name: /Pago no confirmado/i })).toBeInTheDocument();
@@ -144,11 +132,7 @@ describe('PaymentFailure continuity', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/failure?order_id=order-3']}>
-                <Routes>
-                    <Route path="/payment/failure" element={<PaymentFailure />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/failure?order_id=order-3']} path="/payment/failure"><PaymentFailure /></TestRouter>,
         );
 
         expect(screen.getByRole('heading', { name: /Pago confirmado/i })).toBeInTheDocument();

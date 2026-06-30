@@ -5,7 +5,7 @@
  * // Estética: §2.1 Premium (Spotlight effect, Glassmorphism, Gradientes suaves).
  */
 import { useMemo, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ChevronRight } from 'lucide-react';
 import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -82,7 +82,7 @@ function CategoryCard({ category, priority }: { category: FeaturedCategory, prio
             onMouseMove={handleMouseMove}
         >
             <Link
-                to={`/${category.section}/${category.slug}`}
+                to={`/${category.section}/${category.slug}` as any}
                 className="group relative block h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] vsm-border bg-slate-900/40 backdrop-blur-3xl spotlight-container"
             >
                 {/* Spotlight Reveal */}

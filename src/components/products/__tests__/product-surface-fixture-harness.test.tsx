@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createElement, forwardRef, type PropsWithChildren, type ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it, vi } from 'vitest';
 import { ProductPriceSection } from '../ProductPriceSection';
 import { QuickViewModal } from '../QuickViewModal';
@@ -87,9 +87,9 @@ vi.mock('@/stores/wishlist.store', () => ({
 
 function renderQuickView(product = makeProductSurfaceFixture()) {
     return render(
-        <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+        <TestRouter>
             <QuickViewModal product={product} isOpen onClose={vi.fn()} />
-        </MemoryRouter>,
+        </TestRouter>,
     );
 }
 
@@ -148,9 +148,9 @@ describe('product surface local fixture harness', () => {
 
     it('exposes a local browser-renderable fixture surface for visual QA', () => {
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductSurfaceFixture />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByTestId('product-price-fixture')).toHaveTextContent('$850.00');

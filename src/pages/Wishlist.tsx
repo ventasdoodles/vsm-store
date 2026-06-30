@@ -4,7 +4,7 @@
  * // Arquitectura: Pure presentation with Zustand store integration (§1.1).
  * // Estilo: High-End Premium Aesthetics & Cinematic Empty States (§2.1).
  */
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Heart, ShoppingBag, ShoppingCart, Trash2, Sparkles } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useWishlistStore } from '@/stores/wishlist.store';
@@ -102,7 +102,7 @@ export function Wishlist() {
                             </p>
                             <div className="pt-6">
                                 <Link
-                                    to="/"
+                                    to={"/" as any}
                                     className="vsm-button-primary inline-flex gap-4 px-10"
                                 >
                                     <ShoppingBag className="h-4 w-4" />

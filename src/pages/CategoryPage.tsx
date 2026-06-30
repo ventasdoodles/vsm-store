@@ -8,7 +8,7 @@
  * @version 1.1.0
  */
 // Página de categoría - VSM Store
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from '@tanstack/react-router';
 import { FolderOpen, ArrowUpDown, Home, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sortProducts, SORT_OPTIONS, type SortKey } from '@/lib/product-sorting';
@@ -29,7 +29,7 @@ import { getVape420SectionPresentationConfig } from '@/config/productization';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function CategoryPage() {
-    const { slug } = useParams<{ slug: string }>();
+    const { slug } = useParams({ strict: false }) as any;
     const { config } = useActiveVerticalPack();
 
     const section = useSectionFromPath(config);
@@ -135,7 +135,7 @@ export function CategoryPage() {
                 <span className="mb-4 text-5xl">⚠️</span>
                 <h2 className="mb-2 text-xl font-bold text-theme-primary">Error al cargar categoría</h2>
                 <Link
-                    to="/"
+                    to={"/" as any}
                     className="mt-4 rounded-xl bg-theme-secondary/80 px-6 py-2.5 text-sm font-medium text-theme-primary transition-all hover:bg-theme-secondary"
                 >
                     <Home className="mr-2 inline h-4 w-4" />
@@ -155,7 +155,7 @@ export function CategoryPage() {
                     La categoría "{slug}" no existe o no está disponible.
                 </p>
                 <Link
-                    to="/"
+                    to={"/" as any}
                     className="rounded-xl bg-theme-secondary/80 px-6 py-2.5 text-sm font-medium text-theme-primary transition-all hover:bg-theme-secondary"
                 >
                     <Home className="mr-2 inline h-4 w-4" />

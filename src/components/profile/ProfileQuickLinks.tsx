@@ -4,7 +4,7 @@
  * // Arquitectura: Pure presentation bridge (§1.3).
  * // Estilo: High-End Glass Cards & Cinematic Icons.
  */
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import {
     ShoppingBag,
     MapPin,

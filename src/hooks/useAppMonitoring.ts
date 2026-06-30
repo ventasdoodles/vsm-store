@@ -1,6 +1,6 @@
 // Hook para monitoreo de la aplicación - VSM Store
 import { useEffect, useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 import {
     createPresenceChannel,
     trackPresenceActivity,

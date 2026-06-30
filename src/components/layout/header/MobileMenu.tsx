@@ -1,7 +1,7 @@
 // MobileMenu — Menú móvil del header
 // Independiente: obtiene sus propias categorías y lee auth internamente
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { User, Flame, Leaf, LogOut, LogIn, Truck, TrendingUp, ChevronRight, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
@@ -96,7 +96,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                 <div className="grid grid-cols-3 gap-2">
                     <Link
-                        to="/#mas-vendidos"
+                        to={"/mas-vendidos" as any}
                         onClick={(e) => {
                             if (window.location.pathname === '/') {
                                 e.preventDefault();
@@ -111,7 +111,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         Popular
                     </Link>
                     <Link
-                        to="/rastreo"
+                        to={"/rastreo" as any}
                         onClick={onClose}
                         className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
                     >
@@ -119,7 +119,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         Rastrear
                     </Link>
                     <Link
-                        to="/profile"
+                        to={"/profile" as any}
                         onClick={onClose}
                         className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
                     >
@@ -130,7 +130,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                 {isAdmin && (
                     <Link
-                        to="/admin"
+                        to={"/admin" as any}
                         onClick={onClose}
                         className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-500/10 p-4 text-sm font-bold text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all active:scale-95"
                     >
@@ -152,7 +152,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/10 blur-[40px] rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
                     
                     <Link
-                        to="/vape"
+                        to={"/vape" as any}
                         onClick={onClose}
                         className="flex items-center justify-between text-lg font-black text-white mb-4 group/title"
                     >
@@ -175,7 +175,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     transition={{ delay: 0.2 + idx * 0.05 }}
                                 >
                                     <Link
-                                        to={`/vape/${cat.slug}`}
+                                        to={`/vape/${cat.slug}` as any}
                                         onClick={onClose}
                                         className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-[11px] font-black uppercase tracking-wider text-white/60 hover:bg-vape-500/20 hover:text-vape-400 hover:border-vape-500/30 transition-all text-center"
                                     >
@@ -197,7 +197,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
 
                     <Link
-                        to="/420"
+                        to={"/420" as any}
                         onClick={onClose}
                         className="flex items-center justify-between text-lg font-black text-white mb-4 group/title"
                     >
@@ -220,7 +220,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     transition={{ delay: 0.3 + idx * 0.05 }}
                                 >
                                     <Link
-                                        to={`/420/${cat.slug}`}
+                                        to={`/420/${cat.slug}` as any}
                                         onClick={onClose}
                                         className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-[11px] font-black uppercase tracking-wider text-white/60 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-center"
                                     >
@@ -244,7 +244,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         </button>
                     ) : (
                         <Link
-                            to="/login"
+                            to={"/login" as any}
                             onClick={onClose}
                             className="flex items-center justify-center gap-2 rounded-xl bg-accent-primary px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 active:scale-95 transition-all"
                         >

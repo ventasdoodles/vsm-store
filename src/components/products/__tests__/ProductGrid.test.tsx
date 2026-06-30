@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it, vi } from 'vitest';
 import { ProductGrid } from '../ProductGrid';
 import type { Product } from '@/types/product';
@@ -47,9 +47,9 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
 describe('ProductGrid render states', () => {
     it('shows a loading skeleton while products are fetching', () => {
         const { container } = render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProductGrid products={[]} isLoading />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(container.querySelectorAll('.skeleton-shimmer')).toHaveLength(32);
@@ -58,13 +58,13 @@ describe('ProductGrid render states', () => {
 
     it('shows a visible empty state with a search fallback when no products are available', () => {
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProductGrid
                     products={[]}
                     emptyStateTitle="Catálogo en rotación"
                     emptyStateSubtext="Estamos actualizando esta selección."
                 />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByRole('status')).toBeInTheDocument();
@@ -77,9 +77,9 @@ describe('ProductGrid render states', () => {
 
     it('renders product cards when products exist', () => {
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProductGrid products={[makeProduct()]} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('Producto grid')).toBeInTheDocument();

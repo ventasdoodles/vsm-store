@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { m } from 'framer-motion';
 import { Zap, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useBestsellerProducts } from '@/hooks/useProducts';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -48,7 +48,7 @@ export const ProactiveAISuggestions = memo(({
                         transition={{ delay: 0.6 + idx * 0.1 }}
                     >
                         <Link
-                            to={`/product/${config?.id || 'vape'}/${product.slug}`}
+                            to={`/product/${config?.id || 'vape'}/${product.slug}` as any}
                             onClick={closeCart}
                             className="group flex items-center gap-4 rounded-2xl bg-white/[0.03] p-3 pr-4 border border-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all"
                         >

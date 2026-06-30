@@ -6,7 +6,7 @@
  */
 import { useEffect } from 'react';
 import { MapPin, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/hooks/useAuth';
 import { AddressList } from '@/components/addresses/AddressList';
 
@@ -27,7 +27,7 @@ export function Addresses() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate('/profile')}
+                        onClick={() => navigate({ to: '/profile' })}
                         className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all shadow-xl"
                     >
                         <ArrowLeft size={20} />

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CategoryPage } from '../CategoryPage';
 import type { Category } from '@/types/category';
@@ -163,11 +163,7 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
 
 function renderCategoryPage(path = '/vape/categoria/pods') {
     return render(
-        <MemoryRouter initialEntries={[path]}>
-            <Routes>
-                <Route path="/:section/categoria/:slug" element={<CategoryPage />} />
-            </Routes>
-        </MemoryRouter>,
+        <TestRouter initialEntries={[path]} path="/:section/categoria/:slug"><CategoryPage /></TestRouter>,
     );
 }
 

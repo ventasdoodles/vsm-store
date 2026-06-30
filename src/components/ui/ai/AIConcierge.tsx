@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useAIConcierge } from '@/hooks/useAIConcierge';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { getProductsByIds } from '@/services/products.service';
 import type { Product } from '@/types/product';
 import { resolveCesarinCartAssemblyEligibility } from '@/lib/cesarin-cart-assembly';
@@ -54,7 +54,7 @@ export const AIConcierge: React.FC = () => {
     const renderedCtaKeysRef = useRef<Set<string>>(new Set());
 
     const handleOpenProduct = (product: { slug: string; section?: string }) => {
-        navigate(`/${product.section ?? 'vape'}/${product.slug}`);
+        navigate({ to: `/${product.section ?? 'vape'}/${product.slug}` as any });
     };
 
     useEffect(() => {
@@ -345,7 +345,7 @@ export const AIConcierge: React.FC = () => {
                                         handleOpenProduct={handleOpenProduct}
                                         sendMessage={sendMessage}
                                         openCart={openCart}
-                                        navigate={navigate}
+                                        navigate={(path: string) => navigate({ to: path as any })}
                                     />
                                 ))}
 

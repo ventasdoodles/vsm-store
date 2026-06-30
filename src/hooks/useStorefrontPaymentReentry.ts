@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useNotification } from '@/hooks/useNotification';
 import { getStorefrontPaymentReentryView } from '@/lib/domain/orders';
 import { getOrderById } from '@/services';
@@ -17,7 +17,7 @@ export function useStorefrontPaymentReentry() {
         const currentView = getStorefrontPaymentReentryView(order);
         if (!currentView.canReenter) {
             warning('Pago no disponible', currentView.blockedAttemptDetail);
-            navigate(`/orders/${order.id}`);
+            navigate({ to: `/orders/${order.id}` as any });
             return;
         }
 
@@ -31,7 +31,7 @@ export function useStorefrontPaymentReentry() {
                     'Pedido no disponible',
                     'No pudimos confirmar el estado actual del pedido. Revisa el detalle persistido antes de intentar otro pago.',
                 );
-                navigate('/orders');
+                navigate({ to: '/orders' });
                 return;
             }
 
@@ -39,7 +39,7 @@ export function useStorefrontPaymentReentry() {
             if (!freshView.canReenter) {
                 setContinuingOrderId(null);
                 warning('Pago no disponible', freshView.blockedAttemptDetail);
-                navigate(`/orders/${freshOrder.id}`);
+                navigate({ to: `/orders/${freshOrder.id}` as any });
                 return;
             }
 

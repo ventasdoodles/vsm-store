@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CategoryShowcase } from '../CategoryShowcase';
 
@@ -30,9 +30,9 @@ vi.mock('@/components/ui/OptimizedImage', () => ({
 
 function renderShowcase() {
     return render(
-        <MemoryRouter>
+        <TestRouter>
             <CategoryShowcase />
-        </MemoryRouter>,
+        </TestRouter>,
     );
 }
 

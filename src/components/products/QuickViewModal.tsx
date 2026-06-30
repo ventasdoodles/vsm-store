@@ -1,7 +1,7 @@
 import { X, ShoppingCart, Heart, Package, Plus, Minus, ChevronRight, PackageX, Truck } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { m, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useCartStore } from '@/stores/cart.store';
@@ -378,7 +378,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
 
                             <div className="pt-8 border-t border-white/5 flex items-center justify-between">
                                 <Link
-                                    to={`/${product.section}/${product.slug}`}
+                                    to={`/${product.section}/${product.slug}` as any}
                                     onClick={onClose}
                                     className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-[10px] uppercase tracking-[0.2em] transition-colors"
                                 >

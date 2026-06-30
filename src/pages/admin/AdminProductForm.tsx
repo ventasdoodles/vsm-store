@@ -1,6 +1,6 @@
 // Formulario de Producto (Admin) - VSM Store
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, X, Plus, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -38,7 +38,7 @@ export function AdminProductForm() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { success, error: notifyError } = useNotification();
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams({ strict: false }) as any;
     const isEditing = id && id !== 'new';
     const [form, setForm] = useState<ProductFormData>(() => buildDefaultProductForm(config || undefined));
     const [tagInput, setTagInput] = useState('');
@@ -85,7 +85,7 @@ export function AdminProductForm() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
             success('Guardado', isEditing ? 'Producto actualizado correctamente' : 'Producto creado con éxito');
-            navigate('/admin/products');
+            navigate({ to: '/admin/products' });
         },
         onError: (err: unknown) => {
             console.error('Error saving product:', err);
@@ -124,7 +124,7 @@ export function AdminProductForm() {
     return (
         <div className="mx-auto max-w-3xl space-y-6">
             <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin/products')} className="rounded-xl border border-theme p-2 text-theme-secondary hover:bg-theme-secondary/50 transition-colors">
+                <button onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme p-2 text-theme-secondary hover:bg-theme-secondary/50 transition-colors">
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div>
@@ -330,7 +330,7 @@ export function AdminProductForm() {
 
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" onClick={() => navigate('/admin/products')} className="rounded-xl border border-theme px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</button>
+                    <button type="button" onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</button>
                     <button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
                         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isEditing ? 'Guardar cambios' : 'Crear producto'}

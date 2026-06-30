@@ -4,7 +4,7 @@
  * // Proposito principal: Tabla preview de los ultimos pedidos procesados, sirviendo como puente a AdminOrders.
  * // Regla / Notas: Remueve anidacion y elimina etiquetas <table> anticuadas, favoreciendo tarjetas ligeras Flex (iguales a OrderListCard).
  */
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { Package, ArrowRight, ChevronRight } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { ORDER_STATUSES, type AdminOrder } from '@/services/admin';
@@ -27,7 +27,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                     </h2>
                 </div>
                 <Link
-                    to="/admin/orders"
+                    to={"/admin/orders" as any}
                     className="group flex items-center gap-2 text-xs font-bold text-accent-primary hover:text-white transition-colors bg-accent-primary/10 hover:bg-accent-primary/20 px-4 py-2 rounded-[1rem] hover:shadow-lg hover:shadow-accent-primary/5"
                 >
                     Ver todos
@@ -50,7 +50,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                         return (
                             <div
                                 key={order.id}
-                                onClick={() => navigate(`/admin/orders?id=${order.id}`)}
+                                onClick={() => navigate({ to: `/admin/orders?id=${order.id}` as any })}
                                 className="group flex w-full items-center gap-4 px-6 py-5 text-left transition-all duration-300 rounded-[1.5rem] border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-0.5"
                             >
                                 <div className="flex-1 min-w-0">

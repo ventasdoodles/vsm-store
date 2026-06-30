@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import {
     ArrowLeft, Send, MapPin, Phone, User, CheckCircle,
     Award, Tag, Loader2,
@@ -189,7 +189,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
     const hasOpenRecoverableOrder = openOrderRecoveryView?.shouldRecover === true;
     const canSubmitCheckout = transitionView.canSubmitCheckout && !hasOpenRecoverableOrder;
     const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
-        navigate(`/${missingProduct.section}/${missingProduct.slug}`);
+        navigate({ to: `/${missingProduct.section}/${missingProduct.slug}` as any });
     };
 
     const handleValidateCoupon = async () => {

@@ -1,4 +1,4 @@
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -86,11 +86,7 @@ describe('PaymentSuccess cart clear guard', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/success?order_id=order-1']}>
-                <Routes>
-                    <Route path="/payment/success" element={<PaymentSuccess />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/success?order_id=order-1']} path="/payment/success"><PaymentSuccess /></TestRouter>,
         );
 
         expect(clearCartMock).not.toHaveBeenCalled();
@@ -120,11 +116,7 @@ describe('PaymentSuccess cart clear guard', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/success?order_id=order-1']}>
-                <Routes>
-                    <Route path="/payment/success" element={<PaymentSuccess />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/success?order_id=order-1']} path="/payment/success"><PaymentSuccess /></TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Revisar estado de pago/i }));
@@ -148,11 +140,7 @@ describe('PaymentSuccess cart clear guard', () => {
             isFetching: false,
         });
         render(
-            <MemoryRouter initialEntries={['/payment/success?order_id=order-1']}>
-                <Routes>
-                    <Route path="/payment/success" element={<PaymentSuccess />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/success?order_id=order-1']} path="/payment/success"><PaymentSuccess /></TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
@@ -179,11 +167,7 @@ describe('PaymentSuccess cart clear guard', () => {
         });
 
         render(
-            <MemoryRouter initialEntries={['/payment/success?order_id=order-2']}>
-                <Routes>
-                    <Route path="/payment/success" element={<PaymentSuccess />} />
-                </Routes>
-            </MemoryRouter>,
+            <TestRouter initialEntries={['/payment/success?order_id=order-2']} path="/payment/success"><PaymentSuccess /></TestRouter>,
         );
 
         expect(clearCartMock).toHaveBeenCalledTimes(1);

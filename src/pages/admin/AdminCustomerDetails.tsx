@@ -7,7 +7,7 @@
  * 
  * @module admin/customers/details
  */
-import { useParams } from 'react-router-dom';
+import { useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminCustomerDetails } from '@/services/admin';
 
@@ -27,7 +27,7 @@ import { CustomerWishlist } from '@/components/admin/customers/details/CustomerW
 import { CustomerIntelligencePanel } from '@/components/admin/customers/CustomerIntelligencePanel';
 
 export function AdminCustomerDetails() {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams({ strict: false }) as any;
 
     const { data: customer, isLoading } = useQuery({
         queryKey: ['admin', 'customer', id],

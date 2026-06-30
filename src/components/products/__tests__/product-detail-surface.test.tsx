@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProductBreadcrumbs } from '../ProductBreadcrumbs';
 import { ProductActions } from '../ProductActions';
@@ -148,9 +148,9 @@ afterEach(() => {
 describe('product detail presentation boundary', () => {
     it('centralizes breadcrumb hover classes from product detail config', () => {
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductBreadcrumbs section="420" productName="Producto" productSlug="producto" categoryId="category-1" />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         const sectionLink = screen.getByRole('link', { name: '420' });
@@ -164,9 +164,9 @@ describe('product detail presentation boundary', () => {
         const product = makeProductSurfaceFixture();
 
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductActions product={product} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         const variantButton = await screen.findByRole('button', { name: /Menta/i });
@@ -185,9 +185,9 @@ describe('product detail presentation boundary', () => {
         const product = makeProductSurfaceFixture({ tags: ['fixture', 'alpha'] });
 
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <ProductInfo product={product} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('fixture')).toHaveClass('hover:text-vape-400', 'hover:border-vape-400/50');
@@ -200,9 +200,9 @@ describe('product detail presentation boundary', () => {
         });
 
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <QuickViewModal product={product} isOpen onClose={vi.fn()} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByRole('button', { name: /Menta/i })).toHaveClass(
@@ -222,9 +222,9 @@ describe('product detail presentation boundary', () => {
         const product = makeProductSurfaceFixture();
 
         render(
-            <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+            <TestRouter>
                 <FrequentlyBoughtTogether currentProduct={product} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         await waitFor(() => {

@@ -4,7 +4,7 @@
  * @module ProductBreadcrumbs
  * @independent Componente independiente. Obtiene el nombre de la categoría via API.
  */
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@tanstack/react-router';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategoryById } from '@/hooks/useCategories';
@@ -49,14 +49,14 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
         <nav className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-medium text-white/50 overflow-x-auto whitespace-nowrap scrollbar-none bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 shadow-xl shadow-black/20">
             <BreadcrumbJsonLd items={breadcrumbItems} />
             <Link
-                to="/"
+                to={"/" as any}
                 className="flex-shrink-0 hover:text-theme-secondary transition-colors"
             >
                 Inicio
             </Link>
             <ChevronRight className="h-3 w-3 flex-shrink-0 text-theme-secondary" />
             <Link
-                to={`/${section}`}
+                to={`/${section}` as any}
                 className={cn(
                     'flex-shrink-0 transition-colors',
                     productDetailConfig.breadcrumbLinkHoverClassName
@@ -68,7 +68,7 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
                 <>
                     <ChevronRight className="h-3 w-3 flex-shrink-0 text-theme-secondary" />
                     <Link
-                        to={`/${section}/${category.slug}`}
+                        to={`/${section}/${category.slug}` as any}
                         className={cn(
                             'flex-shrink-0 transition-colors',
                             productDetailConfig.breadcrumbLinkHoverClassName

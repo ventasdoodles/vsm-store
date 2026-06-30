@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Calendar, Package, ReceiptText, ShoppingBag } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import type { OrderItem, OrderRecord } from '@/hooks/useOrders';
@@ -109,14 +109,14 @@ export function PostPurchaseReceiptCard({
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Link
-                    to={`/orders/${order.id}`}
+                    to={`/orders/${order.id}` as any}
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-vape-600 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-vape-500"
                 >
                     <ShoppingBag className="h-4 w-4" />
                     {lifecycleView.orderCtaLabel}
                 </Link>
                 <Link
-                    to="/orders"
+                    to={"/orders" as any}
                     className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
                     <Package className="h-4 w-4" />

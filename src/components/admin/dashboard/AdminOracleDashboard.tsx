@@ -5,7 +5,7 @@ import {
     useAdminOraclePrediction 
 } from '@/hooks/admin';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
  
  /**
   * AdminOracleDashboard - Insights proactivos del Oráculo (IA)
@@ -78,7 +78,7 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
 
             <div className="flex items-center gap-2 pt-2">
                 <Link
-                    to={`/admin/products?search=${product.name}`}
+                    to={`/admin/products?search=${product.name}` as any}
                     className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/10 transition-all"
                 >
                     <ShoppingCart className="w-3 h-3" />

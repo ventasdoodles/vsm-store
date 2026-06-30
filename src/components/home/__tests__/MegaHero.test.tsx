@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MegaHero } from '../MegaHero';
 
@@ -44,9 +44,9 @@ vi.mock('@/components/ui/OptimizedImage', () => ({
 
 function renderHero() {
     return render(
-        <MemoryRouter>
+        <TestRouter>
             <MegaHero />
-        </MemoryRouter>,
+        </TestRouter>,
     );
 }
 

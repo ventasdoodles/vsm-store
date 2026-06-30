@@ -4,7 +4,7 @@
  * Soporta modo compacto (solo icono) para el header scrolled.
  */
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
@@ -79,7 +79,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg, co
                 <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl vsm-border-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
                     {/* Link a la sección */}
                     <Link
-                        to={`/${section}`}
+                        to={`/${section}` as any}
                         onClick={() => setOpen(false)}
                         className={cn(
                             'block px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-theme-secondary transition-colors',
@@ -92,7 +92,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg, co
                     {rootCategories.map((cat) => (
                         <Link
                             key={cat.id}
-                            to={`/${section}/${cat.slug}`}
+                            to={`/${section}/${cat.slug}` as any}
                             onClick={() => setOpen(false)}
                             className={cn(
                                 'block px-4 py-2.5 text-sm text-theme-secondary transition-colors',

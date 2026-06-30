@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { m, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNeuralHero } from '@/hooks/useNeuralHero';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
@@ -223,7 +223,7 @@ export const MegaHero = () => {
                                     </MagneticButton>
                                 </Link>
 
-                                <Link to="/vape">
+                                <Link to={"/vape" as any}>
                                     <MagneticButton strength={0.15}>
                                         <m.button
                                             whileHover={{ backgroundColor: 'rgba(255,255,255,0.15)' }}

@@ -1,7 +1,7 @@
 // UserMenuDropdown — Menú de usuario (desktop)
 // Independiente: lee auth internamente via useAuth()
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { User, LogOut, ShoppingBag, MapPin, ChevronDown, Heart, Truck, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -72,25 +72,25 @@ export function UserMenuDropdown() {
                             <span className="text-[13px] font-black text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">{points.toLocaleString()}</span>
                         </div>
                     </div>
-                    <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
+                    <Link to={"/profile" as any} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                         <User className="h-4 w-4 text-theme-secondary" /> Mi perfil
                     </Link>
-                    <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
+                    <Link to={"/orders" as any} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                         <ShoppingBag className="h-4 w-4 text-theme-secondary" /> Mis pedidos
                     </Link>
-                    <Link to="/addresses" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
+                    <Link to={"/addresses" as any} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                         <MapPin className="h-4 w-4 text-theme-secondary" /> Mis direcciones
                     </Link>
-                    <Link to="/rastreo" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-yellow-400 transition-colors">
+                    <Link to={"/rastreo" as any} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-yellow-400 transition-colors">
                         <Truck className="h-4 w-4 text-theme-secondary group-hover:text-yellow-400" /> Rastrear pedido
                     </Link>
-                    <Link to="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-red-400 transition-colors">
+                    <Link to={"/wishlist" as any} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-red-400 transition-colors">
                         <Heart className="h-4 w-4 text-theme-secondary group-hover:text-red-400" /> Mis favoritos
                     </Link>
 
                     {isAdmin && (
                         <Link 
-                            to="/admin" 
+                            to={"/admin" as any} 
                             onClick={() => setOpen(false)} 
                             className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors border-t border-white/5"
                         >

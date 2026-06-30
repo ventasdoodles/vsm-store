@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearch, Link } from '@tanstack/react-router';
 import { useCartStore } from '@/stores/cart.store';
 import confetti from 'canvas-confetti';
 import { m } from 'framer-motion';
@@ -90,8 +90,8 @@ const TONE_UI: Record<
 };
 
 export function PaymentSuccess() {
-    const [searchParams] = useSearchParams();
-    const orderId = searchParams.get('order_id');
+    const search: any = useSearch({ strict: false });
+    const orderId = search.order_id;
     const clearCart = useCartStore((s) => s.clearCart);
     const processed = useRef(false);
     const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
@@ -292,7 +292,7 @@ export function PaymentSuccess() {
                         )}
                         {order && (
                             <Link
-                                to={`/orders/${order.id}`}
+                                to={`/orders/${order.id}` as any}
                                 className={`group relative w-full overflow-hidden rounded-2xl px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-all duration-300 active:scale-95 sm:w-auto ${ui.button}`}
                             >
                                 <div className="relative z-10 flex items-center justify-center gap-2">
@@ -303,7 +303,7 @@ export function PaymentSuccess() {
                             </Link>
                         )}
                         <Link
-                            to="/"
+                            to={"/" as any}
                             className="group w-full rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-sm font-black uppercase tracking-widest text-white/70 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:text-white sm:w-auto"
                         >
                             <div className="flex items-center justify-center gap-2">

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { AlertTriangle, CreditCard, Loader2, Package } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
@@ -70,7 +70,7 @@ export function OpenRecoverableOrderNotice({
 
                         <button
                             type="button"
-                            onClick={() => navigate(`/orders/${order.id}`)}
+                            onClick={() => navigate({ to: `/orders/${order.id}` as any })}
                             className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
                         >
                             <Package className="h-4 w-4" />

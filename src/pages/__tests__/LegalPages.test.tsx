@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { describe, expect, it, vi } from 'vitest';
 import { Privacy } from '../legal/Privacy';
 import { Terms } from '../legal/Terms';
@@ -12,7 +12,7 @@ vi.mock('@/components/seo/SEO', () => ({
 }));
 
 function renderWithRouter(ui: ReactElement) {
-    return render(<MemoryRouter>{ui}</MemoryRouter>);
+    return render(<TestRouter>{ui}</TestRouter>);
 }
 
 describe('Legal pages visible states', () => {

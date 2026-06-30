@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ArrowRight, CreditCard, Loader2, Package, ShoppingBag, Sparkles } from 'lucide-react';
 import { AnimatePresence, m, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
@@ -192,7 +192,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
 
                 <div className="relative z-10 mt-8 flex flex-col gap-3 sm:flex-row">
                     <Link
-                        to={`/orders/${order.id}`}
+                        to={`/orders/${order.id}` as any}
                         className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
                     >
                         <ArrowRight className="h-4 w-4" />
@@ -379,7 +379,7 @@ export function Orders() {
                                         : 'No encontramos pedidos persistidos que coincidan con el filtro aplicado.'}
                                 </p>
                                 <div className="pt-6">
-                                    <Link to="/" className="vsm-button-primary px-10">Explorar catalogo</Link>
+                                    <Link to={"/" as any} className="vsm-button-primary px-10">Explorar catalogo</Link>
                                 </div>
                             </div>
                         </m.div>

@@ -5,7 +5,7 @@ import { useVisualScanner } from '@/hooks/useVisualScanner';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 interface VisualScannerModalProps {
     isOpen: boolean;
@@ -157,7 +157,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                                                 className="w-full h-full object-cover"
                                                             />
                                                         </div>
-                                                        <Link to={`/product/${product.slug}`} className="text-xs font-bold text-white mb-1 line-clamp-2 hover:text-vape-400" onClick={onClose}>
+                                                        <Link to={`/product/${product.slug}` as any} className="text-xs font-bold text-white mb-1 line-clamp-2 hover:text-vape-400" onClick={onClose}>
                                                             {product.name}
                                                         </Link>
                                                         <div className="mt-auto pt-2 flex items-center justify-between">

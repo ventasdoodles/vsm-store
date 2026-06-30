@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from '@/lib/test-router';
 import { describe, expect, it, vi } from 'vitest';
 import { Home } from '../Home';
 import { getStoreMetaCopy } from '@/constants/storeMeta';
@@ -80,9 +80,9 @@ vi.mock('@/components/home/SocialProof', () => ({
 describe('Home store metadata', () => {
     it('uses the shared storefront metadata in the visible Home shell', () => {
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Home />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByTestId('seo')).toHaveAttribute('data-title', 'Inicio');

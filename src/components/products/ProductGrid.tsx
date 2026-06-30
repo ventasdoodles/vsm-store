@@ -1,6 +1,6 @@
 // Grid de productos - VSM Store
 import { PackageOpen, RotateCcw, ShoppingBag } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';

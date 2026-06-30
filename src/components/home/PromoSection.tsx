@@ -6,7 +6,7 @@
  * @data Contenido estático. Sin API calls.
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Truck } from 'lucide-react';
 
 export function PromoSection() {
@@ -41,7 +41,7 @@ export function PromoSection() {
 
                             {/* Right: CTA */}
                             <Link
-                                to="/contact"
+                                to={"/contact" as any}
                                 className="group relative px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-3 whitespace-nowrap overflow-hidden"
                             >
                                 <span className="relative z-10">Consultar cobertura DHL</span>

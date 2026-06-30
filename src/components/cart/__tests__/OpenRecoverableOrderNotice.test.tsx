@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { OpenRecoverableOrderNotice } from '../OpenRecoverableOrderNotice';
 
@@ -48,9 +48,9 @@ describe('OpenRecoverableOrderNotice', () => {
 
     it('renders bounded recovery CTAs and delegates continuation through the shared handler', () => {
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <OpenRecoverableOrderNotice order={order as never} view={view} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
@@ -67,9 +67,9 @@ describe('OpenRecoverableOrderNotice', () => {
         });
 
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <OpenRecoverableOrderNotice order={order as never} view={view} />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByRole('button', { name: /Abriendo Mercado Pago/i })).toBeDisabled();

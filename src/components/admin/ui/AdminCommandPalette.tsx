@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { 
     Search, Command, Package, ShoppingCart, 
     Users, Settings, ArrowRight, X, Sparkles,
@@ -110,7 +110,7 @@ export function AdminCommandPalette() {
             
             if (intent.action === 'navigate' && intent.target) {
                 playSuccess();
-                navigate(intent.target);
+                navigate({ to: intent.target as any });
                 setIsOpen(false);
                 return;
             }
@@ -139,7 +139,7 @@ export function AdminCommandPalette() {
         }
     }, [isRecording, transcript, handleNLPSearch, triggerHaptic, playClick]);
     const handleSelect = (result: SearchResult) => {
-        navigate(result.url);
+        navigate({ to: result.url as any });
         setIsOpen(false);
         setQuery('');
     };

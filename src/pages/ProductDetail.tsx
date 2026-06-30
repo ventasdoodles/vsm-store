@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from '@tanstack/react-router';
 
 import { useProductBySlug } from '@/hooks/useProducts';
 import { ProductImages } from '@/components/products/ProductImages';
@@ -29,7 +29,7 @@ import { getVape420SectionPresentationConfig } from '@/config/productization';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 export function ProductDetail() {
-    const { slug } = useParams<{ slug: string }>();
+    const { slug } = useParams({ strict: false }) as any;
     const { config } = useActiveVerticalPack();
 
     const section = useSectionFromPath(config);
@@ -61,7 +61,7 @@ export function ProductDetail() {
                         : 'El producto que buscas no existe o ya no está disponible.'}
                 </p>
                 <Link
-                    to="/"
+                    to={"/" as any}
                     className="rounded-xl bg-theme-secondary px-6 py-2.5 text-sm font-medium text-theme-secondary transition-all hover:bg-theme-secondary/80 hover:text-theme-primary"
                 >
                     <ArrowLeft className="mr-2 inline h-4 w-4" />

@@ -1,4 +1,4 @@
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ProfileInfo } from '../ProfileInfo';
@@ -13,9 +13,9 @@ vi.mock('@/hooks/useAuth', () => ({
 describe('Profile account trust copy', () => {
     it('uses calm account navigation wording in quick links', () => {
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <ProfileQuickLinks />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByText('Accesos de cuenta')).toBeInTheDocument();

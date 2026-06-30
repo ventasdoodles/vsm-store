@@ -1,7 +1,7 @@
 // Wrapper que distingue entre categoría y producto usando la misma ruta - VSM Store
 // Dado que /vape/:slug puede ser una categoría o un producto,
 // intentamos primero como categoría; si no existe, renderizamos como producto.
-import { useParams } from 'react-router-dom';
+import { useParams } from '@tanstack/react-router';
 import { useCategoryBySlug } from '@/hooks/useCategories';
 import { CategoryPage } from '@/pages/CategoryPage';
 import { ProductDetail } from '@/pages/ProductDetail';
@@ -12,7 +12,7 @@ import { useSectionFromPath } from '@/hooks/useSectionFromPath';
  * Primero busca categoría por slug; si existe → CategoryPage, si no → ProductDetail.
  */
 export function SectionSlugResolver() {
-    const { slug } = useParams<{ slug: string }>();
+    const { slug } = useParams({ strict: false }) as any;
     const section = useSectionFromPath();
 
     const {

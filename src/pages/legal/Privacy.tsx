@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
 
@@ -6,15 +6,15 @@ export function Privacy() {
     return (
         <div className="min-h-screen bg-theme-primary pb-20 pt-20 md:pt-24">
             <SEO
-                title="Política de Privacidad"
-                description="Política de privacidad y protección de datos de VSM Store."
+                title="Polï¿½tica de Privacidad"
+                description="Polï¿½tica de privacidad y protecciï¿½n de datos de VSM Store."
             />
 
             <div className="container-vsm max-w-4xl">
                 {/* Header */}
                 <div className="mb-8">
                     <Link
-                        to="/"
+                        to={"/" as any}
                         className="inline-flex items-center gap-2 text-theme-secondary hover:text-theme-primary transition-colors mb-4"
                     >
                         <ArrowLeft className="h-4 w-4" />
@@ -25,8 +25,8 @@ export function Privacy() {
                             <Shield className="h-6 w-6 text-herbal-400" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-theme-primary">Política de Privacidad</h1>
-                            <p className="text-sm text-theme-secondary">Última actualización: Febrero 2026</p>
+                            <h1 className="text-3xl font-bold text-theme-primary">Polï¿½tica de Privacidad</h1>
+                            <p className="text-sm text-theme-secondary">ï¿½ltima actualizaciï¿½n: Febrero 2026</p>
                         </div>
                     </div>
                 </div>
@@ -37,8 +37,8 @@ export function Privacy() {
                         <section className="mb-8">
                             <h2 className="text-xl font-bold text-theme-primary mb-4">1. Responsable del Tratamiento de Datos</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                VSM Store, con domicilio en Acapulco, Guerrero, México, es responsable del tratamiento de sus datos
-                                personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares
+                                VSM Store, con domicilio en Acapulco, Guerrero, Mï¿½xico, es responsable del tratamiento de sus datos
+                                personales conforme a la Ley Federal de Protecciï¿½n de Datos Personales en Posesiï¿½n de los Particulares
                                 (LFPDPPP).
                             </p>
                         </section>
@@ -52,26 +52,26 @@ export function Privacy() {
                             <h3 className="text-lg font-semibold text-theme-primary mb-3 mt-6">Al Crear una Cuenta:</h3>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
                                 <li>Nombre completo</li>
-                                <li>Correo electrónico</li>
-                                <li>Número de teléfono</li>
-                                <li>Número de WhatsApp</li>
+                                <li>Correo electrï¿½nico</li>
+                                <li>Nï¿½mero de telï¿½fono</li>
+                                <li>Nï¿½mero de WhatsApp</li>
                                 <li>Fecha de nacimiento (opcional)</li>
                             </ul>
 
                             <h3 className="text-lg font-semibold text-theme-primary mb-3 mt-6">Al Realizar una Compra:</h3>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
-                                <li>Dirección de entrega (calle, número, colonia, código postal, ciudad, estado)</li>
-                                <li>Información de pago (según el método seleccionado)</li>
+                                <li>Direcciï¿½n de entrega (calle, nï¿½mero, colonia, cï¿½digo postal, ciudad, estado)</li>
+                                <li>Informaciï¿½n de pago (segï¿½n el mï¿½todo seleccionado)</li>
                                 <li>Historial de pedidos</li>
                                 <li>Preferencias de productos</li>
                             </ul>
 
-                            <h3 className="text-lg font-semibold text-theme-primary mb-3 mt-6">Datos Técnicos:</h3>
+                            <h3 className="text-lg font-semibold text-theme-primary mb-3 mt-6">Datos Tï¿½cnicos:</h3>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
-                                <li>Dirección IP</li>
+                                <li>Direcciï¿½n IP</li>
                                 <li>Tipo de navegador y dispositivo</li>
                                 <li>Sistema operativo</li>
-                                <li>Páginas visitadas y tiempo de navegación</li>
+                                <li>Pï¿½ginas visitadas y tiempo de navegaciï¿½n</li>
                             </ul>
                         </section>
 
@@ -84,7 +84,7 @@ export function Privacy() {
                             <h3 className="text-lg font-semibold text-theme-primary mb-3 mt-6">Finalidades Necesarias:</h3>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
                                 <li>Procesar y entregar sus pedidos</li>
-                                <li>Gestionar pagos y facturación</li>
+                                <li>Gestionar pagos y facturaciï¿½n</li>
                                 <li>Proporcionar servicio al cliente</li>
                                 <li>Cumplir con obligaciones legales</li>
                                 <li>Prevenir fraudes y garantizar seguridad</li>
@@ -100,7 +100,7 @@ export function Privacy() {
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
                                 Puede oponerse al tratamiento de sus datos para finalidades secundarias en cualquier momento
-                                contactándonos vía WhatsApp.
+                                contactï¿½ndonos vï¿½a WhatsApp.
                             </p>
                         </section>
 
@@ -112,35 +112,35 @@ export function Privacy() {
                                 medidas de seguridad:
                             </p>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
-                                <li>Cifrado de datos en tránsito (HTTPS/TLS)</li>
+                                <li>Cifrado de datos en trï¿½nsito (HTTPS/TLS)</li>
                                 <li>Cifrado de datos en reposo</li>
-                                <li>Autenticación de dos factores para acceso administrativo</li>
+                                <li>Autenticaciï¿½n de dos factores para acceso administrativo</li>
                                 <li>Control de acceso basado en roles</li>
-                                <li>Auditorías de seguridad periódicas</li>
-                                <li>Respaldos automáticos diarios</li>
+                                <li>Auditorï¿½as de seguridad periï¿½dicas</li>
+                                <li>Respaldos automï¿½ticos diarios</li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
-                                Sus contraseñas se almacenan usando algoritmos de hash seguros y nunca son accesibles
+                                Sus contraseï¿½as se almacenan usando algoritmos de hash seguros y nunca son accesibles
                                 en texto plano.
                             </p>
                         </section>
 
                         <section className="mb-8">
-                            <h2 className="text-xl font-bold text-theme-primary mb-4">5. Compartir Información</h2>
+                            <h2 className="text-xl font-bold text-theme-primary mb-4">5. Compartir Informaciï¿½n</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                No vendemos ni alquilamos sus datos personales a terceros. Compartimos información únicamente en
+                                No vendemos ni alquilamos sus datos personales a terceros. Compartimos informaciï¿½n ï¿½nicamente en
                                 los siguientes casos:
                             </p>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
                                 <li><strong className="text-theme-primary">Proveedores de servicios:</strong> Supabase (hosting de base de datos),
-                                    servicios de mensajería (WhatsApp Business), procesadores de pago</li>
+                                    servicios de mensajerï¿½a (WhatsApp Business), procesadores de pago</li>
                                 <li><strong className="text-theme-primary">Cumplimiento legal:</strong> Cuando sea requerido por ley o autoridades competentes</li>
-                                <li><strong className="text-theme-primary">Protección de derechos:</strong> Para hacer cumplir nuestros términos o
+                                <li><strong className="text-theme-primary">Protecciï¿½n de derechos:</strong> Para hacer cumplir nuestros tï¿½rminos o
                                     proteger nuestros derechos legales</li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
-                                Todos nuestros proveedores están obligados contractualmente a proteger su información y usarla
-                                únicamente para los fines especificados.
+                                Todos nuestros proveedores estï¿½n obligados contractualmente a proteger su informaciï¿½n y usarla
+                                ï¿½nicamente para los fines especificados.
                             </p>
                         </section>
 
@@ -150,101 +150,101 @@ export function Privacy() {
                                 De acuerdo con la LFPDPPP, usted tiene derecho a:
                             </p>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
-                                <li><strong className="text-theme-primary">Acceso:</strong> Conocer qué datos personales tenemos sobre usted</li>
-                                <li><strong className="text-theme-primary">Rectificación:</strong> Solicitar la corrección de datos inexactos o incompletos</li>
-                                <li><strong className="text-theme-primary">Cancelación:</strong> Solicitar la eliminación de sus datos (sujeto a obligaciones legales)</li>
-                                <li><strong className="text-theme-primary">Oposición:</strong> Oponerse al tratamiento de sus datos para fines específicos</li>
+                                <li><strong className="text-theme-primary">Acceso:</strong> Conocer quï¿½ datos personales tenemos sobre usted</li>
+                                <li><strong className="text-theme-primary">Rectificaciï¿½n:</strong> Solicitar la correcciï¿½n de datos inexactos o incompletos</li>
+                                <li><strong className="text-theme-primary">Cancelaciï¿½n:</strong> Solicitar la eliminaciï¿½n de sus datos (sujeto a obligaciones legales)</li>
+                                <li><strong className="text-theme-primary">Oposiciï¿½n:</strong> Oponerse al tratamiento de sus datos para fines especï¿½ficos</li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
                                 Para ejercer sus derechos ARCO, puede:
                             </p>
                             <ul className="list-none text-theme-secondary space-y-2 mt-4">
-                                <li>• Acceder a su perfil en <Link to="/profile" className="text-vape-400 hover:text-vape-300 underline">Mi Cuenta</Link> para
-                                    actualizar o eliminar información</li>
-                                <li>• Contactarnos vía WhatsApp al +52 228 123 4567</li>
-                                <li>• Enviar solicitud formal a través de nuestro <Link to="/contact" className="text-vape-400 hover:text-vape-300 underline">
+                                <li>ï¿½ Acceder a su perfil en <Link to={"/profile" as any} className="text-vape-400 hover:text-vape-300 underline">Mi Cuenta</Link> para
+                                    actualizar o eliminar informaciï¿½n</li>
+                                <li>ï¿½ Contactarnos vï¿½a WhatsApp al +52 228 123 4567</li>
+                                <li>ï¿½ Enviar solicitud formal a travï¿½s de nuestro <Link to={"/contact" as any} className="text-vape-400 hover:text-vape-300 underline">
                                     formulario de contacto</Link></li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
-                                Responderemos a su solicitud dentro de los 20 días hábiles establecidos por la ley.
+                                Responderemos a su solicitud dentro de los 20 dï¿½as hï¿½biles establecidos por la ley.
                             </p>
                         </section>
 
                         <section className="mb-8">
-                            <h2 className="text-xl font-bold text-theme-primary mb-4">7. Cookies y Tecnologías Similares</h2>
+                            <h2 className="text-xl font-bold text-theme-primary mb-4">7. Cookies y Tecnologï¿½as Similares</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
                                 Utilizamos localStorage (almacenamiento local del navegador) para:
                             </p>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
-                                <li>Mantener su sesión activa</li>
+                                <li>Mantener su sesiï¿½n activa</li>
                                 <li>Recordar los productos en su carrito de compras</li>
-                                <li>Guardar preferencias de navegación</li>
+                                <li>Guardar preferencias de navegaciï¿½n</li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
                                 <strong className="text-theme-primary">No utilizamos cookies de terceros para rastreo o publicidad.</strong>
-                                Puede borrar el localStorage en cualquier momento desde la configuración de su navegador.
+                                Puede borrar el localStorage en cualquier momento desde la configuraciï¿½n de su navegador.
                             </p>
                         </section>
 
                         <section className="mb-8">
-                            <h2 className="text-xl font-bold text-theme-primary mb-4">8. Retención de Datos</h2>
+                            <h2 className="text-xl font-bold text-theme-primary mb-4">8. Retenciï¿½n de Datos</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
                                 Conservamos sus datos personales durante el tiempo necesario para cumplir con las finalidades
                                 descritas en este aviso, excepto que:
                             </p>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
-                                <li>La ley requiera un período de retención específico</li>
+                                <li>La ley requiera un perï¿½odo de retenciï¿½n especï¿½fico</li>
                                 <li>Existan obligaciones fiscales o contables pendientes</li>
                                 <li>Sea necesario para resolver disputas o hacer cumplir acuerdos</li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
-                                Los datos de cuentas inactivas por más de 2 años pueden ser eliminados previo aviso.
+                                Los datos de cuentas inactivas por mï¿½s de 2 aï¿½os pueden ser eliminados previo aviso.
                             </p>
                         </section>
 
                         <section className="mb-8">
                             <h2 className="text-xl font-bold text-theme-primary mb-4">9. Transferencias Internacionales</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                Sus datos pueden ser transferidos y procesados en servidores ubicados fuera de México
-                                (Supabase utiliza infraestructura de AWS). Estas transferencias cumplen con estándares
-                                internacionales de protección de datos y están sujetas a acuerdos de procesamiento que
-                                garantizan el mismo nivel de protección que las leyes mexicanas.
+                                Sus datos pueden ser transferidos y procesados en servidores ubicados fuera de Mï¿½xico
+                                (Supabase utiliza infraestructura de AWS). Estas transferencias cumplen con estï¿½ndares
+                                internacionales de protecciï¿½n de datos y estï¿½n sujetas a acuerdos de procesamiento que
+                                garantizan el mismo nivel de protecciï¿½n que las leyes mexicanas.
                             </p>
                         </section>
 
                         <section className="mb-8">
                             <h2 className="text-xl font-bold text-theme-primary mb-4">10. Menores de Edad</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                Nuestros servicios están dirigidos únicamente a personas mayores de 18 años.
+                                Nuestros servicios estï¿½n dirigidos ï¿½nicamente a personas mayores de 18 aï¿½os.
                                 No recopilamos intencionalmente datos de menores de edad. Si detectamos que hemos
-                                recopilado información de un menor, la eliminaremos inmediatamente.
+                                recopilado informaciï¿½n de un menor, la eliminaremos inmediatamente.
                             </p>
                         </section>
 
                         <section className="mb-8">
-                            <h2 className="text-xl font-bold text-theme-primary mb-4">11. Cambios a esta Política</h2>
+                            <h2 className="text-xl font-bold text-theme-primary mb-4">11. Cambios a esta Polï¿½tica</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                Nos reservamos el derecho de actualizar esta Política de Privacidad en cualquier momento.
-                                Los cambios sustanciales serán notificados a través de:
+                                Nos reservamos el derecho de actualizar esta Polï¿½tica de Privacidad en cualquier momento.
+                                Los cambios sustanciales serï¿½n notificados a travï¿½s de:
                             </p>
                             <ul className="list-disc list-inside text-theme-secondary space-y-2 ml-4">
                                 <li>Aviso destacado en el sitio web</li>
-                                <li>Notificación por correo electrónico o WhatsApp (para cambios importantes)</li>
-                                <li>Actualización de la fecha "Última actualización" en este documento</li>
+                                <li>Notificaciï¿½n por correo electrï¿½nico o WhatsApp (para cambios importantes)</li>
+                                <li>Actualizaciï¿½n de la fecha "ï¿½ltima actualizaciï¿½n" en este documento</li>
                             </ul>
                         </section>
 
                         <section className="mb-8">
                             <h2 className="text-xl font-bold text-theme-primary mb-4">12. Contacto</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                Para cualquier pregunta sobre esta Política de Privacidad o el tratamiento de sus datos personales:
+                                Para cualquier pregunta sobre esta Polï¿½tica de Privacidad o el tratamiento de sus datos personales:
                             </p>
                             <ul className="list-none text-theme-secondary space-y-2">
                                 <li><strong className="text-theme-primary">WhatsApp:</strong> +52 228 123 4567</li>
-                                <li><strong className="text-theme-primary">Ubicación:</strong> Acapulco, Guerrero, México</li>
+                                <li><strong className="text-theme-primary">Ubicaciï¿½n:</strong> Acapulco, Guerrero, Mï¿½xico</li>
                                 <li>
                                     <strong className="text-theme-primary">Formulario:</strong>{' '}
-                                    <Link to="/contact" className="text-vape-400 hover:text-vape-300 underline">
+                                    <Link to={"/contact" as any} className="text-vape-400 hover:text-vape-300 underline">
                                         Contacto
                                     </Link>
                                 </li>
@@ -252,21 +252,21 @@ export function Privacy() {
                         </section>
 
                         <section className="mb-8">
-                            <h2 className="text-xl font-bold text-theme-primary mb-4">13. Autoridad de Protección de Datos</h2>
+                            <h2 className="text-xl font-bold text-theme-primary mb-4">13. Autoridad de Protecciï¿½n de Datos</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
-                                Si considera que sus derechos de protección de datos han sido vulnerados, puede acudir ante el
-                                Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI):
+                                Si considera que sus derechos de protecciï¿½n de datos han sido vulnerados, puede acudir ante el
+                                Instituto Nacional de Transparencia, Acceso a la Informaciï¿½n y Protecciï¿½n de Datos Personales (INAI):
                             </p>
                             <ul className="list-none text-theme-secondary space-y-2">
                                 <li><strong className="text-theme-primary">Sitio web:</strong> <a href="https://home.inai.org.mx" target="_blank" rel="noopener noreferrer" className="text-vape-400 hover:text-vape-300 underline">home.inai.org.mx</a></li>
-                                <li><strong className="text-theme-primary">Teléfono:</strong> 800 835 4324</li>
+                                <li><strong className="text-theme-primary">Telï¿½fono:</strong> 800 835 4324</li>
                             </ul>
                         </section>
 
                         <div className="mt-10 pt-6 border-t border-theme">
                             <p className="text-sm text-theme-secondary italic">
-                                Al utilizar VSM Store, usted acepta los términos de esta Política de Privacidad.
-                                Le recomendamos leerla periódicamente para estar informado sobre cómo protegemos su información.
+                                Al utilizar VSM Store, usted acepta los tï¿½rminos de esta Polï¿½tica de Privacidad.
+                                Le recomendamos leerla periï¿½dicamente para estar informado sobre cï¿½mo protegemos su informaciï¿½n.
                             </p>
                         </div>
                     </div>

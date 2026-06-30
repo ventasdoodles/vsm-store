@@ -13,7 +13,7 @@ import { Route, ShoppingBag, CheckCircle, XCircle, Clock, Package, Loader2, Aler
 import { getCustomerOrders } from '@/services/admin';
 import type { AdminCustomerDetail } from '@/services/admin';
 import { formatTimeAgo, formatPrice } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 interface CustomerOrder {
     id: string;
@@ -119,7 +119,7 @@ export function CustomerTimeline({ customer }: Props) {
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-3">
                                             <div className="flex items-center gap-3">
                                                 <div 
-                                                    onClick={() => navigate(`/admin/orders/${order.id}`)}
+                                                    onClick={() => navigate({ to: `/admin/orders/${order.id}` as any })}
                                                     className="font-black text-white text-sm sm:text-base cursor-pointer hover:text-blue-400 transition-colors uppercase tracking-wider flex items-center gap-2"
                                                 >
                                                     {order.display_id || order.id.slice(0, 8)}
@@ -145,7 +145,7 @@ export function CustomerTimeline({ customer }: Props) {
                                                     {order.items.length} {order.items.length === 1 ? 'artículo' : 'artículos'}
                                                 </div>
                                                 <button 
-                                                    onClick={() => navigate(`/admin/orders/${order.id}`)}
+                                                    onClick={() => navigate({ to: `/admin/orders/${order.id}` as any })}
                                                     className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
                                                 >
                                                     Ver detalles &rarr;

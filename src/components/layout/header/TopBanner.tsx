@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, X, Flame } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { m, AnimatePresence } from 'framer-motion';
 
 const PROMOS = [

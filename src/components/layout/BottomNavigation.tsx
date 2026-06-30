@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { Search, ShoppingCart, User, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
@@ -38,7 +38,7 @@ export const BottomNavigation = memo(function BottomNavigation() {
                 if (pathname === '/') {
                     scrollToPopular();
                 } else {
-                    navigate('/');
+                    navigate({ to: '/' });
                     setTimeout(scrollToPopular, 300);
                 }
             },

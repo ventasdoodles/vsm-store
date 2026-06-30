@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it, vi } from 'vitest';
 import { ProductGridStatesFixture } from '@/pages/ProductGridStatesFixture';
 import {
@@ -22,9 +22,9 @@ vi.mock('@/contexts/TacticalContext', () => ({
 
 function renderFixture() {
     return render(
-        <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+        <TestRouter>
             <ProductGridStatesFixture />
-        </MemoryRouter>,
+        </TestRouter>,
     );
 }
 

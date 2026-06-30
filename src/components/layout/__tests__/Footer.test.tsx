@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import { TestRouter } from "@/lib/test-router";
 import { Footer } from '../Footer';
 
 vi.mock('framer-motion', () => ({
@@ -29,9 +29,9 @@ vi.mock('@/hooks/useNotification', () => ({
 describe('Footer trust copy', () => {
     it('uses evidence-safe footer trust wording', () => {
         render(
-            <MemoryRouter>
+            <TestRouter>
                 <Footer />
-            </MemoryRouter>,
+            </TestRouter>,
         );
 
         expect(screen.getByTitle('Transacciones revisadas')).toBeInTheDocument();

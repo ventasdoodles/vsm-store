@@ -1,6 +1,6 @@
 // Formulario de Login - VSM Store
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Eye, EyeOff, LogIn, Loader2, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -187,7 +187,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
                         Crear cuenta
                     </button>
                 ) : (
-                    <Link to="/signup" className="font-medium text-vape-400 hover:text-vape-300 transition-colors">
+                    <Link to={"/signup" as any} className="font-medium text-vape-400 hover:text-vape-300 transition-colors">
                         Crear cuenta
                     </Link>
                 )}

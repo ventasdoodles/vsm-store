@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, ShoppingBag, ChevronDown } from 'lucide-react';
 import { CheckoutForm } from '@/components/cart/CheckoutForm';
 import { CheckoutTransitionStatus } from '@/components/cart/CheckoutTransitionStatus';
@@ -67,12 +67,15 @@ export function Checkout() {
     useEffect(() => {
         if (items.length === 0 && !checkoutStarted.current) {
             warning('Carrito vacío', 'Agrega productos para continuar con tu compra.');
-            navigate('/');
+            navigate({ to: '/' });
         }
     }, [items, navigate, warning]);
 
     const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
-        navigate(`/${missingProduct.section}/${missingProduct.slug}`);
+        navigate({ 
+            to: '/$section/$slug', 
+            params: { section: missingProduct.section, slug: missingProduct.slug } 
+        });
     };
 
     if (!config || !storeMetaCopy) return null; // Wait for config
@@ -89,7 +92,7 @@ export function Checkout() {
                         {/* Header */}
                         <div className="mb-8 flex items-center gap-4">
                             <button
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate({ to: '..' })}
                                 className="group flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-theme-secondary hover:bg-vape-500/10 hover:border-vape-500/30 hover:text-vape-400 transition-all active:scale-95"
                             >
                                 <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
@@ -185,7 +188,7 @@ export function Checkout() {
                         {canContinueCheckout ? (
                             <CheckoutForm
                                 onSuccess={() => { }}
-                                onBack={() => navigate(-1)}
+                                onBack={() => navigate({ to: '..' })}
                                 openRecoverableOrder={openRecoverableOrder ?? null}
                             />
                         ) : (
@@ -217,7 +220,7 @@ export function Checkout() {
                                 <m.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => navigate('/')}
+                                    onClick={() => navigate({ to: '/' })}
                                     className="relative z-10 mt-10 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-red-500 to-orange-600 px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-[0_10px_30px_-10px_rgba(239,68,68,0.5)] transition-all hover:shadow-[0_15px_40px_-10px_rgba(239,68,68,0.7)]"
                                 >
                                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12 rounded-2xl" />

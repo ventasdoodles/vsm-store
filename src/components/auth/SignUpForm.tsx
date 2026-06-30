@@ -1,6 +1,6 @@
 // Formulario de Registro - VSM Store
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Eye, EyeOff, UserPlus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -188,9 +188,9 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 />
                 <span className="text-xs text-theme-secondary leading-relaxed">
                     Acepto los{' '}
-                    <Link to="/legal/terms" className="text-vape-400 hover:text-vape-300 underline" target="_blank">términos y condiciones</Link>
+                    <Link to={"/legal/terms" as any} className="text-vape-400 hover:text-vape-300 underline" target="_blank">términos y condiciones</Link>
                     {' '}y la{' '}
-                    <Link to="/legal/privacy" className="text-vape-400 hover:text-vape-300 underline" target="_blank">política de privacidad</Link>
+                    <Link to={"/legal/privacy" as any} className="text-vape-400 hover:text-vape-300 underline" target="_blank">política de privacidad</Link>
                 </span>
             </label>
 
@@ -225,7 +225,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                         Iniciar sesión
                     </button>
                 ) : (
-                    <Link to="/login" className="font-medium text-vape-400 hover:text-vape-300 transition-colors">
+                    <Link to={"/login" as any} className="font-medium text-vape-400 hover:text-vape-300 transition-colors">
                         Iniciar sesión
                     </Link>
                 )}

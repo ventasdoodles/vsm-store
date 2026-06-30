@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ArrowRight, Sparkles, TrendingUp, ChevronRight } from 'lucide-react';
 import { cn, optimizeImage } from '@/lib/utils';
@@ -146,7 +146,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                 </div>
 
                                 <Link
-                                    to={`/${section}`}
+                                    to={`/${section}` as any}
                                     onClick={() => setIsOpen(false)}
                                     className="mt-6 flex items-center justify-between rounded-xl bg-gradient-to-r from-vape-600/20 to-vape-400/20 border border-vape-500/20 px-4 py-4 group transition-all hover:from-vape-600/30 hover:to-vape-400/30"
                                 >
@@ -177,7 +177,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                             {activeCategory?.children.map((sub) => (
                                                 <Link
                                                     key={sub.id}
-                                                    to={`/${section}/${sub.slug}`}
+                                                    to={`/${section}/${sub.slug}` as any}
                                                     onClick={() => setIsOpen(false)}
                                                     className="group flex items-center justify-between rounded-lg py-2 text-sm text-white/60 transition-all hover:text-white"
                                                 >
@@ -194,7 +194,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                         </div>
 
                                         <Link
-                                            to={`/${section}/${activeCategory?.slug}`}
+                                            to={`/${section}/${activeCategory?.slug}` as any}
                                             onClick={() => setIsOpen(false)}
                                             className="mt-10 inline-flex items-center gap-2 group"
                                         >

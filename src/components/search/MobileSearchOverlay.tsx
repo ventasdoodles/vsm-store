@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Loader2, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSearch } from '@/hooks/useSearch';
@@ -37,14 +37,14 @@ export function MobileSearchOverlay() {
     const handleResultClick = (product: Product) => {
         trigger('light');
         triggerSensory('nav-click');
-        navigate(`/${product.section}/${product.slug}`);
+        navigate({ to: `/${product.section}/${product.slug}` as any });
         close();
     };
 
     const handleSubmitForm = (searchQuery: string) => {
         if (!searchQuery.trim()) return;
         trigger('medium');
-        navigate(`/buscar?q=${encodeURIComponent(searchQuery)}`);
+        navigate({ to: `/buscar?q=${encodeURIComponent(searchQuery)}` as any });
         close();
     };
 
