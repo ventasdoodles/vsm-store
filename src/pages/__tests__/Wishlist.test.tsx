@@ -1,4 +1,3 @@
-import { createElement, forwardRef, type PropsWithChildren, type ReactNode } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { TestRouter } from '@/lib/test-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -13,25 +12,6 @@ const wishlistMocks = vi.hoisted(() => ({
     notifyWarning: vi.fn(),
 }));
 
-vi.mock('framer-motion', () => {
-    const MotionElement =
-        (Tag: keyof JSX.IntrinsicElements) =>
-            forwardRef<HTMLElement, PropsWithChildren<Record<string, unknown>>>(({
-                children,
-                initial: _initial,
-                animate: _animate,
-                exit: _exit,
-                transition: _transition,
-                ...props
-            }, ref) => createElement(Tag, { ...props, ref }, children as ReactNode));
-
-    return {
-        AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
-        motion: new Proxy({}, {
-            get: (_target, tag: any) => MotionElement(tag as any),
-        }),
-    };
-});
 
 vi.mock('@/stores/wishlist.store', () => ({
     useWishlistStore: (selector: (state: { items: Product[]; clearWishlist: typeof wishlistMocks.clearWishlist }) => unknown) =>
@@ -117,10 +97,10 @@ describe('Wishlist visible states', () => {
         wishlistMocks.notifyWarning.mockReset();
     });
 
-    it('renders the empty wishlist state with count and discovery link', () => {
+    it('renders the empty wishlist state with count and discovery link', async () => {
         renderWishlist();
 
-        expect(screen.getByRole('heading', { name: 'Mis Favoritos' })).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'Mis Favoritos' })).toBeInTheDocument();
         expect(screen.getByText('0 objetos de deseo guardados')).toBeInTheDocument();
         expect(screen.getByText(/Bit.cora de Deseos/i)).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /Descubrir Vanguardia/i })).toHaveAttribute('href', '/');

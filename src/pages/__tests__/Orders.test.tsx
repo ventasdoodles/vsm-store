@@ -1,6 +1,5 @@
 import { TestRouter } from '@/lib/test-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Orders } from '../Orders';
 
@@ -50,20 +49,6 @@ vi.mock('@/components/seo/SEO', () => ({
     SEO: () => null,
 }));
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, layout: _layout, ...props }: PropsWithChildren<Record<string, unknown> & { layout?: unknown }>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-    AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
-    useMotionValue: () => ({ set: vi.fn() }),
-    useMotionTemplate: () => '',
-}));
 
 describe('Orders storefront visibility and self-service', () => {
     beforeEach(() => {

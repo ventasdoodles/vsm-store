@@ -47,15 +47,39 @@ vi.mock('@/contexts/VerticalPackContext', async (importOriginal) => {
 });
 
 import React from 'react';
-vi.mock('framer-motion', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('framer-motion')>();
+vi.mock('framer-motion', () => {
+    const componentMock = (element: string) => {
+        return React.forwardRef((props: any, ref) => {
+            const {
+                initial, animate, exit, transition, variants,
+                whileHover, whileTap, whileInView, viewport,
+                layoutId, layout, custom, onAnimationComplete,
+                onHoverStart, onHoverEnd, drag, dragConstraints,
+                ...rest
+            } = props;
+            return React.createElement(element, { ...rest, ref });
+        });
+    };
+
     const mMock = new Proxy({}, {
-        get: (_, element) => {
-            return React.forwardRef((props: any, ref) => {
-                const { __initial, __animate, __exit, __transition, __variants, __whileHover, __whileTap, __whileInView, __viewport, __layoutId, __layout, __custom, __onAnimationComplete, __onHoverStart, __onHoverEnd, __drag, __dragConstraints, ...rest } = props;
-                return React.createElement(element as string, { ...rest, ref });
-            });
-        }
+        get: (_, element: string) => componentMock(element),
     });
-    return { ...actual, m: mMock, LazyMotion: ({ children }: any) => children, AnimatePresence: ({ children }: any) => children };
+
+    return {
+        motion: mMock,
+        m: mMock,
+        LazyMotion: ({ children }: any) => children,
+        AnimatePresence: ({ children }: any) => children,
+        Reorder: {
+            Group: React.forwardRef(({ children, ...props }: any, ref) => React.createElement('div', { ...props, ref }, children)),
+            Item: React.forwardRef(({ children, ...props }: any, ref) => React.createElement('div', { ...props, ref }, children)),
+        },
+        useMotionValue: (v: any) => ({ get: () => v, set: vi.fn(), onChange: vi.fn() }),
+        useMotionTemplate: () => '',
+        useSpring: (v: any) => v,
+        useTransform: () => '',
+        useInView: () => true,
+        useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
+        useScroll: () => ({ scrollY: { get: () => 0 }, scrollYProgress: { get: () => 0 } }),
+    };
 });

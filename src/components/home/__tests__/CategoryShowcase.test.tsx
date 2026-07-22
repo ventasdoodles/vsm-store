@@ -1,24 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 import { TestRouter } from "@/lib/test-router";
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CategoryShowcase } from '../CategoryShowcase';
 
 const useStoreSettingsMock = vi.hoisted(() => vi.fn());
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-    useMotionValue: () => ({ set: vi.fn() }),
-    useMotionTemplate: () => '',
-}));
 
 vi.mock('@/hooks/useStoreSettings', () => ({
     useStoreSettings: () => useStoreSettingsMock(),

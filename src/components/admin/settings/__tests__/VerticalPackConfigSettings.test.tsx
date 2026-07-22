@@ -3,19 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { VerticalPackConfigSettings } from '../VerticalPackConfigSettings';
 import type { SettingsFormData, SettingsChangeHandler } from '../settings.types';
 
-// Mock framer-motion to avoid animation issues in tests
-vi.mock('framer-motion', () => {
-    return {
-        motion: {
-            div: ({ children, className, 'data-testid': testId, onClick, layoutId }: any) => (
-                <div className={className} data-testid={testId || layoutId} onClick={onClick}>
-                    {children}
-                </div>
-            ),
-        },
-        AnimatePresence: ({ children }: any) => <>{children}</>,
-    };
-});
 
 import { Mock } from 'vitest';
 

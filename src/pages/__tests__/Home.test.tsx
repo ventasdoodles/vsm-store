@@ -8,12 +8,6 @@ import { getStorefrontSettingsFallback } from '@/config/storefrontSettingsFallba
 
 const STORE_META_COPY = getStoreMetaCopy(getStorefrontSettingsFallback().vertical_pack_config!);
 
-vi.mock('framer-motion', () => ({
-    Reorder: {
-        Group: ({ children }: PropsWithChildren) => <div>{children}</div>,
-        Item: ({ children }: PropsWithChildren) => <div>{children}</div>,
-    },
-}));
 
 vi.mock('@/hooks/useAuth', () => ({
     useAuth: () => ({ profile: null }),

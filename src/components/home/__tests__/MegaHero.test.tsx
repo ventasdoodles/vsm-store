@@ -10,21 +10,6 @@ import { MegaHero } from '../MegaHero';
 const useStoreSettingsMock = vi.hoisted(() => vi.fn());
 const readSource = () => readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'MegaHero.tsx'), 'utf8');
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-    AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
-    useMotionValue: () => ({ set: vi.fn() }),
-    useSpring: (value: unknown) => value,
-    useTransform: () => '',
-}));
 
 vi.mock('@/hooks/useStoreSettings', () => ({
     useStoreSettings: () => useStoreSettingsMock(),

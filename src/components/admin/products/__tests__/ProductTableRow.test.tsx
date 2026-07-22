@@ -1,4 +1,3 @@
-import { createElement, forwardRef, type PropsWithChildren, type ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,28 +6,6 @@ import { VerticalPackContext } from '@/contexts/VerticalPackContext';
 import type { Product } from '@/types/product';
 import { ProductsTable } from '../ProductsTable';
 
-vi.mock('framer-motion', () => {
-    const MotionElement =
-        (Tag: keyof JSX.IntrinsicElements) =>
-            forwardRef<HTMLElement, PropsWithChildren<Record<string, unknown>>>(({
-                children,
-                initial: _initial,
-                animate: _animate,
-                exit: _exit,
-                transition: _transition,
-                whileHover: _whileHover,
-                whileTap: _whileTap,
-                ...props
-            }, ref) => createElement(Tag, { ...props, ref }, children as ReactNode));
-
-    return {
-        motion: new Proxy({}, {
-            get: (_target, tag: any) => MotionElement(tag as any),
-        }),
-        useMotionValue: () => ({ set: vi.fn() }),
-        useMotionTemplate: () => '',
-    };
-});
 
 vi.mock('@/components/ui/OptimizedImage', () => ({
     OptimizedImage: ({ alt = '', className = '' }: { alt?: string; className?: string }) => (

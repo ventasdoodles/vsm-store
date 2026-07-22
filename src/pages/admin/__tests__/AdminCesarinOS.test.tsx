@@ -1,5 +1,4 @@
 import { render, screen, within } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AdminCesarinOS } from '../AdminCesarinOS';
 
@@ -44,13 +43,6 @@ vi.mock('react-hot-toast', () => ({
     },
 }));
 
-vi.mock('framer-motion', () => ({
-    AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
-    motion: {
-        div: ({ children, className, ...props }: any) => <div className={className} {...props}>{children}</div>,
-        button: ({ children, className, ...props }: any) => <button className={className} {...props}>{children}</button>,
-    },
-}));
 
 vi.mock('@/hooks/useStoreSettings', () => ({
     useStoreSettings: () => ({

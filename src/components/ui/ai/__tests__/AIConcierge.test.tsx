@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AIConcierge } from '../AIConcierge';
 import * as cesarinTextUtils from '@/lib/cesarin-text-utils';
@@ -33,18 +32,6 @@ const cartStoreState: {
     openCart: openCartMock,
 };
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-    AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
-}));
 
 vi.mock('@tanstack/react-router', async () => {
     const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');

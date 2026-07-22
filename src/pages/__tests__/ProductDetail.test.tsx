@@ -10,17 +10,6 @@ const useProductBySlugMock = vi.hoisted(() => vi.fn());
 const useSectionFromPathMock = vi.hoisted(() => vi.fn());
 const trackViewItemMock = vi.hoisted(() => vi.fn());
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: { children?: ReactNode }) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-}));
 
 vi.mock('@/hooks/useProducts', () => ({
     useProductBySlug: (...args: unknown[]) => useProductBySlugMock(...args),

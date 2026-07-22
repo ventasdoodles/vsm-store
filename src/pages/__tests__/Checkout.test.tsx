@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { TestRouter } from '@/lib/test-router';
-import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Checkout } from '../Checkout';
 import { useCartStore } from '@/stores/cart.store';
@@ -66,18 +65,6 @@ vi.mock('@/lib/conversion-measurement', () => ({
     getCesarinSessionId: (...args: unknown[]) => getCesarinSessionIdMock(...args),
 }));
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-    AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
-}));
 
 function makeProduct(overrides: Partial<Product> = {}): Product {
     return {

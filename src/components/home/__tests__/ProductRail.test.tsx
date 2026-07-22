@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 import { TestRouter } from "@/lib/test-router";
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ProductRail } from '../ProductRail';
@@ -8,17 +7,6 @@ const useFeaturedProductsMock = vi.fn();
 const useNewProductsMock = vi.fn();
 const useBestsellerProductsMock = vi.fn();
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-}));
 
 vi.mock('@/components/products/ProductCard', () => ({
     ProductCard: ({ product }: { product: { name: string } }) => <div>{product.name}</div>,

@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CartSidebar } from '../CartSidebar';
 import { useCartStore } from '@/stores/cart.store';
@@ -19,20 +18,6 @@ vi.mock('@tanstack/react-router', async () => {
     };
 });
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-    AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
-    useMotionValue: () => ({ set: vi.fn() }),
-    useMotionTemplate: () => '',
-}));
 
 vi.mock('@/hooks/useNotification', () => ({
     useNotification: () => ({

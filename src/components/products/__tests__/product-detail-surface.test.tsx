@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { TestRouter } from "@/lib/test-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProductBreadcrumbs } from '../ProductBreadcrumbs';
@@ -22,23 +21,6 @@ const useInventoryOracleMock = vi.hoisted(() => vi.fn());
 const useFocusTrapMock = vi.hoisted(() => vi.fn());
 const useWishlistStoreMock = vi.hoisted(() => vi.fn());
 
-vi.mock('framer-motion', () => {
-    const MotionButton = ({ children, ...props }: { children?: ReactNode }) => <button {...props}>{children}</button>;
-    const MotionDiv = ({ children, ...props }: { children?: ReactNode }) => <div {...props}>{children}</div>;
-
-    return {
-        motion: new Proxy(
-            {},
-            {
-                get: (_target, tag: string) => {
-                    if (tag === 'button') return MotionButton;
-                    return MotionDiv;
-                },
-            },
-        ),
-        AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
-    };
-});
 
 vi.mock('@/hooks/useCategories', () => ({
     useCategoryById: (...args: unknown[]) => useCategoryByIdMock(...args),

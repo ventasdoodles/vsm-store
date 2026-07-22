@@ -1,6 +1,5 @@
 import { TestRouter } from '@/lib/test-router';
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaymentSuccess } from '../PaymentSuccess';
 
@@ -42,17 +41,6 @@ vi.mock('canvas-confetti', () => ({
     default: vi.fn(),
 }));
 
-vi.mock('framer-motion', () => ({
-    motion: new Proxy(
-        {},
-        {
-            get: () =>
-                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
-                    <div {...props}>{children}</div>
-                ),
-        },
-    ),
-}));
 
 describe('PaymentSuccess cart clear guard', () => {
     beforeEach(() => {
