@@ -5,11 +5,12 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { queryClient } from '@/lib/react-query';
 
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router';
 import { App } from './App';
-import { AdminApp } from './AdminApp';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+
+const AdminApp = lazy(() => import('./AdminApp').then(m => ({ default: m.AdminApp })));
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
 const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
@@ -62,6 +63,14 @@ const AdminWheelGame  = lazy(() => import('@/pages/admin/AdminWheelGame').then(m
 const AdminBatchManager = lazy(() => import('@/pages/admin/AdminBatchManager').then(m => ({ default: m.AdminBatchManager })));
 const AdminCesarinOS = lazy(() => import('@/pages/admin/AdminCesarinOS').then(m => ({ default: m.AdminCesarinOS })));
 
+function RootPageLoader() {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-black">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-primary border-t-transparent" />
+        </div>
+    );
+}
+
 // Root Route
 export const rootRoute = createRootRoute({
     component: () => (
@@ -70,7 +79,9 @@ export const rootRoute = createRootRoute({
                 <QueryClientProvider client={queryClient}>
                     <HelmetProvider>
                         <SafetyProvider>
-                            <Outlet />
+                            <Suspense fallback={<RootPageLoader />}>
+                                <Outlet />
+                            </Suspense>
                         </SafetyProvider>
                     </HelmetProvider>
                 </QueryClientProvider>
