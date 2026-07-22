@@ -31,18 +31,15 @@ Object.defineProperty(window, 'matchMedia', {
     })),
 });
 
-import { vape420VerticalPackConfig } from '../config/productization';
-
 // Provide a global default for the VerticalPack context hook to prevent widespread test failures
 // caused by components requiring config metadata that aren't wrapped in a VerticalPackProvider in isolated tests.
-vi.mock('@/contexts/VerticalPackContext', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@/contexts/VerticalPackContext')>();
+vi.mock('@/contexts/VerticalPackContext', async () => {
+    const { vape420VerticalPackConfig } = await import('../config/productization');
     return {
-        ...actual,
-        useActiveVerticalPack: vi.fn(() => ({
+        useActiveVerticalPack: () => ({
             config: vape420VerticalPackConfig,
             isLoading: false,
-        })),
+        }),
     };
 });
 

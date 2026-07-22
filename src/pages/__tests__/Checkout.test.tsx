@@ -20,6 +20,15 @@ const useStorefrontCartDependencyOfferMock = vi.fn();
 const emitConversationConversionEventMock = vi.fn();
 const getCesarinSessionIdMock = vi.fn();
 
+import { vape420VerticalPackConfig } from '@/config/productization';
+
+vi.mock('@/contexts/VerticalPackContext', () => ({
+    useActiveVerticalPack: () => ({
+        config: vape420VerticalPackConfig,
+        isLoading: false,
+    }),
+}));
+
 vi.mock('@tanstack/react-router', async () => {
     const actual = await vi.importActual<typeof import('@tanstack/react-router')>('@tanstack/react-router');
     return {
@@ -122,7 +131,7 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <TestRouter>
+            <TestRouter path="/">
                 <Checkout />
             </TestRouter>,
         );
@@ -144,7 +153,7 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <TestRouter>
+            <TestRouter path="/">
                 <Checkout />
             </TestRouter>,
         );
@@ -163,7 +172,7 @@ describe('Checkout page cart integrity display', () => {
         expect(screen.queryByText(/Pagar.s en MXN/i)).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByText(/Volver al cat[aá]logo/i));
-        expect(navigateMock).toHaveBeenCalledWith('/');
+        expect(navigateMock).toHaveBeenCalledWith({ to: '/' });
     });
 
     it('shows the shared review state when cart corrections were already applied', () => {
@@ -176,7 +185,7 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <TestRouter>
+            <TestRouter path="/">
                 <Checkout />
             </TestRouter>,
         );
@@ -191,7 +200,7 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <TestRouter>
+            <TestRouter path="/">
                 <Checkout />
             </TestRouter>,
         );
@@ -209,7 +218,7 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <TestRouter>
+            <TestRouter path="/">
                 <Checkout />
             </TestRouter>,
         );
@@ -235,7 +244,7 @@ describe('Checkout page cart integrity display', () => {
         });
 
         render(
-            <TestRouter>
+            <TestRouter path="/">
                 <Checkout />
             </TestRouter>,
         );
