@@ -9,6 +9,7 @@
 - Current technical truth is summarized in `AI_CONTEXT.md`.
 
 ## Current Detailed Audit Files
+- `docs/audits/2026-07/checkout-page-modularization.md` (Modularization of monolithic `Checkout.tsx` layout from 320 to 144 lines into 4 domain subcomponents under `src/components/checkout/`)
 - `docs/audits/2026-07/client-secrets-and-dependencies-security.md` (Audit of client bundle secrets isolation and resolution of 13 dependency security advisories via `npm audit fix`)
 - `docs/audits/2026-07/ai-capsule-orchestrator-modularization.md` (Modularization of monolithic `ai-capsule-orchestrator.service.ts` from 1,684 to 6 lines delegating to `src/services/ai-capsules/` domain submodules)
 - `docs/audits/2026-07/router-code-splitting-optimization.md` (Code-splitting optimization with lazy `AdminApp` and root `<Suspense>` fallback boundary)
@@ -17,6 +18,7 @@
 - `docs/audits/2026-06-28/god-classes-modularization.md` (Modularization of `orders.ts` and `product-search-capsule.ts` using zero-token AST extraction)
 
 ## Accepted Lanes (Chronological)
+- **2026-07-22**: [ACCEPT] Modularization of `Checkout.tsx` layout (320 -> 144 lines) into `src/components/checkout/` (`26eb3839`). 6/6 tests pass, 0 TS errors (`tsc --noEmit`).
 - **2026-07-22**: [ACCEPT] Client secrets isolation audit & dependency security patching (`416ea271`). Resolved 13 advisories (`protobufjs`, `tar`, `undici`, `vite`), 0 TS errors (`tsc --noEmit`).
 - **2026-07-22**: [ACCEPT] Modularization of `ai-capsule-orchestrator.service.ts` (1,684 -> 6 lines) delegating to `src/services/ai-capsules/` (`a98894fd`). 15/15 AI capsule tests pass, 0 TS errors (`tsc --noEmit`).
 - **2026-07-22**: [ACCEPT] Test mock stabilization in `admin-orders.service.test.ts` and `AIConcierge.test.tsx` (`cc688428`). 37/37 tests pass, 0 TS errors (`tsc --noEmit`).
