@@ -84,7 +84,7 @@ describe('OrderDetail payment continuation', () => {
             isFetching: false,
         });
         render(
-            <TestRouter initialEntries={['/orders/order-1']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-1']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
@@ -122,7 +122,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-2']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-2']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
@@ -174,7 +174,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-3']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-3']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-3b']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-3b']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         expect(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i })).toBeInTheDocument();
@@ -243,7 +243,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-4']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-4']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
@@ -282,7 +282,7 @@ describe('OrderDetail payment continuation', () => {
         reorderOrderMock.mockResolvedValue(null);
 
         render(
-            <TestRouter initialEntries={['/orders/order-5']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-5']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /Reordenar con catalogo actual/i }));
@@ -334,7 +334,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-6']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-6']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         // 1. Assert Section Headers
@@ -393,7 +393,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-7']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-7']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         expect(screen.getByText(/Pedido en preparacion/i)).toBeInTheDocument();
@@ -432,7 +432,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-8']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-8']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         expect(screen.getByText(/Guia pendiente/i)).toBeInTheDocument();
@@ -469,7 +469,7 @@ describe('OrderDetail payment continuation', () => {
         });
 
         render(
-            <TestRouter initialEntries={['/orders/order-9']} path="/orders/:orderId"><OrderDetail /></TestRouter>,
+            <TestRouter initialEntries={['/orders/order-9']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
         expect(screen.getByText(/Sin continuidad de envio/i)).toBeInTheDocument();

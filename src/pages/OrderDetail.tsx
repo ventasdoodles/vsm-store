@@ -11,21 +11,12 @@ import {
     Loader2, 
     Clock,
     XCircle,
-    MessageCircle,
-    RotateCcw,
-    ShoppingBag,
-    Copy, 
-    CheckCircle2, 
     Package, 
     Truck, 
-    CreditCard,
-    Sparkles,
     ShieldCheck,
     Zap,
     type LucideIcon
 } from 'lucide-react';
-import { m } from 'framer-motion';
-import { cn, formatPrice } from '@/lib/utils';
 import { useOrderWithCrossSurfaceReconciliation, ORDER_STATUS } from '@/hooks/useOrders';
 import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
 import {
@@ -34,11 +25,16 @@ import {
     getStorefrontOrderFreshnessView,
 } from '@/lib/domain/orders';
 import { useAuthenticatedOrderReorder } from '@/hooks/useAuthenticatedOrderReorder';
-import { useNotification } from '@/hooks/useNotification';
 import { SEO } from '@/components/seo/SEO';
 import { SITE_CONFIG } from '@/config/site';
 import { getStorefrontOrderTrackingTrustView } from '@/services/storefront-order-tracking.service';
 import type { OrderStatus, OrderItem } from '@/hooks/useOrders';
+
+import { OrderHeader } from '@/components/orders/detail/OrderHeader';
+import { OrderStatusBanner } from '@/components/orders/detail/OrderStatusBanner';
+import { OrderTimeline } from '@/components/orders/detail/OrderTimeline';
+import { OrderShippingCard } from '@/components/orders/detail/OrderShippingCard';
+import { OrderSummaryCard } from '@/components/orders/detail/OrderSummaryCard';
 
 const STATUS_STEPS: OrderStatus[] = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
 
@@ -53,10 +49,9 @@ const STATUS_ICONS: Record<OrderStatus, LucideIcon> = {
 
 export function OrderDetail() {
     const { orderId } = useParams({ strict: false }) as any;
-    const { data: order, isLoading, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId);
+    const { data: order, isLoading } = useOrderWithCrossSurfaceReconciliation(orderId);
     const { reorderOrder, reorderingOrderId } = useAuthenticatedOrderReorder();
     const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
-    const notify = useNotification();
 
     useEffect(() => {
         if (order) document.title = `Pedido ${order.order_number} | VSM Store`;
@@ -97,15 +92,11 @@ export function OrderDetail() {
     const freshnessView = getStorefrontOrderFreshnessView(order);
     const paymentView = lifecycleView.paymentView;
     const continuationView = lifecycleView.continuationView;
-    const visibilityView = lifecycleView.visibilityView;
     const trackingTrustView = getStorefrontOrderTrackingTrustView(order);
-    const canRefreshPaymentState = order.payment_method === 'mercadopago' && lifecycleView.canRefresh;
     const canContinuePayment = continuationView.canContinue;
     const canReorder = indexActionView.showReorder;
     const continuingPayment = continuingOrderId === order.id;
-    const refreshPaymentLabel = lifecycleView.refreshLabel;
 
-    // Reordenar — construye objetos Product completos
     const handleReorder = async () => {
         await reorderOrder({
             id: order.id,
@@ -127,381 +118,50 @@ export function OrderDetail() {
         <div className="container-vsm py-12 space-y-12 max-w-4xl">
             <SEO title={`Pedido ${order.order_number}`} />
 
-            {/* Header Cinemático Detalle */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 animate-in fade-in slide-in-from-top-4 duration-700">
-                <div className="flex items-center gap-6">
-                    <Link to={"/orders" as any} className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all shadow-xl">
-                        <ArrowLeft size={20} />
-                    </Link>
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-2xl font-black text-white uppercase italic tracking-tight">{order.order_number}</h1>
-                            <Sparkles className="h-4 w-4 text-accent-primary animate-pulse" />
-                        </div>
-                        <p className="text-[10px] text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60">
-                            Registro de compra: {new Date(order.created_at).toLocaleDateString('es-MX', {
-                                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                            })}
-                        </p>
-                    </div>
-                </div>
-                <div className={cn(
-                    'inline-flex items-center gap-3 rounded-2xl border px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-2xl',
-                    statusConfig.color, statusConfig.bg, statusConfig.border
-                )}>
-                    <div className={cn("h-2 w-2 rounded-full animate-pulse", statusConfig.bg.replace('/10', ''))} />
-                    {statusConfig.label}
-                </div>
-            </div>
+            <OrderHeader
+                orderNumber={order.order_number}
+                createdAt={order.created_at}
+                statusConfig={statusConfig}
+            />
 
-            {/* Status Banner */}
-            <div className={cn(
-                "rounded-[2.5rem] border p-8 space-y-4 mb-8 relative overflow-hidden group/banner",
-                statusConfig.bg, statusConfig.border
-            )}>
-                {(() => {
-                    const StatusIcon = STATUS_ICONS[currentStatus] || Package;
-                    return (
-                        <>
-                            <div className="absolute top-0 right-0 p-8 opacity-10 scale-150 rotate-12 transition-transform duration-1000 group-hover/banner:scale-110 group-hover/banner:rotate-0">
-                                <StatusIcon size={120} />
-                            </div>
-                            
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <StatusIcon className={cn("h-5 w-5", statusConfig.color)} />
-                                    <h2 className={cn("text-xs font-black uppercase tracking-[0.2em]", statusConfig.color)}>
-                                        Estado del Pedido: {statusConfig.label}
-                                    </h2>
-                                </div>
-                            </div>
-                        </>
-                    );
-                })()}
-                <p className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter leading-none">
-                    {paymentView.headline}
-                </p>
+            <OrderStatusBanner
+                currentStatus={currentStatus}
+                statusConfig={statusConfig}
+                statusIcons={STATUS_ICONS}
+                paymentView={paymentView}
+                freshnessView={freshnessView}
+            />
 
-                <div className="relative z-10 p-4 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
-                    <p className={cn(
-                        'text-[10px] font-bold leading-relaxed uppercase tracking-wider',
-                        paymentView.paymentTone === 'success'
-                            ? 'text-herbal-500'
-                            : paymentView.paymentTone === 'danger'
-                                ? 'text-red-400'
-                                : paymentView.paymentTone === 'neutral'
-                                    ? 'text-accent-primary'
-                                    : 'text-yellow-400',
-                    )}>
-                        Estado de pago:
-                    </p>
-                    <p className="mt-2 text-[10px] font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
-                        {paymentView.detail}
-                    </p>
-                    {freshnessView.isFreshnessSensitive && (
-                        <p className="mt-3 text-[10px] font-bold text-yellow-400/70 leading-relaxed uppercase tracking-wider italic">
-                            {freshnessView.freshnessNote}
-                        </p>
-                    )}
-                </div>
-            </div>
-
-            {/* Timeline Cinemático */}
             {!isCancelled && (
-                <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent-primary/20 to-transparent" />
-                    
-                    <div className="flex items-center justify-between relative">
-                        {STATUS_STEPS.map((step, i) => {
-                            const config = ORDER_STATUS[step];
-                            const isActive = i <= currentStepIndex;
-                            const isCurrent = i === currentStepIndex;
-                            return (
-                                <div key={step} className="flex flex-1 items-center group/step">
-                                    <div className="flex flex-col items-center relative z-10 transition-transform duration-500 group-hover/step:scale-110">
-                                        <div className={cn(
-                                            'flex h-10 w-10 items-center justify-center rounded-xl border-2 text-[10px] font-black transition-all duration-700 shadow-2xl',
-                                            isCurrent
-                                                ? `${config.border} ${config.bg} ${config.color} ring-4 ring-accent-primary/5 scale-110`
-                                                : isActive
-                                                    ? 'border-accent-primary bg-accent-primary text-white'
-                                                    : 'border-white/10 bg-black/40 text-theme-tertiary'
-                                        )}>
-                                            {isActive ? <CheckCircle2 size={16} /> : i + 1}
-                                        </div>
-                                        <span className={cn(
-                                            'absolute -bottom-7 w-20 text-center text-[8px] font-black uppercase tracking-widest transition-colors duration-500',
-                                            isActive ? 'text-white' : 'text-theme-tertiary opacity-40'
-                                        )}>
-                                            {config.label}
-                                        </span>
-                                    </div>
-                                    {i < STATUS_STEPS.length - 1 && (
-                                        <div className="flex-1 px-2">
-                                            <div className={cn(
-                                                'h-[2px] w-full rounded-full transition-all duration-1000 relative overflow-hidden',
-                                                i < currentStepIndex ? 'bg-accent-primary' : 'bg-white/5'
-                                            )}>
-                                                {isCurrent && (
-                                                    <m.div 
-                                                        initial={{ x: '-100%' }}
-                                                        animate={{ x: '100%' }}
-                                                        transition={{ repeat: Infinity, duration: 1.5 }}
-                                                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                                                    />
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+                <OrderTimeline
+                    statusSteps={STATUS_STEPS}
+                    currentStepIndex={currentStepIndex}
+                    statusConfigMap={ORDER_STATUS}
+                    statusIcons={STATUS_ICONS}
+                />
             )}
 
-            <div className="grid lg:grid-cols-2 gap-10 items-start">
-                {/* TICKET DE VENTA PREMIUM */}
-                <div className="animate-in fade-in slide-in-from-left-4 duration-1000 delay-200">
-                    <div className="relative overflow-hidden rounded-t-[2rem] bg-zinc-900 border-x border-t border-white/10 pt-10 pb-6 px-10 shadow-2xl">
-                        {/* Shimmer on ticket */}
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-vape-500/20 to-transparent" />
-                        
-                        <div className="text-center space-y-4 mb-10">
-                            <div className="mx-auto w-24 h-24 rounded-[2rem] bg-black border border-white/5 flex items-center justify-center shadow-inner relative group">
-                                <Package className="h-10 w-10 text-theme-tertiary opacity-20 transition-opacity group-hover:opacity-40" />
-                                <div className="absolute -inset-2 bg-accent-primary/5 rounded-full blur-xl animate-pulse" />
-                            </div>
-                            <h2 className="text-2xl font-black text-white uppercase italic tracking-[0.2em]">Resumen del pedido</h2>
-                            <div className="flex flex-col items-center gap-1 opacity-60">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">Cod. Reg: {order.order_number}</p>
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">Estado persistido del pedido</p>
-                            </div>
-                        </div>
+            <OrderShippingCard trackingTrustView={trackingTrustView} />
 
-                        {/* Items Loop */}
-                        <div className="space-y-6 pb-10">
-                            <div className="flex justify-between text-[9px] font-black uppercase tracking-[0.3em] text-theme-tertiary border-b border-white/5 pb-2">
-                                <span>Concepto</span>
-                                <span>Total Parcial</span>
-                            </div>
-                            {items.map((item, idx) => (
-                                <div key={idx} className="flex justify-between items-center group/item">
-                                    <div className="flex gap-4 items-center">
-                                         <div className="h-12 w-12 rounded-xl bg-black border border-white/5 overflow-hidden flex-shrink-0">
-                                            {item.image ? (
-                                                <img src={item.image} className="w-full h-full object-cover grayscale group-hover/item:grayscale-0 transition-all duration-500" alt="" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-[10px] text-theme-tertiary opacity-30">📦</div>
-                                            )}
-                                         </div>
-                                         <div className="space-y-0.5">
-                                            <p className="text-xs font-bold text-white uppercase truncate max-w-[150px]">{item.name}</p>
-                                            <p className="text-[9px] font-black text-accent-primary uppercase tracking-widest">{item.quantity} Uni. × {formatPrice(item.price)}</p>
-                                         </div>
-                                    </div>
-                                    <span className="text-xs font-black text-white italic">{formatPrice(item.price * item.quantity)}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Totales */}
-                        <div className="border-t border-dashed border-white/10 pt-8 space-y-4">
-                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
-                                <span>Subtotal</span>
-                                <span className="text-white opacity-80">{formatPrice(order.subtotal)}</span>
-                            </div>
-                            {order.shipping_cost > 0 && (
-                                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
-                                    <span>Envío registrado</span>
-                                    <span className="text-white opacity-80">{formatPrice(order.shipping_cost)}</span>
-                                </div>
-                            )}
-                            {order.discount > 0 && (
-                                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-herbal-500">
-                                    <span>Bonificación Digital</span>
-                                    <span>-{formatPrice(order.discount)}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between items-center pt-6 border-t border-white/5">
-                                <span className="text-sm font-black text-white uppercase italic tracking-[0.2em]">Total registrado</span>
-                                <span className="text-2xl font-black text-accent-primary italic drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">{formatPrice(order.total)}</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-12 text-center opacity-30">
-                            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-theme-tertiary">Referencia persistida para seguimiento</p>
-                        </div>
-                    </div>
-                    {/* Jagged Bottom Detail */}
-                    <div className="h-6 bg-zinc-900 w-full relative -top-[1px] shadow-2xl" 
-                         style={{
-                             clipPath: 'polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)'
-                         }}
-                    />
-                </div>
-
-                {/* INFO LATERAL: LOGÍSTICA Y PAGO */}
-                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-1000 delay-300">
-                    {/* Seguimiento */}
-                    {trackingTrustView.showPanel && (
-                        <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 space-y-6 group/tracking overflow-hidden relative">
-                            <div className="absolute -right-8 -top-8 w-24 h-24 bg-accent-primary/5 rounded-full blur-2xl transition-all duration-700 group-hover/tracking:scale-150" />
-                            <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 rounded-2xl bg-accent-primary/10 border border-accent-primary/20 flex items-center justify-center text-accent-primary shadow-xl">
-                                    <Truck size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-black text-white uppercase tracking-widest">{trackingTrustView.title}</h3>
-                                    <p className="text-[10px] text-theme-tertiary font-bold uppercase opacity-60">{trackingTrustView.subtitle}</p>
-                                </div>
-                            </div>
-
-                            <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                                    {trackingTrustView.headline}
-                                </p>
-                                <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">
-                                    {trackingTrustView.detail}
-                                </p>
-                            </div>
-                            
-                            <div className="space-y-4">
-                                {trackingTrustView.showTrackingNumber && trackingTrustView.trackingNumber && (
-                                    <div className="space-y-2">
-                                        <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Número de Guía</p>
-                                        <div className="flex items-center justify-between p-4 rounded-xl bg-black border border-white/5 group/copy transition-all hover:border-accent-primary/30">
-                                            <p className="text-sm font-black text-accent-primary font-mono tracking-tighter uppercase italic">{trackingTrustView.trackingNumber}</p>
-                                            {trackingTrustView.canCopyTrackingNumber && (
-                                                <button
-                                                    onClick={() => {
-                                                        void navigator.clipboard.writeText(trackingTrustView.trackingNumber!);
-                                                        notify.success('Copiado', 'Número de guía listo.');
-                                                    }}
-                                                    className="text-theme-tertiary hover:text-white transition-colors"
-                                                >
-                                                    <Copy size={16} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {trackingTrustView.showTrackingNotes && trackingTrustView.trackingNotes && (
-                                    <div className="space-y-2">
-                                        <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Notas de Envío</p>
-                                        <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                                            <p className="text-xs text-theme-secondary leading-relaxed">
-                                                {trackingTrustView.trackingNotes}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Pago */}
-                    <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-theme-secondary shadow-xl">
-                                <CreditCard size={24} />
-                            </div>
-                            <div>
-                                <h3 className="text-sm font-black text-white uppercase tracking-widest">Pago</h3>
-                                <p className="text-[10px] text-theme-tertiary font-bold uppercase opacity-60">Estado persistido</p>
-                            </div>
-                        </div>
-
-                        <div className="grid gap-3">
-                            <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Método de pago</span>
-                                <span className="text-xs font-black text-white uppercase italic">{{ cash: 'Efectivo', transfer: 'Transferencia', mercadopago: 'Mercado Pago', card: 'Tarjeta', whatsapp: 'WhatsApp' }[order.payment_method as string] ?? order.payment_method}</span>
-                            </div>
-                            <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Estado de pago</span>
-                                <span className={cn(
-                                    'text-xs font-black uppercase italic tracking-widest',
-                                    paymentView.paymentTone === 'success'
-                                        ? 'text-herbal-500'
-                                        : paymentView.paymentTone === 'danger'
-                                            ? 'text-red-400'
-                                            : paymentView.paymentTone === 'neutral'
-                                                ? 'text-accent-primary'
-                                                : 'text-yellow-500'
-                                )}>
-                                    {paymentView.paymentLabel}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-60">
-                                Siguiente paso real
-                            </p>
-                            <p className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                                {visibilityView.headline}
-                            </p>
-                            <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-white/80 leading-relaxed">
-                                {visibilityView.detail}
-                            </p>
-                        </div>
-
-                        {canContinuePayment && (
-                            <button
-                                type="button"
-                                onClick={() => void handleContinuePayment()}
-                                disabled={continuingPayment}
-                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-yellow-600 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
-                            >
-                                <CreditCard className="h-4 w-4" />
-                                {continuingPayment ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
-                            </button>
-                        )}
-
-                        {canRefreshPaymentState && (
-                            <button
-                                type="button"
-                                onClick={() => void refetch()}
-                                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-colors hover:bg-white/10 hover:text-white"
-                            >
-                                <Loader2 className={cn('h-4 w-4', isFetching && 'animate-spin')} />
-                                {isFetching ? 'Revisando estado...' : refreshPaymentLabel}
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Acciones Cinemáticas */}
-                    <div className="flex gap-4">
-                        {canReorder && (
-                            <button
-                                type="button"
-                                onClick={() => void handleReorder()}
-                                disabled={reorderingOrderId === order.id}
-                                className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary hover:bg-white/5 hover:text-white transition-all duration-500 shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
-                            >
-                                <RotateCcw className="h-4 w-4 group-hover:-rotate-180 transition-transform duration-700" />
-                                {reorderingOrderId === order.id ? 'Revisando catalogo...' : 'Reordenar con catalogo actual'}
-                            </button>
-                        )}
-                        <button
-                            onClick={handleWhatsApp}
-                            className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] bg-herbal-500 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_0_30px_rgba(34,197,94,0.3)] hover:bg-herbal-600 hover:-translate-y-1 active:scale-95 transition-all duration-500"
-                        >
-                            <MessageCircle className="h-4 w-4 group-hover:scale-125 transition-transform" />
-                            Soporte VSM
-                        </button>
-                    </div>
-
-                    <Link
-                        to={"/orders" as any}
-                        className="flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-all duration-500 hover:bg-white/5 hover:text-white"
-                    >
-                        <ShoppingBag className="h-4 w-4" />
-                        Ver historial de pedidos
-                    </Link>
-                </div>
-            </div>
+            <OrderSummaryCard
+                orderNumber={order.order_number}
+                items={items}
+                subtotal={order.subtotal}
+                shippingCost={order.shipping_cost}
+                discount={order.discount}
+                total={order.total}
+                paymentMethod={order.payment_method}
+                paymentView={paymentView}
+                continuationView={continuationView}
+                canContinuePayment={canContinuePayment}
+                continuingPayment={continuingPayment}
+                canReorder={canReorder}
+                reorderingOrderId={reorderingOrderId}
+                orderId={order.id}
+                onContinuePayment={handleContinuePayment}
+                onReorder={handleReorder}
+                onWhatsApp={handleWhatsApp}
+            />
         </div>
     );
 }
