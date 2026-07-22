@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, Sparkles, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { OrderStatus } from '@/hooks/useOrders';
 
 interface OrderHeaderProps {
     orderNumber: string;

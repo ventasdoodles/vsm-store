@@ -15,7 +15,7 @@ interface OrderSummaryCardProps {
         paymentTone: string;
     };
     continuationView: {
-        nextActionText: string;
+        detail: string;
     };
     canContinuePayment: boolean;
     continuingPayment: boolean;
@@ -166,7 +166,7 @@ export function OrderSummaryCard({
                             Siguiente paso real
                         </p>
                         <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">
-                            {continuationView.nextActionText}
+                            {continuationView.detail}
                         </p>
                     </div>
 
