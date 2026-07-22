@@ -92,17 +92,21 @@ describe('cancelAdminOrder audited RPC switch', () => {
         mocks.rpc.mockReset();
     });
 
+    const ORDER_ID_1 = '11111111-1111-4111-8111-111111111111';
+    const ORDER_ID_2 = '22222222-2222-4222-8222-222222222222';
+    const ORDER_ID_3 = '33333333-3333-4333-8333-333333333333';
+
     it('calls the audited unpaid cancellation RPC with trimmed reason', async () => {
         mocks.rpc.mockResolvedValue({
-            data: [{ id: 'order-1' }],
+            data: [{ id: ORDER_ID_1 }],
             error: null,
         });
 
-        await expect(cancelAdminOrder('order-1', '  Valid cancellation reason  '))
-            .resolves.toEqual({ id: 'order-1' });
+        await expect(cancelAdminOrder(ORDER_ID_1, '  Valid cancellation reason  '))
+            .resolves.toEqual({ id: ORDER_ID_1 });
 
         expect(mocks.rpc).toHaveBeenCalledWith('cancel_admin_unpaid_order_with_audit', {
-            p_order_id: 'order-1',
+            p_order_id: ORDER_ID_1,
             p_reason: 'Valid cancellation reason',
         });
         expect(mocks.from).not.toHaveBeenCalled();
@@ -110,14 +114,14 @@ describe('cancelAdminOrder audited RPC switch', () => {
 
     it('does not require or use current tracking notes', async () => {
         mocks.rpc.mockResolvedValue({
-            data: [{ id: 'order-2' }],
+            data: [{ id: ORDER_ID_2 }],
             error: null,
         });
 
-        await cancelAdminOrder('order-2', 'Reason without current notes');
+        await cancelAdminOrder(ORDER_ID_2, 'Reason without current notes');
 
         expect(mocks.rpc).toHaveBeenCalledWith('cancel_admin_unpaid_order_with_audit', {
-            p_order_id: 'order-2',
+            p_order_id: ORDER_ID_2,
             p_reason: 'Reason without current notes',
         });
         expect(JSON.stringify(mocks.rpc.mock.calls[0])).not.toContain('tracking_notes');
@@ -125,7 +129,7 @@ describe('cancelAdminOrder audited RPC switch', () => {
     });
 
     it('fails short reasons before calling RPC', async () => {
-        await expect(cancelAdminOrder('order-1', 'no')).rejects.toThrow(
+        await expect(cancelAdminOrder(ORDER_ID_1, 'no')).rejects.toThrow(
             'El motivo de cancelacion debe tener al menos 5 caracteres.'
         );
 
@@ -140,16 +144,16 @@ describe('cancelAdminOrder audited RPC switch', () => {
         };
         mocks.rpc.mockResolvedValue({ data: null, error });
 
-        await expect(cancelAdminOrder('order-1', 'Valid cancellation reason')).rejects.toEqual(error);
+        await expect(cancelAdminOrder(ORDER_ID_1, 'Valid cancellation reason')).rejects.toEqual(error);
     });
 
     it('normalizes a single-row RPC response object', async () => {
         mocks.rpc.mockResolvedValue({
-            data: { id: 'order-3' },
+            data: { id: ORDER_ID_3 },
             error: null,
         });
 
-        await expect(cancelAdminOrder('order-3', 'Valid cancellation reason'))
-            .resolves.toEqual({ id: 'order-3' });
+        await expect(cancelAdminOrder(ORDER_ID_3, 'Valid cancellation reason'))
+            .resolves.toEqual({ id: ORDER_ID_3 });
     });
 });

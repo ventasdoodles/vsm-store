@@ -385,7 +385,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getAllByText('Revisa primero').length).toBeGreaterThanOrEqual(1);
         fireEvent.click(screen.getByText('Revisar Waka Somatch Menta'));
 
-        expect(navigateMock).toHaveBeenCalledWith('/vape/waka-somatch-menta');
+        expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ to: '/vape/waka-somatch-menta' }));
     });
 
     it('renders the existing link CTA surface and opens the eligible route handoff', () => {
@@ -1520,7 +1520,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         });
         expect(screen.getByText('Agregue 1 de Mint Fresh al carrito.')).toBeInTheDocument();
         expect(notifySuccessMock).toHaveBeenCalledWith('Agregado', 'Agregue 1 de Mint Fresh al carrito.');
-        expect(navigateMock).not.toHaveBeenCalledWith('/checkout');
+        expect(navigateMock).not.toHaveBeenCalledWith(expect.objectContaining({ to: '/checkout' }));
         expect(windowOpenMock).not.toHaveBeenCalled();
     });
 
@@ -1595,7 +1595,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         fireEvent.click(screen.getByText('Elegir opcion de Waka Pod'));
 
         expect(addItemMock).not.toHaveBeenCalled();
-        expect(navigateMock).toHaveBeenCalledWith('/vape/waka-pod');
+        expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ to: '/vape/waka-pod' }));
     });
 
     it('adds a grounded variant through the existing cart store', async () => {
