@@ -3,7 +3,7 @@ name: vsm-evidence-ledger
 description: Use after Ya VOY QA, acceptance, or canon work when exact evidence must be preserved: order_id, order_events, order_offers, wallet_transactions, cleanup status, driver baseline, retained evidence, residual risks, and non-claims.
 ---
 
-# Moto Evidence Ledger
+# VSM Store Evidence Ledger
 
 ## Required Behavior
 

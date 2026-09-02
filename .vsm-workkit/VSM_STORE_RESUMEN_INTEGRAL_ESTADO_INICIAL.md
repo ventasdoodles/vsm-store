@@ -1,87 +1,47 @@
-# VSM Store — Resumen integral inicial y handoff operativo
+# VSM Store — Resumen Integral y Handoff Operativo
 
-## 0. Dónde estamos realmente
+## 0. Estado Real del Proyecto
 
-Este paquete no prueba una app. Instala un sistema serio de trabajo para construir/auditar una app de vsm store.
+Sistema operativo y marco canónico para gobernar el desarrollo, auditoría y aseguramiento de calidad de **VSM Store**.
 
-Dominio esperado:
+Dominio real de la plataforma:
 
-- clientes/remitentes;
-- destinatarios;
-- repartidores/riders;
-- motos/flota;
-- entregas;
-- rutas;
-- tracking;
-- pagos/cobros/liquidaciones;
-- soporte;
-- admin/operación;
-- rollout controlado.
+- Catálogo de productos (Vapes, dispositivos, accesorios);
+- Categorías, variantes, inventario y filtros;
+- Carrito de compras, cupones de descuento y persistencia;
+- Flujo de checkout con pasarela Mercado Pago y estados de orden;
+- Integración de envíos y rastreo (DHL / Estafeta);
+- Asistente inteligente Cesarin (AI Concierge con Supabase Edge Functions + Gemini);
+- Panel administrativo completo (productos, órdenes, clientes, analítica, configuración);
+- Sistema de autenticación e historial de pedidos del cliente.
 
-## 1. Qué se migra desde VSM
-
-Se migra el método:
-
-- roles claros;
-- prompt sizing;
-- templates;
-- skills/procedures;
-- risk matrix;
-- evidence ladder;
-- real-system QA;
-- canon/audit discipline;
-- non-claims;
-- controlled rollout.
-
-No se migra:
-
-- ecommerce;
-- Vape/420;
-- Césarín;
-- Product Search;
-- Mercado Pago como obligación;
-- Supabase como obligación;
-- claims de VSM.
-
-## 2. Filosofía técnica
+## 1. Arquitectura y Principios de Ingeniería
 
 ```text
-Database/API → Services → Hooks/State → Components/Pages
+Supabase DB / Edge Functions → Services Layer → Hooks & Stores (Zustand/Query) → UI Components / Pages
 ```
 
-Principios:
+Principios técnicos:
 
-- modularidad;
-- sin circular imports;
-- reglas de negocio fuera de JSX;
-- estados de entrega auditables;
-- `delivery_id` como proof key;
-- folio visible solo como etiqueta;
-- evidencia antes de claims;
-- rollback antes de producción.
+- Modularidad estricta y eliminación de clases gigantes ("god classes");
+- Sin dependencias circulares;
+- Lógica de negocio y de cálculo desacoplada del JSX;
+- Transición auditable de estados de órdenes (`pending`, `paid`, `shipped`, `delivered`, `cancelled`);
+- Tipado estricto con TypeScript y validación en tiempo de ejecución con esquemas Zod;
+- Evidencia verificable antes de declarar funcionalidad completada.
 
-## 3. Evidence ladder
+## 2. Escalera de Evidencia (Evidence Ladder)
 
-1. Source/test.
-2. Local browser.
-3. Local auth/session.
-4. Local/pre-prod reversible mutation.
-5. DB read proof.
-6. Dummy customer/rider/delivery flow.
-7. Admin delivery observability.
-8. Controlled live smoke.
-9. Monitored real-courier rollout.
+1. Compilación y chequeo de tipos (`tsc --noEmit`).
+2. Pruebas unitarias de lógica y contratos (`npm run test:core`).
+3. Verificación de build y manifests de release (`npm run build:verify`).
+4. Pruebas en navegador local / UI QA.
+5. Verificación de estados y consultas en Supabase.
+6. Pruebas end-to-end simuladas (Checkout, Mercado Pago webhook, Cesarin).
 
-## 4. Primer hito recomendado
+## 3. Roles y Disciplina Operativa
 
-Codex readiness inicial sobre el repo real.
-
-Objetivo: producir un Execution Block de 3-4 lanes, con WIP=1, empezando por inventario real y un primer flujo dummy seguro.
-
-## 5. Non-claims
-
-No producción. No pagos reales. No GPS real. No entregas reales. No admin real. No seguridad completa. No multi-ciudad. No notificaciones reales.
-
-## 6. Frase operativa
-
-Entrega rápida, arquitectura con casco.
+- **ChatGPT:** Orquestador (estrategia, diseño funcional, planificación).
+- **Codex:** Auditor independiente y compuerta de aceptación (readiness, auditoría de diffs, QA read-only).
+- **Antigravity:** Ejecutor (código, pruebas locales, commits y pushes autorizados).
+- **Usuario:** Product Owner y decisor final.

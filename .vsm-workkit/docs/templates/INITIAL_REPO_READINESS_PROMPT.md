@@ -18,17 +18,17 @@ Authoritative current state:
 A new VSM Store work-kit has been installed/adapted from the VSM operating model. It is procedural only and proves no product/runtime behavior yet.
 
 Mission objective:
-Inspect the real repo and produce the first safe execution plan for turning the app into an auditable moto delivery/reparto system.
+Inspect the real repo and produce the safe execution plan for auditable development and maintenance of VSM Store.
 
 Required scope:
 - repo structure
 - package/scripts/stack
 - routes/pages
 - auth/session surfaces
-- customer/remitente surfaces
-- rider/repartidor surfaces
-- motorcycle/fleet surfaces
-- delivery lifecycle surfaces
+- catalog/products/categories surfaces
+- cart/checkout/Mercado Pago surfaces
+- shipping/tracking surfaces
+- Cesarin AI / Edge Functions surfaces
 - admin/operations surfaces
 - DB/schema/migrations if present
 - payment/tracking/notification integrations if present

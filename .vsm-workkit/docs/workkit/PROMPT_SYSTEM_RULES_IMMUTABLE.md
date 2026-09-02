@@ -68,15 +68,12 @@ Distinguir siempre:
 - inferido;
 - no probado.
 
-## 8. Moto reparto high-risk
+## 8. Superficies de alto riesgo VSM Store
 
-- datos personales;
-- direcciones;
-- GPS/tracking;
-- pagos;
-- asignación rider;
-- estados reales de entrega;
-- notificaciones;
-- producción;
-- DB/migrations;
-- secretos.
+- datos personales y direcciones de envío;
+- checkout, gateway y webhook de Mercado Pago;
+- autenticación, sesiones y secretos de API;
+- base de datos, esquemas y migraciones de Supabase;
+- catálogo, stock de inventario y mutación de órdenes;
+- workflows de CI/CD y despliegues en producción;
+- Cesarin AI runtime y llamadas a Gemini API.

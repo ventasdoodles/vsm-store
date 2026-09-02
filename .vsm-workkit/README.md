@@ -1,8 +1,8 @@
 # VSM Store — Work-kit Operativo
 
-Sistema operativo de prompts, auditoría, implementación, QA real y canon para una app de motos para reparto.
+Sistema operativo de prompts, auditoría, implementación, QA real y canon para la tienda e-commerce VSM Store (Vapes, Accesorios, Cesarin AI, Supabase y Mercado Pago).
 
-Este paquete migra el método operativo maduro de VSM Store, pero lo adapta al dominio de reparto en vsm. No copia claims de VSM ni asume que la app ya está probada.
+Este paquete define el marco operativo canónico para gobernar el desarrollo, auditoría y trazabilidad con evidencia verificable.
 
 ## Modelo operativo
 

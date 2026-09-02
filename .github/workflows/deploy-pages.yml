@@ -6,6 +6,10 @@ on:
   # Actions runtime: Node 24. App build: Node 22 LTS.
   workflow_dispatch:
 
+concurrency:
+  group: deploy-pages-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

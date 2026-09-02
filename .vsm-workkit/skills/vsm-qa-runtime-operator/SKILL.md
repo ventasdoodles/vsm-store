@@ -3,7 +3,7 @@ name: vsm-qa-runtime-operator
 description: Use for authorized Ya VOY local/dev QA runtime execution or preflight, including qa-temp handling, QA runtime contract checks, protected evidence, order_id proof, rollback/cleanup, and non-secret evidence reporting.
 ---
 
-# Moto QA Runtime Operator
+# VSM Store QA Runtime Operator
 
 ## Required Behavior
 

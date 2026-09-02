@@ -1,5 +1,7 @@
 # VSM Store - README Work-kit
 
+# VSM Store - README Work-kit
+
 ## Purpose
 
 Entry point for the work-kit operating docs.
@@ -8,7 +10,7 @@ Entry point for the work-kit operating docs.
 
 1. `PROMPT_SYSTEM_RULES_IMMUTABLE.md`
 2. `CONTEXTO_MAESTRO_HANDOFF.md`
-3. `PROMPT_SIZING_POLICY_VSM_REPARTO.md`
+3. `PROMPT_SIZING_POLICY_VSM_STORE.md`
 4. `CONTEXTO_TEMPORAL_ACTUAL.md`
 5. `VSM_SKILL_USAGE_POLICY.md`
 6. `PROMPT_OUTPUT_QUALITY_GATE.md`
@@ -26,13 +28,9 @@ Entry point for the work-kit operating docs.
 - `tools/workflow/evidence-ledger.mjs` creates canon-ready exact-order evidence drafts without touching DB.
 - `tools/workflow/vsm-qa-rehearsal.mjs` runs the local/manual QA rehearsal shell. Default, `--dry-run`, and `--preflight-only` modes do not run mutating harnesses; `--run-harness` is required for controlled rehearsal execution.
 - These helpers are local/manual only. They do not create hooks, CI, runtime enforcement, product/runtime behavior, DB/Auth/Supabase/browser/provider proof, or production readiness.
-- `repo-baseline` is a prerequisite before readiness, canon, or implementation claims in `F:\ivoy`.
+- `repo-baseline` is a prerequisite before readiness, canon, or implementation claims in `C:\dev\vsm-store-fresh`.
 - When product repos are dirty, do not claim baseline truth until they are reconciled to `origin/main` or a fresh explicitly authorized worktree is created and verified.
 - `workspace-sync` is the authoritative lane for current sync claims because it checks the current clean product baselines and canon checkout.
-
-## Prompt lint
-
-- `PROMPT_LINT_SPEC.md` describes the deterministic checks now used by Prompt Lint Helper v1.
 - `PROMPT_LINT_EXAMPLES.md` is a docs-only fixture pack for human review and future lint design.
 - `PROMPT_REPAIR_CONTRACT.md` is the docs-only readiness contract for future auto-repair boundaries and fail-code mapping.
 - `tools/prompt-lint/prompt-lint.mjs` is the local/manual helper v1.

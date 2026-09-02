@@ -18,6 +18,7 @@
 - `docs/audits/2026-06-28/god-classes-modularization.md` (Modularization of `orders.ts` and `product-search-capsule.ts` using zero-token AST extraction)
 
 ## Accepted Lanes (Chronological)
+- **2026-09-02**: [ACCEPT] Work-kit sanitation, GitHub Actions quota optimization, and test suite tiering. Optimized `deploy-functions.yml` with diff-based deployments and concurrency cancellation; purged 137 legacy Ya VOY delivery audits (777 KB) to archive; unified skills under `.vsm-workkit/skills/`; introduced tiered testing (`test:core`, `test:ui`, `test:quick`); stabilized warranty date and order status color assertions (73/73 core test suites pass, 626/626 tests pass, 0 TS errors).
 - **2026-07-22**: [ACCEPT] Modularization of `Checkout.tsx` layout (320 -> 144 lines) into `src/components/checkout/` (`26eb3839`). 6/6 tests pass, 0 TS errors (`tsc --noEmit`).
 - **2026-07-22**: [ACCEPT] Client secrets isolation audit & dependency security patching (`416ea271`). Resolved 13 advisories (`protobufjs`, `tar`, `undici`, `vite`), 0 TS errors (`tsc --noEmit`).
 - **2026-07-22**: [ACCEPT] Modularization of `ai-capsule-orchestrator.service.ts` (1,684 -> 6 lines) delegating to `src/services/ai-capsules/` (`a98894fd`). 15/15 AI capsule tests pass, 0 TS errors (`tsc --noEmit`).

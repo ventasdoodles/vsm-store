@@ -6,12 +6,25 @@ on:
       - main
     paths:
       - 'supabase/functions/**'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+    paths-ignore:
+      - '**.md'
+      - 'supabase/functions/**/*.test.*'
+      - 'supabase/functions/**/*.spec.*'
+  workflow_dispatch:
+    inputs:
+      function_name:
+        description: 'Specific function to deploy (e.g. create-payment, or "all")'
+        required: false
+        default: 'all'
+
+concurrency:
+  group: deploy-edge-functions-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
@@ -19,53 +32,80 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
 
       - name: Setup toolchain
         uses: supabase/setup-cli@df56b21da46c98abb12a9804e4fb1f657773e333
         with:
           version: latest
 
-      - name: Deploy bundle-intelligence
-        run: supabase functions deploy bundle-intelligence --project-ref $PROJECT_ID
+      - name: Deploy Modified or Selected Edge Functions
+        run: |
+          set -euo pipefail
 
-      - name: Deploy cesarin-qa-judge
-        run: supabase functions deploy cesarin-qa-judge --project-ref $PROJECT_ID
+          FUNCTIONS_TO_DEPLOY=()
 
-      - name: Deploy checkout-submit
-        run: supabase functions deploy checkout-submit --project-ref $PROJECT_ID
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TARGET="${{ inputs.function_name }}"
+            if [ -n "$TARGET" ] && [ "$TARGET" != "all" ]; then
+              if [ -d "supabase/functions/$TARGET" ]; then
+                FUNCTIONS_TO_DEPLOY=("$TARGET")
+              else
+                echo "❌ ERROR: Function '$TARGET' does not exist in supabase/functions/"
+                exit 1
+              fi
+            fi
+          fi
 
-      - name: Deploy create-payment
-        run: supabase functions deploy create-payment --project-ref $PROJECT_ID
+          if [ ${#FUNCTIONS_TO_DEPLOY[@]} -eq 0 ]; then
+            SHARED_CHANGED=false
+            if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+              CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- supabase/functions/)
+              if echo "$CHANGED_FILES" | grep -q "^supabase/functions/_shared/"; then
+                SHARED_CHANGED=true
+                echo "ℹ️ supabase/functions/_shared/ modified: will deploy all functions."
+              fi
+            else
+              SHARED_CHANGED=true
+              echo "ℹ️ Single commit / no parent HEAD~1 found: will deploy all functions."
+            fi
 
-      - name: Deploy customer-intelligence
-        run: supabase functions deploy customer-intelligence --project-ref $PROJECT_ID
+            if [ "$SHARED_CHANGED" = true ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              for d in supabase/functions/*/; do
+                fn=$(basename "$d")
+                if [ "$fn" != "_shared" ] && [ -f "$d/index.ts" ]; then
+                  FUNCTIONS_TO_DEPLOY+=("$fn")
+                fi
+              done
+            else
+              CHANGED_FNS=$(echo "$CHANGED_FILES" | grep -oE "^supabase/functions/[^/]+" | sed 's#^supabase/functions/##' | grep -v '^_shared$' | sort -u || true)
+              for fn in $CHANGED_FNS; do
+                if [ -d "supabase/functions/$fn" ] && [ -f "supabase/functions/$fn/index.ts" ]; then
+                  FUNCTIONS_TO_DEPLOY+=("$fn")
+                fi
+              done
+            fi
+          fi
 
-      - name: Deploy customer-narrative
-        run: supabase functions deploy customer-narrative --project-ref $PROJECT_ID
+          echo "=========================================="
+          echo "Edge Functions to deploy: ${#FUNCTIONS_TO_DEPLOY[@]}"
+          for fn in "${FUNCTIONS_TO_DEPLOY[@]}"; do
+            echo "  - $fn"
+          done
+          echo "=========================================="
 
-      - name: Deploy dashboard-intelligence
-        run: supabase functions deploy dashboard-intelligence --project-ref $PROJECT_ID
+          if [ ${#FUNCTIONS_TO_DEPLOY[@]} -eq 0 ]; then
+            echo "No edge function deployment needed. Skipping."
+            exit 0
+          fi
 
-      - name: Deploy embeddings-processor
-        run: supabase functions deploy embeddings-processor --project-ref $PROJECT_ID
-
-      - name: Deploy inventory-oracle
-        run: supabase functions deploy inventory-oracle --project-ref $PROJECT_ID
-
-      - name: Deploy knowledge-ingestor
-        run: supabase functions deploy knowledge-ingestor --project-ref $PROJECT_ID
-
-      - name: Deploy loyalty-intelligence
-        run: supabase functions deploy loyalty-intelligence --project-ref $PROJECT_ID
-
-      - name: Deploy mercadopago-webhook
-        run: supabase functions deploy mercadopago-webhook --project-ref $PROJECT_ID --no-verify-jwt
-
-      - name: Deploy product-intelligence
-        run: supabase functions deploy product-intelligence --project-ref $PROJECT_ID
-
-      - name: Deploy track-shipment
-        run: supabase functions deploy track-shipment --project-ref $PROJECT_ID
-
-      - name: Deploy voice-intelligence
-        run: supabase functions deploy voice-intelligence --project-ref $PROJECT_ID
+          for fn in "${FUNCTIONS_TO_DEPLOY[@]}"; do
+            echo ""
+            echo "🚀 Deploying: $fn"
+            EXTRA_FLAGS=""
+            if [ "$fn" = "mercadopago-webhook" ]; then
+              EXTRA_FLAGS="--no-verify-jwt"
+            fi
+            supabase functions deploy "$fn" --project-ref "$PROJECT_ID" $EXTRA_FLAGS
+          done

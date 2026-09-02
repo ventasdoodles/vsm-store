@@ -12,6 +12,20 @@ git rev-list --left-right --count origin/main...HEAD
 ```
 
 ## Canon and Work-kit Pointers
+# VSM Store — Codex Workflow Profile
+
+Perfil operativo repo-level para Codex.
+
+## Baseline Checks
+
+Al inicio de audit, readiness, canon o push lanes:
+
+```powershell
+git status -sb
+git rev-list --left-right --count origin/main...HEAD
+```
+
+## Canon and Work-kit Pointers
 
 Cargar solo lo necesario:
 
@@ -21,7 +35,7 @@ Cargar solo lo necesario:
 - `docs/workkit/README_WORKKIT.md`
 - `docs/workkit/PROMPT_SYSTEM_RULES_IMMUTABLE.md`
 - `docs/workkit/CONTEXTO_MAESTRO_HANDOFF.md`
-- `docs/workkit/PROMPT_SIZING_POLICY_VSM_REPARTO.md`
+- `docs/workkit/PROMPT_SIZING_POLICY_VSM_STORE.md`
 - `docs/workkit/PROMPT_LIBRARY_TEMPLATES.md`
 - `docs/workkit/VSM_SKILL_USAGE_POLICY.md`
 - `docs/workkit/CODEX_PROMPT_RELIABILITY_PROTOCOL.md`
@@ -61,15 +75,13 @@ Nunca permitir que quien implementa haga acceptance final de su propio cambio.
 Requieren autorización explícita y fases separadas:
 
 - auth/session/storage/secrets;
-- PII: nombres, teléfonos, direcciones;
-- GPS/tracking;
-- pagos/cobros/liquidaciones;
-- repartidor/moto/documentos;
-- delivery lifecycle real;
-- DB/migrations;
-- deploy/live smoke;
-- notificaciones reales;
-- integraciones externas: mapas, geocoding, pagos, SMS/WhatsApp/push.
+- PII: nombres de clientes, teléfonos, direcciones de envío;
+- checkout, gateway de pago y webhooks (Mercado Pago);
+- modelos de datos, RLS y migraciones DB/Supabase;
+- catálogo, inventario y mutaciones de estado de órdenes;
+- deploy / workflows de GitHub Actions / Cloudflare;
+- Cesarin AI runtime y generación de embeddings;
+- integraciones externas: paqueterías (DHL), Mercado Pago, Gemini API.
 
 ## Browser QA
 
@@ -84,5 +96,5 @@ No inferir producción desde source tests, mocks, local browser o DB local.
 **THIS IS A CRITICAL DIRECTIVE FOR ALL AGENTS WORKING ON THIS PROJECT:**
 
 1. **Obey the Work Kit**: You must ALWAYS adhere 100% to the VSM Store Work Kit (`C:\dev\vsm-store-fresh\.vsm-workkit\docs\workkit\README_WORKKIT.md`). Never deviate from its architectural, design, or lane discipline guidelines.
-2. **Moto-Gate Baseline Checks**: EVERY TIME you are instructed to implement a new lane (Implementation, Audit, Readiness, etc.), you MUST start by running `node "C:\dev\vsm-store-fresh\.vsm-workkit\tools\workflow\vsm-gate.mjs" --lane repo-baseline` to verify that the repositories are clean and synchronized. Do not proceed with code changes if this check fails.
-3. **Canon Documentation Maintenance**: Whenever you complete a significant implementation, you must review the Canon documentation (`C:\dev\vsm-store-fresh\.vsm-workkit\docs\`) and propose updates if the implementation changes the single source of truth or architecture. Do not leave the Canon docs outdated.
+2. **VSM Baseline Checks**: EVERY TIME you are instructed to implement a new lane (Implementation, Audit, Readiness, etc.), you MUST start by running `node "C:\dev\vsm-store-fresh\.vsm-workkit\tools\workflow\vsm-gate.mjs" --lane repo-baseline` to verify that the repositories are clean and synchronized. Do not proceed with code changes if this check fails.
+3. **Canon Documentation Maintenance**: Whenever you complete a significant implementation, you must review the Canon documentation (`AI_CONTEXT.md` and `AUDIT_LOG.md`) and propose updates if the implementation changes the single source of truth or architecture. Do not leave the Canon docs outdated.

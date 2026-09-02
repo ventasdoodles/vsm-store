@@ -3,7 +3,7 @@ name: vsm-prompt-reliability-operator
 description: Use for Ya VOY prompt quality gates, prompt-lint, scorecard, repair evals, reliability smoke, fail-code interpretation, and blocking unsafe exact-next-prompts before execution.
 ---
 
-# Moto Prompt Reliability Operator
+# VSM Store Prompt Reliability Operator
 
 ## Required Behavior
 

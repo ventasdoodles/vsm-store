@@ -38,8 +38,8 @@ function makeOrder(overrides: Record<string, unknown> = {}) {
     tracking_notes: null,
     whatsapp_sent: false,
     whatsapp_sent_at: null,
-    created_at: '2026-03-25T00:00:00.000Z',
-    updated_at: '2026-03-25T00:00:00.000Z',
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    updated_at: new Date(Date.now() - 2 * 86400000).toISOString(),
     ...overrides,
   };
 }

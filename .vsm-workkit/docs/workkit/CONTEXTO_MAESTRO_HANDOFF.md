@@ -2,7 +2,7 @@
 
 ## Identidad
 
-App de motos para reparto con posibles módulos de cliente, destinatario, repartidor, moto, entrega, ruta, tracking, pago, soporte y admin.
+Plataforma e-commerce VSM Store con módulos de catálogo, variantes, carrito, checkout Mercado Pago, órdenes, tracking DHL, panel admin y Cesarin AI Concierge.
 
 ## Modelo operativo
 
