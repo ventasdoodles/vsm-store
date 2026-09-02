@@ -303,7 +303,7 @@ describe('useCheckout', () => {
             'Ya existe una orden pendiente',
             'Ya existe una orden pendiente para este checkout. Continua con esa orden y revisa su estado antes de enviar otro pedido.',
         );
-        expect(navigateMock).toHaveBeenCalledWith('/orders/order-123');
+        expect(navigateMock).toHaveBeenCalledWith({ to: '/orders/order-123' });
         expect(openMock).not.toHaveBeenCalled();
         expect(markWhatsAppSentMock).not.toHaveBeenCalled();
         expect(clearCartMock).not.toHaveBeenCalled();
@@ -336,7 +336,7 @@ describe('useCheckout', () => {
             'Ya existe una orden pendiente',
             'Ya existe una orden pendiente y pagable para esta cuenta. Continua con esa orden y revisa su estado real antes de intentar otro checkout.',
         );
-        expect(navigateMock).toHaveBeenCalledWith('/orders/order-open-1');
+        expect(navigateMock).toHaveBeenCalledWith({ to: '/orders/order-open-1' });
         expect(openMock).not.toHaveBeenCalled();
     });
 

@@ -17,7 +17,7 @@ export function OrderHeader({ orderNumber, createdAt, statusConfig }: OrderHeade
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center gap-6">
-                <Link to={"/orders" as any} className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all shadow-xl">
+                <Link to={"/orders" as any} aria-label="Ver historial de pedidos" className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all shadow-xl">
                     <ArrowLeft size={20} />
                 </Link>
                 <div>

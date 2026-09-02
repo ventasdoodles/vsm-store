@@ -126,7 +126,7 @@ describe('OrderDetail payment continuation', () => {
         );
 
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
-        expect(screen.getByText(/Pedido liquidado y en curso/i)).toBeInTheDocument();
+        expect(screen.getByText(/Pago confirmado/i)).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /Ver historial de pedidos/i })).toBeInTheDocument();
         expect(screen.getByText(/Resumen del pedido/i)).toBeInTheDocument();
         expect(screen.getByText(/Estado persistido del pedido/i)).toBeInTheDocument();
@@ -285,7 +285,7 @@ describe('OrderDetail payment continuation', () => {
             <TestRouter initialEntries={['/orders/order-5']} path="/orders/$orderId"><OrderDetail /></TestRouter>,
         );
 
-        fireEvent.click(screen.getByRole('button', { name: /Reordenar con catalogo actual/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Reordenar con cat[aá]logo actual/i }));
 
         await waitFor(() => {
             expect(reorderOrderMock).toHaveBeenCalledWith({

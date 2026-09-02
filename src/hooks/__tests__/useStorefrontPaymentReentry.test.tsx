@@ -109,7 +109,7 @@ describe('useStorefrontPaymentReentry', () => {
                 'Pago no disponible',
                 'El pago de esta orden ya figura confirmado. Revisa el detalle persistido en lugar de intentar abrir otro cobro.',
             );
-            expect(navigateMock).toHaveBeenCalledWith('/orders/order-1');
+            expect(navigateMock).toHaveBeenCalledWith({ to: '/orders/order-1' });
         });
     });
 
@@ -147,7 +147,7 @@ describe('useStorefrontPaymentReentry', () => {
                 'Pedido no disponible',
                 'No pudimos confirmar el estado actual del pedido. Revisa el detalle persistido antes de intentar otro pago.',
             );
-            expect(navigateMock).toHaveBeenCalledWith('/orders');
+            expect(navigateMock).toHaveBeenCalledWith({ to: '/orders' });
         });
     });
 });

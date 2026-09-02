@@ -57,7 +57,7 @@ describe('OpenRecoverableOrderNotice', () => {
         fireEvent.click(screen.getByRole('button', { name: /Ver pedido y revisar pago/i }));
 
         expect(continuePaymentMock).toHaveBeenCalledWith(expect.objectContaining({ id: 'order-open-1' }));
-        expect(navigateMock).toHaveBeenCalledWith('/orders/order-open-1');
+        expect(navigateMock).toHaveBeenCalledWith({ to: '/orders/order-open-1' });
     });
 
     it('shows loading copy while the shared handler is continuing the same order', () => {
