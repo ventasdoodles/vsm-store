@@ -6,10 +6,9 @@ on:
       - main
     paths:
       - 'supabase/functions/**'
-    paths-ignore:
-      - '**.md'
-      - 'supabase/functions/**/*.test.*'
-      - 'supabase/functions/**/*.spec.*'
+      - '!**.md'
+      - '!supabase/functions/**/*.test.*'
+      - '!supabase/functions/**/*.spec.*'
   workflow_dispatch:
     inputs:
       function_name:
