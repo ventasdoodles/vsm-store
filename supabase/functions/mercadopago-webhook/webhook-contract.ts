@@ -41,6 +41,8 @@ export interface WebhookContractDeps {
     getOrderAttribution(orderId: string): Promise<OrderAttribution | null>;
     updateOrderPayment(orderId: string, update: OrderPaymentUpdate): Promise<void>;
     insertConversionEvent(event: ConversionEventInsert): Promise<void>;
+    getOrderItems(orderId: string): Promise<Array<{ product_id: string; variant_id: string | null; quantity: number }>>;
+    decrementStock(items: Array<{ product_id: string; variant_id: string | null; quantity: number }>): Promise<void>;
     now(): string;
 }
 
@@ -53,6 +55,7 @@ export interface WebhookContractResult {
     paymentStatus?: string;
     orderStatus?: string;
     conversionInserted?: boolean;
+    stockDecremented?: boolean;
 }
 
 export interface MercadoPagoWebhookRequestHandlerDeps {
@@ -171,7 +174,14 @@ export async function processMercadoPagoWebhook(
     });
 
     let conversionInserted = false;
+    let stockDecremented = false;
     if (paymentStatus === 'paid' && orderForAttribution?.payment_status !== 'paid') {
+        const orderItems = await deps.getOrderItems(orderId);
+        if (orderItems.length > 0) {
+            await deps.decrementStock(orderItems);
+            stockDecremented = true;
+        }
+
         await deps.insertConversionEvent({
             session_id: orderForAttribution?.cesarin_session_id ?? null,
             event_type: 'payment_completed',
@@ -193,5 +203,6 @@ export async function processMercadoPagoWebhook(
         paymentStatus,
         orderStatus,
         conversionInserted,
+        stockDecremented,
     };
 }

@@ -11,6 +11,8 @@ export default defineConfig({
         },
     },
     test: {
+        bail: 1,
+        reporter: ['default'],
         environment: 'jsdom',
         globals: true,
         setupFiles: ['./src/test/setup.ts'],

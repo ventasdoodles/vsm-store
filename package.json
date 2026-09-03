@@ -15,6 +15,7 @@
     "generate-sitemap": "node scripts/generate-sitemap.js",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:changed": "vitest run --changed",
     "test:core": "vitest run src/lib src/actions src/services src/stores supabase/functions",
     "test:ui": "vitest run src/components src/pages",
     "test:quick": "npm run test:core && npm run typecheck",

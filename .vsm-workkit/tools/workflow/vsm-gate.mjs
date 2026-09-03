@@ -13,7 +13,7 @@ const workspaceRoot = path.resolve(canonRoot, '..');
 const args = process.argv.slice(2);
 const jsonMode = args.includes('--json');
 const laneArg = valueFor('--lane') || 'repo-baseline';
-const allowedLanes = new Set(['repo-baseline', 'workspace-sync', 'prompt', 'qa-preflight', 'canon']);
+const allowedLanes = new Set(['repo-baseline', 'workspace-sync', 'prompt', 'qa-preflight', 'canon', 'implementation']);
 
 function valueFor(name) {
   const index = args.indexOf(name);
@@ -176,6 +176,24 @@ function addCanonChecks(checks) {
   ));
 }
 
+function addImplementationChecks(checks) {
+  addRepoBaseline(checks);
+  const testCore = run('npm', ['run', 'test:core'], workspaceRoot, { shell: true });
+  checks.push(check(
+    'test-core',
+    'Core test suite passes',
+    testCore,
+    testCore.status === 0,
+  ));
+  const typecheck = run('npm', ['run', 'typecheck'], workspaceRoot, { shell: true });
+  checks.push(check(
+    'typecheck',
+    'TypeScript compilation passes with zero errors',
+    typecheck,
+    typecheck.status === 0,
+  ));
+}
+
 if (!allowedLanes.has(laneArg)) {
   const failure = {
     ok: false,
@@ -194,6 +212,7 @@ if (laneArg === 'workspace-sync') addWorkspaceSync(checks);
 if (laneArg === 'prompt') addPromptReliability(checks);
 if (laneArg === 'qa-preflight') addQaPreflight(checks);
 if (laneArg === 'canon') addCanonChecks(checks);
+if (laneArg === 'implementation') addImplementationChecks(checks);
 
 const failures = checks.filter((item) => !item.ok && !item.warning);
 const warnings = checks.filter((item) => !item.ok && item.warning);

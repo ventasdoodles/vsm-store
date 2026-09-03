@@ -44,6 +44,24 @@ serve((req) => handleMercadoPagoWebhookRequest(req, {
                     throw error
                 }
             },
+            getOrderItems: async (orderId) => {
+                const { data, error } = await supabase
+                    .from('order_items')
+                    .select('product_id, variant_id, quantity')
+                    .eq('order_id', orderId)
+                if (error) throw error
+                return (data ?? []).map(item => ({
+                    product_id: item.product_id,
+                    variant_id: item.variant_id ?? null,
+                    quantity: item.quantity,
+                }))
+            },
+            decrementStock: async (items) => {
+                const { error } = await supabase.rpc('decrement_stock_for_order', {
+                    p_items: JSON.stringify(items),
+                })
+                if (error) throw error
+            },
             now: () => new Date().toISOString(),
         })
     },

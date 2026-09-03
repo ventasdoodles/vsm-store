@@ -20,6 +20,10 @@ function createDeps(payment: MercadoPagoPaymentPayload, existingPaymentStatus: s
         })),
         updateOrderPayment: vi.fn(async () => undefined),
         insertConversionEvent: vi.fn(async () => undefined),
+        getOrderItems: vi.fn(async () => [
+            { product_id: 'prod-1', variant_id: null, quantity: 2 },
+        ]),
+        decrementStock: vi.fn(async () => undefined),
         now: vi.fn(() => '2026-05-22T19:00:00.000Z'),
     };
 
@@ -134,6 +138,53 @@ describe('mercadopago webhook contract', () => {
             conversionInserted: false,
         });
         expect(deps.updateOrderPayment).toHaveBeenCalledTimes(1);
+        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
+    });
+
+    it('decrements stock atomically when payment transitions from pending to paid', async () => {
+        const payment = {
+            id: 999,
+            external_reference: 'order-123',
+            status: 'approved',
+            transaction_amount: 250,
+        };
+        const deps = createDeps(payment);
+
+        const result = await processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps);
+
+        expect(result.stockDecremented).toBe(true);
+        expect(deps.getOrderItems).toHaveBeenCalledWith('order-123');
+        expect(deps.decrementStock).toHaveBeenCalledWith([
+            { product_id: 'prod-1', variant_id: null, quantity: 2 },
+        ]);
+    });
+
+    it('does NOT decrement stock when order is already paid (idempotency)', async () => {
+        const deps = createDeps({
+            id: 999,
+            external_reference: 'order-123',
+            status: 'approved',
+        }, 'paid');
+
+        const result = await processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps);
+
+        expect(result.stockDecremented).toBe(false);
+        expect(deps.getOrderItems).not.toHaveBeenCalled();
+        expect(deps.decrementStock).not.toHaveBeenCalled();
+    });
+
+    it('surfaces stock decrement failures and does NOT insert conversion event', async () => {
+        const deps = createDeps({
+            id: 999,
+            external_reference: 'order-123',
+            status: 'approved',
+        });
+        vi.mocked(deps.decrementStock).mockRejectedValueOnce(new Error('Insufficient product stock'));
+
+        await expect(processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps))
+            .rejects.toThrow('Insufficient product stock');
+
+        expect(deps.decrementStock).toHaveBeenCalledTimes(1);
         expect(deps.insertConversionEvent).not.toHaveBeenCalled();
     });
 
