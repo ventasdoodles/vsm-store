@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildDegradedPolicyInquiryFallback } from '../../../supabase/functions/customer-intelligence/policy-degraded-fallback';
@@ -61,3 +62,4 @@ describe('customer-intelligence degraded policy fallback', () => {
     expect(fallback.text).not.toMatch(/entrega ma[ñn]ana a domicilio confirmada/i);
   });
 });
+

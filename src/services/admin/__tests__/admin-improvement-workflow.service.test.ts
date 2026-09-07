@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
     buildAdminImprovementWorkflowViewForInteraction,
@@ -241,3 +242,4 @@ describe('admin-improvement-workflow.service', () => {
         expect(view.steps.find((step) => step.key === 'closure')?.statusLabel).toBe('Cerrado');
     });
 });
+

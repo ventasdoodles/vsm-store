@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 import {
     extractMercadoPagoNotification,
@@ -282,3 +283,4 @@ describe('mercadopago webhook request handler', () => {
         expect(deps.log.error).toHaveBeenCalledWith('No external_reference found in payment');
     });
 });
+

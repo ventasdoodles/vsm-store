@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import type { CesarinPreferenceSummary } from '../cesarin-stage3';
@@ -186,3 +187,4 @@ describe('buildCesarinAdaptiveConversationView', () => {
     expect(view.mode).toBe('GUIDED_COMPARE');
   });
 });
+

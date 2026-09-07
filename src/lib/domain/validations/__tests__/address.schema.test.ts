@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import { addressSchema } from '../address.schema';
 
@@ -46,3 +47,4 @@ describe('Address Schema Validation', () => {
         expect(result.success).toBe(true);
     });
 });
+

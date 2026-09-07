@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const invokeMock = vi.fn<any>();
@@ -80,3 +81,4 @@ describe('resolveStorefrontCompatibilityCheck', () => {
     expect(resolution.signal.cart_context_used).toBe(true);
   });
 });
+

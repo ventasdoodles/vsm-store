@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { parseServiceWorkerVersion, resolveShellFreshness } from '../runtime-build';
@@ -44,3 +45,4 @@ describe('runtime build diagnostics', () => {
         })).toBe('stale-shell');
     });
 });
+

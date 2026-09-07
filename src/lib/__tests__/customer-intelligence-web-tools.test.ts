@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeTools } from '../../../supabase/functions/customer-intelligence/tools';
@@ -192,3 +193,4 @@ describe('customer-intelligence native public web tools', () => {
     expect(shouldSuppress).toBe(true);
   });
 });
+

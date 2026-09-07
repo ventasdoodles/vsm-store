@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
     buildCesarinHonestEscalation,
@@ -99,3 +100,4 @@ describe('Cesarin Stage 1 storefront helpers', () => {
         expect(decodeURIComponent(escalation.action.url)).toContain('waka somatch mb6000');
     });
 });
+

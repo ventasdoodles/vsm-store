@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { searchProducts } from '@/services/search.service';
 
@@ -106,3 +107,4 @@ describe('searchProducts', () => {
         expect(orFilter).toContain('tags.cs.{valid-tag-123}');
     });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -34,3 +35,4 @@ describe('customer-intelligence persona fallbacks', () => {
     expect(compacted).toBe('Si quieres, te paso una opcion. Te paso una opcion.');
   });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useWishlistStore } from '../wishlist.store';
 import type { Product } from '@/types/product';
@@ -96,3 +97,4 @@ describe('Wishlist Store', () => {
         expect(useWishlistStore.getState().items).toHaveLength(0);
     });
 });
+

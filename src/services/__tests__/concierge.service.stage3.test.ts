@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const invokeMock = vi.fn<any>();
@@ -172,3 +173,4 @@ describe('conciergeService Stage 3 memory-aware reranking', () => {
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint', 'sweet']);
   });
 });
+

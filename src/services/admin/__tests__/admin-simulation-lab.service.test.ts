@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { SimulationSession } from '@/types/cesarin';
 import {
@@ -91,3 +92,4 @@ describe('admin-simulation-lab.service', () => {
         expect(view.selectedTurn?.canOpenReview).toBe(true);
     });
 });
+

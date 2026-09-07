@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import { cn, formatPrice, slugify, formatTimeAgo } from '../utils';
 
@@ -85,3 +86,4 @@ describe('formatTimeAgo', () => {
         expect(typeof result).toBe('string');
     });
 });
+

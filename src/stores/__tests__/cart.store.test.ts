@@ -1,3 +1,4 @@
+// @vitest-environment node
 // Tests para cart.store.ts — validación del carrito contra API
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCartStore, selectTotalItems, selectSubtotal } from '../cart.store';
@@ -375,3 +376,4 @@ describe('cart.store', () => {
         });
     });
 });
+

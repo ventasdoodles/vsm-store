@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { compactCesarinResponseText } from '../../../supabase/functions/customer-intelligence/persona.ts';
@@ -244,3 +245,4 @@ describe('guardClarificationFirstFinalText', () => {
     })).toBe(original);
   });
 });
+

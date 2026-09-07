@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { Product } from '@/types/product';
 import type { ProductVariant } from '@/types/variant';
@@ -119,3 +120,4 @@ describe('storefront product purchaseability', () => {
         expect(getVariantDisplayName(makeVariant())).toBe('Rojo');
     });
 });
+

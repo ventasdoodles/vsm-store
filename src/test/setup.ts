@@ -3,37 +3,36 @@ import { cleanup } from '@testing-library/react';
 import React from 'react';
 import { afterEach, vi } from 'vitest';
 
-// Desmonta los Ã¡rboles DOM modificados tras cada test
+// Desmonta los árboles DOM modificados tras cada test
 afterEach(() => {
     cleanup();
 });
 
-// Mock para obviar problemas de IntersectionObserver
-const mockIntersectionObserver = vi.fn();
-mockIntersectionObserver.mockReturnValue({
-    observe: () => null,
-    unobserve: () => null,
-    disconnect: () => null
-});
-window.IntersectionObserver = mockIntersectionObserver;
+if (typeof window !== 'undefined') {
+    // Mock para obviar problemas de IntersectionObserver
+    const mockIntersectionObserver = vi.fn();
+    mockIntersectionObserver.mockReturnValue({
+        observe: () => null,
+        unobserve: () => null,
+        disconnect: () => null
+    });
+    window.IntersectionObserver = mockIntersectionObserver;
 
-// Mock matchMedia
-Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(query => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(), // deprecated
-        removeListener: vi.fn(), // deprecated
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-    })),
-});
-
-// Provide a global default for the VerticalPack context hook to prevent widespread test failures
-// caused by components requiring config metadata that aren't wrapped in a VerticalPackProvider in isolated tests.
+    // Mock matchMedia
+    Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: vi.fn().mockImplementation(query => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(), // deprecated
+            removeListener: vi.fn(), // deprecated
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        })),
+    });
+}
 vi.mock('@/contexts/VerticalPackContext', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/contexts/VerticalPackContext')>();
     const { vape420VerticalPackConfig } = await import('../config/productization');
@@ -129,3 +128,5 @@ vi.mock('framer-motion', () => {
         useScroll: () => ({ scrollY: { get: () => 0 }, scrollYProgress: { get: () => 0 } }),
     };
 });
+
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 import type { HeroSlider } from '@/services';
@@ -122,3 +123,4 @@ describe('home hero slider editor logic', () => {
         ]);
     });
 });
+

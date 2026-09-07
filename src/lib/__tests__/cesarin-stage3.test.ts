@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '../cesarin-stage3';
@@ -137,3 +138,4 @@ describe('rerankCesarinSuggestedProducts', () => {
     ).toEqual(['first', 'second']);
   });
 });
+

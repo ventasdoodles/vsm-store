@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildSoftContinuityContext } from '../../../supabase/functions/customer-intelligence/soft-continuity';
@@ -59,3 +60,4 @@ describe('customer-intelligence soft continuity', () => {
     expect(continuity.prompt_block).toBeNull();
   });
 });
+

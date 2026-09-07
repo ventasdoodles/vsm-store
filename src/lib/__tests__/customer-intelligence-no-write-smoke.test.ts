@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -118,3 +119,4 @@ describe('customer-intelligence no-write smoke contract', () => {
     expect(buildCustomerIntelligenceNoWriteSmokeErrorFields(null)).toEqual({});
   });
 });
+

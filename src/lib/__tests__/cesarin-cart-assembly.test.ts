@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { resolveCesarinCartAssemblyEligibility } from '../cesarin-cart-assembly';
 import type { Product } from '@/types/product';
@@ -125,3 +126,4 @@ describe('resolveCesarinCartAssemblyEligibility', () => {
     });
   });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getProductsMock = vi.fn<any>();
@@ -156,3 +157,4 @@ describe('storefront kitting basket service', () => {
     expect(result.kitting_signal.kit_size).toBe(0);
   });
 });
+

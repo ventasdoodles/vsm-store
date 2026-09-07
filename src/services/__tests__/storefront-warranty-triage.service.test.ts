@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getCustomerOrdersMock = vi.hoisted(() => vi.fn<any>());
@@ -148,3 +149,4 @@ describe('resolveStorefrontAuthenticatedWarrantyTriage', () => {
     expect(resolution.message).toContain('No veo pedidos recientes');
   });
 });
+

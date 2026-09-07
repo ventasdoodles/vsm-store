@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildCesarinCommercialMemoryPromptGuidance } from '../../../supabase/functions/customer-intelligence/commercial-memory';
@@ -45,3 +46,4 @@ describe('buildCesarinCommercialMemoryPromptGuidance', () => {
     expect(guidance).not.toContain('Evita insistir en caminos que ya rechazo');
   });
 });
+

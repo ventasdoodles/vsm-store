@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
@@ -136,3 +137,4 @@ describe('homeFeaturedCategories', () => {
         expect(findMatchingHomeFeaturedCategoryId(createCategory({ slug: 'missing' }), categories)).toBe('');
     });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import {
     normalizeCompactText,
@@ -185,3 +186,4 @@ describe('Response Compaction Regression Tests (Commit 3faaae0)', () => {
         expect(result).toBe(draft);
     });
 });
+

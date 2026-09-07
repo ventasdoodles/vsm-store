@@ -15,7 +15,7 @@ declare global {
 export const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; // Replace with actual ID
 
 export const pageView = (url: string) => {
-    if (window.gtag) {
+    if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('config', GA_MEASUREMENT_ID, {
             page_path: url,
         });
@@ -28,7 +28,7 @@ interface AnalyticsEvent {
 }
 
 export const trackEvent = ({ action, params }: AnalyticsEvent) => {
-    if (window.gtag) {
+    if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', action, params);
     }
 };
@@ -72,3 +72,4 @@ export const trackAIInteraction = (action: string, params?: Record<string, unkno
         params
     });
 };
+

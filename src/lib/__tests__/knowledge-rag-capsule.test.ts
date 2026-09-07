@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildDegradedPolicyInquiryFallback } from '../../../supabase/functions/customer-intelligence/policy-degraded-fallback';
@@ -305,3 +306,4 @@ describe('scoped RAG answer-quality harness', () => {
     expect(fallback.text).not.toMatch(/ma[ñn]ana/i);
   });
 });
+

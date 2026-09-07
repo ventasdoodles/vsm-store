@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -29,3 +30,4 @@ describe('knowledge-ingestor auth helpers', () => {
     expect(canMutateKnowledgeAsRole(null)).toBe(false);
   });
 });
+

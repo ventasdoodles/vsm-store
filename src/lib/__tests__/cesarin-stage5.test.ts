@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import type { CesarinPreferenceSummary } from '../cesarin-stage3';
@@ -644,3 +645,4 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.guidance).not.toContain('agregalo al carrito');
   });
 });
+

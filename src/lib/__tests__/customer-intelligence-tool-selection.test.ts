@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildRuntimeCapabilityPlan } from '../../../supabase/functions/customer-intelligence/tool-selection';
@@ -609,3 +610,4 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.primaryCapability.call?.name).toBe('get_store_policy');
   });
 });
+

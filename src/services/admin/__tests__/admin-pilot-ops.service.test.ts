@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type QueryResult = {
@@ -158,3 +159,4 @@ describe('admin pilot ops telemetry reader', () => {
         });
     });
 });
+

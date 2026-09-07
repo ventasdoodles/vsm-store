@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { ProductFormData } from '@/services/admin';
 import {
@@ -58,3 +59,4 @@ describe('adminBatchManager', () => {
         ]);
     });
 });
+

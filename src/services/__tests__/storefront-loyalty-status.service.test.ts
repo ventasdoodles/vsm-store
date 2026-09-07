@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getCustomerProfileMock = vi.hoisted(() => vi.fn<any>());
@@ -157,3 +158,4 @@ describe('resolveStorefrontAuthenticatedLoyaltyStatus', () => {
     expect(resolution.message).toContain('No veo un perfil de lealtad confirmado');
   });
 });
+

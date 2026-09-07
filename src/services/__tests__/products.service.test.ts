@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { getDiscountedProducts } from '@/services/products.service';
 import type { Product } from '@/types/product';
@@ -86,3 +87,4 @@ describe('getDiscountedProducts', () => {
         expect(result.map((p) => p.id)).toEqual(['discounted']);
     });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -378,3 +379,4 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
     expect(mocks.telemetryInsert).not.toHaveBeenCalled();
   });
 });
+

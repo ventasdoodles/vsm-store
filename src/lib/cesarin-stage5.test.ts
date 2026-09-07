@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildCesarinActionableNextStepView } from '@/lib/cesarin-stage5';
@@ -133,3 +134,4 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.guidance).not.toContain('pod compatible');
   });
 });
+

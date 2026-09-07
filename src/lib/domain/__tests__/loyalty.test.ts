@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
     calculateLoyaltyPoints,
@@ -186,3 +187,4 @@ describe('getNextTierProgress', () => {
         expect(result.progress).toBeLessThanOrEqual(100);
     });
 });
+

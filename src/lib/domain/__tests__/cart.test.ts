@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { getStorefrontCheckoutTransitionView } from '../cart';
 import type { CartItem } from '@/types/cart';
@@ -134,3 +135,4 @@ describe('getStorefrontCheckoutTransitionView', () => {
         expect(view.warningIssueCount).toBe(1);
     });
 });
+

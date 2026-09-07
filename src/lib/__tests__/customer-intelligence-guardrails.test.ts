@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { resolveStorefrontWeakIntent } from '../../../supabase/functions/customer-intelligence/intent-guardrails';
@@ -40,3 +41,4 @@ describe('storefront customer-intelligence weak intent guardrails', () => {
         expect(policyLike.guardrailOverrides).toContain('UNKNOWN_RESOLVE_POLICY');
     });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
     buildAdminDecisionTraceView,
@@ -71,3 +72,4 @@ describe('buildAdminDecisionTraceViewFromSimulationResult', () => {
         expect(trace.degradedReason).toBe('low_confidence_fallback');
     });
 });
+

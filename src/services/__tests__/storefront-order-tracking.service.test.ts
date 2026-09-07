@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getCustomerOrdersMock = vi.hoisted(() => vi.fn<any>());
@@ -187,3 +188,4 @@ describe('getStorefrontOrderTrackingTrustView', () => {
     expect(view.showTrackingNotes).toBe(false);
   });
 });
+

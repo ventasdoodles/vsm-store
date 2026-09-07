@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { buildCesarinConversationModePromptGuidance } from '../../../supabase/functions/customer-intelligence/conversation-modes';
@@ -35,3 +36,4 @@ describe('buildCesarinConversationModePromptGuidance', () => {
     expect(result.guidance).toContain('manten la exploracion ligera');
   });
 });
+

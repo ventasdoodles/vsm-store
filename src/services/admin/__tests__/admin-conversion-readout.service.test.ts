@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
     buildConversionFunnelReadout,
@@ -266,3 +267,4 @@ describe('admin conversion readout service', () => {
         expect(JSON.stringify(orders)).toBe(ordersBefore);
     });
 });
+

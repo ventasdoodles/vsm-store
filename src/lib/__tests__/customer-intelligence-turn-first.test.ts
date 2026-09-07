@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -748,3 +749,4 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(turnProfile.current_turn_decision).toBe('ASK_CLARIFYING_QUESTION');
   });
 });
+

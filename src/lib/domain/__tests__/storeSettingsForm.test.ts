@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { StoreSettings } from '@/services';
 import {
@@ -113,3 +114,4 @@ describe('storeSettingsForm', () => {
         });
     });
 });
+

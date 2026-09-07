@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { getCapabilityIdsForIntent, getCapabilityDefinition } from '../../../supabase/functions/customer-intelligence/tool-index';
@@ -84,3 +85,4 @@ describe('customer-intelligence tool index', () => {
     expect(getCapabilityIdsForIntent('UNKNOWN')).toEqual([]);
   });
 });
+

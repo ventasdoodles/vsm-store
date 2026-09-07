@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { evaluateProductSearchFallbackTree } from '../domain/product-search';
@@ -1257,3 +1258,4 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('catalogo actual');
   });
 });
+

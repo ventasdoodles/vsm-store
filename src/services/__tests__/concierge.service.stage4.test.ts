@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const invokeMock = vi.fn<any>();
@@ -4872,3 +4873,4 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.capsule_contract?.capsule_name).toBe('storefront_compatibility_check');
   });
 });
+

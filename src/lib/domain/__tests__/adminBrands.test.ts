@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { Brand } from '@/services/admin';
 import {
@@ -65,3 +66,4 @@ describe('adminBrands', () => {
         });
     });
 });
+

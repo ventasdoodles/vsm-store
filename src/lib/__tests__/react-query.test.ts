@@ -1,3 +1,4 @@
+// @vitest-environment node
 // Tests para react-query.ts — getErrorMessage helper
 import { describe, it, expect } from 'vitest';
 import { getErrorMessage } from '../react-query';
@@ -32,3 +33,4 @@ describe('getErrorMessage', () => {
             .toBe('Tu sesión expiró. Vuelve a iniciar sesión.');
     });
 });
+

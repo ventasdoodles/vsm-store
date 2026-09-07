@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -42,3 +43,4 @@ describe('ai telemetry ownership contract', () => {
     expect(shouldClientLogAITelemetry(contract)).toBe(true);
   });
 });
+

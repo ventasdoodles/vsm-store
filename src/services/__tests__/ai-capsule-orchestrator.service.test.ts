@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type ProductRow = {
@@ -747,3 +748,4 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.resolved_products?.[0]?.slug).toBe('caliburn-ak3');
   });
 });
+

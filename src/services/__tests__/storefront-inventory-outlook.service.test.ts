@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Product } from '@/types/product';
@@ -160,3 +161,4 @@ describe('resolveStorefrontInventoryOutlook', () => {
     expect(resolution.message).toContain('No pude ubicar un producto actual');
   });
 });
+

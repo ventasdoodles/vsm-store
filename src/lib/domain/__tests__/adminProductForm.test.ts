@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import type { Category } from '@/types/category';
 import type { Product } from '@/types/product';
@@ -129,3 +130,4 @@ describe('adminProductForm', () => {
         expect(payload.tags).not.toBe(form.tags);
     });
 });
+

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
 import { resolveStorefrontCompatibilityCheck } from '../../../supabase/functions/customer-intelligence/storefront-compatibility';
@@ -224,3 +225,4 @@ describe('resolveStorefrontCompatibilityCheck', () => {
     expect(resolution.message).toContain('modelo exacto');
   });
 });
+

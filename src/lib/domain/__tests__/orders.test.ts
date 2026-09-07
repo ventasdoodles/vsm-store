@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import {
     canTransitionTo,
@@ -621,3 +622,4 @@ describe('getStorefrontOrderFreshnessView', () => {
         expect(view.shouldAutoReconcile).toBe(false);
     });
 });
+
