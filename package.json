@@ -20,7 +20,10 @@
     "test:ui": "vitest run src/components src/pages",
     "test:quick": "npm run test:core && npm run typecheck",
     "test:coverage": "vitest run --coverage",
-    "local:write-edge-env": "powershell -ExecutionPolicy Bypass -File scripts/local/write-edge-env-from-local-status.ps1"
+    "local:write-edge-env": "powershell -ExecutionPolicy Bypass -File scripts/local/write-edge-env-from-local-status.ps1",
+    "qa:simulate": "tsx scripts/simulate_cesarin.ts",
+    "qa:mp-e2e": "tsx scripts/test_mp_e2e.ts",
+    "qa:embeddings": "tsx supabase/tests/smoke_embeddings.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

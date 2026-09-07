@@ -97,37 +97,47 @@ async function generateSitemap() {
     staticRoutes.forEach(route => pushUrl(urls, route));
 
     // 2. Products
-    const { data: products, error: productError } = await supabase
-        .from('products')
-        .select('slug, section, updated_at')
-        .eq('is_active', true);
+    try {
+        const { data: products, error: productError } = await supabase
+            .from('products')
+            .select('slug, section, updated_at')
+            .eq('is_active', true);
 
-    if (productError) console.error('Error fetching products:', productError);
-    else {
-        products.forEach(p => {
-            pushUrl(urls, `/${p.section}/${p.slug}`, {
-                lastmod: p.updated_at ? new Date(p.updated_at).toISOString() : new Date().toISOString(),
-                changefreq: 'weekly',
-                priority: '0.9',
+        if (productError) {
+            console.warn('Notice: Supabase product query unavailable for sitemap (using static routes only). Reason:', productError.message || productError);
+        } else if (products) {
+            products.forEach(p => {
+                pushUrl(urls, `/${p.section}/${p.slug}`, {
+                    lastmod: p.updated_at ? new Date(p.updated_at).toISOString() : new Date().toISOString(),
+                    changefreq: 'weekly',
+                    priority: '0.9',
+                });
             });
-        });
+        }
+    } catch (err) {
+        console.warn('Notice: Supabase product query skipped (database offline or unreachable).');
     }
 
     // 3. Categories
-    const { data: categories, error: catError } = await supabase
-        .from('categories')
-        .select('slug, section, created_at')
-        .eq('is_active', true);
+    try {
+        const { data: categories, error: catError } = await supabase
+            .from('categories')
+            .select('slug, section, created_at')
+            .eq('is_active', true);
 
-    if (catError) console.error('Error fetching categories:', catError);
-    else {
-        categories.forEach(c => {
-            pushUrl(urls, `/${c.section}/${c.slug}`, {
-                lastmod: c.created_at ? new Date(c.created_at).toISOString() : new Date().toISOString(),
-                changefreq: 'weekly',
-                priority: '0.8',
+        if (catError) {
+            console.warn('Notice: Supabase category query unavailable for sitemap. Reason:', catError.message || catError);
+        } else if (categories) {
+            categories.forEach(c => {
+                pushUrl(urls, `/${c.section}/${c.slug}`, {
+                    lastmod: c.created_at ? new Date(c.created_at).toISOString() : new Date().toISOString(),
+                    changefreq: 'weekly',
+                    priority: '0.8',
+                });
             });
-        });
+        }
+    } catch (err) {
+        console.warn('Notice: Supabase category query skipped (database offline or unreachable).');
     }
 
     // 4. Local fallback categories keep the sitemap useful in offline cloud environments.

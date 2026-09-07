@@ -3,7 +3,7 @@ import { cleanup } from '@testing-library/react';
 import React from 'react';
 import { afterEach, vi } from 'vitest';
 
-// Desmonta los �rboles DOM modificados tras cada test
+// Desmonta los árboles DOM modificados tras cada test
 afterEach(() => {
     cleanup();
 });
@@ -33,6 +33,7 @@ if (typeof window !== 'undefined') {
         })),
     });
 }
+
 vi.mock('@/contexts/VerticalPackContext', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/contexts/VerticalPackContext')>();
     const { vape420VerticalPackConfig } = await import('../config/productization');
@@ -96,10 +97,23 @@ vi.mock('framer-motion', () => {
     const componentMock = (element: string) => {
         return React.forwardRef((props: any, ref) => {
             const {
-                initial, animate, exit, transition, variants,
-                whileHover, whileTap, whileInView, viewport,
-                layoutId, layout, custom, onAnimationComplete,
-                onHoverStart, onHoverEnd, drag, dragConstraints,
+                initial: _initial,
+                animate: _animate,
+                exit: _exit,
+                transition: _transition,
+                variants: _variants,
+                whileHover: _whileHover,
+                whileTap: _whileTap,
+                whileInView: _whileInView,
+                viewport: _viewport,
+                layoutId: _layoutId,
+                layout: _layout,
+                custom: _custom,
+                onAnimationComplete: _onAnimationComplete,
+                onHoverStart: _onHoverStart,
+                onHoverEnd: _onHoverEnd,
+                drag: _drag,
+                dragConstraints: _dragConstraints,
                 ...rest
             } = props;
             return React.createElement(element, { ...rest, ref });
@@ -128,5 +142,3 @@ vi.mock('framer-motion', () => {
         useScroll: () => ({ scrollY: { get: () => 0 }, scrollYProgress: { get: () => 0 } }),
     };
 });
-
-
