@@ -13,7 +13,7 @@ const workspaceRoot = path.resolve(canonRoot, '..');
 const args = process.argv.slice(2);
 const jsonMode = args.includes('--json');
 const laneArg = valueFor('--lane') || 'repo-baseline';
-const allowedLanes = new Set(['repo-baseline', 'workspace-sync', 'prompt', 'qa-preflight', 'canon', 'implementation']);
+const allowedLanes = new Set(['repo-baseline', 'workspace-sync', 'prompt', 'canon', 'implementation']);
 
 function valueFor(name) {
   const index = args.indexOf(name);
