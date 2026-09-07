@@ -34,7 +34,7 @@ import {
 import { getVape420CategoryShowcaseFallbackImageUrl } from '../categoryShowcase';
 import { getVape420HomeHeroFallbackImageUrl, getVape420HomeHeroSliderFallbacks } from '../homeHero';
 
-const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/\\__tests__$/, '');
+const productizationDir = dirname(fileURLToPath(import.meta.url)).replace(/[\\/]__tests__$/, '');
 
 const readProductizationImports = () =>
     [
@@ -404,3 +404,4 @@ describe('productization config boundary', () => {
         ]);
     });
 });
+

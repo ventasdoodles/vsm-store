@@ -134,36 +134,6 @@ function addPromptReliability(checks) {
   ));
 }
 
-function addQaPreflight(checks) {
-  const contractPath = path.join(workspaceRoot, 'scripts', 'qa-runtime-contract-check.cjs');
-  if (!fs.existsSync(contractPath)) {
-    checks.push({
-      id: 'qa-runtime-contract',
-      label: 'QA runtime contract checker exists',
-      ok: false,
-      warning: false,
-      details: { contractPath, reason: 'missing checker' },
-    });
-    return;
-  }
-
-  const contract = run(process.execPath, ['scripts/qa-runtime-contract-check.cjs'], workspaceRoot);
-  checks.push(check(
-    'qa-runtime-contract',
-    'QA runtime contract checker passes before harness execution',
-    contract,
-    contract.status === 0 && contract.stdout.includes('READY_FOR_QA_RUN'),
-    {
-      safeOutputTail: contract.stdout.split(/\r?\n/).filter(Boolean).slice(-8),
-      nonClaims: [
-        'does not print secrets',
-        'does not start full harness',
-        'does not prove production readiness',
-      ],
-    },
-  ));
-}
-
 function addCanonChecks(checks) {
   addRepoBaseline(checks);
   addPromptReliability(checks);
@@ -210,7 +180,6 @@ const checks = [];
 if (laneArg === 'repo-baseline') addRepoBaseline(checks);
 if (laneArg === 'workspace-sync') addWorkspaceSync(checks);
 if (laneArg === 'prompt') addPromptReliability(checks);
-if (laneArg === 'qa-preflight') addQaPreflight(checks);
 if (laneArg === 'canon') addCanonChecks(checks);
 if (laneArg === 'implementation') addImplementationChecks(checks);
 

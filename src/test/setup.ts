@@ -1,9 +1,9 @@
-import '@testing-library/jest-dom/vitest';
+ï»¿import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import React from 'react';
 import { afterEach, vi } from 'vitest';
 
-// Desmonta los árboles DOM modificados tras cada test
+// Desmonta los ï¿½rboles DOM modificados tras cada test
 afterEach(() => {
     cleanup();
 });
