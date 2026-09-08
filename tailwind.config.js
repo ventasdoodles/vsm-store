@@ -114,6 +114,10 @@ export default {
                     '100%': { 'offset-distance': '100%' },
                 },
             },
+            fontSize: {
+                '3xs': ['0.5rem', { lineHeight: '0.75rem' }],     // 8px / 12px
+                '2xs': ['0.625rem', { lineHeight: '0.875rem' }],   // 10px / 14px
+            },
             backgroundSize: {
                 '200%': '200% auto',
             },
@@ -123,6 +127,12 @@ export default {
                     secondary: 'rgb(var(--bg-secondary) / <alpha-value>)',
                     tertiary: 'rgb(var(--bg-tertiary) / <alpha-value>)',
                     highlight: 'rgb(var(--bg-tertiary) / <alpha-value>)',
+                },
+                surface: {
+                    base: '#13141f',
+                    card: '#1a1c29',
+                    elevated: '#1e2538',
+                    overlay: '#0a0a0f',
                 },
                 accent: {
                     primary: 'rgb(var(--accent-primary) / <alpha-value>)',
@@ -143,6 +153,11 @@ export default {
                     DEFAULT: 'rgb(var(--border-primary) / 0.10)',
                     subtle: 'rgb(var(--border-primary) / 0.06)',
                     strong: 'rgb(var(--border-primary) / 0.15)',
+                },
+                surface: {
+                    subtle: 'rgba(255, 255, 255, 0.06)',
+                    DEFAULT: 'rgba(255, 255, 255, 0.10)',
+                    strong: 'rgba(255, 255, 255, 0.15)',
                 },
                 accent: 'rgb(var(--accent-primary) / <alpha-value>)',
             }
