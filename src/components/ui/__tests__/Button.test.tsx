@@ -1,9 +1,19 @@
 import { createRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Button } from '../Button';
 
 describe('Button Component (UI Atomic)', () => {
+    let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+        consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        consoleWarnSpy.mockRestore();
+    });
+
     it('renders with default attributes (type="button", md size, rounded-xl, primary variant)', () => {
         render(<Button>Guardar</Button>);
         const btn = screen.getByRole('button', { name: 'Guardar' });
@@ -13,6 +23,8 @@ describe('Button Component (UI Atomic)', () => {
         expect(btn.className).toContain('rounded-xl');
         expect(btn.className).toContain('h-10');
         expect(btn.className).toContain('bg-white');
+        expect(btn.className).toContain('whitespace-nowrap');
+        expect(btn.className).toContain('shrink-0');
     });
 
     it('honors custom type like type="submit"', () => {
@@ -90,8 +102,10 @@ describe('Button Component (UI Atomic)', () => {
 
         expect(btn).toBeDisabled();
         expect(btn).toHaveAttribute('aria-busy', 'true');
+        expect(btn).toHaveAttribute('aria-live', 'polite');
         expect(btn).toHaveTextContent('Procesando pedido...');
         expect(btn.querySelector('svg')).toBeInTheDocument(); // Loader2 spinner
+        expect(btn.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('replaces leftIcon with spinner during loading', () => {
@@ -107,7 +121,7 @@ describe('Button Component (UI Atomic)', () => {
         expect(screen.getByRole('button').querySelector('svg')).toBeInTheDocument();
     });
 
-    it('renders left and right icons when not loading', () => {
+    it('renders left and right icons with aria-hidden="true" when not loading', () => {
         render(
             <Button
                 leftIcon={<span data-testid="left-icon">←</span>}
@@ -116,8 +130,11 @@ describe('Button Component (UI Atomic)', () => {
                 Siguiente
             </Button>
         );
-        expect(screen.getByTestId('left-icon')).toBeInTheDocument();
-        expect(screen.getByTestId('right-icon')).toBeInTheDocument();
+        const leftWrapper = screen.getByTestId('left-icon').parentElement;
+        const rightWrapper = screen.getByTestId('right-icon').parentElement;
+
+        expect(leftWrapper).toHaveAttribute('aria-hidden', 'true');
+        expect(rightWrapper).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('supports fullWidth prop', () => {
@@ -144,5 +161,157 @@ describe('Button Component (UI Atomic)', () => {
         render(<Button ref={ref}>Ref Target</Button>);
         expect(ref.current).toBeInstanceOf(HTMLButtonElement);
         expect(ref.current?.textContent).toBe('Ref Target');
+    });
+
+    /* ── Adversarial & Hardened Test Suite ────────────────────────── */
+
+    describe('A11y & Screen Reader Enhancements', () => {
+        it('appends sr-only announcement (Cargando...) when isLoading is true without loadingText', () => {
+            render(<Button isLoading>Confirmar</Button>);
+            const btn = screen.getByRole('button');
+
+            expect(btn).toHaveAttribute('aria-busy', 'true');
+            expect(btn).toHaveAttribute('aria-live', 'polite');
+            const srSpan = btn.querySelector('.sr-only');
+            expect(srSpan).toBeInTheDocument();
+            expect(srSpan?.textContent).toContain('Cargando...');
+        });
+
+        it('derives accessible aria-label from title on icon-only buttons if aria-label is omitted', () => {
+            render(
+                <Button size="icon" title="Cerrar modal">
+                    <span data-testid="close-icon">✕</span>
+                </Button>
+            );
+            const btn = screen.getByRole('button', { name: 'Cerrar modal' });
+            expect(btn).toHaveAttribute('aria-label', 'Cerrar modal');
+        });
+
+        it('warns in development if an icon button has no accessible label or string child', () => {
+            render(
+                <Button size="icon">
+                    <span data-testid="dummy-icon">⚙</span>
+                </Button>
+            );
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                expect.stringContaining('[Button]: Icon-only buttons')
+            );
+        });
+
+        it('does not warn in development if icon button has explicit aria-label', () => {
+            render(
+                <Button size="icon" aria-label="Ajustes">
+                    <span data-testid="dummy-icon">⚙</span>
+                </Button>
+            );
+            expect(consoleWarnSpy).not.toHaveBeenCalled();
+        });
+
+        it('protects icon button geometry during loading: hides icon child and renders centered spinner + sr-only text', () => {
+            render(
+                <Button size="icon" aria-label="Eliminar elemento" isLoading loadingText="Eliminando...">
+                    <span data-testid="trash-icon">🗑</span>
+                </Button>
+            );
+
+            // Icon child must NOT be rendered, avoiding double-icon squishing in square button
+            expect(screen.queryByTestId('trash-icon')).not.toBeInTheDocument();
+
+            const btn = screen.getByRole('button', { name: 'Eliminar elemento' });
+            expect(btn.querySelector('svg')).toBeInTheDocument(); // Loader2
+            const srOnly = btn.querySelector('.sr-only');
+            expect(srOnly).toBeInTheDocument();
+            expect(srOnly?.textContent).toBe('Eliminando...');
+        });
+
+        it('defaults icon button sr-only loading text to Cargando... if loadingText is not passed', () => {
+            render(
+                <Button size="icon" aria-label="Eliminar" isLoading>
+                    <span data-testid="trash-icon">🗑</span>
+                </Button>
+            );
+            const srOnly = screen.getByRole('button').querySelector('.sr-only');
+            expect(srOnly?.textContent).toBe('Cargando...');
+        });
+    });
+
+    describe('Form & Keyboard Event Hardening', () => {
+        it('prevents form submit even on enter or synthetic clicks when isLoading is true and type="submit"', () => {
+            const handleSubmit = vi.fn((e) => e.preventDefault());
+            const handleClick = vi.fn();
+
+            render(
+                <form onSubmit={handleSubmit}>
+                    <Button type="submit" isLoading onClick={handleClick}>
+                        Enviar
+                    </Button>
+                </form>
+            );
+
+            const btn = screen.getByRole('button');
+            fireEvent.click(btn);
+            fireEvent.keyDown(btn, { key: 'Enter', code: 'Enter' });
+
+            expect(handleClick).not.toHaveBeenCalled();
+            expect(handleSubmit).not.toHaveBeenCalled();
+        });
+
+        it('blocks click and keydown when aria-disabled is passed', () => {
+            const handleClick = vi.fn();
+            const handleKeyDown = vi.fn();
+
+            render(
+                <Button aria-disabled="true" onClick={handleClick} onKeyDown={handleKeyDown}>
+                    Bloqueado
+                </Button>
+            );
+
+            const btn = screen.getByRole('button');
+            fireEvent.click(btn);
+            fireEvent.keyDown(btn, { key: 'Enter', code: 'Enter' });
+            fireEvent.keyDown(btn, { key: ' ', code: 'Space' });
+
+            expect(handleClick).not.toHaveBeenCalled();
+            expect(handleKeyDown).not.toHaveBeenCalled();
+        });
+
+        it('allows normal keydown when button is enabled', () => {
+            const handleKeyDown = vi.fn();
+            render(<Button onKeyDown={handleKeyDown}>Presionar</Button>);
+
+            const btn = screen.getByRole('button');
+            fireEvent.keyDown(btn, { key: 'Enter', code: 'Enter' });
+            expect(handleKeyDown).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('Proportional Sizing & Layout Security', () => {
+        it('scales spinner sizes proportionally across button sizes', () => {
+            const { rerender } = render(<Button size="xs" isLoading>XS</Button>);
+            expect(screen.getByRole('button').querySelector('svg')?.className.baseVal).toContain('h-3.5 w-3.5');
+
+            rerender(<Button size="sm" isLoading>SM</Button>);
+            expect(screen.getByRole('button').querySelector('svg')?.className.baseVal).toContain('h-4 w-4');
+
+            rerender(<Button size="md" isLoading>MD</Button>);
+            expect(screen.getByRole('button').querySelector('svg')?.className.baseVal).toContain('h-4 w-4');
+
+            rerender(<Button size="lg" isLoading>LG</Button>);
+            expect(screen.getByRole('button').querySelector('svg')?.className.baseVal).toContain('h-5 w-5');
+
+            rerender(<Button size="icon-sm" aria-label="Icon SM" isLoading>✕</Button>);
+            expect(screen.getByRole('button').querySelector('svg')?.className.baseVal).toContain('h-3.5 w-3.5');
+
+            rerender(<Button size="icon-lg" aria-label="Icon LG" isLoading>✕</Button>);
+            expect(screen.getByRole('button').querySelector('svg')?.className.baseVal).toContain('h-5 w-5');
+        });
+
+        it('applies high-contrast WCAG 2.2 focus ring classes with offset', () => {
+            render(<Button>Focus Test</Button>);
+            const btn = screen.getByRole('button');
+            expect(btn.className).toContain('focus-visible:ring-vape-500');
+            expect(btn.className).toContain('focus-visible:ring-offset-2');
+            expect(btn.className).toContain('focus-visible:ring-offset-surface-base');
+        });
     });
 });

@@ -24,6 +24,11 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
     fullWidth?: boolean;
+    /**
+     * Accessible label for the button.
+     * Strongly recommended for icon-only buttons (size="icon", "icon-sm", "icon-lg").
+     */
+    'aria-label'?: string;
 }
 
 const variants: Record<ButtonVariant, string> = {
@@ -46,6 +51,16 @@ const sizes: Record<ButtonSize, string> = {
     icon: 'h-9 w-9 p-0 flex items-center justify-center',
     'icon-sm': 'h-7 w-7 p-0 flex items-center justify-center',
     'icon-lg': 'h-11 w-11 p-0 flex items-center justify-center',
+};
+
+const spinnerSizes: Record<ButtonSize, string> = {
+    xs: 'h-3.5 w-3.5',
+    sm: 'h-4 w-4',
+    md: 'h-4 w-4',
+    lg: 'h-5 w-5',
+    icon: 'h-4 w-4',
+    'icon-sm': 'h-3.5 w-3.5',
+    'icon-lg': 'h-5 w-5',
 };
 
 const radii: Record<ButtonRadius, string> = {
@@ -73,38 +88,107 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             type = 'button',
             children,
             disabled,
+            title,
+            onClick,
+            onKeyDown,
+            'aria-label': ariaLabelProp,
+            'aria-live': ariaLiveProp,
+            'aria-busy': ariaBusyProp,
             ...props
         },
         ref
     ) => {
+        const isIconButton = size === 'icon' || size === 'icon-sm' || size === 'icon-lg';
         const isDisabled = isLoading || disabled;
+        const accessibleLabel =
+            ariaLabelProp || (isIconButton && typeof title === 'string' && title.trim() ? title.trim() : undefined);
+
+        if (
+            process.env.NODE_ENV !== 'production' &&
+            isIconButton &&
+            !accessibleLabel &&
+            !props['aria-labelledby'] &&
+            typeof children !== 'string'
+        ) {
+            console.warn(
+                '[Button]: Icon-only buttons (size="icon", "icon-sm", "icon-lg") should have an accessible name via `aria-label`, `aria-labelledby`, or `title`.'
+            );
+        }
+
+        const computedAriaBusy = ariaBusyProp !== undefined ? ariaBusyProp : (isLoading ? true : undefined);
+        const computedAriaLive = ariaLiveProp !== undefined ? ariaLiveProp : (isLoading ? 'polite' : undefined);
+
+        const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+            if (isDisabled || props['aria-disabled'] === true || props['aria-disabled'] === 'true') {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            onClick?.(e);
+        };
+
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+            if (
+                (isDisabled || props['aria-disabled'] === true || props['aria-disabled'] === 'true') &&
+                (e.key === 'Enter' || e.key === ' ')
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            onKeyDown?.(e);
+        };
 
         return (
             <button
                 ref={ref}
                 type={type}
+                title={title}
+                aria-label={accessibleLabel}
+                aria-busy={computedAriaBusy}
+                aria-live={computedAriaLive}
+                disabled={isDisabled}
+                onClick={handleClick}
+                onKeyDown={handleKeyDown}
                 className={cn(
-                    'relative inline-flex items-center justify-center font-medium transition-all duration-200 select-none',
-                    'disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]',
-                    'focus-visible:ring-2 focus-visible:ring-vape-500/30 focus-visible:outline-none',
+                    'relative inline-flex items-center justify-center font-medium transition-all duration-200 select-none whitespace-nowrap shrink-0',
+                    'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none active:scale-[0.98]',
+                    'aria-disabled:opacity-50 aria-disabled:cursor-not-allowed',
+                    'focus-visible:ring-2 focus-visible:ring-vape-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:outline-none',
                     radii[radius],
                     variants[variant],
                     sizes[size],
                     fullWidth && 'w-full',
                     className
                 )}
-                disabled={isDisabled}
-                aria-busy={isLoading || undefined}
                 {...props}
             >
                 {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                    <>
+                        <Loader2 className={cn(spinnerSizes[size], 'animate-spin shrink-0')} aria-hidden="true" />
+                        {isIconButton ? (
+                            <span className="sr-only">{loadingText || 'Cargando...'}</span>
+                        ) : (
+                            <>
+                                {loadingText ? loadingText : children}
+                                {!loadingText && <span className="sr-only"> (Cargando...)</span>}
+                            </>
+                        )}
+                    </>
                 ) : (
-                    leftIcon && <span className="shrink-0 flex items-center">{leftIcon}</span>
-                )}
-                {isLoading && loadingText ? loadingText : children}
-                {!isLoading && rightIcon && (
-                    <span className="shrink-0 flex items-center">{rightIcon}</span>
+                    <>
+                        {leftIcon && (
+                            <span className="shrink-0 flex items-center" aria-hidden="true">
+                                {leftIcon}
+                            </span>
+                        )}
+                        {children}
+                        {rightIcon && (
+                            <span className="shrink-0 flex items-center" aria-hidden="true">
+                                {rightIcon}
+                            </span>
+                        )}
+                    </>
                 )}
             </button>
         );
