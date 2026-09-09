@@ -16,18 +16,25 @@ interface BottomSheetProps {
 export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetProps) {
     const [isRendered, setIsRendered] = useState(isOpen);
     const sheetRef = useRef<HTMLDivElement>(null);
+    const previousFocusRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
+        let originalOverflow = '';
         if (isOpen) {
             setIsRendered(true);
+            previousFocusRef.current = document.activeElement as HTMLElement;
+            originalOverflow = document.body.style.overflow;
             document.body.style.overflow = 'hidden';
         } else {
             const timer = setTimeout(() => setIsRendered(false), 300); // Match transition duration
-            document.body.style.overflow = '';
+            document.body.style.overflow = originalOverflow;
             return () => clearTimeout(timer);
         }
         return () => {
-            document.body.style.overflow = '';
+            document.body.style.overflow = originalOverflow;
+            if (!isOpen && previousFocusRef.current) {
+                previousFocusRef.current.focus();
+            }
         };
     }, [isOpen]);
 
@@ -36,6 +43,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
         if (!isOpen) return;
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
+                e.preventDefault();
                 e.stopPropagation();
                 onClose();
             }
@@ -51,7 +59,10 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
         const focusable = sheetRef.current.querySelectorAll<HTMLElement>(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
-        if (focusable.length === 0) return;
+        if (focusable.length === 0) {
+            e.preventDefault();
+            return;
+        }
 
         const first = focusable[0]!;
         const last = focusable[focusable.length - 1]!;
@@ -62,13 +73,16 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
         } else if (!e.shiftKey && document.activeElement === last) {
             e.preventDefault();
             first.focus();
+        } else if (focusable.length === 1) {
+            e.preventDefault();
+            first.focus();
         }
     }, []);
 
     useEffect(() => {
         if (!isOpen) return;
         document.addEventListener('keydown', handleFocusTrap);
-        // Auto-focus the close button when opened
+        // Auto-focus the first element or close button when opened
         const timer = setTimeout(() => {
             const firstBtn = sheetRef.current?.querySelector<HTMLElement>('button');
             firstBtn?.focus();
@@ -103,9 +117,10 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="bottom-sheet-title"
+                tabIndex={-1}
             >
                 {/* Handle (Visual indicator for swipe/drag - optional functionality) */}
-                <div className="flex w-full items-center justify-center pt-3 pb-1">
+                <div className="flex w-full items-center justify-center pt-3 pb-1" aria-hidden="true">
                     <div className="h-1.5 w-12 rounded-full bg-theme-secondary/40" />
                 </div>
 
@@ -116,7 +131,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
                     </h2>
                     <button
                         onClick={onClose}
-                        className="rounded-full p-2 text-theme-secondary transition-colors hover:bg-white/5 hover:text-theme-primary active:scale-95"
+                        className="rounded-full p-2 text-theme-secondary transition-colors hover:bg-white/5 hover:text-theme-primary active:scale-95 focus:outline-none focus:ring-2 focus:ring-theme/50"
                         aria-label="Cerrar"
                     >
                         <X className="h-5 w-5" />
@@ -124,7 +139,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-none">
+                <div className="flex-1 overflow-y-auto p-6 scrollbar-none overscroll-contain">
                     {children}
                 </div>
             </div>
