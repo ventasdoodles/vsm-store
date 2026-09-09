@@ -81,18 +81,18 @@ serve(async (req) => {
 
         const { data: order, error } = await supabase
             .from('orders')
-            .select('id, order_number, customer_id, customer_name, customer_phone, items, status, payment_method, payment_status, mp_preference_id')
+            .select('id, order_number, customer_id, customer_name, customer_phone, items, status, payment_method, payment_status, mp_preference_id, total, subtotal, discount, shipping_cost')
             .eq('id', order_id)
             .eq('customer_id', user.id)
             .single()
 
         if (error) {
             console.error('Supabase raw error:', error)
-            throw new Error(`DB Error: ${error.message}`)
+            throw new Error(`DB Error`)
         }
 
         if (!order) {
-            throw new Error(`Order not found: ${order_id}`)
+            throw new Error(`Order not found`)
         }
 
         if (order.payment_method !== 'mercadopago') {
@@ -154,8 +154,17 @@ serve(async (req) => {
         }
 
         // 2. Construir items para Mercado Pago
-        // Asegurar que prices sean números y titles strings
-        const items = order.items.map((item: Record<string, unknown>) => ({
+        // If there's a discount or shipping cost, passing raw items will result in a mismatch with the order total.
+        // MercadoPago doesn't support negative unit_price for discounts, so we bundle into a single item if needed.
+        const hasModifiers = Number(order.discount) > 0 || Number(order.shipping_cost) > 0;
+        
+        const items = hasModifiers ? [{
+            id: 'pedido',
+            title: `Pedido ${order.order_number || order.id.slice(0, 8)}`,
+            quantity: 1,
+            unit_price: Number(order.total),
+            currency_id: 'MXN'
+        }] : order.items.map((item: Record<string, unknown>) => ({
             title: item.name || 'Producto VSM',
             quantity: Number(item.quantity),
             unit_price: Number(item.price),
@@ -215,7 +224,7 @@ serve(async (req) => {
     } catch (error) {
         console.error('Error creating payment:', error)
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ error: 'No se pudo procesar el pago. Por favor, intenta de nuevo.' }),
             {
                 status: 500,
                 headers: {
