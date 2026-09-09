@@ -78,6 +78,16 @@ describe('cart.store', () => {
             });
             expect(selectSubtotal(useCartStore.getState())).toBe(200); // 50*2 + 100*1
         });
+
+        it('handles floating point precision properly', () => {
+            useCartStore.setState({
+                items: [
+                    { product: mockProduct({ id: 'a', price: 10.99 }), quantity: 3 },
+                    { product: mockProduct({ id: 'b', price: 0.1 }), quantity: 2 }, // 32.97 + 0.2 = 33.17
+                ],
+            });
+            expect(selectSubtotal(useCartStore.getState())).toBe(33.17);
+        });
     });
 
     // ─── validateCart ─────────────────────────────────
@@ -107,6 +117,20 @@ describe('cart.store', () => {
             useCartStore.getState().updateQuantity('p-variant-invalid', 9, 'variant-missing');
 
             expect(useCartStore.getState().items[0]!.quantity).toBe(1);
+        });
+    });
+
+    describe('addItem', () => {
+        it('clamps quantity to available stock when item already exists', () => {
+            const product = mockProduct({ id: 'p-clamp', stock: 5 });
+            useCartStore.setState({
+                items: [{ product, quantity: 3, variant_id: null, variant_name: null }],
+            });
+
+            useCartStore.getState().addItem(product, 4); // Trying to add 4, total 7 > 5 stock
+            
+            const updatedItem = useCartStore.getState().items[0];
+            expect(updatedItem?.quantity).toBe(5); // Clamped to 5
         });
     });
 
@@ -368,11 +392,15 @@ describe('cart.store', () => {
 
             mockGetProductsByIds.mockRejectedValue(new Error('Network error'));
 
-            const result = await useCartStore.getState().validateCart();
+            const promise = useCartStore.getState().validateCart();
+            expect(useCartStore.getState().isSyncing).toBe(true);
+
+            const result = await promise;
 
             // Should NOT remove items on network error
             expect(result.hasIssues).toBe(false);
             expect(useCartStore.getState().items).toHaveLength(1);
+            expect(useCartStore.getState().isSyncing).toBe(false);
         });
     });
 });

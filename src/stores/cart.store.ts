@@ -36,8 +36,11 @@ interface CartState {
     items: CartItem[];
     isOpen: boolean;
     lastValidationResult: CartValidationResult | null;
+    isSyncing: boolean;
+    _hasHydrated: boolean;
 
     // Acciones
+    setHasHydrated: (state: boolean) => void;
     addItem: (product: Product, quantity?: number, variant?: { id: string; name: string } | null, context?: CartConversionContext) => void;
     removeItem: (productId: string, variantId?: string | null) => void;
     updateQuantity: (productId: string, quantity: number, variantId?: string | null) => void;
@@ -63,6 +66,10 @@ export const useCartStore = create<CartState>()(
             isOpen: false,
             bundleOffer: null,
             lastValidationResult: null,
+            isSyncing: false,
+            _hasHydrated: false,
+
+            setHasHydrated: (state) => set({ _hasHydrated: state }),
 
             // Agregar producto (o incrementar cantidad si ya existe esta combinación variante/producto)
             addItem: (product: Product, quantity = 1, variant = null, context = {}) => {
@@ -113,27 +120,27 @@ export const useCartStore = create<CartState>()(
                         const currentQty = currentItem.quantity;
                         const newQty = currentQty + quantity;
 
-                        // No exceder stock disponible (si es variante, el stock debería validarse contra la variante en el futuro)
-                        // Por ahora usamos el stock del producto base como fallback
-                        if (newQty > purchaseability.maxQuantity) return state;
+                        const clampedQty = Math.min(newQty, purchaseability.maxQuantity);
+                        if (clampedQty === currentQty) return state;
 
                         const updatedItems = [...state.items];
                         updatedItems[existingIndex] = {
                             ...currentItem,
-                            quantity: newQty,
+                            quantity: clampedQty,
                         };
                         return { items: updatedItems, lastValidationResult: null };
                     }
 
                     // Verificar stock antes de agregar nuevo item
-                    if (quantity > purchaseability.maxQuantity) return state;
+                    const clampedQty = Math.min(quantity, purchaseability.maxQuantity);
+                    if (clampedQty <= 0) return state;
 
                     return {
                         items: [
                             ...state.items,
                             {
                                 product,
-                                quantity,
+                                quantity: clampedQty,
                                 variant_id: variant?.id || null,
                                 variant_name: variant?.name || null
                             }
@@ -222,10 +229,11 @@ export const useCartStore = create<CartState>()(
                 const { items } = get();
                 if (items.length === 0) {
                     const emptyResult = { issues: [], hasIssues: false };
-                    set({ lastValidationResult: emptyResult });
+                    set({ lastValidationResult: emptyResult, isSyncing: false });
                     return emptyResult;
                 }
 
+                set({ isSyncing: true });
                 const ids = items.map((item) => item.product.id);
 
                 try {
@@ -297,14 +305,14 @@ export const useCartStore = create<CartState>()(
 
                     // Aplicar correcciones al carrito
                     const result = { issues, hasIssues: issues.length > 0 };
-                    set({ items: validItems, lastValidationResult: result });
+                    set({ items: validItems, lastValidationResult: result, isSyncing: false });
 
                     return result;
                 } catch (err) {
                     console.error('[cart.store] validateCart error:', err);
                     // En caso de error de red, no eliminar items
                     const result = { issues: [], hasIssues: false };
-                    set({ lastValidationResult: result });
+                    set({ lastValidationResult: result, isSyncing: false });
                     return result;
                 }
             },
@@ -334,6 +342,9 @@ export const useCartStore = create<CartState>()(
             name: 'vsm-cart', // Key en localStorage
             version: 2, // Incrementar al cambiar schema de Product/CartItem
             partialize: (state) => ({ items: state.items }), // Solo persistir items
+            onRehydrateStorage: () => (state) => {
+                if (state) state.setHasHydrated(true);
+            },
             migrate: (persisted, version) => {
                 // Si la versión guardada es vieja, limpiar el carrito
                 // para evitar objetos Product con campos faltantes
@@ -352,8 +363,10 @@ export const selectTotalItems = (state: CartState) =>
     state.items.reduce((sum, item) => sum + item.quantity, 0);
 
 // Subtotal: suma de productos sin descuentos ni envío
-export const selectSubtotal = (state: CartState) =>
-    state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+export const selectSubtotal = (state: CartState) => {
+    const total = state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    return Math.round(total * 100) / 100;
+};
 
 // Total final — actualmente igual a subtotal (descuentos se calculan en checkout)
 export const selectTotal = selectSubtotal;
