@@ -223,6 +223,48 @@ describe('resolveStorefrontCheckoutReadiness', () => {
     expect(resolution.signal.shipping_quote_available).toBe(false);
     expect(resolution.message).toContain('No te voy a inventar una tarifa exacta');
   });
+
+  it('returns MISSING_REQUIRED_INFO when delivery type is completely omitted from the draft', async () => {
+    const product = makeProduct();
+    cartStateMock.items = [
+      { product, quantity: 1, variant_id: null, variant_name: null }
+    ];
+    getProductsByIdsMock.mockResolvedValue([product]);
+    
+    // Set everything else valid but deliveryType is null/missing
+    window.sessionStorage.setItem('vsm_checkout_form', JSON.stringify({
+      customerName: 'Juan Perez',
+      customerPhone: '7441234567',
+      deliveryType: null,
+      address: 'Some address',
+      paymentMethod: 'transfer',
+    }));
+
+    const resolution = await resolveStorefrontCheckoutReadiness({
+      customerId: 'customer-1',
+      query: 'ya puedo pagar?',
+    });
+
+    expect(resolution.kind).toBe('MISSING_REQUIRED_INFO');
+    expect(resolution.signal.missing_fields).toContain('delivery_type');
+    expect(resolution.signal.can_submit_checkout).toBe(false);
+  });
+
+  it('returns CART_BLOCKER when network fails during cart validation', async () => {
+    cartStateMock.items = [
+      { product: makeProduct(), quantity: 1, variant_id: null, variant_name: null }
+    ];
+    // Force network failure
+    getProductsByIdsMock.mockRejectedValue(new Error('Network disconnected'));
+
+    const resolution = await resolveStorefrontCheckoutReadiness({
+      customerId: 'customer-1',
+      query: 'ya puedo pagar?',
+    });
+
+    expect(resolution.kind).toBe('CART_BLOCKER');
+    expect(resolution.signal.blocker_reason).toBe('inventory_conflict');
+    expect(resolution.signal.can_submit_checkout).toBe(false);
+    expect(resolution.message).toContain('No pudimos validar la disponibilidad');
+  });
 });
-
-

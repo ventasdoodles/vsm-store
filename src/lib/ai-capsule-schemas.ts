@@ -237,7 +237,7 @@ export const storefrontCheckoutReadinessSignalSchema = z.object({
   delivery_type: z.enum(['pickup', 'delivery']).nullable().optional(),
   payment_method: z.enum(['transfer', 'mercadopago', 'cash']).nullable().optional(),
   enabled_payment_methods: z.array(z.enum(['transfer', 'mercadopago', 'cash'])),
-  missing_fields: z.array(z.enum(['customer_name', 'customer_phone', 'shipping_address', 'payment_method'])),
+  missing_fields: z.array(z.enum(['customer_name', 'customer_phone', 'delivery_type', 'shipping_address', 'payment_method'])),
   blocker_reason: z.enum(['empty_cart', 'inventory_conflict', 'open_recoverable_order', 'mercadopago_auth_required', 'none']).nullable().optional(),
   can_proceed_to_checkout: z.boolean(),
   can_submit_checkout: z.boolean(),

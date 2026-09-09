@@ -25,7 +25,7 @@ type CheckoutMatchStrategy = CheckoutReadinessKind;
 type CheckoutFocus = 'checkout' | 'payment' | 'shipping' | 'cart';
 type CheckoutScope = 'CHECKOUT_DRAFT' | 'CART_VALIDATION' | 'PAYMENT_METHODS' | 'AUTHENTICATED_OPEN_ORDER' | 'NONE';
 type CheckoutRetrievalSource = 'CHECKOUT_DRAFT' | 'CART_VALIDATION' | 'STORE_PAYMENT_SETTINGS' | 'AUTHENTICATED_ORDER_RECOVERY' | 'NONE';
-type MissingField = 'customer_name' | 'customer_phone' | 'shipping_address' | 'payment_method';
+type MissingField = 'customer_name' | 'customer_phone' | 'delivery_type' | 'shipping_address' | 'payment_method';
 type BlockerReason = 'empty_cart' | 'inventory_conflict' | 'open_recoverable_order' | 'mercadopago_auth_required' | 'none';
 type EnabledPaymentMethod = 'transfer' | 'mercadopago' | 'cash';
 
@@ -173,7 +173,8 @@ async function buildCartSnapshot(items: CartItem[]): Promise<CartSnapshot> {
   }
 
   try {
-    const currentProducts = await getProductsByIds(items.map((item) => item.product.id));
+    const productIds = Array.from(new Set(items.map((item) => item.product.id)));
+    const currentProducts = await getProductsByIds(productIds);
     const productMap = new Map(currentProducts.map((product) => [product.id, product]));
     const issues: CartValidationIssue[] = [];
     const normalizedItems: CartItem[] = [];
@@ -246,13 +247,7 @@ async function buildCartSnapshot(items: CartItem[]): Promise<CartSnapshot> {
     };
   } catch (error) {
     console.error('[storefront-checkout-readiness] Error preparing contextual cart:', error);
-    return {
-      items,
-      validationResult: {
-        issues: [],
-        hasIssues: false,
-      },
-    };
+    throw new Error('NETWORK_ERROR_CART_VALIDATION');
   }
 }
 
@@ -325,6 +320,10 @@ function detectMissingFields(input: {
     missingFields.push('customer_phone');
   }
 
+  if (!input.draft.deliveryType) {
+    missingFields.push('delivery_type');
+  }
+
   if (!input.draft.paymentMethod || !input.enabledPaymentMethods.includes(input.draft.paymentMethod)) {
     missingFields.push('payment_method');
   }
@@ -343,6 +342,8 @@ function buildMissingFieldsLine(missingFields: MissingField[], shippingAddressCo
         return 'nombre';
       case 'customer_phone':
         return 'telefono';
+      case 'delivery_type':
+        return 'tipo de entrega (envio o recoger)';
       case 'payment_method':
         return 'metodo de pago';
       case 'shipping_address':
@@ -439,7 +440,33 @@ export async function resolveStorefrontCheckoutReadiness(input: {
   const draft = readCheckoutDraft();
   const cartState = useCartStore.getState();
   const rawItems = cartState.items ?? [];
-  const cartSnapshot = await buildCartSnapshot(rawItems);
+  
+  let cartSnapshot: CartSnapshot;
+  try {
+    cartSnapshot = await buildCartSnapshot(rawItems);
+  } catch (_error) {
+    return buildResolution({
+      kind: 'CART_BLOCKER',
+      focus,
+      scope: 'CART_VALIDATION',
+      message: 'No pudimos validar la disponibilidad de los productos en tu carrito. Por favor, intenta de nuevo mas tarde.',
+      retrievalSource: 'CART_VALIDATION',
+      matchStrategy: 'CART_BLOCKER',
+      cartItemCount: rawItems.length,
+      purchasableItemCount: 0,
+      checkoutStatus: 'blocked',
+      deliveryType: draft.deliveryType,
+      paymentMethod: draft.paymentMethod,
+      enabledPaymentMethods: [],
+      missingFields: [],
+      blockerReason: 'inventory_conflict',
+      canProceedToCheckout: false,
+      canSubmitCheckout: false,
+      coupon: null,
+      shippingQuoteAvailable: null,
+    });
+  }
+
   const subtotal = getSubtotal(cartSnapshot.items);
   const [settings, shippingAddresses, openRecoverableOrder, couponSignal] = await Promise.all([
     getStoreSettings().catch(() => null),
