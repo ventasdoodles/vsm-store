@@ -2,50 +2,110 @@ import * as React from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+export type ButtonVariant =
+    | 'primary'
+    | 'secondary'
+    | 'surface'
+    | 'outline'
+    | 'ghost'
+    | 'danger'
+    | 'vape'
+    | 'herbal';
+
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
+export type ButtonRadius = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'vape' | 'herbal';
-    size?: 'sm' | 'md' | 'lg' | 'icon';
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+    radius?: ButtonRadius;
     isLoading?: boolean;
+    loadingText?: string;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    fullWidth?: boolean;
 }
 
+const variants: Record<ButtonVariant, string> = {
+    primary:
+        'bg-white text-theme-primary hover:bg-theme-secondary border border-transparent shadow-[0_0_15px_rgba(255,255,255,0.3)] btn-shine font-bold',
+    secondary: 'bg-white/10 text-white hover:bg-white/20 border border-surface backdrop-blur-sm',
+    surface: 'bg-surface-card hover:bg-surface-elevated text-white border border-surface shadow-sm',
+    outline: 'bg-transparent border border-surface text-white hover:bg-white/10 hover:border-surface-strong',
+    ghost: 'bg-transparent text-theme-secondary hover:text-white hover:bg-white/5',
+    danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40',
+    vape: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:to-blue-600 shadow-blue-500/20 shadow-lg border border-blue-400/20 btn-shine',
+    herbal: 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:to-emerald-600 shadow-emerald-500/20 shadow-lg border border-emerald-400/20 btn-shine',
+};
+
+const sizes: Record<ButtonSize, string> = {
+    xs: 'h-7 px-2.5 text-xs gap-1.5',
+    sm: 'h-8 px-3 text-xs gap-1.5',
+    md: 'h-10 px-4 text-sm gap-2',
+    lg: 'h-12 px-6 text-base gap-2.5',
+    icon: 'h-9 w-9 p-0 flex items-center justify-center',
+    'icon-sm': 'h-7 w-7 p-0 flex items-center justify-center',
+    'icon-lg': 'h-11 w-11 p-0 flex items-center justify-center',
+};
+
+const radii: Record<ButtonRadius, string> = {
+    none: 'rounded-none',
+    sm: 'rounded-sm',
+    md: 'rounded-md',
+    lg: 'rounded-lg',
+    xl: 'rounded-xl',
+    '2xl': 'rounded-2xl',
+    full: 'rounded-full',
+};
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = 'primary', size = 'md', isLoading, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
-
-        const variants = {
-            primary: 'bg-white text-theme-primary hover:bg-theme-secondary border border-transparent shadow-[0_0_15px_rgba(255,255,255,0.3)] btn-shine font-bold',
-            secondary: 'bg-white/10 text-white hover:bg-white/20 border border-theme backdrop-blur-sm',
-            outline: 'bg-transparent border border-theme text-white hover:bg-white/10 hover:border-theme',
-            ghost: 'bg-transparent text-theme-secondary hover:text-white hover:bg-white/5',
-            danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40',
-            vape: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:to-blue-600 shadow-blue-500/20 shadow-lg border border-blue-400/20 btn-shine',
-            herbal: 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:to-emerald-600 shadow-emerald-500/20 shadow-lg border border-emerald-400/20 btn-shine',
-        };
-
-        const sizes = {
-            sm: 'h-8 px-3 text-xs',
-            md: 'h-10 px-4 text-sm',
-            lg: 'h-12 px-6 text-base',
-            icon: 'h-9 w-9 p-0 flex items-center justify-center',
-        };
+    (
+        {
+            className,
+            variant = 'primary',
+            size = 'md',
+            radius = 'xl',
+            isLoading = false,
+            loadingText,
+            leftIcon,
+            rightIcon,
+            fullWidth = false,
+            type = 'button',
+            children,
+            disabled,
+            ...props
+        },
+        ref
+    ) => {
+        const isDisabled = isLoading || disabled;
 
         return (
             <button
                 ref={ref}
+                type={type}
                 className={cn(
-                    'relative inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none active:scale-95 focus-visible:ring-2 focus-visible:ring-vape-500/30 focus-visible:outline-none',
+                    'relative inline-flex items-center justify-center font-medium transition-all duration-200 select-none',
+                    'disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]',
+                    'focus-visible:ring-2 focus-visible:ring-vape-500/30 focus-visible:outline-none',
+                    radii[radius],
                     variants[variant],
                     sizes[size],
+                    fullWidth && 'w-full',
                     className
                 )}
-                disabled={isLoading || disabled}
+                disabled={isDisabled}
+                aria-busy={isLoading || undefined}
                 {...props}
             >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {!isLoading && leftIcon}
-                {children}
-                {!isLoading && rightIcon}
+                {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                ) : (
+                    leftIcon && <span className="shrink-0 flex items-center">{leftIcon}</span>
+                )}
+                {isLoading && loadingText ? loadingText : children}
+                {!isLoading && rightIcon && (
+                    <span className="shrink-0 flex items-center">{rightIcon}</span>
+                )}
             </button>
         );
     }
