@@ -76,4 +76,63 @@ describe('Heading Component (UI Atomic)', () => {
         expect(element.className).toContain('italic');
         expect(element.className).toContain('custom-class');
     });
+
+    it('renders heading levels 5 and 6 correctly', () => {
+        const { rerender } = render(<Heading level={5}>Nivel 5</Heading>);
+        expect(screen.getByRole('heading', { level: 5 }).tagName).toBe('H5');
+
+        rerender(<Heading level={6}>Nivel 6</Heading>);
+        expect(screen.getByRole('heading', { level: 6 }).tagName).toBe('H6');
+    });
+
+    it('supports polymorphic anchor tag with href and forwards anchor ref', () => {
+        const anchorRef = createRef<HTMLAnchorElement>();
+        render(
+            <Heading as="a" href="/catalogo" ref={anchorRef}>
+                Enlace como Heading
+            </Heading>
+        );
+        const element = screen.getByRole('link');
+        expect(element.tagName).toBe('A');
+        expect(element).toHaveAttribute('href', '/catalogo');
+        expect(anchorRef.current).toBeInstanceOf(HTMLAnchorElement);
+        expect(anchorRef.current?.href).toContain('/catalogo');
+    });
+
+    it('supports polymorphic paragraph tag with paragraph ref', () => {
+        const pRef = createRef<HTMLParagraphElement>();
+        render(
+            <Heading as="p" ref={pRef} data-testid="p-heading">
+                Párrafo estilizado como heading
+            </Heading>
+        );
+        const element = screen.getByTestId('p-heading');
+        expect(element.tagName).toBe('P');
+        expect(pRef.current).toBeInstanceOf(HTMLParagraphElement);
+    });
+
+    it('supports polymorphic button tag with native button attributes', () => {
+        render(
+            <Heading as="button" type="button">
+                Botón Heading
+            </Heading>
+        );
+        const button = screen.getByRole('button');
+        expect(button.tagName).toBe('BUTTON');
+        expect(button).toHaveAttribute('type', 'button');
+    });
+
+    it('supports all tracking options', () => {
+        const { rerender } = render(<Heading tracking="tight">Tight</Heading>);
+        expect(screen.getByRole('heading').className).toContain('tracking-tight');
+
+        rerender(<Heading tracking="normal">Normal</Heading>);
+        expect(screen.getByRole('heading').className).toContain('tracking-normal');
+
+        rerender(<Heading tracking="wide">Wide</Heading>);
+        expect(screen.getByRole('heading').className).toContain('tracking-wide');
+
+        rerender(<Heading tracking="wider">Wider</Heading>);
+        expect(screen.getByRole('heading').className).toContain('tracking-wider');
+    });
 });

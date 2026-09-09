@@ -2,18 +2,52 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
-export type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
+export type HeadingTag =
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | 'p'
+    | 'span'
+    | 'div'
+    | 'label'
+    | 'legend'
+    | 'a';
 export type HeadingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
 export type HeadingVariant = 'default' | 'muted' | 'accent' | 'gradient';
 export type HeadingTracking = 'tighter' | 'tight' | 'normal' | 'wide' | 'wider';
 
-export interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
+export interface HeadingBaseProps {
     level?: HeadingLevel;
-    as?: HeadingTag;
     size?: HeadingSize;
     variant?: HeadingVariant;
     tracking?: HeadingTracking;
 }
+
+type AsProp<C extends React.ElementType> = {
+    as?: C;
+};
+
+type PropsToOmit<C extends React.ElementType, P> = keyof (AsProp<C> & P);
+
+export type PolymorphicComponentProps<
+    C extends React.ElementType,
+    Props = Record<string, unknown>
+> = React.PropsWithChildren<Props & AsProp<C>> &
+    Omit<React.ComponentPropsWithoutRef<C>, PropsToOmit<C, Props>>;
+
+export type PolymorphicRef<C extends React.ElementType> =
+    React.ComponentPropsWithRef<C>['ref'];
+
+export type PolymorphicComponentPropsWithRef<
+    C extends React.ElementType,
+    Props = Record<string, unknown>
+> = PolymorphicComponentProps<C, Props> & { ref?: PolymorphicRef<C> };
+
+export type HeadingProps<C extends React.ElementType = React.ElementType> =
+    PolymorphicComponentPropsWithRef<C, HeadingBaseProps>;
 
 const defaultSizes: Record<HeadingLevel, HeadingSize> = {
     1: '3xl',
@@ -51,38 +85,50 @@ const trackingStyles: Record<HeadingTracking, string> = {
     wider: 'tracking-wider',
 };
 
-export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
-    (
-        {
-            level = 2,
-            as,
-            size,
-            variant = 'default',
-            tracking,
-            className,
-            children,
-            ...props
-        },
-        ref
-    ) => {
-        const Tag = (as || `h${level}`) as React.ElementType;
-        const resolvedSize = size || defaultSizes[level];
+interface HeadingComponent {
+    <C extends React.ElementType = 'h2'>(
+        props: HeadingProps<C>
+    ): React.ReactElement | null;
+    displayName?: string;
+}
 
-        return (
-            <Tag
-                ref={ref as React.Ref<HTMLElement>}
-                className={cn(
-                    sizeStyles[resolvedSize],
-                    variantStyles[variant],
-                    tracking ? trackingStyles[tracking] : undefined,
-                    className
-                )}
-                {...props}
-            >
-                {children}
-            </Tag>
-        );
-    }
-);
+const HeadingInner = (
+    {
+        level = 2,
+        as,
+        size,
+        variant = 'default',
+        tracking,
+        className,
+        children,
+        ...props
+    }: HeadingBaseProps & {
+        as?: React.ElementType;
+        className?: string;
+        children?: React.ReactNode;
+        [key: string]: unknown;
+    },
+    ref: React.Ref<HTMLElement>
+) => {
+    const Tag = as || `h${level}`;
+    const resolvedSize = size || defaultSizes[level];
+
+    return (
+        <Tag
+            ref={ref}
+            className={cn(
+                sizeStyles[resolvedSize],
+                variantStyles[variant],
+                tracking ? trackingStyles[tracking] : undefined,
+                className
+            )}
+            {...props}
+        >
+            {children}
+        </Tag>
+    );
+};
+
+export const Heading: HeadingComponent = React.forwardRef(HeadingInner) as unknown as HeadingComponent;
 
 Heading.displayName = 'Heading';

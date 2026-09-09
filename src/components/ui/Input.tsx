@@ -26,6 +26,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             variant = 'default',
             id,
             disabled,
+            'aria-describedby': ariaDescribedByProp,
+            'aria-invalid': ariaInvalidProp,
             ...props
         },
         ref
@@ -34,6 +36,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         const inputId = id || generatedId;
         const errorId = `${inputId}-error`;
         const helperId = `${inputId}-helper`;
+
+        const hasError = Boolean(error && error.trim().length > 0);
+        const hasHelperText = Boolean(!hasError && helperText && helperText.trim().length > 0);
+
+        const customDescribedBy = ariaDescribedByProp?.trim();
+        const internalDescribedBy = hasError ? errorId : hasHelperText ? helperId : undefined;
+        const combinedDescribedBy = [customDescribedBy, internalDescribedBy]
+            .filter(Boolean)
+            .join(' ')
+            .trim() || undefined;
+
+        const computedAriaInvalid = hasError ? true : ariaInvalidProp;
 
         const sizeStyles = {
             sm: 'h-8 px-2.5 text-xs rounded-lg',
@@ -60,18 +74,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         };
 
         return (
-            <div className={cn('w-full', containerClassName)}>
+            <div className={cn('w-full min-w-0', containerClassName)}>
                 {label && (
                     <label
                         htmlFor={inputId}
-                        className="mb-1.5 block text-xs font-medium text-theme-secondary"
+                        className="mb-1.5 block text-xs font-medium text-theme-secondary cursor-pointer"
                     >
                         {label}
                     </label>
                 )}
                 <div className="relative flex items-center">
                     {leftIcon && (
-                        <div className="pointer-events-none absolute left-3 flex items-center justify-center text-white/40">
+                        <div className="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center justify-center text-white/40 [&_button]:pointer-events-auto [&_a]:pointer-events-auto [&_[role=button]]:pointer-events-auto [&_.pointer-events-auto]:pointer-events-auto [&_[data-interactive]]:pointer-events-auto">
                             {leftIcon}
                         </div>
                     )}
@@ -79,32 +93,30 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         id={inputId}
                         ref={ref}
                         disabled={disabled}
-                        aria-invalid={Boolean(error)}
-                        aria-describedby={
-                            error ? errorId : helperText ? helperId : undefined
-                        }
+                        aria-invalid={computedAriaInvalid}
+                        aria-describedby={combinedDescribedBy}
                         className={cn(
-                            'w-full border font-normal transition-all duration-150 focus:outline-none focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
+                            'w-full min-w-0 border font-normal transition-all duration-150 focus:outline-none focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
                             sizeStyles[inputSize],
                             leftPadding[inputSize],
                             rightPadding[inputSize],
                             variantStyles[variant],
-                            error && 'border-red-500/60 text-red-100 placeholder:text-red-300/30 focus:border-red-500 focus:ring-red-500/20',
+                            hasError && 'border-red-500/60 text-red-100 placeholder:text-red-300/30 focus:border-red-500 focus:ring-red-500/20',
                             className
                         )}
                         {...props}
                     />
                     {rightIcon && (
-                        <div className="pointer-events-none absolute right-3 flex items-center justify-center text-white/40">
+                        <div className="pointer-events-none absolute inset-y-0 right-3 z-10 flex items-center justify-center text-white/40 [&_button]:pointer-events-auto [&_a]:pointer-events-auto [&_[role=button]]:pointer-events-auto [&_.pointer-events-auto]:pointer-events-auto [&_[data-interactive]]:pointer-events-auto">
                             {rightIcon}
                         </div>
                     )}
                 </div>
-                {error ? (
+                {hasError ? (
                     <p id={errorId} role="alert" className="mt-1 text-2xs font-medium text-red-400">
                         {error}
                     </p>
-                ) : helperText ? (
+                ) : hasHelperText ? (
                     <p id={helperId} className="mt-1 text-2xs text-white/40">
                         {helperText}
                     </p>

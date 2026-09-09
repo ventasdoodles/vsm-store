@@ -1,5 +1,6 @@
 import { createRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { Input } from '../Input';
 
@@ -96,5 +97,131 @@ describe('Input Component (UI Atomic)', () => {
         const inputElement = screen.getByPlaceholderText('Disabled input');
         expect(inputElement).toBeDisabled();
         expect(inputElement.className).toContain('disabled:opacity-50');
+    });
+
+    it('allows clicking interactive elements inside rightIcon and leftIcon', () => {
+        const handleRightClick = vi.fn();
+        const handleLeftClick = vi.fn();
+
+        render(
+            <Input
+                placeholder="Contraseña"
+                type="password"
+                leftIcon={
+                    <button
+                        type="button"
+                        onClick={handleLeftClick}
+                        aria-label="Prefix action"
+                    >
+                        🔒
+                    </button>
+                }
+                rightIcon={
+                    <button
+                        type="button"
+                        onClick={handleRightClick}
+                        aria-label="Toggle password visibility"
+                    >
+                        👁️
+                    </button>
+                }
+            />
+        );
+
+        const rightButton = screen.getByRole('button', { name: 'Toggle password visibility' });
+        const leftButton = screen.getByRole('button', { name: 'Prefix action' });
+
+        fireEvent.click(rightButton);
+        expect(handleRightClick).toHaveBeenCalledTimes(1);
+
+        fireEvent.click(leftButton);
+        expect(handleLeftClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('cleanly merges custom aria-describedby with errorId', () => {
+        render(
+            <Input
+                id="email-field"
+                aria-describedby="external-hint-id"
+                error="El correo es obligatorio"
+            />
+        );
+        const inputElement = screen.getByRole('textbox');
+        expect(inputElement).toHaveAttribute('aria-describedby', 'external-hint-id email-field-error');
+        expect(screen.getByRole('alert')).toHaveAttribute('id', 'email-field-error');
+    });
+
+    it('cleanly merges custom aria-describedby with helperId', () => {
+        render(
+            <Input
+                id="phone-field"
+                aria-describedby="external-hint-id"
+                helperText="Formato: 10 dígitos"
+            />
+        );
+        const inputElement = screen.getByRole('textbox');
+        expect(inputElement).toHaveAttribute('aria-describedby', 'external-hint-id phone-field-helper');
+        expect(screen.getByText('Formato: 10 dígitos')).toHaveAttribute('id', 'phone-field-helper');
+    });
+
+    it('preserves custom aria-describedby when neither error nor helperText is present', () => {
+        render(<Input aria-describedby="external-only-desc" placeholder="Solo custom desc" />);
+        const inputElement = screen.getByPlaceholderText('Solo custom desc');
+        expect(inputElement).toHaveAttribute('aria-describedby', 'external-only-desc');
+    });
+
+    it('does not set aria-describedby when no error, helperText, or custom prop is provided', () => {
+        render(<Input placeholder="Plain input" />);
+        const inputElement = screen.getByPlaceholderText('Plain input');
+        expect(inputElement).not.toHaveAttribute('aria-describedby');
+    });
+
+    it('does not flag aria-invalid or render alert paragraph when error is an empty string or whitespace', () => {
+        const { rerender } = render(
+            <Input label="Test" error="" helperText="Instrucción de ayuda" />
+        );
+        const inputElement = screen.getByLabelText('Test');
+
+        expect(inputElement).not.toHaveAttribute('aria-invalid', 'true');
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+        // Since error is empty, fallback helperText renders
+        expect(screen.getByText('Instrucción de ayuda')).toBeInTheDocument();
+
+        // When whitespace only
+        rerender(<Input label="Test" error="   " />);
+        expect(inputElement).not.toHaveAttribute('aria-invalid', 'true');
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+        expect(inputElement.className).not.toContain('border-red-500');
+    });
+
+    it('does not render helperText paragraph when helperText is an empty string or whitespace', () => {
+        render(<Input label="Empty Helper" helperText="" />);
+        expect(screen.queryByText('', { selector: 'p' })).not.toBeInTheDocument();
+    });
+
+    it('prioritizes error over helperText and only links error to aria-describedby', () => {
+        render(
+            <Input
+                id="conflict-field"
+                label="Conflicto"
+                error="Error prioritario"
+                helperText="Texto secundario ignorado"
+            />
+        );
+        const inputElement = screen.getByLabelText('Conflicto');
+
+        expect(screen.getByRole('alert')).toHaveTextContent('Error prioritario');
+        expect(screen.queryByText('Texto secundario ignorado')).not.toBeInTheDocument();
+        expect(inputElement).toHaveAttribute('aria-describedby', 'conflict-field-error');
+    });
+
+    it('focuses the input when clicking the label', async () => {
+        const user = userEvent.setup();
+        render(<Input label="Click Me Label" id="label-focus-test" />);
+        const labelElement = screen.getByText('Click Me Label');
+        const inputElement = screen.getByLabelText('Click Me Label');
+
+        await user.click(labelElement);
+        expect(inputElement).toHaveFocus();
     });
 });
