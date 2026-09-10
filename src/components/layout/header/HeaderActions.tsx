@@ -25,6 +25,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
         <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4 xl:gap-5 ml-auto pl-2 xl:pl-4">
             <button
                 onClick={() => setIsScannerOpen(true)}
+                aria-label="Escáner Visual IA"
                 className="p-2 sm:px-3 sm:py-2 rounded-full bg-vape-500/10 border border-vape-500/20 text-vape-400 hover:bg-vape-500/20 transition-all flex items-center gap-2"
                 title="Escáner Visual IA"
             >
