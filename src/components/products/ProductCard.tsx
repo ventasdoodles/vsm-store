@@ -282,6 +282,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             {!compact && (
                                 <m.button
                                     onClick={handleWishlist}
+                                    aria-label={isWishlisted ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                                     initial={{ x: 20, opacity: 0 }}
                                     whileHover={{ scale: 1.1 }}
                                     animate={{
@@ -304,12 +305,14 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <div className="absolute top-2 right-2 flex flex-col gap-2 translate-x-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 hidden md:flex z-10">
                                     <button
                                         onClick={handleQuickView}
+                                        aria-label="Vista rápida del producto"
                                         className="flex-1 h-12 bg-white text-slate-900 font-black rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-all text-2xs tracking-widest shadow-xl active:scale-95"
                                     >
                                         <Eye className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={handleQuickAdd}
+                                        aria-label="Agregar al carrito"
                                         disabled={!purchaseability.canAddToCart && !requiresOptionSelection}
                                         className={cn(
                                             "h-12 bg-slate-900/90 backdrop-blur-xl hover:bg-slate-900 text-white rounded-xl flex items-center justify-center transition-all shadow-xl border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",

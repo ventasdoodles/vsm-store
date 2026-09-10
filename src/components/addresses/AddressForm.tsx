@@ -66,6 +66,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                 <button
                     type="button"
                     onClick={onCancel}
+                    aria-label="Cerrar formulario"
                     className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all group-hover/header:rotate-90 duration-500"
                 >
                     <X size={24} />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { logError } from '@/services';
+import { safeLocalStorage } from '@/lib/safe-storage';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
@@ -52,9 +53,9 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         });
 
         // DEV OVERRIDE TO CATCH ERROR
-        localStorage.setItem('VSM_LAST_CRASH', error.stack || error.message);
+        safeLocalStorage.setItem('VSM_LAST_CRASH', error.stack || error.message);
         if (errorInfo?.componentStack) {
-            localStorage.setItem('VSM_LAST_CRASH_STACK', errorInfo.componentStack);
+            safeLocalStorage.setItem('VSM_LAST_CRASH_STACK', errorInfo.componentStack);
         }
     }
 

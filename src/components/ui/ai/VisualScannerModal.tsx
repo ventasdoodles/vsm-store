@@ -72,6 +72,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                             </div>
                             <button
                                 onClick={onClose}
+                                aria-label="Cerrar scanner de compatibilidad"
                                 className="p-2 transition-colors rounded-full text-white/50 hover:text-white hover:bg-white/5"
                             >
                                 <X className="w-5 h-5" />

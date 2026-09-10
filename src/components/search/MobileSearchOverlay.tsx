@@ -76,6 +76,7 @@ export function MobileSearchOverlay() {
                 </form>
                 <button
                     onClick={close}
+                    aria-label="Cerrar búsqueda"
                     className="rounded-full p-2 text-theme-secondary hover:bg-white/5 active:scale-95 transition-all"
                 >
                     <X className="h-6 w-6" />

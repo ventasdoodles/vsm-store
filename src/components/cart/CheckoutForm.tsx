@@ -11,6 +11,7 @@ import {
 import { m, AnimatePresence } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
+import { safeSessionStorage } from '@/lib/safe-storage';
 import { useAuth } from '@/hooks/useAuth';
 import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
@@ -147,18 +148,15 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
 
     // Persistencia
     useEffect(() => {
-        const savedData = sessionStorage.getItem('vsm_checkout_form');
-        if (savedData) {
-            try {
-                const parsed = JSON.parse(savedData);
-                setFormData(prev => ({ ...prev, ...parsed }));
-            } catch (e) { console.error('Error parsing saved checkout data', e); }
+        const saved = safeSessionStorage.getJSON<Partial<CheckoutFormData> | null>('vsm_checkout_form', null);
+        if (saved) {
+            setFormData(prev => ({ ...prev, ...saved }));
         }
     }, []);
 
     useEffect(() => {
         if (formData.customerName || formData.customerPhone || formData.address) {
-            sessionStorage.setItem('vsm_checkout_form', JSON.stringify(formData));
+            safeSessionStorage.setJSON('vsm_checkout_form', formData);
         }
     }, [formData]);
 

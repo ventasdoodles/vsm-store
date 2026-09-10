@@ -88,6 +88,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                                 <m.button
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleCopy}
+                                    aria-label="Copiar código de referido"
                                     className={cn(
                                         "flex h-14 w-14 items-center justify-center rounded-xl transition-all duration-500 shadow-2xl",
                                         copied 
@@ -110,6 +111,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                                 <m.button
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleShare}
+                                    aria-label="Compartir código de referido"
                                     className="flex h-14 w-14 items-center justify-center rounded-xl bg-accent-primary text-white shadow-2xl shadow-accent-primary/30 hover:bg-accent-primary/90 transition-all duration-500"
                                 >
                                     <Share2 className="h-6 w-6" />

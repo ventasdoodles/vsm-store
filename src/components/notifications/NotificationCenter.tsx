@@ -82,6 +82,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                 whileTap={{ scale: 0.9 }}
                                 onClick={markAllAsRead}
                                 title="Marcar todas como leídas"
+                                aria-label="Marcar todas como leídas"
                                 className="rounded-lg p-1.5 text-theme-secondary transition-colors"
                             >
                                 <Check className="h-4 w-4" />
@@ -91,6 +92,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                 whileTap={{ scale: 0.9 }}
                                 onClick={clearAll}
                                 title="Limpiar todo"
+                                aria-label="Limpiar todo"
                                 className="rounded-lg p-1.5 text-theme-secondary hover:text-red-400 transition-colors"
                             >
                                 <Trash2 className="h-4 w-4" />
@@ -98,6 +100,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                             <m.button
                                 whileHover={{ scale: 1.1 }}
                                 onClick={onClose}
+                                aria-label="Cerrar notificaciones"
                                 className="rounded-lg p-1.5 text-theme-secondary sm:hidden"
                             >
                                 <X className="h-4 w-4" />

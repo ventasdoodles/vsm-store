@@ -59,6 +59,7 @@ export function SmartRewardToast() {
                                 </div>
                                 <button
                                     onClick={handleDismiss}
+                                    aria-label="Cerrar oferta"
                                     className="h-6 w-6 flex items-center justify-center rounded-full hover:bg-white/10 text-theme-tertiary transition-colors"
                                 >
                                     <X className="h-4 w-4" />

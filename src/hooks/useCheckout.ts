@@ -12,6 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
+import { safeSessionStorage } from '@/lib/safe-storage';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotification } from '@/hooks/useNotification';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -78,14 +79,16 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
 
     // Auto-aplicacion de cupon de bundle
     useEffect(() => {
-        const bundleCoupon = sessionStorage.getItem('active_bundle_coupon');
+        const bundleCoupon = safeSessionStorage.getItem('active_bundle_coupon');
         if (bundleCoupon && !appliedCoupon) {
             validateCoupon(bundleCoupon, subtotal, user?.id).then(res => {
                 if (res.valid) {
                     setAppliedCoupon(res);
-                    sessionStorage.removeItem('active_bundle_coupon');
+                    safeSessionStorage.removeItem('active_bundle_coupon');
                     haptic('success');
                 }
+            }).catch(() => {
+                // coupon validation failed quietly
             });
         }
     }, [subtotal, user?.id, appliedCoupon, haptic]);

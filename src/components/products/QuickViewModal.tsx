@@ -149,6 +149,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                             whileHover={{ scale: 1.1, rotate: 90 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={onClose}
+                            aria-label="Cerrar vista rápida"
                             className="absolute top-6 right-6 z-50 w-12 h-12 bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center transition-colors shadow-xl"
                         >
                             <X className="w-6 h-6 text-white" />
@@ -320,6 +321,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                                 disabled={quantity <= 1}
+                                                aria-label="Disminuir cantidad"
                                                 className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white disabled:opacity-20 transition-colors"
                                             >
                                                 <Minus className="w-5 h-5" />
@@ -331,6 +333,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
                                                 disabled={!purchaseability.canAddToCart || quantity >= maxQuantity}
+                                                aria-label="Aumentar cantidad"
                                                 className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white disabled:opacity-20 transition-colors"
                                             >
                                                 <Plus className="w-5 h-5" />
@@ -341,6 +344,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             onClick={handleWishlist}
+                                            aria-label={isWishlisted ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                                             className={cn(
                                                 'w-14 h-14 rounded-2xl flex items-center justify-center transition-all border shadow-lg',
                                                 isWishlisted

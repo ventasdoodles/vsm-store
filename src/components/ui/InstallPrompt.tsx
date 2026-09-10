@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
+import { safeLocalStorage } from '@/lib/safe-storage';
 
 // Interface para el evento BeforeInstallPrompt (no incluido en lib.dom.d.ts)
 interface BeforeInstallPromptEvent extends Event {
@@ -17,7 +18,7 @@ export function InstallPrompt() {
             e.preventDefault();
             setDeferredPrompt(e as BeforeInstallPromptEvent);
             // Mostrar prompt solo si no ha sido descartado recientemente
-            const dismissed = localStorage.getItem('pwa_prompt_dismissed');
+            const dismissed = safeLocalStorage.getItem('pwa_prompt_dismissed');
             if (!dismissed || Date.now() - Number(dismissed) > 1000 * 60 * 60 * 24 * 7) { // 7 days
                 setIsVisible(true);
             }
@@ -39,7 +40,7 @@ export function InstallPrompt() {
 
     const handleDismiss = () => {
         setIsVisible(false);
-        localStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
+        safeLocalStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
     };
 
     if (!isVisible) return null;
@@ -63,6 +64,7 @@ export function InstallPrompt() {
                     </button>
                     <button
                         onClick={handleDismiss}
+                        aria-label="Descartar aviso de instalación"
                         className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                     >
                         <X className="h-4 w-4" />

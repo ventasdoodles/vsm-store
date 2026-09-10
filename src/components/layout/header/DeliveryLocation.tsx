@@ -5,6 +5,7 @@
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MapPin, LocateFixed, Loader2, X, Check } from 'lucide-react';
+import { safeLocalStorage } from '@/lib/safe-storage';
 
 // ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm_delivery_cp';
@@ -20,7 +21,7 @@ const MAX_CP_LENGTH = 10;
  */
 function useDeliveryLocation() {
     const [postalCode, setPostalCode] = useState<string | null>(() =>
-        localStorage.getItem(STORAGE_KEY)
+        safeLocalStorage.getItem(STORAGE_KEY)
     );
     const [detecting, setDetecting] = useState(false);
 
@@ -40,7 +41,7 @@ function useDeliveryLocation() {
             const data = await res.json();
             const cp = data?.address?.postcode ?? null;
             if (cp) {
-                localStorage.setItem(STORAGE_KEY, cp);
+                safeLocalStorage.setItem(STORAGE_KEY, cp);
                 setPostalCode(cp);
             }
         } catch {
@@ -54,7 +55,7 @@ function useDeliveryLocation() {
     const save = useCallback((cp: string) => {
         const clean = cp.trim().slice(0, MAX_CP_LENGTH);
         if (clean) {
-            localStorage.setItem(STORAGE_KEY, clean);
+            safeLocalStorage.setItem(STORAGE_KEY, clean);
             setPostalCode(clean);
         }
     }, []);
@@ -137,6 +138,7 @@ export function DeliveryLocation() {
                         />
                         <button
                             onClick={handleSave}
+                            aria-label="Guardar código postal"
                             className="h-9 w-9 flex items-center justify-center rounded-lg bg-accent-primary hover:bg-accent-primary/80 transition-colors"
                         >
                             <Check className="h-4 w-4 text-white" />

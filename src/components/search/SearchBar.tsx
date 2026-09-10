@@ -15,6 +15,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useStorefrontTactical } from '@/hooks/useStorefrontTactical';
 import { conciergeService } from '@/services';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
+import { safeLocalStorage } from '@/lib/safe-storage';
 import type { Product } from '@/types/product';
 
 // ── Constantes ───────────────────────────────────────────────
@@ -78,9 +79,9 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
     // Cargar búsquedas recientes de localStorage
     useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try { setRecentSearches(JSON.parse(saved)); } catch { /* corrupted */ }
+        const saved = safeLocalStorage.getJSON<string[]>(STORAGE_KEY, []);
+        if (saved.length > 0) {
+            setRecentSearches(saved);
         }
     }, []);
 
@@ -95,13 +96,13 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
         ].slice(0, MAX_RECENT_SEARCHES);
 
         setRecentSearches(updated);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        safeLocalStorage.setJSON(STORAGE_KEY, updated);
     }, [recentSearches]);
 
     /** Limpiar todo el historial */
     const clearRecentSearches = useCallback(() => {
         setRecentSearches([]);
-        localStorage.removeItem(STORAGE_KEY);
+        safeLocalStorage.removeItem(STORAGE_KEY);
     }, []);
 
     /** 

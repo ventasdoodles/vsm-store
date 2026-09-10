@@ -262,6 +262,7 @@ export const MegaHero = () => {
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={prevSlide}
+                        aria-label="Diapositiva anterior"
                         className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-all"
                     >
                         <ChevronLeft className="w-8 h-8" />
@@ -270,6 +271,7 @@ export const MegaHero = () => {
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={nextSlide}
+                        aria-label="Diapositiva siguiente"
                         className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-all"
                     >
                         <ChevronRight className="w-8 h-8" />

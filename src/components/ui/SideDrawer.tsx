@@ -76,6 +76,7 @@ export function SideDrawer({
                             <h2 className="text-lg font-black italic tracking-tight text-white uppercase">{title}</h2>
                             <button
                                 onClick={onClose}
+                                aria-label="Cerrar panel lateral"
                                 className="rounded-xl p-2 text-white/30 hover:bg-white/5 hover:text-white transition-all active:scale-90"
                             >
                                 <X className="h-5 w-5" />

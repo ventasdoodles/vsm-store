@@ -316,6 +316,7 @@ export const AIConcierge: React.FC = () => {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={toggleOpen}
+                                        aria-label="Cerrar asistente virtual"
                                         className="p-2.5 rounded-xl hover:bg-white/5 text-white/30 hover:text-white transition-all"
                                     >
                                         <X className="h-5 w-5" />
@@ -431,6 +432,7 @@ export const AIConcierge: React.FC = () => {
                                             <button
                                                 type="button"
                                                 onClick={isListening ? stopRecording : startRecording}
+                                                aria-label={isListening ? 'Detener dictado de voz' : 'Iniciar dictado de voz'}
                                                 className={cn(
                                                     'p-1.5 rounded-lg transition-all',
                                                     isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'text-white/10 hover:text-vape-400',
@@ -443,6 +445,7 @@ export const AIConcierge: React.FC = () => {
                                     </div>
                                     <button
                                         type="submit"
+                                        aria-label="Enviar mensaje al asistente"
                                         disabled={isLoading || !input.trim()}
                                         className="h-12 w-12 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-vape-500/20 hover:scale-105 active:scale-95 disabled:opacity-20 transition-all bg-vape-500"
                                     >
