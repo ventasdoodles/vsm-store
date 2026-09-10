@@ -9,6 +9,7 @@
 - Current technical truth is summarized in `AI_CONTEXT.md`.
 
 ## Current Detailed Audit Files
+- `docs/audits/2026-09/last-20-commits-adversarial-audit.md` (Exhaustive adversarial audit of the last 20 commits: Edge Functions zero-total guard, token normalization, atomic primitives hardening, BOM handling in codemods, and WorkKit skill unification)
 - `docs/audits/2026-07/checkout-page-modularization.md` (Modularization of monolithic `Checkout.tsx` layout from 320 to 144 lines into 4 domain subcomponents under `src/components/checkout/`)
 - `docs/audits/2026-07/client-secrets-and-dependencies-security.md` (Audit of client bundle secrets isolation and resolution of 13 dependency security advisories via `npm audit fix`)
 - `docs/audits/2026-07/ai-capsule-orchestrator-modularization.md` (Modularization of monolithic `ai-capsule-orchestrator.service.ts` from 1,684 to 6 lines delegating to `src/services/ai-capsules/` domain submodules)

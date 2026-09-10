@@ -134,6 +134,19 @@ serve(async (req) => {
             )
         }
 
+        if (Number(order.total) <= 0) {
+            return new Response(
+                JSON.stringify({ error: 'El total del pedido debe ser mayor a 0 para pagar con Mercado Pago' }),
+                {
+                    status: 400,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            )
+        }
+
         if (typeof order.mp_preference_id === 'string' && order.mp_preference_id.length > 0) {
             const existingInitPoint = await getExistingPreferenceInitPoint(order.mp_preference_id)
 

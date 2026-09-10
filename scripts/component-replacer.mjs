@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+﻿import fs from "fs/promises";
 import path from "path";
 
 const targetDirs = [
@@ -38,6 +38,7 @@ async function replace() {
 
     for (const file of files) {
         let content = await fs.readFile(file, "utf-8");
+        content = content.replace(/^\uFEFF/, "");
         let modified = false;
 
         // Button replacements
@@ -82,7 +83,7 @@ async function replace() {
         }
     }
 
-    console.log(`\n✅ Reemplazo completo. Archivos modificados: ${totalModificados}`);
+    console.log(`\n✔ Reemplazo completo. Archivos modificados: ${totalModificados}`);
 }
 
 replace().catch(console.error);
