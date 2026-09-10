@@ -122,21 +122,21 @@ const HeadingInner = (
     ref: React.Ref<HTMLElement>
 ) => {
     // 1. Auto-infer level from `as` if `as` is a heading tag ('h1'..'h6') and level was not passed
-    const inferredLevel = (typeof as === 'string' && tagToLevel[as.toLowerCase()])
-        ? tagToLevel[as.toLowerCase()]
+    const inferredLevel: HeadingLevel = (typeof as === 'string' && tagToLevel[as.toLowerCase()])
+        ? tagToLevel[as.toLowerCase()]!
         : 2;
-    const level = levelProp ?? inferredLevel;
-    const Tag = as || `h${level}`;
+    const level: HeadingLevel = (levelProp ?? inferredLevel) as HeadingLevel;
+    const Tag = (as || `h${level}`) as React.ElementType;
 
     // 2. Auto-detect if className contains an explicit font size to avoid breakpoint clobbering
-    const hasExplicitTextSize = className && /\b(text-(2xs|3xs|xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl))\b/.test(className);
-    const resolvedSize = sizeProp !== undefined
+    const hasExplicitTextSize = Boolean(className && /\b(text-(2xs|3xs|xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl))\b/.test(className));
+    const resolvedSize: HeadingSize = sizeProp !== undefined
         ? sizeProp
-        : (hasExplicitTextSize ? 'none' : defaultSizes[level]);
+        : (hasExplicitTextSize ? 'none' : (defaultSizes[level] ?? 'xl'));
 
     // 3. Auto-detect if className contains an explicit text color to avoid clobbering with default white
-    const hasExplicitTextColor = className && /\b(text-(white|black|transparent|theme|theme-primary|theme-secondary|theme-tertiary|accent-primary|vape|herbal|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose))\b/.test(className);
-    const resolvedVariant = variantProp !== 'default'
+    const hasExplicitTextColor = Boolean(className && /\b(text-(white|black|transparent|theme|theme-primary|theme-secondary|theme-tertiary|accent-primary|vape|herbal|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose))\b/.test(className));
+    const resolvedVariant: HeadingVariant = variantProp !== 'default'
         ? variantProp
         : (hasExplicitTextColor ? 'none' : 'default');
 
