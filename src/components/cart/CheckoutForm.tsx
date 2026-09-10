@@ -191,7 +191,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
     const hasOpenRecoverableOrder = openOrderRecoveryView?.shouldRecover === true;
     const canSubmitCheckout = transitionView.canSubmitCheckout && !hasOpenRecoverableOrder;
     const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
-        navigate({ to: `/${missingProduct.section}/${missingProduct.slug}` as any });
+        navigate({ to: '/$section/$slug', params: { section: missingProduct.section, slug: missingProduct.slug } });
     };
 
     const handleValidateCoupon = async () => {
@@ -358,7 +358,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 useNewAddress={useNewAddress}
                                 selectedAddressId={selectedAddressId}
                                 addressFormValue={formData.address}
-                                errors={errors as any}
+                                errors={errors}
                                 setSelectedAddressId={setSelectedAddressId}
                                 setUseNewAddress={setUseNewAddress}
                                 setAddressFormValue={(val) => setFormData({ ...formData, address: val })}

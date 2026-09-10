@@ -361,7 +361,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                     <div className="mt-auto border-t border-white/5 p-5 space-y-3">
                         <Link
-                            to={"/" as any}
+                            to="/"
                             className="flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold text-theme-secondary hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5"
                         >
                             <Store className="h-4 w-4" />

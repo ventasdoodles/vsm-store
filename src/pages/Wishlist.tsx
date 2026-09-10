@@ -102,7 +102,7 @@ export function Wishlist() {
                             </p>
                             <div className="pt-6">
                                 <Link
-                                    to={"/" as any}
+                                    to="/"
                                     className="vsm-button-primary inline-flex gap-4 px-10"
                                 >
                                     <ShoppingBag className="h-4 w-4" />

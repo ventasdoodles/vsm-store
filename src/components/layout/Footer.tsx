@@ -320,8 +320,8 @@ export const Footer = memo(function Footer() {
                     </div>
 
                     <nav className="flex gap-8">
-                        <Link to={"/legal/privacy" as any} className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
-                        <Link to={"/legal/terms" as any} className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Términos</Link>
+                        <Link to="/legal/privacy" className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
+                        <Link to="/legal/terms" className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Términos</Link>
                     </nav>
                 </div>
             </div>

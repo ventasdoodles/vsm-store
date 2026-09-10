@@ -292,7 +292,8 @@ export function PaymentSuccess() {
                         )}
                         {order && (
                             <Link
-                                to={`/orders/${order.id}` as any}
+                                to="/orders/$orderId"
+                                params={{ orderId: order.id }}
                                 className={`group relative w-full overflow-hidden rounded-2xl px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-all duration-300 active:scale-95 sm:w-auto ${ui.button}`}
                             >
                                 <div className="relative z-10 flex items-center justify-center gap-2">
@@ -303,7 +304,7 @@ export function PaymentSuccess() {
                             </Link>
                         )}
                         <Link
-                            to={"/" as any}
+                            to="/"
                             className="group w-full rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-sm font-black uppercase tracking-widest text-white/70 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:text-white sm:w-auto"
                         >
                             <div className="flex items-center justify-center gap-2">

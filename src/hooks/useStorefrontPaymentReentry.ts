@@ -17,7 +17,7 @@ export function useStorefrontPaymentReentry() {
         const currentView = getStorefrontPaymentReentryView(order);
         if (!currentView.canReenter) {
             warning('Pago no disponible', currentView.blockedAttemptDetail);
-            navigate({ to: `/orders/${order.id}` as any });
+            navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
             return;
         }
 
@@ -39,7 +39,7 @@ export function useStorefrontPaymentReentry() {
             if (!freshView.canReenter) {
                 setContinuingOrderId(null);
                 warning('Pago no disponible', freshView.blockedAttemptDetail);
-                navigate({ to: `/orders/${freshOrder.id}` as any });
+                navigate({ to: '/orders/$orderId', params: { orderId: freshOrder.id } });
                 return;
             }
 

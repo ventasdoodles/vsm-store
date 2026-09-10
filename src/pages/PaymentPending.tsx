@@ -121,7 +121,8 @@ export function PaymentPending() {
 
                 {order && (
                     <Link
-                        to={`/orders/${order.id}` as any}
+                        to="/orders/$orderId"
+                        params={{ orderId: order.id }}
                         className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 ${ui.primaryLink}`}
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -130,7 +131,7 @@ export function PaymentPending() {
                 )}
 
                 <Link
-                    to={"/" as any}
+                    to="/"
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
                 >
                     <Home className="h-4 w-4" />

@@ -157,7 +157,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                                                 className="w-full h-full object-cover"
                                                             />
                                                         </div>
-                                                        <Link to="/$section/$slug" params={{ section: (product as any).section || 'vape', slug: product.slug || '' }} className="text-xs font-bold text-white mb-1 line-clamp-2 hover:text-vape-400" onClick={onClose}>
+                                                        <Link to="/$section/$slug" params={{ section: product.section || 'vape', slug: product.slug || '' }} className="text-xs font-bold text-white mb-1 line-clamp-2 hover:text-vape-400" onClick={onClose}>
                                                             {product.name}
                                                         </Link>
                                                         <div className="mt-auto pt-2 flex items-center justify-between">
@@ -165,7 +165,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                                             <button 
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
-                                                                    addItem(product as any);
+                                                                    addItem(product as import('@/types/product').Product);
                                                                     onClose();
                                                                 }}
                                                                 className="w-6 h-6 rounded-full bg-vape-500 text-white flex items-center justify-center hover:bg-vape-400 transition-colors"

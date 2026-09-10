@@ -54,7 +54,7 @@ export const AIConcierge: React.FC = () => {
     const renderedCtaKeysRef = useRef<Set<string>>(new Set());
 
     const handleOpenProduct = (product: { slug: string; section?: string }) => {
-        navigate({ to: `/${product.section ?? 'vape'}/${product.slug}` as any });
+        navigate({ to: '/$section/$slug', params: { section: product.section ?? 'vape', slug: product.slug } });
     };
 
     useEffect(() => {

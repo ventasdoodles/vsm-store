@@ -24,7 +24,7 @@ export function NotFound() {
                     Volver
                 </button>
                 <Link
-                    to={"/" as any}
+                    to="/"
                     className="inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-500/25 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
                 >
                     <Home className="h-4 w-4" />

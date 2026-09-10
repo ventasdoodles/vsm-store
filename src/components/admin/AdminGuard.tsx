@@ -107,7 +107,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
     // Not logged in
     if (!user) {
-        return <Navigate to={"/login" as any} replace />;
+        return <Navigate to="/login" replace />;
     }
 
     // Not admin

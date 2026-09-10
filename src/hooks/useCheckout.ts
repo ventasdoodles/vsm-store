@@ -155,7 +155,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
 
                 if (openRecoverableOrder && recoveryView?.shouldRecover) {
                     warning('Ya existe una orden pendiente', recoveryView.submitBlockedDetail);
-                    navigate({ to: `/orders/${openRecoverableOrder.id}` as any });
+                    navigate({ to: '/orders/$orderId', params: { orderId: openRecoverableOrder.id } });
                     setSending(false);
                     return;
                 }
@@ -233,7 +233,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                                 result.message || 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago.'
                             );
                         }
-                        navigate({ to: `/orders/${dbOrderId}` as any });
+                        navigate({ to: '/orders/$orderId', params: { orderId: dbOrderId } });
                         setSending(false);
                         return;
                     }
@@ -244,7 +244,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                         'Ya existe una orden pendiente',
                         result.message || 'Continua con esa orden y revisa su estado antes de enviar otro pedido.'
                     );
-                    navigate({ to: `/orders/${dbOrderId}` as any });
+                    navigate({ to: '/orders/$orderId', params: { orderId: dbOrderId } });
                     setSending(false);
                     return;
                 }

@@ -22,7 +22,8 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
 
     return (
         <Link
-            to={`/${section}/${category.slug}` as any}
+            to="/$section/$slug"
+            params={{ section, slug: category.slug }}
             className={cn(
                 'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl border p-10 text-center glass-premium',
                 'transition-all duration-500 cursor-pointer spotlight-container',

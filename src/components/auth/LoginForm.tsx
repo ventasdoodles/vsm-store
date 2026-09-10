@@ -187,7 +187,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
                         Crear cuenta
                     </button>
                 ) : (
-                    <Link to={"/signup" as any} className="font-medium text-vape-400 hover:text-vape-300 transition-colors">
+                    <Link to="/signup" className="font-medium text-vape-400 hover:text-vape-300 transition-colors">
                         Crear cuenta
                     </Link>
                 )}

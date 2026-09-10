@@ -44,7 +44,7 @@ export function InventoryAlertsPanel() {
                                     </div>
                                 </div>
                                 <Link 
-                                    to={`/admin/products` as any}
+                                    to="/admin/products"
                                     className="p-2 rounded-lg hover:bg-white/10 transition-colors text-theme-secondary hover:text-white"
                                 >
                                     <ExternalLink className="h-4 w-4" />

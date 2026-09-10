@@ -14,7 +14,7 @@ export function Terms() {
                 {/* Header */}
                 <div className="mb-8">
                     <Link
-                        to={"/" as any}
+                        to="/"
                         className="inline-flex items-center gap-2 text-theme-secondary hover:text-theme-primary transition-colors mb-4"
                     >
                         <ArrowLeft className="h-4 w-4" />
@@ -166,7 +166,7 @@ export function Terms() {
                             <h2 className="text-xl font-bold text-theme-primary mb-4">11. Privacidad</h2>
                             <p className="text-theme-secondary leading-relaxed mb-4">
                                 El uso de nuestros servicios tambi�n est� regido por nuestra{' '}
-                                <Link to={"/legal/privacy" as any} className="text-vape-400 hover:text-vape-300 underline">
+                                <Link to="/legal/privacy" className="text-vape-400 hover:text-vape-300 underline">
                                     Pol�tica de Privacidad
                                 </Link>
                                 . Al aceptar estos T�rminos, tambi�n acepta nuestra Pol�tica de Privacidad.
@@ -200,7 +200,7 @@ export function Terms() {
                                 <li><strong className="text-theme-primary">Ubicaci�n:</strong> Acapulco, Guerrero, M�xico</li>
                                 <li>
                                     <strong className="text-theme-primary">Sitio web:</strong>{' '}
-                                    <Link to={"/contact" as any} className="text-vape-400 hover:text-vape-300 underline">
+                                    <Link to="/contact" className="text-vape-400 hover:text-vape-300 underline">
                                         Formulario de contacto
                                     </Link>
                                 </li>

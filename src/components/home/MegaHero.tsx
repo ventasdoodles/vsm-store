@@ -225,7 +225,7 @@ export const MegaHero = () => {
                                     </MagneticButton>
                                 </Link>
 
-                                <Link to={"/vape" as any}>
+                                <Link to="/$section" params={{ section: 'vape' }}>
                                     <MagneticButton strength={0.15}>
                                         <m.button
                                             whileHover={{ backgroundColor: 'rgba(255,255,255,0.15)' }}

@@ -14,7 +14,7 @@ export function Privacy() {
                 {/* Header */}
                 <div className="mb-8">
                     <Link
-                        to={"/" as any}
+                        to="/"
                         className="inline-flex items-center gap-2 text-theme-secondary hover:text-theme-primary transition-colors mb-4"
                     >
                         <ArrowLeft className="h-4 w-4" />
@@ -159,10 +159,10 @@ export function Privacy() {
                                 Para ejercer sus derechos ARCO, puede:
                             </p>
                             <ul className="list-none text-theme-secondary space-y-2 mt-4">
-                                <li>� Acceder a su perfil en <Link to={"/profile" as any} className="text-vape-400 hover:text-vape-300 underline">Mi Cuenta</Link> para
+                                <li>� Acceder a su perfil en <Link to="/profile" className="text-vape-400 hover:text-vape-300 underline">Mi Cuenta</Link> para
                                     actualizar o eliminar informaci�n</li>
                                 <li>� Contactarnos v�a WhatsApp al +52 228 123 4567</li>
-                                <li>� Enviar solicitud formal a trav�s de nuestro <Link to={"/contact" as any} className="text-vape-400 hover:text-vape-300 underline">
+                                <li>� Enviar solicitud formal a trav�s de nuestro <Link to="/contact" className="text-vape-400 hover:text-vape-300 underline">
                                     formulario de contacto</Link></li>
                             </ul>
                             <p className="text-theme-secondary leading-relaxed mt-4">
@@ -244,7 +244,7 @@ export function Privacy() {
                                 <li><strong className="text-theme-primary">Ubicaci�n:</strong> Acapulco, Guerrero, M�xico</li>
                                 <li>
                                     <strong className="text-theme-primary">Formulario:</strong>{' '}
-                                    <Link to={"/contact" as any} className="text-vape-400 hover:text-vape-300 underline">
+                                    <Link to="/contact" className="text-vape-400 hover:text-vape-300 underline">
                                         Contacto
                                     </Link>
                                 </li>

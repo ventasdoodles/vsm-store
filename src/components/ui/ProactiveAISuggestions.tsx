@@ -18,7 +18,7 @@ export const ProactiveAISuggestions = memo(({
     className?: string 
 }) => {
     const { config } = useActiveVerticalPack();
-    const { data: bestsellers } = useBestsellerProducts({ section: config?.id as any || 'vape', limit });
+    const { data: bestsellers } = useBestsellerProducts({ section: config?.id || 'vape', limit });
     const closeCart = useCartStore(s => s.closeCart);
 
     if (!bestsellers || bestsellers.length === 0) return null;

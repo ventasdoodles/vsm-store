@@ -378,7 +378,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
 
                             <div className="pt-8 border-t border-white/5 flex items-center justify-between">
                                 <Link
-                                    to={`/${product.section}/${product.slug}` as any}
+                                    to="/$section/$slug"
+                                    params={{ section: product.section, slug: product.slug }}
                                     onClick={onClose}
                                     className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-2xs uppercase tracking-[0.2em] transition-colors"
                                 >

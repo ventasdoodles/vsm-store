@@ -137,7 +137,7 @@ export function CartSidebar() {
         if (openRecoverableOrder && openOrderRecoveryView?.shouldRecover) {
             notify.warning('Ya existe una orden pendiente', openOrderRecoveryView.detail);
             closeCart();
-            navigate({ to: `/orders/${openRecoverableOrder.id}` as any });
+            navigate({ to: '/orders/$orderId', params: { orderId: openRecoverableOrder.id } });
             return;
         }
 
@@ -158,7 +158,7 @@ export function CartSidebar() {
 
     const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
         closeCart();
-        navigate({ to: `/${missingProduct.section}/${missingProduct.slug}` as any });
+        navigate({ to: '/$section/$slug', params: { section: missingProduct.section, slug: missingProduct.slug } });
     };
 
     return (

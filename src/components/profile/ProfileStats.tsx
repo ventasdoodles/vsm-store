@@ -18,7 +18,7 @@ interface StatCardProps {
     label: string;
     value: string | number;
     gradient: string;
-    to?: string;
+    to?: '/orders' | '/stats' | '/loyalty';
     isLoading?: boolean;
 }
 
@@ -74,7 +74,7 @@ export function ProfileStats() {
                 label="Pedidos"
                 value={stats?.totalOrders ?? 0}
                 gradient="from-blue-500 to-cyan-400"
-                to={"/orders" as any}
+                to="/orders"
                 isLoading={isLoading}
             />
             <StatCard
@@ -82,7 +82,7 @@ export function ProfileStats() {
                 label="Total gastado"
                 value={formatPrice(stats?.totalSpent ?? 0)}
                 gradient="from-emerald-500 to-teal-400"
-                to={"/stats" as any}
+                to="/stats"
                 isLoading={isLoading}
             />
             <StatCard
@@ -90,7 +90,7 @@ export function ProfileStats() {
                 label="V-Coins"
                 value={points.toLocaleString()}
                 gradient="from-yellow-500 to-amber-400"
-                to={"/loyalty" as any}
+                to="/loyalty"
                 isLoading={isLoading}
             />
             <StatCard

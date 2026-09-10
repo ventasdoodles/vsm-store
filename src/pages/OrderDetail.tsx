@@ -48,7 +48,7 @@ const STATUS_ICONS: Record<OrderStatus, LucideIcon> = {
 };
 
 export function OrderDetail() {
-    const { orderId } = useParams({ strict: false }) as any;
+    const { orderId } = useParams({ strict: false });
     const { data: order, isLoading } = useOrderWithCrossSurfaceReconciliation(orderId);
     const { reorderOrder, reorderingOrderId } = useAuthenticatedOrderReorder();
     const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
@@ -74,7 +74,7 @@ export function OrderDetail() {
                     <Package size={40} />
                 </div>
                 <h2 className="text-2xl font-black text-white uppercase italic">Adquisición No Encontrada</h2>
-                <Link to={"/orders" as any} className="vsm-button-primary inline-flex">
+                <Link to="/orders" className="vsm-button-primary inline-flex">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Volver a Bitácora
                 </Link>

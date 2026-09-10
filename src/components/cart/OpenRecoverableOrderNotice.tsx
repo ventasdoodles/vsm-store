@@ -71,7 +71,7 @@ export function OpenRecoverableOrderNotice({
 
                         <Button
                             type="button"
-                            onClick={() => navigate({ to: `/orders/${order.id}` as any })}
+                            onClick={() => navigate({ to: '/orders/$orderId', params: { orderId: order.id } })}
                             className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-2xs font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
                         >
                             <Package className="h-4 w-4" />

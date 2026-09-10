@@ -85,7 +85,7 @@ export function SearchResults() {
             {/* Header */}
             <div className="mb-8">
                 <Link
-                    to={"/" as any}
+                    to="/"
                     className="mb-4 inline-flex items-center gap-1.5 text-xs text-theme-secondary hover:text-theme-secondary transition-colors"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />

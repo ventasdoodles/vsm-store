@@ -121,7 +121,8 @@ export function PaymentFailure() {
 
                 {order ? (
                     <Link
-                        to={`/orders/${order.id}` as any}
+                        to="/orders/$orderId"
+                        params={{ orderId: order.id }}
                         className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 ${ui.primaryLink}`}
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -129,7 +130,7 @@ export function PaymentFailure() {
                     </Link>
                 ) : (
                     <Link
-                        to={"/orders" as any}
+                        to="/orders"
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:-translate-y-0.5 hover:bg-red-500"
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -138,7 +139,7 @@ export function PaymentFailure() {
                 )}
 
                 <Link
-                    to={"/" as any}
+                    to="/"
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
                 >
                     <Home className="h-4 w-4" />
