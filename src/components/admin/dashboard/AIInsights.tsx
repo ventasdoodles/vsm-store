@@ -24,7 +24,7 @@ export function AIInsights() {
     };
 
     return (
-        <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-[#0D0D0D]/50 backdrop-blur-3xl p-8 group">
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-surface-overlay/50 backdrop-blur-3xl p-8 group">
             {/* Ambient background glow */}
             <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-vape-500/10 blur-[80px] group-hover:bg-vape-500/20 transition-all duration-700" />
             

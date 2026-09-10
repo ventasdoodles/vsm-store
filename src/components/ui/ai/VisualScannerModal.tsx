@@ -53,7 +53,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                         initial={{ scale: 0.95, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                        className="relative w-full max-w-lg overflow-hidden bg-[#0A0A0A] border border-white/10 rounded-[2rem] shadow-2xl"
+                        className="relative w-full max-w-lg overflow-hidden bg-surface-overlay border border-white/10 rounded-[2rem] shadow-2xl"
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Background FX */}

@@ -424,7 +424,7 @@ export function CartSidebar() {
                                     onClick={handleProceedToCheckout}
                                     disabled={isValidating || (!openOrderRecoveryView?.shouldRecover && !transitionView.canProceedToCheckout)}
                                     className={cn(
-                                        "group relative flex w-full h-16 items-center justify-center overflow-hidden rounded-2xl bg-[#50E3C2] shadow-[0_20px_40px_rgba(80,227,194,0.25)] transition-all hover:shadow-[0_25px_50px_rgba(80,227,194,0.4)] border border-white/20",
+                                        "group relative flex w-full h-16 items-center justify-center overflow-hidden rounded-2xl bg-emerald-400 shadow-xl shadow-emerald-500/25 transition-all hover:shadow-2xl hover:shadow-emerald-500/40 border border-white/20",
                                         (isValidating || (!openOrderRecoveryView?.shouldRecover && !transitionView.canProceedToCheckout)) && "cursor-not-allowed opacity-60 grayscale"
                                     )}
                                 >

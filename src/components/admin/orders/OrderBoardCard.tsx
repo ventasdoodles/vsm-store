@@ -52,7 +52,7 @@ export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoard
                             key={s.value}
                             value={s.value}
                             disabled={order.status !== s.value && !canTransitionTo(order.status as AdminOrderStatus, s.value as AdminOrderStatus)}
-                            className="bg-[#0d0e12] text-white"
+                            className="bg-surface-base text-white"
                         >
                             {s.label}
                         </option>

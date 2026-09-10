@@ -59,7 +59,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    className="absolute right-0 top-full z-40 mt-3 w-80 max-w-[calc(100vw-2rem)] sm:w-96 origin-top-right rounded-3xl vsm-border bg-[#111]/90 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                    className="absolute right-0 top-full z-40 mt-3 w-80 max-w-[calc(100vw-2rem)] sm:w-96 origin-top-right rounded-3xl vsm-border bg-surface-base/90 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-[rgb(var(--border-primary)/0.06)] bg-white/5 px-5 py-4">

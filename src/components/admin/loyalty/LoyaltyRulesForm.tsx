@@ -147,7 +147,7 @@ function RuleCard({
     };
 
     return (
-        <div className="bg-[#181825]/60 backdrop-blur-md rounded-3xl p-6 border border-white/[0.04] shadow-xl hover:bg-[#181825]/80 hover:border-white/10 transition-all flex flex-col justify-between group">
+        <div className="bg-surface-card/60 backdrop-blur-md rounded-3xl p-6 border border-white/[0.04] shadow-xl hover:bg-surface-card/80 hover:border-white/10 transition-all flex flex-col justify-between group">
             <div>
                 <div className="flex items-center gap-3 mb-2">
                     <div className={cn("p-2 rounded-xl border", colorMap[color])}>

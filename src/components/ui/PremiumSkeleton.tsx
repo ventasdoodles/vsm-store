@@ -15,7 +15,7 @@ export function PremiumSkeleton({ className, variant = 'rect' }: PremiumSkeleton
     return (
         <div
             className={cn(
-                "relative overflow-hidden bg-[#1e293b]/50 backdrop-blur-sm border border-white/5",
+                "relative overflow-hidden bg-slate-800/50 backdrop-blur-sm border border-white/5",
                 variant === 'circle' && "rounded-full",
                 variant === 'pill' && "rounded-full",
                 variant === 'rect' && "rounded-2xl",

@@ -117,7 +117,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-gradient-to-b from-[#181825] to-[#13141f] border border-fuchsia-500/20 shadow-[0_0_40px_rgba(168,85,247,0.1)] rounded-[2.5rem] p-6 md:p-10 mb-8 relative overflow-hidden group">                                                             
+        <form onSubmit={handleSubmit} className="bg-gradient-to-b from-surface-card to-surface-base border border-fuchsia-500/20 shadow-[0_0_40px_rgba(168,85,247,0.1)] rounded-[2.5rem] p-6 md:p-10 mb-8 relative overflow-hidden group">
             {/* Background Gradients */}
             <div className="absolute -top-32 -right-32 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />

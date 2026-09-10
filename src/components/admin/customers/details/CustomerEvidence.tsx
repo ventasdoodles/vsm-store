@@ -104,7 +104,7 @@ export function CustomerEvidence({ customer }: Props) {
                                 />
                                 
                                 {/* Overlay gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#13141f]/90 via-[#13141f]/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-surface-base/90 via-surface-base/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
                                 
                                 <div className="absolute inset-0 flex flex-col items-center justify-end p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                                     <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-xl">

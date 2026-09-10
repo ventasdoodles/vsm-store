@@ -25,7 +25,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
     ) : 'text-white/40';
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#1a1b26]/40 p-1 backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-card/40 p-1 backdrop-blur-xl">
             {/* Background Glow */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
             

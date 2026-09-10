@@ -70,7 +70,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                     />
 
                     {isOpen && (
-                        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-theme bg-[#18181b] shadow-xl">
+                        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-theme bg-zinc-900 shadow-xl">
                             {isLoading ? (
                                 <div className="p-4 text-center text-xs text-theme-secondary">Cargando clientes...</div>
                             ) : filteredCustomers.length > 0 ? (

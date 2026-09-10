@@ -299,7 +299,7 @@ export function FlashDealEditor({
                                             autoFocus
                                         />
                                     </div>
-                                    <div className="max-h-48 overflow-y-auto rounded-[0.75rem] border border-white/5 bg-[#1a1a2e] divide-y divide-white/5">
+                                    <div className="max-h-48 overflow-y-auto rounded-[0.75rem] border border-white/5 bg-surface-card divide-y divide-white/5">
                                         {filteredProducts.length === 0 ? (
                                             <p className="p-3 text-xs text-white/30 text-center">Sin resultados</p>
                                         ) : (
@@ -522,7 +522,7 @@ export function FlashDealEditor({
                 </div>
 
                 {/* Footer — sticky */}
-                <div className="sticky bottom-0 border-t border-white/5 bg-[#0d0d1a]/95 backdrop-blur-xl p-4">
+                <div className="sticky bottom-0 border-t border-white/5 bg-surface-overlay/95 backdrop-blur-xl p-4">
                     <Button
                         type="button"
                         onClick={handleSubmit}

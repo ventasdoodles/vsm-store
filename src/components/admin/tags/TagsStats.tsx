@@ -45,7 +45,7 @@ export function TagsStats({ total, productsTagged, mostUsedTag }: TagsStatsProps
             {stats.map((s) => (
                 <div
                     key={s.label}
-                    className="flex items-center gap-4 rounded-2xl border border-white/5 bg-[#181825]/50 p-4 backdrop-blur-md"
+                    className="flex items-center gap-4 rounded-2xl border border-white/5 bg-surface-card/50 p-4 backdrop-blur-md"
                 >
                     <div className={`p-2.5 rounded-xl ${s.bg} ring-1 ring-inset ${s.ring}`}>
                         <s.icon className={`h-5 w-5 ${s.color}`} />

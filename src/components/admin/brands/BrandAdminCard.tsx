@@ -19,8 +19,8 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
         <div className={cn(
             'group relative flex flex-col rounded-3xl transition-all duration-300 overflow-hidden',
             brand.is_active
-                ? 'bg-[#181825]/80 backdrop-blur-xl border border-white/[0.06] hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1'
-                : 'bg-[#181825]/40 border border-white/[0.04] opacity-75 grayscale-[0.5]'
+                ? 'bg-surface-card/80 backdrop-blur-xl border border-white/[0.06] hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1'
+                : 'bg-surface-card/40 border border-white/[0.04] opacity-75 grayscale-[0.5]'
         )}>
             {/* Status Badge */}
             {!brand.is_active && (

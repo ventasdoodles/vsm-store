@@ -161,7 +161,7 @@ const columns = [
                                             key={s.value}
                                             value={s.value}
                                             disabled={!isCurrent && !allowed}
-                                            className="bg-[#0d0e12] text-white"
+                                            className="bg-surface-base text-white"
                                         >
                                             {s.label}
                                         </option>

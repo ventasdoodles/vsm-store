@@ -29,7 +29,7 @@ export function CouponStats({ coupons }: Props) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             
             {/* Activos */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -46,7 +46,7 @@ export function CouponStats({ coupons }: Props) {
             </div>
 
             {/* Agotados */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl group-hover:bg-orange-500/20 transition-all opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400">
@@ -63,7 +63,7 @@ export function CouponStats({ coupons }: Props) {
             </div>
 
             {/* Expirados */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-white/5 rounded-3xl p-5 md:p-6 shadow-xl relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full blur-2xl group-hover:bg-red-500/20 transition-all opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500">
@@ -79,7 +79,7 @@ export function CouponStats({ coupons }: Props) {
             </div>
 
             {/* Usos Totales */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-purple-500/20 rounded-3xl p-5 md:p-6 shadow-[0_0_30px_rgba(168,85,247,0.05)] relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-purple-500/20 rounded-3xl p-5 md:p-6 shadow-[0_0_30px_rgba(168,85,247,0.05)] relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all opacity-70" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 shadow-inner">

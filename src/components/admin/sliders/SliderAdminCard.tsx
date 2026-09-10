@@ -39,8 +39,8 @@ export function SliderAdminCard({
         <div className={cn(
             'group relative flex flex-col md:flex-row overflow-hidden rounded-3xl transition-all duration-300 border',
             slider.active
-                ? 'bg-[#181825]/90 backdrop-blur-xl border-white/[0.08] hover:border-pink-500/30 hover:shadow-2xl hover:shadow-pink-500/10'
-                : 'bg-[#181825]/40 border-white/[0.04] opacity-75 grayscale-[0.6]'
+                ? 'bg-surface-card/90 backdrop-blur-xl border-white/[0.08] hover:border-pink-500/30 hover:shadow-2xl hover:shadow-pink-500/10'
+                : 'bg-surface-card/40 border-white/[0.04] opacity-75 grayscale-[0.6]'
         )}>
             
             {/* Visual Preview Area (Left side) */}

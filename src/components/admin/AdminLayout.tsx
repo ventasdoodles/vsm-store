@@ -282,7 +282,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <TacticalProvider>
-            <div className="relative flex h-screen overflow-hidden bg-[#07070a] text-theme-primary selection:bg-vape-500/30">
+            <div className="relative flex h-screen overflow-hidden bg-surface-overlay text-theme-primary selection:bg-vape-500/30">
                 {/* 🌌 Admin Liquid Mesh Background */}
                 <AnimatedAtmosphere />
 

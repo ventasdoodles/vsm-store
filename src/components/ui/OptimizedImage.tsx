@@ -70,7 +70,7 @@ export function OptimizedImage({
 
             {/* Error Fallback / No Image */}
             {error || !src ? (
-                <div className="flex h-full w-full items-center justify-center bg-[#0f172a] flex-col gap-3 p-4 text-center group relative overflow-hidden">
+                <div className="flex h-full w-full items-center justify-center bg-slate-900 flex-col gap-3 p-4 text-center group relative overflow-hidden">
                     {/* Artistic Glow for Fallback */}
                     <div className="absolute inset-0 opacity-20 pointer-events-none">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-vape-500 rounded-full blur-[40px] animate-pulse" />

@@ -61,12 +61,12 @@ export function CustomerHeader({ customer }: Props) {
                 {/* Avatar / Identity */}
                 <div className="hidden md:flex flex-shrink-0 relative">
                     <div className={`h-20 w-20 rounded-2xl flex items-center justify-center text-3xl font-black shadow-inner
-                        ${isVIP ? 'bg-gradient-to-br from-yellow-400 to-amber-600 text-black shadow-amber-500/20' : 'bg-gradient-to-br from-[#1a1c29] to-[#2a2d3d] text-white border border-white/10'}
+                        ${isVIP ? 'bg-gradient-to-br from-yellow-400 to-amber-600 text-black shadow-amber-500/20' : 'bg-gradient-to-br from-surface-card to-surface-elevated text-white border border-white/10'}
                     `}>
                         {getInitials(customer.full_name)}
                     </div>
                     {isVerified && (
-                        <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-surface-card rounded-full flex items-center justify-center border-2 border-[#13141f]">
+                        <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-surface-card rounded-full flex items-center justify-center border-2 border-surface-base">
                             <div className="h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
                                 <ShieldCheck className="h-4 w-4" />
                             </div>

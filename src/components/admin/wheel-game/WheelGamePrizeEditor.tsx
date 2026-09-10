@@ -95,7 +95,7 @@ export function WheelGamePrizeEditor({
             />
 
             {/* Slide-over panel */}
-            <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-[#0d0e1a] border-l border-white/8 shadow-2xl">
+            <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-surface-overlay border-l border-white/8 shadow-2xl">
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-white/8">

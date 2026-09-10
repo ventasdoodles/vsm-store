@@ -22,7 +22,7 @@ export function WheelInvitation() {
     return (
         <Link
             to={isAuthenticated ? '/loyalty' : '/login'}
-            className="block relative overflow-hidden rounded-[3rem] border border-white/10 bg-[#08090f]/80 backdrop-blur-3xl group transition-all duration-700 hover:border-vape-500/50 hover:scale-[1.02] active:scale-[0.99] shadow-2xl"
+            className="block relative overflow-hidden rounded-[3rem] border border-white/10 bg-surface-overlay/80 backdrop-blur-3xl group transition-all duration-700 hover:border-vape-500/50 hover:scale-[1.02] active:scale-[0.99] shadow-2xl"
         >
             {/* ── Background: Cinematic Auras ── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -147,8 +147,7 @@ export function WheelInvitation() {
                         <m.div
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.98 }}
-                            className="group/btn relative inline-flex items-center gap-4 px-10 py-5 rounded-full font-black uppercase text-sm tracking-widest bg-[rgb(var(--border-primary))] shadow-[0_20px_40px_rgba(255,255,255,0.15)] transition-all duration-300 overflow-hidden cursor-pointer"
-                            style={{ color: 'rgb(var(--bg-primary))' }}
+                            className="group/btn relative inline-flex items-center gap-4 px-10 py-5 rounded-full font-black uppercase text-sm tracking-widest bg-[rgb(var(--border-primary))] text-[rgb(var(--bg-primary))] shadow-[0_20px_40px_rgba(255,255,255,0.15)] transition-all duration-300 overflow-hidden cursor-pointer"
                         >
                             <Zap className="w-5 h-5 fill-current" />
                             <span>{isAuthenticated ? 'Girar Ahora' : 'Comenzar Aventura'}</span>

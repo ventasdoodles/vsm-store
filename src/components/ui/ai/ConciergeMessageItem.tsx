@@ -151,7 +151,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                 'relative rounded-2xl px-4 py-3 text-sm shadow-2xl backdrop-blur-md',
                 message.role === 'user'
                     ? 'bg-gradient-to-br from-vape-500 to-vape-600 text-white font-medium rounded-tr-sm border border-vape-400/20'
-                    : 'bg-[#1a1b26]/80 text-white/90 border border-white/10 rounded-tl-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)]',
+                    : 'bg-surface-card/80 text-white/90 border border-white/10 rounded-tl-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)]',
             )}
         >
             {message.role === 'assistant' ? (

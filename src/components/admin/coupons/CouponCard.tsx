@@ -40,7 +40,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
 
     return (
         <div className={cn(
-            "rounded-3xl border bg-[#181825]/60 backdrop-blur-md p-6 relative overflow-hidden group transition-all duration-300 hover:bg-[#181825]/80 hover:-translate-y-1 flex flex-col",
+            "rounded-3xl border bg-surface-card/60 backdrop-blur-md p-6 relative overflow-hidden group transition-all duration-300 hover:bg-surface-card/80 hover:-translate-y-1 flex flex-col",
             status.border,
             status.shadow,
             !coupon.is_active && "opacity-75 grayscale-[0.5]"

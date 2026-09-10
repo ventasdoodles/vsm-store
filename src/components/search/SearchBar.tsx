@@ -314,7 +314,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className="fixed left-4 right-4 top-[140px] md:absolute md:left-0 md:right-0 md:top-full md:mt-2 bg-[#0f172a]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[70vh] md:max-h-[80vh] overflow-y-auto scrollbar-hide"
+                        className="fixed left-4 right-4 top-[140px] md:absolute md:left-0 md:right-0 md:top-full md:mt-2 bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[70vh] md:max-h-[80vh] overflow-y-auto scrollbar-hide"
                     >
                     {/* Recent Searches or AI Suggestions */}
                     {(showRecent || showAIHints) && (

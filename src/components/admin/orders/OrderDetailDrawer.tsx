@@ -128,7 +128,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                     const isCurrent = s.value === order.status;
                                     const allowed = canTransitionTo(order.status as AdminOrderStatus, s.value as AdminOrderStatus);
                                     return (
-                                        <option key={s.value} value={s.value} disabled={!isCurrent && !allowed} className="bg-[#0d0e12] text-white">
+                                        <option key={s.value} value={s.value} disabled={!isCurrent && !allowed} className="bg-surface-base text-white">
                                             {s.label}{(!isCurrent && !allowed) ? ' (No permitido)' : ''}
                                         </option>
                                     );

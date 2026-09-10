@@ -71,7 +71,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                                         <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/30 flex items-center justify-center">
                                             <User className={`h-5 w-5 ${isAnonymous ? 'text-theme-secondary/50' : 'text-emerald-400'}`} />
                                         </div>
-                                        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-[#13141f]" />
+                                        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-surface-base" />
                                     </div>
 
                                     {/* Info */}

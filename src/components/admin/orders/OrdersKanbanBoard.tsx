@@ -71,7 +71,7 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
     const orderIds = useMemo(() => orders.map(o => o.id), [orders]);
 
     return (
-        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-[1.5rem] border border-white/5 bg-[#181825]/40 backdrop-blur-sm shadow-xl relative overflow-hidden group">
+        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-[1.5rem] border border-white/5 bg-surface-card/40 backdrop-blur-sm shadow-xl relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
             {/* Column Header */}
             <div className="flex items-center justify-between border-b border-white/5 bg-black/20 px-5 py-4 rounded-t-[1.5rem] relative z-10">

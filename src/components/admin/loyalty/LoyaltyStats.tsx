@@ -20,7 +20,7 @@ export function LoyaltyStats() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Tarjeta 1: Puntos Emitidos Hoy */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -37,7 +37,7 @@ export function LoyaltyStats() {
             </div>
 
             {/* Tarjeta 2: Último Canje */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
@@ -71,7 +71,7 @@ export function LoyaltyStats() {
             </div>
 
             {/* Tarjeta 3: Top 3 Usuarios */}
-            <div className="bg-gradient-to-br from-[#181825] to-[#181825]/80 backdrop-blur-md border border-amber-500/20 rounded-3xl p-6 shadow-[0_0_30px_rgba(251,191,36,0.05)] relative overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-br from-surface-card to-surface-card/80 backdrop-blur-md border border-amber-500/20 rounded-3xl p-6 shadow-[0_0_30px_rgba(251,191,36,0.05)] relative overflow-hidden flex flex-col">
                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 shadow-inner">

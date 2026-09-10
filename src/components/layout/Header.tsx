@@ -35,7 +35,7 @@ export function Header() {
                     className={cn(
                         'mx-auto relative overflow-visible transition-all duration-500 container-vsm',
                         scrolled
-                            ? 'h-[64px] flex items-center justify-between gap-3 bg-[#0f172a]/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
+                            ? 'h-[64px] flex items-center justify-between gap-3 bg-slate-900/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
                             : 'h-auto px-0 flex flex-col gap-4 bg-transparent border-transparent'
                     )}
                 >
@@ -104,7 +104,7 @@ export function Header() {
                                         "w-full rounded-full transition-all duration-300",
                                         scrolled
                                             ? "bg-surface-elevated/60 backdrop-blur-md border border-white/20 shadow-none group-focus-within:border-accent-primary/60"
-                                            : "bg-[#161d2e] border-2 border-white/10 shadow-[0_0_0_1px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(0,0,0,0.6)] group-focus-within:border-accent-primary/70 group-focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(59,130,246,0.2)] group-hover:border-white/20 group-hover:bg-[#1c2438]"
+                                            : "bg-surface-card border-2 border-white/10 shadow-[0_0_0_1px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(0,0,0,0.6)] group-focus-within:border-accent-primary/70 group-focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(59,130,246,0.2)] group-hover:border-white/20 group-hover:bg-surface-elevated"
                                     )}
                                 />
                             </ErrorBoundary>

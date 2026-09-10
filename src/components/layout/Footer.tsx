@@ -44,19 +44,19 @@ const SOCIAL_LINKS = [
         name: 'Instagram',
         href: SITE_CONFIG.social.instagram,
         icon: Instagram,
-        gradient: 'from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]'
+        gradient: 'from-amber-400 via-pink-500 to-purple-600'
     },
     {
         name: 'Facebook',
         href: SITE_CONFIG.social.facebook,
         icon: Facebook,
-        gradient: 'from-[#1877F2] to-[#0052cc]'
+        gradient: 'from-blue-600 to-blue-700'
     },
     {
         name: 'Twitter',
         href: 'https://twitter.com',
         icon: Twitter,
-        gradient: 'from-[#1DA1F2] to-[#0d8bd9]'
+        gradient: 'from-sky-400 to-sky-600'
     },
 ];
 
@@ -147,7 +147,7 @@ export const Footer = memo(function Footer() {
     };
 
     return (
-        <footer className="relative bg-[#02060c] pt-24 pb-12 overflow-hidden border-t border-white/5">
+        <footer className="relative bg-surface-overlay pt-24 pb-12 overflow-hidden border-t border-white/5">
             {/* 🌌 Cinema Poly-Glow Orbs */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 <m.div 

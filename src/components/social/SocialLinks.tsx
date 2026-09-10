@@ -1,4 +1,4 @@
-﻿// Componente de redes sociales - VSM Store
+// Componente de redes sociales - VSM Store
 import { Facebook, Instagram, Youtube, MessageCircle, Music2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
@@ -18,22 +18,22 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
             name: 'Facebook',
             icon: Facebook,
             url: settings?.social_links?.facebook || SITE_CONFIG.social.facebook,
-            color: 'hover:text-[#1877F2]',
-            bgColor: 'hover:bg-[#1877F2]/10',
+            color: 'hover:text-blue-500',
+            bgColor: 'hover:bg-blue-500/10',
         },
         {
             name: 'Instagram',
             icon: Instagram,
             url: settings?.social_links?.instagram || SITE_CONFIG.social.instagram,
-            color: 'hover:text-[#E4405F]',
-            bgColor: 'hover:bg-[#E4405F]/10',
+            color: 'hover:text-pink-500',
+            bgColor: 'hover:bg-pink-500/10',
         },
         {
             name: 'YouTube',
             icon: Youtube,
             url: settings?.social_links?.youtube || SITE_CONFIG.social.youtube,
-            color: 'hover:text-[#FF0000]',
-            bgColor: 'hover:bg-[#FF0000]/10',
+            color: 'hover:text-red-500',
+            bgColor: 'hover:bg-red-500/10',
         },
         {
             name: 'TikTok',
@@ -46,8 +46,8 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
             name: 'WhatsApp',
             icon: MessageCircle,
             url: `https://wa.me/${settings?.whatsapp_number || SITE_CONFIG.whatsapp.number}`,
-            color: 'hover:text-[#25D366]',
-            bgColor: 'hover:bg-[#25D366]/10',
+            color: 'hover:text-emerald-500',
+            bgColor: 'hover:bg-emerald-500/10',
         },
     ];
 

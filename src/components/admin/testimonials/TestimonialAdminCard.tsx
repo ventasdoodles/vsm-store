@@ -31,8 +31,8 @@ export function TestimonialAdminCard({
             className={cn(
                 'group relative flex flex-col p-6 rounded-3xl transition-all duration-300',
                 t.is_active
-                    ? 'bg-[#181825]/80 backdrop-blur-xl border border-white/[0.06] hover:border-white/20 hover:shadow-xl hover:-translate-y-1'
-                    : 'bg-[#181825]/40 border border-white/[0.04] opacity-75 grayscale-[0.3]',
+                    ? 'bg-surface-card/80 backdrop-blur-xl border border-white/[0.06] hover:border-white/20 hover:shadow-xl hover:-translate-y-1'
+                    : 'bg-surface-card/40 border border-white/[0.04] opacity-75 grayscale-[0.3]',
                 t.is_featured && t.is_active && 'shadow-[0_0_20px_rgba(251,191,36,0.1)] border-amber-500/20'
             )}
         >

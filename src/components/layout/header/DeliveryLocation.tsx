@@ -116,7 +116,7 @@ export function DeliveryLocation() {
 
             {/* Popover */}
             {open && (
-                <div className="absolute top-full left-0 mt-2 w-64 rounded-xl bg-[#0f172a]/95 border border-white/15 shadow-2xl shadow-black/60 backdrop-blur-xl z-50 p-4 animate-fadeIn">
+                <div className="absolute top-full left-0 mt-2 w-64 rounded-xl bg-slate-900/95 border border-white/15 shadow-2xl shadow-black/60 backdrop-blur-xl z-50 p-4 animate-fadeIn">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-semibold text-white">Código postal</span>
                         <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white transition-colors">

@@ -191,7 +191,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-violet-600/20 blur-[128px] rounded-full pointer-events-none mix-blend-screen" />
             <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-600/10 blur-[128px] rounded-full pointer-events-none mix-blend-screen" />
 
-            <div className="rounded-[2rem] bg-[#0c0d14]/80 backdrop-blur-3xl border border-white/10 overflow-hidden relative shadow-[0_0_80px_rgba(0,0,0,0.8)] focus-within:border-violet-500/30 transition-all duration-500 flex flex-col lg:flex-row min-h-[700px]">
+            <div className="rounded-[2rem] bg-surface-overlay/80 backdrop-blur-3xl border border-white/10 overflow-hidden relative shadow-[0_0_80px_rgba(0,0,0,0.8)] focus-within:border-violet-500/30 transition-all duration-500 flex flex-col lg:flex-row min-h-[700px]">
                 
                 {/* Left Sidebar Navigator */}
                 <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/5 bg-white/[0.01] flex flex-col relative z-10">
@@ -370,7 +370,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                     animate={{ opacity: 1, scale: 1, y: 0 }} 
                                                     exit={{ opacity: 0, scale: 0.95 }}
                                                     transition={{ delay: idx * 0.05, duration: 0.2 }}
-                                                    className="group bg-[#1a1b26]/50 backdrop-blur-md border border-white/5 hover:border-violet-500/30 rounded-3xl p-6 relative shadow-xl transition-all focus-within:border-violet-500/50 focus-within:shadow-[0_0_40px_rgba(139,92,246,0.15)]"
+                                                    className="group bg-surface-card/50 backdrop-blur-md border border-white/5 hover:border-violet-500/30 rounded-3xl p-6 relative shadow-xl transition-all focus-within:border-violet-500/50 focus-within:shadow-[0_0_40px_rgba(139,92,246,0.15)]"
                                                 >
                                                     <Button 
                                                         type="button" 

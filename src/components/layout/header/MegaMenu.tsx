@@ -105,7 +105,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="absolute left-1/2 top-full z-50 mt-3 w-[800px] -translate-x-1/2 overflow-hidden rounded-[2rem] border border-white/10 bg-[#0f172a]/95 p-1 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                        className="absolute left-1/2 top-full z-50 mt-3 w-[800px] -translate-x-1/2 overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/95 p-1 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                     >
                         <div className="flex bg-white/[0.02] rounded-[1.8rem] overflow-hidden">
 

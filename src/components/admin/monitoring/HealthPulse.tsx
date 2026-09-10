@@ -31,10 +31,10 @@ export function HealthPulse({ isHealthy, lastCheckTime, uptimeMinutes }: HealthP
         }`}>
             {/* Background Pulse Ring */}
             <div className={`absolute inset-0 flex items-center justify-center pointer-events-none`}>
-                <div className={`h-32 w-32 rounded-full ${isHealthy ? 'bg-emerald-500/5' : 'bg-rose-500/5'} animate-ping`} style={{ animationDuration: isHealthy ? '3s' : '1.5s' }} />
+                <div className={`h-32 w-32 rounded-full ${isHealthy ? 'bg-emerald-500/5 animate-pulse-slow' : 'bg-rose-500/5 animate-ping'}`} />
             </div>
             <div className={`absolute inset-0 flex items-center justify-center pointer-events-none`}>
-                <div className={`h-20 w-20 rounded-full ${isHealthy ? 'bg-emerald-500/8' : 'bg-rose-500/8'} animate-ping`} style={{ animationDuration: isHealthy ? '2.5s' : '1s', animationDelay: '0.5s' }} />
+                <div className={`h-20 w-20 rounded-full ${isHealthy ? 'bg-emerald-500/8 animate-pulse' : 'bg-rose-500/8 animate-ping'}`} />
             </div>
 
             <div className="relative z-10 flex flex-col items-center text-center">
@@ -57,14 +57,13 @@ export function HealthPulse({ isHealthy, lastCheckTime, uptimeMinutes }: HealthP
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 className={isHealthy ? 'animate-pulse' : 'animate-bounce'}
-                                style={{ animationDuration: isHealthy ? '2s' : '0.5s' }}
                             />
                         </svg>
                     </div>
                     {/* Outer ring pulse */}
                     <div className={`absolute inset-0 rounded-full border ${
                         isHealthy ? 'border-emerald-400/20' : 'border-rose-400/30'
-                    } animate-ping`} style={{ animationDuration: '2s' }} />
+                    } animate-ping`} />
                 </div>
 
                 {/* Status Text */}

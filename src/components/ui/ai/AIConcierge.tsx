@@ -285,13 +285,13 @@ export const AIConcierge: React.FC = () => {
                             exit={{ opacity: 0, scale: 0.8, y: 20, x: -20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                             style={{ willChange: 'transform, opacity' }}
-                            className="pointer-events-auto mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[580px] max-h-[75vh] rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] border border-white/10 flex flex-col isolation-auto bg-[#0a0f1d]/60 backdrop-blur-3xl relative"
+                            className="pointer-events-auto mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[580px] max-h-[75vh] rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] border border-white/10 flex flex-col isolation-auto bg-surface-overlay/60 backdrop-blur-3xl relative"
                         >
                             {/* Inner border glow / highlight */}
                             <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none" style={{ maskImage: 'linear-gradient(to bottom, white, transparent)' }} />
                             
                             <div className="absolute inset-x-0 -top-20 -z-10 flex justify-center">
-                                <div className="h-40 w-full blur-[64px] rounded-full bg-vape-500/30 animate-pulse" style={{ animationDuration: '4s' }} />
+                                <div className="h-40 w-full blur-[64px] rounded-full bg-vape-500/30 animate-pulse-slow" />
                             </div>
 
                             <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between bg-white/[0.03] backdrop-blur-md relative z-10">
@@ -356,7 +356,7 @@ export const AIConcierge: React.FC = () => {
                                         className="flex items-start max-w-[85%]"
                                         data-testid="typing-indicator"
                                     >
-                                        <div className="relative rounded-2xl px-4 py-3 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-[#1a1b26]/80 border border-white/10 rounded-tl-sm backdrop-blur-md">
+                                        <div className="relative rounded-2xl px-4 py-3 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] bg-surface-card/80 border border-white/10 rounded-tl-sm backdrop-blur-md">
                                             <div className="flex items-center gap-1.5 h-5">
                                                 <m.div 
                                                     className="w-1.5 h-1.5 rounded-full bg-vape-400"

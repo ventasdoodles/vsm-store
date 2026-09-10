@@ -67,7 +67,7 @@ export function SideDrawer({
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         className={cn(
-                            "relative flex h-full w-full flex-col bg-[#0d0d12]/90 shadow-2xl backdrop-blur-3xl border-l border-white/5",
+                            "relative flex h-full w-full flex-col bg-surface-base/90 shadow-2xl backdrop-blur-3xl border-l border-white/5",
                             width
                         )}
                     >

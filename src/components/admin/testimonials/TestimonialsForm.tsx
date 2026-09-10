@@ -253,7 +253,7 @@ function ToggleSwitch({
                 onClick={() => onChange(!checked)}
                 className={cn(
                     'relative w-12 h-6 rounded-full transition-all duration-300 shadow-inner border border-white/5',
-                    checked ? color : 'bg-[#181825]'
+                    checked ? color : 'bg-surface-card'
                 )}
             >
                 <span

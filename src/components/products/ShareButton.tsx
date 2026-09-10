@@ -65,13 +65,13 @@ export function ShareButton({ product, className }: ShareButtonProps) {
             name: 'WhatsApp',
             icon: MessageCircle,
             url: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
-            color: 'text-[#25D366] group-hover:bg-[#25D366]/10',
+            color: 'text-emerald-500 group-hover:bg-emerald-500/10',
         },
         {
             name: 'Facebook',
             icon: Facebook,
             url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-            color: 'text-[#1877F2] group-hover:bg-[#1877F2]/10',
+            color: 'text-blue-500 group-hover:bg-blue-500/10',
         },
     ];
 

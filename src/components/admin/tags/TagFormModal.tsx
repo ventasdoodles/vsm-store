@@ -89,7 +89,7 @@ export function TagFormModal({
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.2 }}
-                        className="relative w-full max-w-md rounded-3xl border border-white/10 bg-[#181825]/95 p-6 shadow-2xl backdrop-blur-xl"
+                        className="relative w-full max-w-md rounded-3xl border border-white/10 bg-surface-card/95 p-6 shadow-2xl backdrop-blur-xl"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between mb-6">

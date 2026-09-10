@@ -1,4 +1,4 @@
-﻿/**
+/**
  * CustomerStats — Métricas y Segmentación Automática
  * 
  * Grid de KPIs: LTV, transacciones, AOV y recencia.
@@ -78,7 +78,7 @@ function calculateSegment(stats: AdminCustomerDetail['orders_summary']) {
     return { 
         label: 'Recurrente Base', 
         color: 'text-white', 
-        bg: 'from-[#1a1c29] to-[#13141f]', 
+        bg: 'from-surface-card to-surface-base',
         border: 'border-white/10',
         icon: <Target className="h-5 w-5 text-theme-secondary" />
     };

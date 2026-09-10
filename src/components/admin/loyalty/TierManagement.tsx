@@ -71,7 +71,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                 {localTiers.map((tier) => (
                     <div
                         key={tier.id}
-                        className="group relative bg-[#1c1d29]/50 backdrop-blur-md border border-white/5 rounded-3xl p-6 transition-all duration-500 hover:border-white/10 hover:shadow-2xl overflow-hidden"
+                        className="group relative bg-surface-card/50 backdrop-blur-md border border-white/5 rounded-3xl p-6 transition-all duration-500 hover:border-white/10 hover:shadow-2xl overflow-hidden"
                     >
                         {/* Gradient Backdrop */}
                         <div

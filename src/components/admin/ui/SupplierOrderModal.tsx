@@ -80,7 +80,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0A0A0A] shadow-2xl"
+                    className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-white/10 bg-surface-overlay shadow-2xl"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between p-8 border-b border-white/5 bg-white/[0.02]">
