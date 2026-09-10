@@ -135,4 +135,34 @@ describe('Heading Component (UI Atomic)', () => {
         rerender(<Heading tracking="wider">Wider</Heading>);
         expect(screen.getByRole('heading').className).toContain('tracking-wider');
     });
+
+    it('infers level automatically from the "as" prop when level is not provided', () => {
+        const { rerender } = render(<Heading as="h1">Auto H1</Heading>);
+        const h1 = screen.getByRole('heading', { level: 1 });
+        expect(h1.tagName).toBe('H1');
+        // Default size for H1 is 3xl (text-2xl)
+        expect(h1.className).toContain('text-2xl');
+
+        rerender(<Heading as="h4">Auto H4</Heading>);
+        const h4 = screen.getByRole('heading', { level: 4 });
+        expect(h4.tagName).toBe('H4');
+        // Default size for H4 is lg (text-base)
+        expect(h4.className).toContain('text-base');
+    });
+
+    it('defensively detects custom text size in className and does not inject conflicting default responsive font sizes', () => {
+        render(<Heading as="h4" className="text-sm font-bold">Custom Small Heading</Heading>);
+        const heading = screen.getByRole('heading', { level: 4 });
+        expect(heading.className).toContain('text-sm');
+        // Should NOT contain the default sizeStyles['lg'] classes like sm:text-lg
+        expect(heading.className).not.toContain('sm:text-lg');
+    });
+
+    it('defensively detects custom text color in className and does not inject text-white', () => {
+        render(<Heading as="h3" className="text-theme-secondary">Muted Subtitle</Heading>);
+        const heading = screen.getByRole('heading', { level: 3 });
+        expect(heading.className).toContain('text-theme-secondary');
+        expect(heading.className).not.toContain('text-white');
+    });
 });
+

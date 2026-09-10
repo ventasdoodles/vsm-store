@@ -81,8 +81,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     (
         {
             className,
-            variant = 'primary',
-            size = 'md',
+            variant: variantProp,
+            size: sizeProp,
             radius = 'xl',
             isLoading = false,
             loadingText,
@@ -102,6 +102,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         },
         ref
     ) => {
+        // Defensive detection: if consumer passed custom sizing/padding in className without explicit size, don't force 'md' (h-10 px-4)
+        const hasExplicitSizing = Boolean(className && /\b(h-\d+|w-\d+|p-\d+|px-\d+|py-\d+|size-\d+)\b/.test(className));
+        const size = sizeProp !== undefined ? sizeProp : (hasExplicitSizing ? 'none' : 'md');
+
+        // Defensive detection: if consumer passed custom bg/colors in className without explicit variant, don't force 'primary' (bg-white btn-shine)
+        const hasExplicitStyling = Boolean(className && /\b(bg-|border-|shadow-|btn-)\b/.test(className));
+        const variant = variantProp !== undefined ? variantProp : (hasExplicitStyling ? 'unstyled' : 'primary');
+
         const isIconButton = size === 'icon' || size === 'icon-sm' || size === 'icon-lg';
         const isDisabled = isLoading || disabled;
         const accessibleLabel =

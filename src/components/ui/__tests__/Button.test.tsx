@@ -313,5 +313,22 @@ describe('Button Component (UI Atomic)', () => {
             expect(btn.className).toContain('focus-visible:ring-offset-2');
             expect(btn.className).toContain('focus-visible:ring-offset-surface-base');
         });
+
+        it('defensively falls back to size="none" when custom dimensions/padding are passed in className', () => {
+            render(<Button className="h-8 w-8 p-0">Icon</Button>);
+            const btn = screen.getByRole('button');
+            expect(btn.className).toContain('h-8 w-8');
+            expect(btn.className).not.toContain('h-10');
+            expect(btn.className).not.toContain('px-4');
+        });
+
+        it('defensively falls back to variant="unstyled" when custom bg/border are passed in className', () => {
+            render(<Button className="bg-red-600 border-red-500">Custom Red</Button>);
+            const btn = screen.getByRole('button');
+            expect(btn.className).toContain('bg-red-600');
+            expect(btn.className).not.toContain('bg-white');
+            expect(btn.className).not.toContain('btn-shine');
+        });
     });
 });
+

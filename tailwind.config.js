@@ -123,6 +123,7 @@ export default {
             },
             backgroundColor: {
                 theme: {
+                    DEFAULT: 'rgb(var(--bg-primary) / <alpha-value>)',
                     primary: 'rgb(var(--bg-primary) / <alpha-value>)',
                     secondary: 'rgb(var(--bg-secondary) / <alpha-value>)',
                     tertiary: 'rgb(var(--bg-tertiary) / <alpha-value>)',
@@ -140,6 +141,7 @@ export default {
             },
             textColor: {
                 theme: {
+                    DEFAULT: 'rgb(var(--text-primary) / <alpha-value>)',
                     primary: 'rgb(var(--text-primary) / <alpha-value>)',
                     secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
                     tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',

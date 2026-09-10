@@ -94,12 +94,21 @@ interface HeadingComponent {
     displayName?: string;
 }
 
+const tagToLevel: Record<string, HeadingLevel> = {
+    h1: 1,
+    h2: 2,
+    h3: 3,
+    h4: 4,
+    h5: 5,
+    h6: 6,
+};
+
 const HeadingInner = (
     {
-        level = 2,
+        level: levelProp,
         as,
-        size,
-        variant = 'default',
+        size: sizeProp,
+        variant: variantProp = 'default',
         tracking,
         className,
         children,
@@ -112,15 +121,31 @@ const HeadingInner = (
     },
     ref: React.Ref<HTMLElement>
 ) => {
+    // 1. Auto-infer level from `as` if `as` is a heading tag ('h1'..'h6') and level was not passed
+    const inferredLevel = (typeof as === 'string' && tagToLevel[as.toLowerCase()])
+        ? tagToLevel[as.toLowerCase()]
+        : 2;
+    const level = levelProp ?? inferredLevel;
     const Tag = as || `h${level}`;
-    const resolvedSize = size || defaultSizes[level];
+
+    // 2. Auto-detect if className contains an explicit font size to avoid breakpoint clobbering
+    const hasExplicitTextSize = className && /\b(text-(2xs|3xs|xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl))\b/.test(className);
+    const resolvedSize = sizeProp !== undefined
+        ? sizeProp
+        : (hasExplicitTextSize ? 'none' : defaultSizes[level]);
+
+    // 3. Auto-detect if className contains an explicit text color to avoid clobbering with default white
+    const hasExplicitTextColor = className && /\b(text-(white|black|transparent|theme|theme-primary|theme-secondary|theme-tertiary|accent-primary|vape|herbal|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose))\b/.test(className);
+    const resolvedVariant = variantProp !== 'default'
+        ? variantProp
+        : (hasExplicitTextColor ? 'none' : 'default');
 
     return (
         <Tag
             ref={ref}
             className={cn(
                 sizeStyles[resolvedSize],
-                variantStyles[variant],
+                variantStyles[resolvedVariant],
                 tracking ? trackingStyles[tracking] : undefined,
                 className
             )}
