@@ -1,4 +1,6 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+/**
  * // ─── COMPONENTE: DashboardHeader ───
  * // Arquitectura: Dumb Component (Visual)
  * // Propósito principal: Botonera superior para filtrar el dashboard y exportar reportes.
@@ -47,9 +49,9 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                             Analítica
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm flex items-center gap-3">
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white drop-shadow-sm flex items-center gap-3">
                         Dashboard Global
-                    </h1>
+                    </Heading>
                     <p className="mt-1 text-sm font-medium text-theme-secondary">
                         Resumen general de rendimiento de tu tienda
                     </p>
@@ -66,7 +68,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     {/* Presets */}
                     <div className="flex items-center gap-1 rounded-[1.5rem] border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
                         {PRESETS.map(({ label, days }) => (
-                            <button
+                            <Button
                                 key={days}
                                 onClick={() => handlePreset(days)}
                                 className={cn(
@@ -77,7 +79,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                                 )}
                             >
                                 {label}
-                            </button>
+                            </Button>
                         ))}
                     </div>
 
@@ -102,7 +104,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     </div>
 
                     {/* Export Superpower */}
-                    <button
+                    <Button
                         onClick={onExport}
                         className="group flex items-center justify-center gap-2 rounded-2xl bg-theme-secondary px-5 py-3 text-sm font-black text-black transition-all hover:bg-white hover:shadow-lg hover:shadow-white/10 sm:ml-2"
                         aria-label="Exportar reporte a CSV"
@@ -110,7 +112,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     >
                         <Download className="h-4 w-4" />
                         <span className="hidden sm:inline">Exportar CSV</span>
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

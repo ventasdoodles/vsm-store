@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * BrandsCarousel Component — VSM Store
  *
@@ -97,12 +98,12 @@ export const BrandsCarousel = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-theme-primary">
+                        <Heading as="h2" className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-theme-primary">
                             Trusted by the
-                        </h2>
-                        <h2 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+                        </Heading>
+                        <Heading as="h2" className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
                             Industry Leaders
-                        </h2>
+                        </Heading>
                     </div>
 
                     <p className="text-xs sm:text-sm font-black uppercase tracking-[0.5em] text-white/30 max-w-xl mx-auto leading-relaxed">

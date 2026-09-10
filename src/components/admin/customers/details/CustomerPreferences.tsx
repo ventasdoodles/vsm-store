@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * CustomerPreferences — Algoritmo de Consumo
  * 
  * Analiza el historial de pedidos del cliente para proyectar:
@@ -55,7 +56,7 @@ export function CustomerPreferences({ customer }: Props) {
                     <PieChart className="h-5 w-5 text-purple-400" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Algoritmo de Consumo</h3>
+                    <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">Algoritmo de Consumo</Heading>
                     <p className="text-xs text-theme-secondary/70">Intereses y recurrencia mapeada</p>
                 </div>
             </div>
@@ -64,9 +65,9 @@ export function CustomerPreferences({ customer }: Props) {
                 {/* Top Categorías */}
                 {data.topCategories.length > 0 && (
                     <div>
-                        <h4 className="text-2xs text-theme-secondary/80 mb-3 uppercase tracking-widest font-bold flex items-center gap-1.5 border-b border-white/5 pb-2">
+                        <Heading as="h4" className="text-2xs text-theme-secondary/80 mb-3 uppercase tracking-widest font-bold flex items-center gap-1.5 border-b border-white/5 pb-2">
                             <Sparkles className="h-3 w-3 text-purple-400" /> Categorías Top
-                        </h4>
+                        </Heading>
                         <div className="flex flex-wrap gap-2">
                             {data.topCategories.map((cat: { name: string; count: number }, i: number) => {
                                 // Progress bar effect based on index to simulate volume
@@ -88,9 +89,9 @@ export function CustomerPreferences({ customer }: Props) {
                 {/* Top Productos */}
                 {data.topProducts.length > 0 && (
                     <div>
-                        <h4 className="text-2xs text-theme-secondary/80 mb-3 uppercase tracking-widest font-bold flex items-center gap-1.5 border-b border-white/5 pb-2">
+                        <Heading as="h4" className="text-2xs text-theme-secondary/80 mb-3 uppercase tracking-widest font-bold flex items-center gap-1.5 border-b border-white/5 pb-2">
                             <ShoppingBag className="h-3 w-3 text-fuchsia-400" /> Reposición Frecuente
-                        </h4>
+                        </Heading>
                         <div className="space-y-2">
                             {data.topProducts.map((prod: { name: string; count: number }, i: number) => (
                                 <div key={i} className="flex items-center justify-between bg-gradient-to-r hover:from-white/5 hover:to-transparent p-2.5 rounded-xl border border-transparent hover:border-white/5 transition-all group">

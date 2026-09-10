@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: MonitoringHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -33,9 +34,9 @@ export function MonitoringHeader({ onlineCount, errorCount, warnCount }: Monitor
                             Tiempo Real
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
                         Centro de Monitoreo
-                    </h1>
+                    </Heading>
                     <p className="mt-1 text-sm font-medium text-theme-secondary/80">
                         Visibilidad total del sistema, usuarios activos y errores en vivo.
                     </p>

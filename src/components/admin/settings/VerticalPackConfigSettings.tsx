@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from 'react';
 import type { SettingsChangeHandler, SettingsFormData } from './settings.types';
 import type { VerticalPackConfig } from '@/config/productization/types';
@@ -197,9 +199,9 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                         <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-violet-500/20 to-blue-500/20 border border-white/10 text-white mb-6 shadow-[0_0_20px_rgba(139,92,246,0.2)]">
                             <Package className="h-7 w-7" />
                         </div>
-                        <h2 className="text-2xl font-black text-white tracking-tight leading-tight">
+                        <Heading as="h2" className="text-2xl font-black text-white tracking-tight leading-tight">
                             Arquitectura<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">Vertical</span>
-                        </h2>
+                        </Heading>
                         <p className="text-sm text-white/40 font-medium mt-3 leading-relaxed">
                             Diseña la identidad, estructura y persuasión de tu modelo de negocio de manera centralizada.
                         </p>
@@ -211,7 +213,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                             const Icon = tab.icon;
                             const isDisabled = parseError && tab.id !== 'advanced';
                             return (
-                                <button
+                                <Button
                                     key={tab.id}
                                     type="button"
                                     onClick={() => !isDisabled && setActiveTab(tab.id)}
@@ -239,7 +241,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                         </div>
                                     </div>
                                     {isActive && <ChevronRight className="relative z-10 h-4 w-4 text-violet-400" />}
-                                </button>
+                                </Button>
                             );
                         })}
                     </div>
@@ -265,7 +267,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                             {activeTab === 'general' && config && (
                                 <m.div key="general" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-3xl">
                                     <div className="mb-10">
-                                        <h3 className="text-2xl font-bold text-white mb-2">Identidad General</h3>
+                                        <Heading as="h3" className="text-2xl font-bold text-white mb-2">Identidad General</Heading>
                                         <p className="text-white/50 text-sm">Define cómo el sistema identifica internamente tu tienda y el nombre base que se mostrará en lugares neutros.</p>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -296,7 +298,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                 <m.div key="hero" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-3xl">
                                     <div className="mb-10 flex items-center justify-between bg-gradient-to-r from-violet-500/10 to-transparent p-6 rounded-2xl border border-violet-500/20">
                                         <div>
-                                            <h3 className="text-2xl font-bold text-white mb-2">Impacto Visual Hero</h3>
+                                            <Heading as="h3" className="text-2xl font-bold text-white mb-2">Impacto Visual Hero</Heading>
                                             <p className="text-violet-200/60 text-sm">El primer mensaje que ven tus clientes al entrar a la tienda.</p>
                                         </div>
                                         <Sparkles className="w-12 h-12 text-violet-400/20" />
@@ -337,10 +339,10 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                 <m.div key="sections" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-8 max-w-5xl">
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                                         <div>
-                                            <h3 className="text-2xl font-bold text-white mb-2">Estructura de Secciones</h3>
+                                            <Heading as="h3" className="text-2xl font-bold text-white mb-2">Estructura de Secciones</Heading>
                                             <p className="text-white/50 text-sm">Organiza las grandes divisiones de tu catálogo en tarjetas visuales independientes.</p>
                                         </div>
-                                        <button 
+                                        <Button 
                                             type="button" 
                                             onClick={addSection} 
                                             className="group relative inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/50 rounded-xl font-bold text-sm text-white transition-all overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)]"
@@ -348,7 +350,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                             <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-blue-600/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                                             <Plus className="w-4 h-4 relative z-10 group-hover:rotate-90 transition-transform duration-500" />
                                             <span className="relative z-10">Añadir Sección</span>
-                                        </button>
+                                        </Button>
                                     </div>
 
                                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -370,14 +372,14 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                     transition={{ delay: idx * 0.05, duration: 0.2 }}
                                                     className="group bg-[#1a1b26]/50 backdrop-blur-md border border-white/5 hover:border-violet-500/30 rounded-3xl p-6 relative shadow-xl transition-all focus-within:border-violet-500/50 focus-within:shadow-[0_0_40px_rgba(139,92,246,0.15)]"
                                                 >
-                                                    <button 
+                                                    <Button 
                                                         type="button" 
                                                         onClick={() => removeSection(idx)} 
                                                         className="absolute top-5 right-5 p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-full opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100"
                                                         title="Eliminar sección"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    </Button>
                                                     
                                                     <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/5 pr-10">
                                                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center font-bold text-lg text-white/80 shadow-inner">
@@ -441,9 +443,9 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                 <m.div key="advanced" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="space-y-6 h-full flex flex-col">
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
-                                            <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
+                                            <Heading as="h3" className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
                                                 JSON Raw <span className="text-2xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full uppercase tracking-widest border border-red-500/30">Modo Desarrollador</span>
-                                            </h3>
+                                            </Heading>
                                             <p className="text-white/50 text-sm">Control total sobre el esquema subyacente. Útil para copiar/pegar configuraciones enteras.</p>
                                         </div>
                                     </div>

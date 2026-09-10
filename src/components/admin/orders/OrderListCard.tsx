@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 // ─── COMPONENTE: TARJETA DE PEDIDO LIGERA ───────────────────────────────────────────
 // Vista expandible en formato lista para administrar un pedido a la vez.
 // Incorpora transiciones de estado validadas desde el Domain Model, actualizaciones
@@ -69,7 +70,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                     </div>
                 </div>
 
-                <button
+                <Button
                     onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
                     className="flex-1 min-w-0 flex items-center gap-4"
                 >
@@ -102,7 +103,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                 <div className={`shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
                     <ChevronDown className="h-5 w-5 text-theme-secondary/40 group-hover:text-theme-secondary transition-colors" />
                 </div>
-            </button>
+            </Button>
         </div>
 
             {/* Expanded Detail */}
@@ -184,22 +185,22 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                                 onChange={(e) => setTrackingInput(e.target.value)}
                                 className="w-36 rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs text-theme-primary placeholder-theme-secondary/30 focus:border-vape-500/50 focus:outline-none transition-colors hover:border-white/20"
                             />
-                            <button
+                            <Button
                                 onClick={handleSaveTracking}
                                 disabled={trackingInput === (order.tracking_number || '')}
                                 className="p-1.5 rounded-lg border border-white/10 bg-white/[0.03] text-theme-secondary/60 hover:border-white/20 hover:text-theme-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                 title="Guardar número de guía"
                             >
                                 <Save className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                             {trackingInput && (
-                                <button
+                                <Button
                                     onClick={handleNotifyWhatsApp}
                                     className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors"
                                     title="Notificar por WhatsApp"
                                 >
                                     <MessageCircle className="h-3.5 w-3.5" />
-                                </button>
+                                </Button>
                             )}
                         </div>
                     </div>

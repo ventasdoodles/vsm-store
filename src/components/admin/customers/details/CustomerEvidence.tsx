@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * CustomerEvidence — Bóveda de Evidencia
  * 
  * Almacén visual de documentos del cliente (fotos, identificaciones, tickets).
@@ -49,7 +50,7 @@ export function CustomerEvidence({ customer }: Props) {
                         <Camera className="h-5 w-5 text-cyan-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-white uppercase tracking-wider">Bóveda de Evidencia</h3>
+                        <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">Bóveda de Evidencia</Heading>
                         <p className="text-xs text-theme-secondary/70">Fotos, identificaciones y tickets</p>
                     </div>
                 </div>

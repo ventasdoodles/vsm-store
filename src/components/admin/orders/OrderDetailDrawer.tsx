@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 // ─── COMPONENTE: PANEL DE DETALLES DEL PEDIDO (GOD MODE) ──────────────────────────
 // Panel lateral deslizable (Off-canvas) que muestra la radiografía total de un pedido.
 // Se invoca desde listados o tarjetas Kanban e inyecta toda la información vital:
@@ -164,7 +166,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                         </div>
 
                         {order.customer_phone && (
-                            <button
+                            <Button
                                 onClick={handleWhatsApp}
                                 className="group flex w-full items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 hover:bg-emerald-500/15 hover:border-emerald-500/30 transition-all"
                             >
@@ -173,7 +175,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                     <span className="text-sm font-bold text-emerald-400">Notificar por WhatsApp</span>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-emerald-400/40 group-hover:translate-x-0.5 transition-transform" />
-                            </button>
+                            </Button>
                         )}
                     </section>
 
@@ -198,18 +200,18 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                     className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-mono text-theme-primary focus:outline-none focus:border-accent-primary/40 mb-4"
                                 />
                                 <div className="flex gap-2 justify-end">
-                                    <button
+                                    <Button
                                         onClick={() => { setIsEditingTracking(false); setTrackingInput(order.tracking_number || ''); }}
                                         className="px-4 py-2 text-xs font-bold text-theme-secondary/60 hover:text-theme-primary transition-colors"
                                     >
                                         Cancelar
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={handleSaveTracking}
                                         className="flex items-center gap-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 px-4 py-2 text-xs font-black text-emerald-400 transition-colors"
                                     >
                                         <Save className="h-3.5 w-3.5" /> Guardar
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         ) : (
@@ -221,12 +223,12 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                         : <span className="text-sm text-theme-secondary/30 italic">Sin guía asignada</span>
                                     }
                                 </div>
-                                <button
+                                <Button
                                     onClick={() => setIsEditingTracking(true)}
                                     className="shrink-0 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-2xs font-black uppercase tracking-wider text-theme-secondary/60 hover:border-white/15 hover:text-theme-primary transition-colors ml-3"
                                 >
                                     {order.tracking_number ? 'Editar' : 'Agregar'}
-                                </button>
+                                </Button>
                             </div>
                         )}
                     </section>
@@ -248,12 +250,12 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                 </span>
 
                                 {order.payment_status !== 'paid' && (
-                                    <button
+                                    <Button
                                         onClick={() => onPaymentStatusChange(order.id, 'paid')}
                                         className="text-2xs font-black uppercase tracking-tighter text-emerald-400 hover:text-emerald-300 transition-colors text-left"
                                     >
                                         [Confirmar Pago]
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
                             {order.coupon_code && (
@@ -335,16 +337,16 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                         <section className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 mt-8">
                             <div className="flex flex-col gap-4">
                                 <div>
-                                    <h3 className="text-sm font-black uppercase tracking-widest text-red-500">Zona de Peligro</h3>
+                                    <Heading as="h3" className="text-sm font-black uppercase tracking-widest text-red-500">Zona de Peligro</Heading>
                                     <p className="text-xs text-theme-secondary/60 mt-1">Acciones destructivas para este pedido.</p>
                                 </div>
 
                                 {showCancelConfirm ? (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                                         <div className="rounded-xl border border-red-500/30 bg-surface-card p-4 space-y-3">
-                                            <h4 className="text-sm font-bold text-red-400 flex items-center gap-2">
+                                            <Heading as="h4" className="text-sm font-bold text-red-400 flex items-center gap-2">
                                                 <XCircle className="h-4 w-4" /> ¿Cancelar Pedido?
-                                            </h4>
+                                            </Heading>
                                             <p className="text-xs text-theme-secondary/70">
                                                 Esta acción cancelará el pedido. Las estadísticas del cliente y puntos asociados se ajustarán por la capa de integridad de datos.
                                             </p>
@@ -368,34 +370,34 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                             </div>
 
                                             <div className="flex gap-2 justify-end pt-2">
-                                                <button
+                                                <Button
                                                     onClick={() => setShowCancelConfirm(false)}
                                                     disabled={isCancelling}
                                                     className="px-4 py-2 text-xs font-bold text-theme-secondary/60 hover:text-white transition-colors"
                                                 >
                                                     Mantener pedido
-                                                </button>
-                                                <button
+                                                </Button>
+                                                <Button
                                                     onClick={submitCancelOrder}
                                                     disabled={isCancelling}
                                                     className="px-4 py-2 text-xs font-black bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
                                                 >
                                                     {isCancelling && <Loader2 className="h-3 w-3 animate-spin" />}
                                                     Sí, cancelar pedido
-                                                </button>
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
                                     <div>
-                                        <button
+                                        <Button
                                             onClick={() => setShowCancelConfirm(true)}
                                             disabled={order.payment_status === 'paid'}
                                             className="w-full py-3 rounded-xl border border-red-500/30 text-sm font-bold text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                         >
                                             <XCircle className="h-4 w-4" />
                                             Cancelar Pedido
-                                        </button>
+                                        </Button>
                                         {order.payment_status === 'paid' && (
                                             <p className="text-2xs text-center text-red-400/60 mt-2 font-bold uppercase tracking-wider">
                                                 Deshabilitado: El pedido está pagado. Reembolsos próximamente.

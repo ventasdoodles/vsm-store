@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: CategoryForm ───
  * // Arquitectura: Dumb Component (Visual + Form State)
@@ -130,21 +132,21 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                                     {editing ? 'Editar' : isChild ? 'Nueva Sub' : 'Nueva Categoría'}
                                 </span>
                             </div>
-                            <h2 className="text-lg font-bold text-white">
+                            <Heading as="h2" className="text-lg font-bold text-white">
                                 {editing ? editing.name : isChild ? 'Subcategoría' : 'Categoría'}
-                            </h2>
+                            </Heading>
                             {parentCategory && (
                                 <p className="text-xs text-white/40">
                                     Bajo: <span className="text-emerald-400">{parentCategory.name}</span>
                                 </p>
                             )}
                         </div>
-                        <button
+                        <Button
                             onClick={onClose}
                             className="rounded-xl p-2 text-white/30 transition-all hover:bg-white/5 hover:text-white/60"
                         >
                             <X className="h-5 w-5" />
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -309,13 +311,13 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
 
                 {/* ── Footer ── */}
                 <div className="flex items-center justify-end gap-3 border-t border-white/5 px-6 py-4">
-                    <button
+                    <Button
                         onClick={onClose}
                         className="rounded-[0.75rem] border border-white/10 px-4 py-2.5 text-sm font-medium text-white/50 transition-all hover:bg-white/5 hover:text-white/70"
                     >
                         Cancelar
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleSubmit}
                         disabled={isSaving || !form.name.trim() || !form.slug.trim()}
                         className="
@@ -334,7 +336,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                             {editing ? 'Guardar cambios' : 'Crear categoría'}
                         </span>
-                    </button>
+                    </Button>
                 </div>
             </div>
         </>
@@ -352,7 +354,7 @@ function ToggleSwitch({
     activeColor: string;
 }) {
     return (
-        <button
+        <Button
             type="button"
             onClick={onChange}
             className={cn(
@@ -366,6 +368,6 @@ function ToggleSwitch({
                     checked ? 'translate-x-6' : 'translate-x-1',
                 )}
             />
-        </button>
+        </Button>
     );
 }

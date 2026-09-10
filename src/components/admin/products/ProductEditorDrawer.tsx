@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: ProductEditorDrawer ───
  * // Arquitectura: Dumb Component (Visual)
@@ -308,10 +310,10 @@ export function ProductEditorDrawer({
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             {/* 1. Imagenes */}
                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <Camera className="h-4 w-4 text-violet-400" />
                                     Fotografias
-                                </h3>
+                                </Heading>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <ImageUploader
                                         images={formData.images || []}
@@ -324,10 +326,10 @@ export function ProductEditorDrawer({
 
                             {/* 2. Info Basica */}
                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <Package2 className="h-4 w-4 text-blue-400" />
                                     Identidad & Precios
-                                </h3>
+                                </Heading>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <div className="md:col-span-2">
                                         <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Nombre del Producto *</label>
@@ -353,10 +355,10 @@ export function ProductEditorDrawer({
                             </section>
 
                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <LayoutDashboard className="h-4 w-4 text-amber-400" />
                                     Descripción Corta
-                                </h3>
+                                </Heading>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <textarea name="short_description" value={formData.short_description || ''} onChange={handleChange} rows={2} className={INPUT_CLS} placeholder="Resumen breve visible en tarjetas..." />
                                 </div>
@@ -368,10 +370,10 @@ export function ProductEditorDrawer({
                     {activeTab === 'clasificacion' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <FolderTree className="h-4 w-4 text-cyan-400" />
                                     Ontología del Catálogo
-                                </h3>
+                                </Heading>
                                 <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     {/* Seccion */}
                                     <div>
@@ -445,10 +447,10 @@ export function ProductEditorDrawer({
 
                              {/* Variantes */}
                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <Layers className="h-4 w-4 text-violet-400" />
                                     Matriz de Variantes (Purchasable)
-                                </h3>
+                                </Heading>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.01] p-1 backdrop-blur-sm">
                                     <ProductVariantsEditor
                                         existingVariants={formData.variants || []}
@@ -469,11 +471,11 @@ export function ProductEditorDrawer({
                             {/* AI Marketing Copy */}
                             <section className="space-y-3">
                                 <div className="flex items-center justify-between px-2">
-                                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
+                                    <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
                                         <Sparkles className="h-4 w-4 text-violet-400" />
                                         Copywriting & IA
-                                    </h3>
-                                    <button
+                                    </Heading>
+                                    <Button
                                         type="button"
                                         onClick={handleAIGenerate}
                                         disabled={isGeneratingAI || !formData.name}
@@ -481,7 +483,7 @@ export function ProductEditorDrawer({
                                     >
                                         {isGeneratingAI ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3 animate-pulse" />}
                                         Optimizar con IA
-                                    </button>
+                                    </Button>
                                 </div>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
                                     <div>
@@ -503,10 +505,10 @@ export function ProductEditorDrawer({
                             </section>
 
                             <section className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <Zap className="h-4 w-4 text-amber-400" />
                                     Tags & Badges
-                                </h3>
+                                </Heading>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-6">
                                     {/* Badges Array */}
                                     <div>
@@ -515,7 +517,7 @@ export function ProductEditorDrawer({
                                             {['HOT', 'NEW', 'LIMITADO', 'RECOMENDADO', 'OFERTA'].map(badge => {
                                                 const isActive = formData.badges?.includes(badge);
                                                 return (
-                                                    <button
+                                                    <Button
                                                         key={badge}
                                                         onClick={() => {
                                                             const next = isActive 
@@ -531,7 +533,7 @@ export function ProductEditorDrawer({
                                                         )}
                                                     >
                                                         {badge}
-                                                    </button>
+                                                    </Button>
                                                 );
                                             })}
                                         </div>
@@ -551,11 +553,11 @@ export function ProductEditorDrawer({
                                                 className={cn(INPUT_CLS, 'flex-1')}
                                                 placeholder="Sabor, Perfil, Ocasión..."
                                             />
-                                            <button type="button" onClick={() => addTag()} className="px-3 bg-white/5 rounded-xl border border-white/10"><Plus className="h-4 w-4 text-white/40" /></button>
+                                            <Button type="button" onClick={() => addTag()} className="px-3 bg-white/5 rounded-xl border border-white/10"><Plus className="h-4 w-4 text-white/40" /></Button>
                                             {showTagDropdown && tagSuggestions.length > 0 && (
                                                 <div className="absolute left-0 top-full z-20 mt-1 max-h-40 w-full overflow-y-auto rounded-xl border border-white/10 bg-theme-primary/95 shadow-xl backdrop-blur-xl">
                                                     {tagSuggestions.map(t => (
-                                                        <button key={t} type="button" onMouseDown={() => addTag(t)} className="flex w-full items-center px-3 py-2 text-sm text-white/60 hover:bg-white/5 hover:text-white">{t}</button>
+                                                        <Button key={t} type="button" onMouseDown={() => addTag(t)} className="flex w-full items-center px-3 py-2 text-sm text-white/60 hover:bg-white/5 hover:text-white">{t}</Button>
                                                     ))}
                                                 </div>
                                             )}
@@ -564,7 +566,7 @@ export function ProductEditorDrawer({
                                             {(formData.tags ?? []).map(tag => (
                                                 <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-400 ring-1 ring-inset ring-violet-500/20">
                                                     {tag}
-                                                    <button type="button" onClick={() => removeTag(tag)}><X className="h-2.5 w-2.5" /></button>
+                                                    <Button type="button" onClick={() => removeTag(tag)}><X className="h-2.5 w-2.5" /></Button>
                                                 </span>
                                             ))}
                                         </div>
@@ -590,8 +592,8 @@ export function ProductEditorDrawer({
             {/* Sticky Footer */}
             <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/5 bg-theme-primary/95 px-6 py-4 backdrop-blur-xl">
                 <div className="flex items-center justify-between">
-                    <button onClick={onClose} className="rounded-xl px-4 py-2 text-sm font-bold text-white/40 hover:text-white/70 transition-all">Cancelar</button>
-                    <button
+                    <Button onClick={onClose} className="rounded-xl px-4 py-2 text-sm font-bold text-white/40 hover:text-white/70 transition-all">Cancelar</Button>
+                    <Button
                         onClick={handleSave}
                         disabled={isSaving}
                         className="group relative inline-flex items-center gap-2 rounded-xl px-8 py-3 font-bold text-white text-sm bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20 transition-all hover:shadow-violet-500/30 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
@@ -599,7 +601,7 @@ export function ProductEditorDrawer({
                         <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
                         {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         <span>{isEditMode ? 'Guardar Cambios' : 'Crear Producto'}</span>
-                    </button>
+                    </Button>
                 </div>
             </div>
         </SideDrawer>

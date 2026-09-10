@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { useMemo, useState } from 'react';
 import {
     useReactTable,
@@ -75,7 +76,7 @@ const columns = [
     }),
     columnHelper.accessor('customer_name', {
         header: ({ column }) => (
-            <button
+            <Button
                 onClick={column.getToggleSortingHandler()}
                 className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
@@ -84,7 +85,7 @@ const columns = [
                     asc: <ArrowUp className="h-3 w-3" />,
                     desc: <ArrowDown className="h-3 w-3" />,
                 }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-3 w-3 opacity-50" />}
-            </button>
+            </Button>
         ),
         cell: ({ row }) => (
             <div>
@@ -114,7 +115,7 @@ const columns = [
     }),
     columnHelper.accessor('total', {
         header: ({ column }) => (
-            <button
+            <Button
                 onClick={column.getToggleSortingHandler()}
                 className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
@@ -123,7 +124,7 @@ const columns = [
                     asc: <ArrowUp className="h-3 w-3" />,
                     desc: <ArrowDown className="h-3 w-3" />,
                 }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-3 w-3 opacity-50" />}
-            </button>
+            </Button>
         ),
         cell: ({ getValue }) => (
             <span className="font-black text-theme-primary text-sm">
@@ -176,7 +177,7 @@ const columns = [
     }),
     columnHelper.accessor('created_at', {
         header: ({ column }) => (
-            <button
+            <Button
                 onClick={column.getToggleSortingHandler()}
                 className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
@@ -185,7 +186,7 @@ const columns = [
                     asc: <ArrowUp className="h-3 w-3" />,
                     desc: <ArrowDown className="h-3 w-3" />,
                 }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-3 w-3 opacity-50" />}
-            </button>
+            </Button>
         ),
         cell: ({ getValue }) => (
             <span className="text-2xs text-theme-secondary/50 font-mono tabular-nums">

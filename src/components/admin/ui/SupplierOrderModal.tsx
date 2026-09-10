@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useCallback, useState, useEffect } from 'react';
 import { 
     X, ShoppingCart, MessageSquare, 
@@ -87,16 +89,16 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                                 <Truck className="h-6 w-6" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-black text-white italic uppercase tracking-tight">Reordenar Stock</h2>
+                                <Heading as="h2" className="text-xl font-black text-white italic uppercase tracking-tight">Reordenar Stock</Heading>
                                 <p className="text-2xs font-bold text-white/40 uppercase tracking-widest leading-none mt-1">Smart Supplier Connect</p>
                             </div>
                         </div>
-                        <button 
+                        <Button 
                             onClick={onClose}
                             className="p-3 rounded-2xl bg-white/5 text-white/40 hover:text-white transition-all"
                         >
                             <X className="h-5 w-5" />
-                        </button>
+                        </Button>
                     </div>
 
                     <div className="p-8 space-y-6">
@@ -137,33 +139,33 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                                     className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 text-sm text-white/80 leading-relaxed focus:border-vape-500/50 outline-none transition-all resize-none"
                                 />
                                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                                    <button 
+                                    <Button 
                                         onClick={handleCopy}
                                         className="p-2 rounded-xl bg-white/5 text-white/40 hover:text-white transition-all border border-white/10"
                                         title="Copiar"
                                     >
                                         <Copy className="h-4 w-4" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Action Bar */}
                         <div className="flex items-center gap-4 pt-4">
-                            <button 
+                            <Button 
                                 onClick={onClose}
                                 className="flex-1 px-6 py-4 rounded-2xl bg-white/5 text-white text-xs font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 transition-all"
                             >
                                 Cancelar
-                            </button>
-                            <button 
+                            </Button>
+                            <Button 
                                 onClick={handleWhatsApp}
                                 disabled={!message || loading}
                                 className="flex-[2] flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500 text-white text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-400 transition-all disabled:opacity-50"
                             >
                                 <ShoppingCart className="h-4 w-4" />
                                 Enviar Pedido vía WA
-                            </button>
+                            </Button>
                         </div>
                     </div>
 

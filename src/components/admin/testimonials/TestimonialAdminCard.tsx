@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import React from 'react';
 import { ShieldCheck, Sparkles, EyeOff, Eye, Pencil, Trash2, Copy, Star } from 'lucide-react';
 import { getAdminSectionCatalogEntry } from '@/config/productization';
@@ -151,15 +152,15 @@ export function TestimonialAdminCard({
 
             {/* Mobile Action Bar (Always visible on touch) */}
             <div className="flex md:hidden border-t border-white/5 -mx-6 -mb-6 mt-4 bg-surface-base justify-around rounded-b-3xl">
-                <button onClick={() => onEdit(t)} className="p-3 text-accent-primary" aria-label="Editar"><Pencil className="w-5 h-5" /></button>
-                <button onClick={() => onDuplicate(t)} className="p-3 text-blue-400" aria-label="Duplicar"><Copy className="w-5 h-5" /></button>
-                <button onClick={() => onToggleFeatured(t.id, !t.is_featured)} className="p-3 text-amber-400" aria-label={t.is_featured ? 'Quitar destacado' : 'Destacar'}>
+                <Button onClick={() => onEdit(t)} className="p-3 text-accent-primary" aria-label="Editar"><Pencil className="w-5 h-5" /></Button>
+                <Button onClick={() => onDuplicate(t)} className="p-3 text-blue-400" aria-label="Duplicar"><Copy className="w-5 h-5" /></Button>
+                <Button onClick={() => onToggleFeatured(t.id, !t.is_featured)} className="p-3 text-amber-400" aria-label={t.is_featured ? 'Quitar destacado' : 'Destacar'}>
                     <Sparkles className={cn('w-5 h-5', t.is_featured && 'fill-amber-400')} />
-                </button>
-                <button onClick={() => onToggleActive(t.id, !t.is_active)} className="p-3 text-emerald-400" aria-label={t.is_active ? 'Ocultar' : 'Mostrar'}>
+                </Button>
+                <Button onClick={() => onToggleActive(t.id, !t.is_active)} className="p-3 text-emerald-400" aria-label={t.is_active ? 'Ocultar' : 'Mostrar'}>
                     {t.is_active ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-                <button onClick={() => onDelete(t.id)} className="p-3 text-red-400" aria-label="Eliminar"><Trash2 className="w-5 h-5" /></button>
+                </Button>
+                <Button onClick={() => onDelete(t.id)} className="p-3 text-red-400" aria-label="Eliminar"><Trash2 className="w-5 h-5" /></Button>
             </div>
         </div>
     );
@@ -187,7 +188,7 @@ function ActionBtn({
     };
 
     return (
-        <button
+        <Button
             onClick={onClick}
             title={label}
             className={cn(
@@ -197,6 +198,6 @@ function ActionBtn({
             )}
         >
             {icon}
-        </button>
+        </Button>
     );
 }

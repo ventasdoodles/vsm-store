@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: CATEGORY SHOWCASE ───
  * // Propósito: Grid interactivo de categorías con efectos de spotlight.
@@ -128,9 +129,9 @@ function CategoryCard({ category, priority }: { category: FeaturedCategory, prio
                     </m.div>
 
                     <div className="space-y-2">
-                        <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tighter uppercase italic line-clamp-2 leading-[0.9] pb-1 pt-1 group-hover:text-vape-400 transition-colors">
+                        <Heading as="h3" className="text-2xl sm:text-3xl font-black text-white tracking-tighter uppercase italic line-clamp-2 leading-[0.9] pb-1 pt-1 group-hover:text-vape-400 transition-colors">
                             {category.name}
-                        </h3>
+                        </Heading>
                         <div className="flex items-center gap-2">
                             <div className="h-px w-8 bg-vape-500/50 group-hover:w-12 transition-all duration-500" />
                             <p className="text-white/40 text-2xs font-black uppercase tracking-[0.3em]">
@@ -177,9 +178,9 @@ export const CategoryShowcase = () => {
             >
                 <div className="flex items-center gap-4">
                     <div className="h-8 w-1.5 rounded-full bg-vape-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
-                    <h2 className="text-3xl font-black text-theme-primary tracking-tighter uppercase italic">
+                    <Heading as="h2" className="text-3xl font-black text-theme-primary tracking-tighter uppercase italic">
                         Explora Categorías
-                    </h2>
+                    </Heading>
                 </div>
             </m.div>
 

@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 // Guard para rutas de admin - VSM Store
 // Verifica auth + rol admin antes de renderizar
 
@@ -73,7 +75,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
             <div className="flex h-screen items-center justify-center bg-theme-primary">
                 <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center max-w-md">
                     <ShieldX className="h-12 w-12 text-amber-400" />
-                    <h1 className="text-xl font-bold text-theme-primary">Tiempo de espera agotado</h1>
+                    <Heading as="h1" className="text-xl font-bold text-theme-primary">Tiempo de espera agotado</Heading>
                     <p className="text-sm text-theme-secondary">
                         No se pudo verificar tu acceso de administrador. Esto puede ser un problema temporal.
                     </p>
@@ -85,12 +87,12 @@ export function AdminGuard({ children }: AdminGuardProps) {
                         </p>
                     </div>
                     <div className="flex gap-3">
-                        <button
+                        <Button
                             onClick={() => window.location.reload()}
                             className="rounded-lg bg-vape-500 px-4 py-2 text-sm font-medium text-primary-950 hover:bg-vape-400 transition-colors"
                         >
                             Reintentar
-                        </button>
+                        </Button>
                         <a
                             href="/"
                             className="rounded-lg bg-theme-secondary px-4 py-2 text-sm text-theme-secondary hover:bg-theme-secondary transition-colors"
@@ -114,7 +116,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
             <div className="flex h-screen items-center justify-center bg-theme-primary">
                 <div className="flex flex-col items-center gap-4 rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
                     <ShieldX className="h-12 w-12 text-red-400" />
-                    <h1 className="text-xl font-bold text-theme-primary">Acceso denegado</h1>
+                    <Heading as="h1" className="text-xl font-bold text-theme-primary">Acceso denegado</Heading>
                     <p className="text-sm text-theme-secondary max-w-xs">
                         No tienes permisos de administrador. Contacta al propietario si necesitas acceso.
                     </p>

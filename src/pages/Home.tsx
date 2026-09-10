@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── PÁGINA: HOME ───
  * // Propósito: Fachada principal de la tienda. Orquestación de secciones de alto impacto.
@@ -195,7 +196,7 @@ export function Home() {
             />
             <OrganizationJsonLd />
 
-            <h1 className="sr-only">{storeMetaCopy.home.hiddenHeading}</h1>
+            <Heading as="h1" className="sr-only">{storeMetaCopy.home.hiddenHeading}</Heading>
 
             <div className="space-y-12 md:space-y-16">
                 <SectionErrorBoundary name="MegaHero">

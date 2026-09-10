@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * CustomerFormModal — Modal de Creación de Cliente
  * 
@@ -86,28 +88,28 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-8 py-6 relative z-10">
-                    <h2 className="text-xl font-black text-theme-primary flex items-center gap-3">
+                    <Heading as="h2" className="text-xl font-black text-theme-primary flex items-center gap-3">
                         <div className="p-2 bg-blue-500/20 text-blue-400 rounded-xl">
                             <User className="h-5 w-5" />
                         </div>
                         Nuevo Cliente
-                    </h2>
-                    <button
+                    </Heading>
+                    <Button
                         type="button"
                         onClick={onClose}
                         className="rounded-xl p-2 text-theme-secondary hover:bg-white/10 hover:text-white transition-all hover:rotate-90 duration-300"
                     >
                         <X className="h-5 w-5" />
-                    </button>
+                    </Button>
                 </div>
 
                 <form id="customer-form" onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[75vh] md:h-auto overflow-hidden relative z-10">
                     {/* Col 1: Datos Personales */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 border-b md:border-b-0 md:border-r border-white/5 custom-scrollbar">
-                        <h3 className="text-2xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <Heading as="h3" className="text-2xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                             <Mail className="h-3 w-3" />
                             Datos de Cuenta
-                        </h3>
+                        </Heading>
 
                         <div className="grid gap-5">
                             <div>
@@ -174,10 +176,10 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                     {/* Col 2: Dirección */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-white/[0.02] custom-scrollbar">
-                        <h3 className="text-2xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <Heading as="h3" className="text-2xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                             <MapPin className="h-3 w-3" />
                             Dirección de Entrega
-                        </h3>
+                        </Heading>
 
                         <div className="grid gap-5">
                             <div className="grid grid-cols-3 gap-5">
@@ -267,14 +269,14 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                 {/* Footer Actions */}
                 <div className="flex items-center justify-end gap-4 border-t border-white/5 bg-black/40 px-8 py-5 relative z-10">
-                    <button
+                    <Button
                         type="button"
                         onClick={onClose}
                         className="rounded-xl px-5 py-3 text-sm font-bold text-theme-secondary hover:bg-white/10 hover:text-white transition-all"
                     >
                         Cancelar
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         form="customer-form"
                         disabled={loading}
@@ -291,7 +293,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                                 Crear Cliente
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: AdminProducts ─── [Wave 90 - Thin Component Refactor]
  * // Arquitectura: Page Orchestrator (Thin Component)
@@ -94,13 +95,13 @@ export function AdminProducts() {
                             {admin.selectedIds.length} Seleccionados
                         </span>
                         <div className="flex items-center gap-2">
-                            <button onClick={() => admin.bulkToggle(true)} disabled={admin.isBulkToggling} className="btn-vsm-bulk text-emerald-400">Activar</button>
-                            <button onClick={() => admin.bulkToggle(false)} disabled={admin.isBulkToggling} className="btn-vsm-bulk text-amber-400">Desactivar</button>
-                            <button onClick={admin.bulkAISync} disabled={admin.isBulkAISyncing} className="btn-vsm-bulk text-violet-400">
+                            <Button onClick={() => admin.bulkToggle(true)} disabled={admin.isBulkToggling} className="btn-vsm-bulk text-emerald-400">Activar</Button>
+                            <Button onClick={() => admin.bulkToggle(false)} disabled={admin.isBulkToggling} className="btn-vsm-bulk text-amber-400">Desactivar</Button>
+                            <Button onClick={admin.bulkAISync} disabled={admin.isBulkAISyncing} className="btn-vsm-bulk text-violet-400">
                                 {admin.isBulkAISyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                                 Sincronización (Sistema)
-                            </button>
-                            <button onClick={() => admin.setSelectedIds([])} className="text-xs font-bold text-white/30 hover:text-white/60 px-2 transition-colors">Cancelar</button>
+                            </Button>
+                            <Button onClick={() => admin.setSelectedIds([])} className="text-xs font-bold text-white/30 hover:text-white/60 px-2 transition-colors">Cancelar</Button>
                         </div>
                     </div>
                 </div>

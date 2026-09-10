@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { Sparkles, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { EnrichmentPackage } from '@/services/admin';
@@ -18,7 +20,7 @@ export function EnrichmentFieldRow({ fieldKey, label, approved, onToggle, childr
         )}>
             <div className="flex items-center justify-between mb-2">
                 <span className="text-2xs font-black uppercase tracking-widest text-white/40">{label}</span>
-                <button
+                <Button
                     type="button"
                     onClick={() => onToggle(fieldKey)}
                     className={cn(
@@ -29,7 +31,7 @@ export function EnrichmentFieldRow({ fieldKey, label, approved, onToggle, childr
                     )}
                 >
                     ✓
-                </button>
+                </Button>
             </div>
             {children}
         </div>
@@ -54,10 +56,10 @@ export function ProductEnrichmentReview({
     return (
         <section className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center justify-between px-2">
-                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
+                <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
                     <Sparkles className="h-4 w-4 text-violet-400" />
                     Sugerencias de Enriquecimiento
-                </h3>
+                </Heading>
                 <span className={cn(
                     'px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest',
                     enrichmentResult.confidence === 'high'
@@ -184,21 +186,21 @@ export function ProductEnrichmentReview({
 
                 {/* Action buttons */}
                 <div className="flex items-center gap-3 border-t border-white/5 pt-4">
-                    <button
+                    <Button
                         type="button"
                         onClick={handleApplyEnrichment}
                         disabled={approvedFields.size === 0}
                         className="flex-1 py-2.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/20 text-violet-300 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-30"
                     >
                         Aplicar Aprobadas ({approvedFields.size})
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="button"
                         onClick={() => setEnrichmentResult(null)}
                         className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/30 hover:text-white/60 text-xs font-bold uppercase tracking-wider transition-all"
                     >
                         Descartar
-                    </button>
+                    </Button>
                 </div>
             </div>
         </section>

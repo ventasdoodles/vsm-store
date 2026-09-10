@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { Building, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Address } from '@/hooks/useAddresses';
@@ -30,7 +31,7 @@ export function ShippingAddressContent({
             <div className="space-y-4">
                 <div className="grid gap-3">
                     {shippingAddresses.map((a: Address) => (
-                        <button
+                        <Button
                             key={a.id}
                             onClick={() => setSelectedAddressId(a.id)}
                             className={cn(
@@ -51,15 +52,15 @@ export function ShippingAddressContent({
                                 <p className="text-2xs text-theme-tertiary">{a.street} #{a.number}, {a.colony}</p>
                             </div>
                             {selectedAddressId === a.id && <CheckCircle className="h-5 w-5 text-vape-400" />}
-                        </button>
+                        </Button>
                     ))}
                 </div>
-                <button
+                <Button
                     onClick={() => setUseNewAddress(true)}
                     className="text-xs font-bold text-vape-400 hover:text-vape-300 ml-2"
                 >
                     + Agregar nueva dirección
-                </button>
+                </Button>
             </div>
         );
     }
@@ -80,12 +81,12 @@ export function ShippingAddressContent({
                 {errors.address && <p className="mt-2 text-2xs text-red-500 ml-2">{errors.address}</p>}
             </div>
             {isAuthenticated && (
-                <button
+                <Button
                     onClick={() => setUseNewAddress(false)}
                     className="text-xs font-bold text-theme-tertiary hover:text-white"
                 >
                     ← Volver a mis direcciones
-                </button>
+                </Button>
             )}
         </div>
     );

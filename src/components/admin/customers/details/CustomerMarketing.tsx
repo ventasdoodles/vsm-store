@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * CustomerMarketing — Máquina de Retención y Lealtad
  * 
@@ -87,7 +89,7 @@ export function CustomerMarketing({ customer }: Props) {
                     <Sparkles className="h-5 w-5 text-pink-400" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Máquina de Retención</h3>
+                    <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">Máquina de Retención</Heading>
                     <p className="text-xs text-theme-secondary/70">Incentivos y lealtad</p>
                 </div>
             </div>
@@ -96,9 +98,9 @@ export function CustomerMarketing({ customer }: Props) {
                 {/* V-Coins Controller */}
                 <div className="p-5 rounded-2xl border border-white/5 bg-surface-card/50 hover:bg-surface-card/80 transition-colors group">
                     <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                        <Heading as="h4" className="text-sm font-bold text-white flex items-center gap-2">
                             <Coins className="h-4 w-4 text-yellow-400" /> Controlador V-Coins
-                        </h4>
+                        </Heading>
                         <div className="text-xs font-bold text-yellow-400 bg-yellow-400/10 px-2.5 py-1 rounded-full border border-yellow-400/20 flex items-center gap-1">
                             {currentCoins} Disponibles
                         </div>
@@ -124,7 +126,7 @@ export function CustomerMarketing({ customer }: Props) {
                                 className="flex-1 bg-surface-base border border-white/10 focus:border-yellow-400/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
                             />
                         </div>
-                        <button
+                        <Button
                             onClick={handleGivePoints}
                             disabled={adjustPointsMutation.isPending}
                             className={`w-full py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300
@@ -133,22 +135,22 @@ export function CustomerMarketing({ customer }: Props) {
                         >
                             {adjustPointsMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
                             Inyectar V-Coins a la Billetera
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
                 {/* Cupón Único */}
                 <div className="p-5 rounded-2xl border border-white/5 bg-surface-card/50 hover:bg-surface-card/80 transition-colors">
                     <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                        <Heading as="h4" className="text-sm font-bold text-white flex items-center gap-2">
                             <Ticket className="h-4 w-4 text-blue-400" /> Cupón Dedicado One-Click
-                        </h4>
+                        </Heading>
                         <span className="text-2xs font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-md border border-blue-500/20">Nuevo</span>
                     </div>
                     <p className="text-xs text-theme-secondary/80 mb-4 leading-relaxed">
                         Genera un cupón de 10% de descuento irrepetible (1 uso) anclado estrictamente a este correo. Ideal para carritos abandonados o disculpas.
                     </p>
-                    <button 
+                    <Button 
                         onClick={handleGenerateUniqueCoupon}
                         disabled={isGeneratingCoupon}
                         className="w-full bg-gradient-to-r from-blue-600/20 to-indigo-600/20 hover:from-blue-600/30 hover:to-indigo-600/30 text-blue-400 border border-blue-500/30 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(59,130,246,0.15)] focus:scale-[0.98]"
@@ -158,7 +160,7 @@ export function CustomerMarketing({ customer }: Props) {
                         ) : (
                             <><Sparkles className="h-4 w-4" /> Generar y Copiar MAGIC-10%</>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

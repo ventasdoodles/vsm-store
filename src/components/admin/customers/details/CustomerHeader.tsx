@@ -1,4 +1,6 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+/**
  * CustomerHeader — Hero del Perfil de Cliente
  * 
  * Muestra avatar con iniciales, nombre, badges VIP/Verificado,
@@ -48,13 +50,13 @@ export function CustomerHeader({ customer }: Props) {
             <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
                 
                 {/* Back Button (Floating) */}
-                <button 
+                <Button 
                     onClick={() => navigate({ to: '/admin/customers' })} 
                     className="absolute -top-2 -left-2 md:static md:top-auto md:left-auto flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-theme-secondary hover:text-white transition-colors border border-white/5 hover:border-white/10"
                     title="Volver al directorio"
                 >
                     <ArrowLeft className="h-5 w-5" />
-                </button>
+                </Button>
 
                 {/* Avatar / Identity */}
                 <div className="hidden md:flex flex-shrink-0 relative">
@@ -75,9 +77,9 @@ export function CustomerHeader({ customer }: Props) {
                 {/* Core Info */}
                 <div className="flex-1 min-w-0 mt-8 md:mt-0">
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight truncate">
+                        <Heading as="h1" className="text-2xl md:text-3xl font-black text-white tracking-tight truncate">
                             {customer.full_name || 'Usuario Sincrónico'}
-                        </h1>
+                        </Heading>
                         {isVIP && (
                             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
                                 ⭐️ Cliente VIP
@@ -112,13 +114,13 @@ export function CustomerHeader({ customer }: Props) {
 
                 {/* Action Shortcuts */}
                 <div className="flex flex-row md:flex-col gap-2 w-full md:w-auto mt-4 md:mt-0">
-                    <button 
+                    <Button 
                         onClick={handleCopyId}
                         className="flex-1 md:flex-none flex items-center justify-center md:justify-start gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl text-white text-sm font-medium transition-all group/btn"
                     >
                         <LinkIcon className="h-4 w-4 text-theme-secondary group-hover/btn:text-white transition-colors" />
                         <span>Copiar ID</span>
-                    </button>
+                    </Button>
                     {customer.phone && (
                         <a 
                             href={`https://wa.me/${customer.phone.replace(/\D/g, '')}`}

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { Building, CreditCard, Send, CheckCircle, Award } from 'lucide-react';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -28,7 +29,7 @@ export function PaymentMethodContent({
         <>
             <div className="grid gap-3">
                 {paymentOptions.filter(o => !o.disabled).map((option) => (
-                    <button
+                    <Button
                         key={option.value}
                         onClick={() => setPaymentMethod(option.value)}
                         className={cn(
@@ -41,7 +42,7 @@ export function PaymentMethodContent({
                         <option.icon className={cn("h-5 w-5", paymentMethod === option.value ? "text-vape-400" : "text-white/20")} />
                         <span className="flex-1 text-xs font-bold uppercase tracking-widest">{option.label}</span>
                         {paymentMethod === option.value && <CheckCircle className="h-5 w-5 text-vape-400" />}
-                    </button>
+                    </Button>
                 ))}
             </div>
 

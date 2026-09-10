@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: TagsHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -27,21 +29,21 @@ export function TagsHeader({ onNew }: TagsHeaderProps) {
                             Marketing & SEO
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
                         Gestor de Etiquetas
-                    </h1>
+                    </Heading>
                     <p className="mt-1 text-sm font-medium text-theme-secondary/80">
                         Crea, organiza y gestiona las etiquetas de tus productos.
                     </p>
                 </div>
 
-                <button
+                <Button
                     onClick={onNew}
                     className="flex items-center gap-2 self-start sm:self-auto px-5 py-3 rounded-2xl bg-accent-primary text-black text-sm font-black hover:bg-accent-primary/90 transition-all active:scale-95 shadow-lg shadow-accent-primary/20"
                 >
                     <Plus className="h-4 w-4" />
                     Nueva Etiqueta
-                </button>
+                </Button>
             </div>
         </div>
     );

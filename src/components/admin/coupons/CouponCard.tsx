@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState } from 'react';
 import {
     Ticket, Pencil, Trash2, Copy, Link as LinkIcon,
@@ -57,7 +59,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                     <Ticket className="h-6 w-6 drop-shadow-sm" />
                 </div>
                 <div>
-                    <h3 className="text-xl font-black text-theme-primary font-mono tracking-tight">{coupon.code}</h3>
+                    <Heading as="h3" className="text-xl font-black text-theme-primary font-mono tracking-tight">{coupon.code}</Heading>
                     <p className="text-xs font-medium text-theme-secondary/70 line-clamp-1 mt-0.5">{coupon.description || 'Sin descripción'}</p>
                 </div>
             </div>
@@ -97,36 +99,36 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
 
             {/* Actions */}
             <div className="flex items-center justify-between pt-4 border-t border-white/5 relative z-10 mt-auto">                                                                                      
-                <button
+                <Button
                     onClick={handleCopyLink}
                     className="text-xs font-bold flex items-center gap-1.5 text-theme-secondary hover:text-theme-primary transition-colors bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10"                                                 
                 >
                     {copied ? <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> : <LinkIcon className="h-3.5 w-3.5" />}                                                               
                     {copied ? '¡Copiado!' : 'Link Mágico'}
-                </button>
+                </Button>
 
                 <div className="flex items-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">                                                                      
-                    <button
+                    <Button
                         onClick={() => onDuplicate(coupon)}
                         className="p-2 rounded-xl bg-theme-primary/10 text-theme-secondary hover:text-blue-400 hover:bg-blue-500/20 transition-all border border-transparent hover:border-blue-500/30"                          
                         title="Clonar Cupón"
                     >
                         <Copy className="h-4 w-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => onEdit(coupon)}
                         className="p-2 rounded-xl bg-theme-primary/10 text-theme-secondary hover:text-fuchsia-400 hover:bg-fuchsia-500/20 transition-all border border-transparent hover:border-fuchsia-500/30"                                                                                                    
                         title="Editar"
                     >
                         <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => onDelete(coupon.code)}
                         className="p-2 rounded-xl bg-theme-primary/10 text-theme-secondary hover:text-red-400 hover:bg-red-500/20 transition-all border border-transparent hover:border-red-500/30"                                  
                         title="Desactivar"
                     >
                         <Trash2 className="h-4 w-4" />
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

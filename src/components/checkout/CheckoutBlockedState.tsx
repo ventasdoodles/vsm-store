@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { ShoppingBag } from 'lucide-react';
 import { m } from 'framer-motion';
 
@@ -27,9 +28,9 @@ export function CheckoutBlockedState({ headline, detail, onGoToCatalog }: Checko
                 <ShoppingBag className="h-10 w-10 text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,0.5)]" />
             </m.div>
             
-            <h2 className="relative z-10 text-2xl sm:text-3xl font-black tracking-tight text-white drop-shadow-sm">
+            <Heading as="h2" className="relative z-10 text-2xl sm:text-3xl font-black tracking-tight text-white drop-shadow-sm">
                 {headline}
-            </h2>
+            </Heading>
             <p className="relative z-10 mt-4 text-sm sm:text-base font-medium leading-relaxed text-red-100/70 max-w-md mx-auto">
                 {detail}
             </p>

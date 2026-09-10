@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { createColumnHelper } from '@tanstack/react-table';
 import { Eye, FileEdit, Save, X, Trash2, Pencil, Copy, Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -148,7 +149,7 @@ export const columns = [
                     {FLAG_CONFIG.map(({ flag, icon: Icon, color, label, key }) => {
                         const active = product[key as keyof Product] as boolean;
                         return (
-                            <button
+                            <Button
                                 key={flag}
                                 onClick={() => meta.onToggle(product.id, flag as 'is_featured' | 'is_new' | 'is_bestseller', active)}
                                 title={label}
@@ -159,7 +160,7 @@ export const columns = [
                                 )}
                             >
                                 <Icon className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
@@ -176,7 +177,7 @@ export const columns = [
 
             return (
                 <div className="text-center">
-                    <button
+                    <Button
                         onClick={() => meta.onToggle(product.id, PRODUCT_FLAGS.IS_ACTIVE as 'is_active', isActive)}
                         disabled={isToggling}
                         className="transition-all disabled:opacity-50 inline-flex items-center justify-center"
@@ -187,7 +188,7 @@ export const columns = [
                         ) : (
                             <ToggleLeft className="h-5 w-5 text-white/20" />
                         )}
-                    </button>
+                    </Button>
                 </div>
             );
         }
@@ -223,26 +224,26 @@ export const columns = [
                     >
                         <Eye className="h-3.5 w-3.5" />
                     </a>
-                    <button
+                    <Button
                         onClick={() => meta.onEdit(product)}
                         className="rounded-lg p-2.5 text-white/40 hover:bg-violet-500/10 hover:text-violet-400 transition-all"
                         aria-label="Editar producto"
                         title="Editar completo"
                     >
                         <FileEdit className="h-3.5 w-3.5" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => meta.onDuplicate(product)}
                         className="rounded-lg p-2.5 text-white/40 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all"
                         aria-label="Duplicar producto"
                         title="Duplicar producto"
                     >
                         <Copy className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
 
                     {editing ? (
                         <>
-                            <button
+                            <Button
                                 onClick={handleSave}
                                 disabled={meta.isSavingId === product.id}
                                 className="rounded-lg p-2.5 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-50"
@@ -250,28 +251,28 @@ export const columns = [
                                 title="Guardar"
                             >
                                 <Save className="h-3.5 w-3.5" />
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={() => { setEditing(false); setEditForm({ price: product.price, stock: product.stock }); }}
                                 className="rounded-lg p-2.5 text-red-400 hover:bg-red-500/10 transition-all"
                                 aria-label="Cancelar edición"
                                 title="Cancelar"
                             >
                                 <X className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                         </>
                     ) : (
-                        <button
+                        <Button
                             onClick={() => setEditing(true)}
                             className="rounded-lg p-2.5 text-white/40 hover:bg-amber-500/10 hover:text-amber-400 transition-all"
                             aria-label="Edición rápida de precio y stock"
                             title="Edicion Rapida (precio y stock)"
                         >
                             <Pencil className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                     )}
 
-                    <button
+                    <Button
                         onClick={() => meta.onDelete(product.id, product.name)}
                         disabled={meta.isDeletingId === product.id}
                         className="rounded-lg p-2.5 text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
@@ -279,7 +280,7 @@ export const columns = [
                         title="Desactivar"
                     >
                         <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                 </div>
             );
         }

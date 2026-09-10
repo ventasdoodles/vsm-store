@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StorefrontCheckoutTransitionView } from '@/lib/domain/cart';
@@ -75,7 +76,7 @@ export function CheckoutTransitionStatus({
                                 {view.dependencyGuidance.detail}
                             </p>
                             {onDependencyAction && (
-                                <button
+                                <Button
                                     type="button"
                                     onClick={() => onDependencyAction(view.dependencyGuidance!.missingProduct)}
                                     className={cn(
@@ -84,7 +85,7 @@ export function CheckoutTransitionStatus({
                                     )}
                                 >
                                     {view.dependencyGuidance.actionLabel}
-                                </button>
+                                </Button>
                             )}
                         </div>
                     )}

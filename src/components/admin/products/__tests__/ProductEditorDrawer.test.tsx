@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -39,7 +41,7 @@ vi.mock('@/components/ui/SideDrawer', () => ({
     SideDrawer: ({ children, isOpen, title }: { children: ReactNode; isOpen: boolean; title: string }) =>
         isOpen ? (
             <section data-testid="side-drawer">
-                <h1>{title}</h1>
+                <Heading as="h1">{title}</Heading>
                 {children}
             </section>
         ) : null,
@@ -60,9 +62,9 @@ vi.mock('../CategoryCascader', () => ({
         onChange: (categoryId: string) => void;
     }) => (
         <div data-testid="category-cascader" data-section={section} data-value={value}>
-            <button type="button" onClick={() => onChange('cat-1')}>
+            <Button type="button" onClick={() => onChange('cat-1')}>
                 Set category
-            </button>
+            </Button>
         </div>
     ),
 }));

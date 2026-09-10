@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useRef, memo } from 'react';
 import { m, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
@@ -73,15 +75,15 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
             <div className="flex flex-1 flex-col min-w-0 justify-between py-0.5 z-10">
                 <div>
                     <div className="flex justify-between items-start gap-2">
-                        <h3 className="text-sm font-bold text-white leading-snug line-clamp-2 pr-6">
+                        <Heading as="h3" className="text-sm font-bold text-white leading-snug line-clamp-2 pr-6">
                             {item.product.name}
-                        </h3>
-                        <button
+                        </Heading>
+                        <Button
                             onClick={() => onRemove(item.product.id, item.variant_id)}
                             className="absolute top-4 right-4 p-1.5 text-white/20 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors z-30"
                         >
                             <Trash2 className="h-4 w-4" />
-                        </button>
+                        </Button>
                     </div>
                     {item.variant_name && (
                         <div className="inline-block mt-2 px-2 py-0.5 rounded-md bg-white/10 border border-white/5">
@@ -114,13 +116,13 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
 
                     {/* Controles cantidad */}
                     <div className="flex items-center bg-black/50 rounded-lg border border-white/10 p-1 shadow-inner relative z-30">
-                        <button
+                        <Button
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1, item.variant_id)}
                             disabled={item.quantity <= 1}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20 disabled:hover:bg-transparent"
                         >
                             <Minus className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                         <m.span
                             key={item.quantity}
                             initial={{ scale: 0.5, opacity: 0 }}
@@ -129,13 +131,13 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
                         >
                             {item.quantity}
                         </m.span>
-                        <button
+                        <Button
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1, item.variant_id)}
                             disabled={!purchaseability.canAddToCart || item.quantity >= maxQuantity}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20 disabled:hover:bg-transparent"
                         >
                             <Plus className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

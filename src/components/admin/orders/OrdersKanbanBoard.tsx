@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 // ─── COMPONENTE: TABLERO KANBAN DE PEDIDOS ──────────────────────────────────────────
 // Representación visual estilo Trello para la gestión del flujo de preparación.
 // Interfaz Drag & Drop implementada con @dnd-kit/core.
@@ -76,7 +77,7 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
             <div className="flex items-center justify-between border-b border-white/5 bg-black/20 px-5 py-4 rounded-t-[1.5rem] relative z-10">
                 <div className="flex items-center gap-3">
                     <div className={cn("h-2.5 w-2.5 rounded-full", getStatusDotClass(status.color))} />
-                    <h3 className="text-sm font-black text-theme-primary tracking-wide">{status.label}</h3>
+                    <Heading as="h3" className="text-sm font-black text-theme-primary tracking-wide">{status.label}</Heading>
                 </div>
                 <span className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-0.5 text-xs font-bold text-theme-secondary/60">
                     {orders.length}

@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * ProductRail — Riel horizontal de productos (Featured, New, Bestseller).
  *
@@ -109,9 +111,9 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                         <div className={`w-12 h-12 bg-gradient-to-br ${theme.gradient} rounded-2xl flex items-center justify-center shadow-lg ${theme.shadow}`}>
                             {theme.icon}
                         </div>
-                        <h2 className="text-2xl sm:text-3xl font-black text-theme-primary tracking-tighter uppercase italic drop-shadow-sm">
+                        <Heading as="h2" className="text-2xl sm:text-3xl font-black text-theme-primary tracking-tighter uppercase italic drop-shadow-sm">
                             {title}
-                        </h2>
+                        </Heading>
                     </div>
 
                     <Link
@@ -143,9 +145,9 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                         >
                             <div className="scale-125">{theme.icon}</div>
                         </m.div>
-                        <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter drop-shadow-md">
+                        <Heading as="h3" className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter drop-shadow-md">
                             {renderabilityConfig.rail.emptyStateTitle}
-                        </h3>
+                        </Heading>
                         <p className="mt-4 max-w-md text-sm sm:text-base font-medium leading-relaxed text-theme-secondary/80">
                             {renderabilityConfig.rail.emptyStateDescription}
                         </p>
@@ -179,9 +181,9 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     <div className={`w-12 h-12 bg-gradient-to-br ${theme.gradient} rounded-2xl flex items-center justify-center shadow-lg ${theme.shadow}`}>
                         {theme.icon}
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-theme-primary tracking-tighter uppercase italic drop-shadow-sm">
+                    <Heading as="h2" className="text-2xl sm:text-3xl font-black text-theme-primary tracking-tighter uppercase italic drop-shadow-sm">
                         {title}
-                    </h2>
+                    </Heading>
                 </div>
 
                 <Link
@@ -196,21 +198,21 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
             {/* Riel */}
             <div className="relative">
                 {/* Controles de Navegación Custom (Desktop) */}
-                <button
+                <Button
                     onClick={() => scroll('left')}
                     className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-theme-strong rounded-full hidden items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 sm:flex"
                     aria-label="Anterior"
                 >
                     <ChevronLeft className="w-6 h-6 text-theme-primary" />
-                </button>
+                </Button>
 
-                <button
+                <Button
                     onClick={() => scroll('right')}
                     className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-theme-strong rounded-full hidden items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 sm:flex"
                     aria-label="Siguiente"
                 >
                     <ChevronRight className="w-6 h-6 text-theme-primary" />
-                </button>
+                </Button>
 
                 {/* Lista de productos animada */}
                 <m.div

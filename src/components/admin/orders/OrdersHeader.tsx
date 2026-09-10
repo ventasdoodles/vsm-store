@@ -1,4 +1,6 @@
-﻿// ─── COMPONENTE: ENCABEZADO DE PEDIDOS ───────────────────────────────────────────────
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+// ─── COMPONENTE: ENCABEZADO DE PEDIDOS ───────────────────────────────────────────────
 // Renderiza el título, las estadísticas base y la barra de herramientas principal.
 // Incluye: Buscador de texto, Modalidad de vista (Lista/Kanban), Rango de Fechas
 // y el botón de exportación CSV con estilo Glassmorphism Premium.
@@ -42,9 +44,9 @@ export function OrdersHeader({
                             Gestión Logística
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black text-theme-primary flex items-center gap-3 drop-shadow-sm tracking-tight">
+                    <Heading as="h1" className="text-3xl font-black text-theme-primary flex items-center gap-3 drop-shadow-sm tracking-tight">
                         Centro de Pedidos
-                    </h1>
+                    </Heading>
                     <p className="text-sm text-theme-secondary font-medium mt-1">
                         {totalOrders} pedido{totalOrders !== 1 ? 's' : ''} registrados en el sistema
                     </p>
@@ -62,14 +64,14 @@ export function OrdersHeader({
                         />
                     </div>
                     {/* Superpoder: Exportar */}
-                    <button
+                    <Button
                         onClick={onExport}
                         className="flex items-center justify-center gap-2 bg-theme-secondary hover:bg-white text-black px-4 py-2.5 rounded-2xl font-black transition-all hover:shadow-lg hover:shadow-white/10"
                         title="Exportar pedidos filtrados a CSV"
                     >
                         <Download className="h-4 w-4" />
                         <span className="hidden sm:inline">Exportar CSV</span>
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -77,7 +79,7 @@ export function OrdersHeader({
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between relative z-10 w-full pt-4 border-t border-white/5 mt-4">
                 {/* Visual View Toggle */}
                 <div className="flex items-center gap-1 rounded-2xl border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
-                    <button
+                    <Button
                         onClick={() => setViewMode('list')}
                         className={cn(
                             'rounded-xl px-4 py-2 transition-all font-bold text-sm flex items-center gap-2',
@@ -87,8 +89,8 @@ export function OrdersHeader({
                     >
                         <List className="h-4 w-4" />
                         Lista
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => setViewMode('board')}
                         className={cn(
                             'rounded-xl px-4 py-2 transition-all font-bold text-sm flex items-center gap-2',
@@ -98,8 +100,8 @@ export function OrdersHeader({
                     >
                         <KanbanSquare className="h-4 w-4" />
                         Kanban
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => setViewMode('table')}
                         className={cn(
                             'rounded-xl px-4 py-2 transition-all font-bold text-sm flex items-center gap-2',
@@ -109,7 +111,7 @@ export function OrdersHeader({
                     >
                         <Table2 className="h-4 w-4" />
                         Tabla
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Date Filter */}

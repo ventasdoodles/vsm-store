@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: WheelGamePrizeEditor ───
  * // Arquitectura: Smart Component (Form Dialog)
@@ -102,18 +104,18 @@ export function WheelGamePrizeEditor({
                             <Dices className="h-4 w-4 text-indigo-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-black text-white">
+                            <Heading as="h2" className="text-base font-black text-white">
                                 {prize ? 'Editar Premio' : 'Nuevo Premio'}
-                            </h2>
+                            </Heading>
                             <p className="text-2xs text-white/35">Segmento de la Ruleta de VSM</p>
                         </div>
                     </div>
-                    <button
+                    <Button
                         onClick={onClose}
                         className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white/40 hover:text-white"
                     >
                         <X className="h-5 w-5" />
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Form */}
@@ -163,7 +165,7 @@ export function WheelGamePrizeEditor({
                         </label>
                         <div className="grid grid-cols-1 gap-2">
                             {PRIZE_TYPES.map(({ value, label, desc }) => (
-                                <button
+                                <Button
                                     key={value}
                                     type="button"
                                     onClick={() => {
@@ -188,7 +190,7 @@ export function WheelGamePrizeEditor({
                                         <p className="text-sm font-black text-white">{label}</p>
                                         <p className="text-2xs text-white/35">{desc}</p>
                                     </div>
-                                </button>
+                                </Button>
                             ))}
                         </div>
                     </div>
@@ -232,7 +234,7 @@ export function WheelGamePrizeEditor({
                         </label>
                         <div className="flex flex-wrap gap-2">
                             {PRESET_COLORS.map(c => (
-                                <button
+                                <Button
                                     key={c}
                                     type="button"
                                     onClick={() => setField('color', c)}
@@ -288,7 +290,7 @@ export function WheelGamePrizeEditor({
                             <p className="text-sm font-black text-white">Premio activo</p>
                             <p className="text-2xs text-white/35">Disponible para aparecer en la ruleta</p>
                         </div>
-                        <button
+                        <Button
                             type="button"
                             onClick={() => setField('is_active', !form.is_active)}
                             className="relative flex-shrink-0"
@@ -302,20 +304,20 @@ export function WheelGamePrizeEditor({
                                     form.is_active ? 'left-6' : 'left-1',
                                 )} />
                             </div>
-                        </button>
+                        </Button>
                     </div>
                 </form>
 
                 {/* Footer */}
                 <div className="px-6 py-4 border-t border-white/8 flex gap-3">
-                    <button
+                    <Button
                         type="button"
                         onClick={onClose}
                         className="flex-1 py-3 rounded-2xl border border-white/10 text-sm font-bold text-white/60 hover:bg-white/5 hover:text-white transition-all"
                     >
                         Cancelar
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         form="wheel-prize-form"
                         disabled={isSaving || !form.label}
@@ -335,7 +337,7 @@ export function WheelGamePrizeEditor({
                         ) : (
                             prize ? 'Actualizar Premio' : 'Crear Premio'
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </>

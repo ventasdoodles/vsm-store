@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,9 +35,9 @@ export function AdminEmptyState({ icon: Icon, title, description, className }: A
             </div>
 
             {/* Typography */}
-            <h3 className="relative z-10 text-lg font-black text-theme-primary mb-1">
+            <Heading as="h3" className="relative z-10 text-lg font-black text-theme-primary mb-1">
                 {title}
-            </h3>
+            </Heading>
             {description && (
                 <p className="relative z-10 text-sm font-medium text-theme-secondary">
                     {description}

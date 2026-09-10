@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * CustomerDirectoryStats — KPIs Globales del Directorio
  * 
@@ -100,7 +101,7 @@ export function CustomerDirectoryStats({ customers }: Props) {
                         </div>
 
                         <div className="relative z-10">
-                            <h3 className="text-sm font-bold text-theme-secondary mb-1">{s.title}</h3>
+                            <Heading as="h3" className="text-sm font-bold text-theme-secondary mb-1">{s.title}</Heading>
                             <p className="text-3xl font-black text-theme-primary tracking-tight mb-1">{s.value}</p>
                             <p className="text-xs font-medium text-theme-secondary/50 tracking-wide">{s.subtitle}</p>
                         </div>

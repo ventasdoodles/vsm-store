@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: FlashDealsHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -38,9 +40,9 @@ export function FlashDealsHeader({ deals, onAdd }: FlashDealsHeaderProps) {
                         <Zap className="h-7 w-7 text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black tracking-tight text-white">
+                        <Heading as="h1" className="text-2xl font-black tracking-tight text-white">
                             Ofertas Flash
-                        </h1>
+                        </Heading>
                         <p className="text-sm text-white/40 mt-0.5">
                             Promociones urgentes con timer y stock limitado
                         </p>
@@ -48,14 +50,14 @@ export function FlashDealsHeader({ deals, onAdd }: FlashDealsHeaderProps) {
                 </div>
 
                 {/* Add button */}
-                <button
+                <Button
                     onClick={onAdd}
                     className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-orange-600 to-red-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:shadow-orange-500/40 hover:scale-[1.02] active:scale-[0.98]"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 opacity-0 transition-opacity group-hover:opacity-100" />
                     <Plus className="relative z-10 h-4 w-4" />
                     <span className="relative z-10">Nueva Oferta</span>
-                </button>
+                </Button>
             </div>
 
             {/* Stats row */}

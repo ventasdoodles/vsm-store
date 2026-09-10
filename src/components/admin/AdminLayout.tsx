@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 // Layout principal del Admin Panel - VSM Store
 // Sidebar + Header + Content area
 import React, { useState, useMemo } from 'react';
@@ -326,20 +328,20 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                 </div>
                             </div>
                         </Link>
-                        <button
+                        <Button
                             onClick={() => setSidebarOpen(false)}
                             className="rounded-xl p-2 text-theme-secondary hover:bg-white/5 transition-colors lg:hidden"
                         >
                             <X className="h-5 w-5" />
-                        </button>
+                        </Button>
                     </div>
 
                     <nav className="flex-1 space-y-8 overflow-y-auto px-5 py-8 custom-scrollbar">
                         {menuSections.map((section, idx) => (
                             <div key={idx} className="space-y-3 flex flex-col items-stretch">
-                                <h3 className="px-4 text-[9px] font-black uppercase tracking-[0.3em] text-theme-secondary/30 select-none">
+                                <Heading as="h3" className="px-4 text-[9px] font-black uppercase tracking-[0.3em] text-theme-secondary/30 select-none">
                                     {section.title}
-                                </h3>
+                                </Heading>
                                 <div className="space-y-1">
                                     {section.items.map((item) => (
                                         <SidebarItem
@@ -365,25 +367,25 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                             <Store className="h-4 w-4" />
                             Ver sitio público
                         </Link>
-                        <button
+                        <Button
                             onClick={handleSignOut}
                             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold text-red-400/60 hover:bg-red-500/10 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"
                         >
                             <LogOut className="h-4 w-4" />
                             Cerrar sesión
-                        </button>
+                        </Button>
                     </div>
                 </aside>
 
                 {/* Main Content */}
                 <div className="flex flex-1 flex-col overflow-hidden">
                     <header className="relative z-20 flex h-16 items-center gap-4 border-b border-white/5 bg-surface-overlay/40 backdrop-blur-xl px-6 lg:px-8">
-                        <button
+                        <Button
                             onClick={() => setSidebarOpen(true)}
                             className="rounded-xl p-2 text-theme-secondary hover:bg-theme-secondary/50 lg:hidden"
                         >
                             <Menu className="h-5 w-5" />
-                        </button>
+                        </Button>
 
                         <div className="flex-1" />
 

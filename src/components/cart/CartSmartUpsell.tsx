@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { useEffect, memo } from 'react';
 import { m } from 'framer-motion';
 import { Plus, Zap } from 'lucide-react';
@@ -41,9 +42,9 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
                         <Zap className="h-3.5 w-3.5 fill-current" />
                     </div>
-                    <h3 className="text-2xs font-black uppercase tracking-[0.2em] text-white/90">
+                    <Heading as="h3" className="text-2xs font-black uppercase tracking-[0.2em] text-white/90">
                         IA Suggestion
-                    </h3>
+                    </Heading>
                 </div>
                 <div className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
                     <span className="text-[9px] font-black text-vape-400 uppercase tracking-widest">
@@ -75,12 +76,12 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     </div>
 
                     <div className="flex flex-col justify-center flex-1">
-                        <h4 className="text-2xs font-black text-white/40 uppercase tracking-[0.2em] mb-1">
+                        <Heading as="h4" className="text-2xs font-black text-white/40 uppercase tracking-[0.2em] mb-1">
                             {bundleName}
-                        </h4>
-                        <h3 className="text-sm font-bold text-white mb-3 line-clamp-1">
+                        </Heading>
+                        <Heading as="h3" className="text-sm font-bold text-white mb-3 line-clamp-1">
                             {suggestedProduct.name}
-                        </h3>
+                        </Heading>
                         
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col">

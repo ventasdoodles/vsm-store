@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { AdminCategories } from '../AdminCategories';
@@ -9,7 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 vi.mock('@/components/admin/categories', () => ({
     CategoriesHeader: ({ onNew }: any) => (
         <div data-testid="mock-header">
-            <button onClick={onNew}>Nueva Categoría</button>
+            <Button onClick={onNew}>Nueva Categoría</Button>
         </div>
     ),
     CategoryTreeContainer: ({ roots, childrenMap }: any) => (
@@ -22,7 +23,7 @@ vi.mock('@/components/admin/categories', () => ({
         open ? (
             <div data-testid="mock-form">
                 Form is open
-                <button onClick={onClose}>Cerrar</button>
+                <Button onClick={onClose}>Cerrar</Button>
             </div>
         ) : null
     )

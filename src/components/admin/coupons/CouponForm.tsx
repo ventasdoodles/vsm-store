@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from 'react';
 import { 
     Save, X, Percent, DollarSign, Calendar, 
@@ -126,15 +128,15 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         <Zap className="h-6 w-6 text-fuchsia-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black text-theme-primary tracking-tight">
+                        <Heading as="h2" className="text-2xl font-black text-theme-primary tracking-tight">
                             {initialData.code ? 'Editar Cupón' : 'Nuevo Cupón'}
-                        </h2>
+                        </Heading>
                         <p className="text-xs font-medium text-theme-secondary">Configura las reglas matemáticas de esta promoción.</p>
                     </div>
                 </div>
-                <button type="button" onClick={onCancel} className="p-2.5 hover:bg-white/5 rounded-2xl text-theme-secondary transition-colors">                                                 
+                <Button type="button" onClick={onCancel} className="p-2.5 hover:bg-white/5 rounded-2xl text-theme-secondary transition-colors">                                                 
                     <X className="h-6 w-6" />
-                </button>
+                </Button>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8 relative z-10">
@@ -145,7 +147,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                             <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest">Código del Cupón *</label>                                                               
                             <div className="flex gap-2">
                                 {(['conversion', 'retention'] as const).map(goal => (
-                                    <button
+                                    <Button
                                         key={goal}
                                         type="button"
                                         onClick={() => handleSystemGen(goal)}
@@ -153,7 +155,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                         className="text-[9px] font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-400/10 px-2 py-1 rounded-lg border border-fuchsia-400/20 hover:bg-fuchsia-400/20 transition-all disabled:opacity-50"
                                     >
                                         {goal === 'conversion' ? '⚡ Sugerencia: Venta' : '💎 Sugerencia: Lealtad'}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         </div>
@@ -191,20 +193,20 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                             <div>
                                 <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Tipo</label>                                                                
                                 <div className="flex bg-black/40 border border-white/10 rounded-xl p-1">                                                                                       
-                                    <button
+                                    <Button
                                         type="button"
                                         onClick={() => setForm({ ...form, discount_type: 'percentage' })}                                                                                               
                                         className={cn("flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all", form.discount_type === 'percentage' ? 'bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/20' : 'text-theme-secondary hover:text-white hover:bg-white/5')}                                                                      
                                     >
                                         <Percent className="h-4 w-4" /> %
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         type="button"
                                         onClick={() => setForm({ ...form, discount_type: 'fixed' })}                                                                                                    
                                         className={cn("flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-all", form.discount_type === 'fixed' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-theme-secondary hover:text-white hover:bg-white/5')}                                                                           
                                     >
                                         <DollarSign className="h-4 w-4" /> Fijo     
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                             <div>
@@ -232,7 +234,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 <TrendingUp className="h-5 w-5 text-indigo-400" />
                                 <span className="text-2xs font-black uppercase tracking-widest text-indigo-400">Sugerencia del Sistema</span>
                             </div>
-                            <button
+                            <Button
                                 type="button"
                                 onClick={handleForecast}
                                 disabled={isForecasting || form.discount_value <= 0}
@@ -240,7 +242,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                             >
                                 {isForecasting ? <Loader2 className="h-3 w-3 animate-spin" /> : <TrendingUp className="h-3 w-3" />}
                                 Consultar Sugerencia
-                            </button>
+                            </Button>
                         </div>
                         
                         {forecast ? (
@@ -299,13 +301,13 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                     <label className="flex items-center gap-1.5 text-xs font-bold text-theme-secondary uppercase tracking-widest">                                                                     
                                         <Calendar className="h-3 w-3 text-blue-400" /> Desde   
                                     </label>
-                                    <button 
+                                    <Button 
                                         type="button" 
                                         onClick={() => clearDate('valid_from')}
                                         className="text-[9px] font-bold text-red-400/50 hover:text-red-400 uppercase"
                                     >
                                         Limpiar
-                                    </button>
+                                    </Button>
                                 </div>
                                 <input
                                     type="datetime-local"
@@ -320,27 +322,27 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                         <Calendar className="h-3 w-3 text-red-400" /> Hasta   
                                     </label>
                                     <div className="flex gap-1.5">
-                                        <button 
+                                        <Button 
                                             type="button" 
                                             onClick={() => addDays(7)} 
                                             className="text-[8px] font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
                                         >
                                             +7d
-                                        </button>
-                                        <button 
+                                        </Button>
+                                        <Button 
                                             type="button" 
                                             onClick={() => addDays(30)} 
                                             className="text-[8px] font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
                                         >
                                             +30d
-                                        </button>
-                                        <button 
+                                        </Button>
+                                        <Button 
                                             type="button" 
                                             onClick={() => clearDate('valid_until')}
                                             className="text-[9px] font-bold text-red-400/50 hover:text-red-400 uppercase ml-1"
                                         >
                                             X
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                                 <input
@@ -367,21 +369,21 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
 
             {/* Footer Form */}
             <div className="mt-8 pt-8 border-t border-white/10 flex items-center justify-end gap-4 relative z-10">
-                <button
+                <Button
                     type="button"
                     onClick={onCancel}
                     className="px-6 py-3 rounded-xl text-sm font-bold text-theme-secondary hover:text-white hover:bg-white/5 transition-colors"
                 >
                     Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                     type="submit"
                     disabled={isSubmitting || !form.code || form.discount_value <= 0}
                     className="flex items-center gap-2 bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-400 hover:to-purple-500 text-white px-8 py-3 rounded-xl font-black tracking-wide transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.4)]"
                 >
                     <Save className="w-5 h-5" />
                     {isSubmitting ? 'GUARDANDO...' : 'GUARDAR CUPÓN'}
-                </button>
+                </Button>
             </div>
         </form>
     );

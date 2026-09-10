@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { Coins, HandCoins, ArrowRightLeft, ClockAlert, Unlock } from 'lucide-react';
 import type { LoyaltyConfig } from '@/services';
 import { cn } from '@/lib/utils';
@@ -152,7 +153,7 @@ function RuleCard({
                     <div className={cn("p-2 rounded-xl border", colorMap[color])}>
                         {icon}
                     </div>
-                    <h3 className="text-lg font-black text-theme-primary tracking-tight">{title}</h3>
+                    <Heading as="h3" className="text-lg font-black text-theme-primary tracking-tight">{title}</Heading>
                 </div>
                 <p className="text-xs font-medium text-theme-secondary/70 mb-6 leading-relaxed">
                     {description}

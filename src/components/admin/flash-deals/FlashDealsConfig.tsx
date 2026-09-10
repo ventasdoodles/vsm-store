@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: FlashDealsConfig ───
  * // Arquitectura: Dumb Component (Visual)
@@ -85,7 +86,7 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
                         <Zap className="h-5 w-5 text-orange-400 drop-shadow-[0_0_6px_rgba(251,146,60,0.4)]" />
                     </div>
                     <div>
-                        <h2 className="text-base font-bold text-white">Estado de Ofertas</h2>
+                        <Heading as="h2" className="text-base font-bold text-white">Estado de Ofertas</Heading>
                         <p className="text-xs text-white/35">Vista en tiempo real</p>
                     </div>
                 </div>

@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // â”€â”€â”€ COMPONENTE: SystemLogsPanel â”€â”€â”€
  * // Arquitectura: Dumb Component (Visual Feed)
@@ -87,9 +89,9 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
             {/* Section Title */}
             <div className="flex items-center gap-3 px-1">
                 <div className="h-5 w-1.5 rounded-full bg-cyan-400" />
-                <h2 className="text-lg font-black text-white tracking-tight">
+                <Heading as="h2" className="text-lg font-black text-white tracking-tight">
                     Logs del Sistema
-                </h2>
+                </Heading>
             </div>
 
             {/* Filter Pills */}
@@ -102,7 +104,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                         : { text: 'text-white', bg: 'bg-white/10', border: 'border-white/20' };
 
                     return (
-                        <button
+                        <Button
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`relative rounded-[1rem] border px-4 py-2 text-2xs font-black uppercase tracking-widest transition-all duration-300 ${
@@ -115,7 +117,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                             <span className={`ml-1.5 text-[9px] font-mono ${isActive ? 'opacity-80' : 'opacity-40'}`}>
                                 ({counts[f]})
                             </span>
-                        </button>
+                        </Button>
                     );
                 })}
             </div>

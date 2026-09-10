@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { m } from 'framer-motion';
 import { formatPrice } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -19,7 +20,7 @@ export function CheckoutDesktopSummary({
             <div className="sticky top-28 xl:top-32 space-y-6">
                 <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-2xl shadow-2xl">
                     <div className="border-b border-white/5 bg-white/[0.02] px-8 py-6">
-                        <h3 className="text-lg font-black tracking-tight text-white uppercase italic">Tu Pedido</h3>
+                        <Heading as="h3" className="text-lg font-black tracking-tight text-white uppercase italic">Tu Pedido</Heading>
                     </div>
 
                     <div className="max-h-[40vh] overflow-y-auto scrollbar-thin px-8 py-6 space-y-6">
@@ -45,7 +46,7 @@ export function CheckoutDesktopSummary({
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-0 space-y-1">
-                                    <h4 className="text-sm font-bold leading-tight text-white truncate">{item.product.name}</h4>
+                                    <Heading as="h4" className="text-sm font-bold leading-tight text-white truncate">{item.product.name}</Heading>
                                     {item.variant_name && (
                                         <p className="text-2xs font-black uppercase tracking-widest text-vape-400">{item.variant_name}</p>
                                     )}

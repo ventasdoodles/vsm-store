@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { MessageSquare, Sparkles } from 'lucide-react';
 import type { CustomerIntelligence } from '@/services/admin';
 
@@ -20,16 +22,16 @@ export function IntelligenceMessageBubble({
                         <MessageSquare className="h-5 w-5" />
                     </div>
                     <div>
-                        <h6 className="text-2xs font-black uppercase tracking-widest text-emerald-400">Mensaje de WhatsApp Generado</h6>
+                        <Heading as="h6" className="text-2xs font-black uppercase tracking-widest text-emerald-400">Mensaje de WhatsApp Generado</Heading>
                         <p className="text-xs text-white/40">Personalizado según el contexto del cliente</p>
                     </div>
                 </div>
-                <button 
+                <Button 
                     onClick={() => setGeneratedWhatsApp(null)}
                     className="text-2xs font-bold text-white/20 hover:text-white/40 uppercase tracking-widest"
                 >
                     Cerrar
-                </button>
+                </Button>
             </div>
             <div className="relative p-6 rounded-3xl bg-black/40 border border-white/5 group">
                 <textarea 
@@ -43,7 +45,7 @@ export function IntelligenceMessageBubble({
                 </div>
             </div>
             <div className="flex items-center gap-4 mt-6">
-                <button 
+                <Button 
                     onClick={() => {
                         const phone = intelligence?.customer_phone || '';
                         const text = encodeURIComponent(generatedWhatsApp);
@@ -53,8 +55,8 @@ export function IntelligenceMessageBubble({
                 >
                     <MessageSquare className="h-4 w-4" />
                     Enviar por WhatsApp
-                </button>
-                <button 
+                </Button>
+                <Button 
                     onClick={() => {
                         navigator.clipboard.writeText(generatedWhatsApp);
                         alert('Mensaje copiado al portapapeles');
@@ -62,7 +64,7 @@ export function IntelligenceMessageBubble({
                     className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-2xs font-black uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95"
                 >
                     Copiar
-                </button>
+                </Button>
             </div>
         </div>
     );

@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * CustomerWishlist — Lista de Favoritos del Cliente
  * 
@@ -59,7 +60,7 @@ export function CustomerWishlist({ customer }: Props) {
                         <Heart className="h-5 w-5 text-rose-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-white uppercase tracking-wider">Wishlist</h3>
+                        <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">Wishlist</Heading>
                         <p className="text-xs text-theme-secondary/70">{items.length} producto{items.length !== 1 ? 's' : ''} guardado{items.length !== 1 ? 's' : ''}</p>
                     </div>
                 </div>

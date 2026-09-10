@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // â”€â”€â”€ COMPONENTE: AdminMonitoring â”€â”€â”€
  * // Arquitectura: Page Orchestrator (Lego Master)
@@ -117,9 +118,9 @@ export function AdminMonitoring() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-3 px-1">
                             <div className="h-5 w-1.5 rounded-full bg-accent-primary" />
-                            <h2 className="text-lg font-black text-white tracking-tight">
+                            <Heading as="h2" className="text-lg font-black text-white tracking-tight">
                                 Pulso del Sistema
-                            </h2>
+                            </Heading>
                         </div>
                         <HealthPulse
                             isHealthy={isSystemHealthy}

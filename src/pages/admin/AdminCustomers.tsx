@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * AdminCustomers — Directorio Premium de Clientes
  * 
@@ -75,7 +76,7 @@ export function AdminCustomers() {
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="h-4 w-1.5 rounded-full bg-blue-500" />
-                            <h2 className="text-xl font-black text-theme-primary tracking-tight">Directorio Completo</h2>
+                            <Heading as="h2" className="text-xl font-black text-theme-primary tracking-tight">Directorio Completo</Heading>
                         </div>
                         <p className="text-sm font-medium text-theme-secondary/70">
                             Explora y encuentra a cualquier miembro registrado en la plataforma.

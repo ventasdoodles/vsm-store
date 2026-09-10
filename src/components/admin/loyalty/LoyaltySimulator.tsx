@@ -1,4 +1,5 @@
-﻿import { Settings, ExternalLink, Calculator } from 'lucide-react';
+import { Heading } from "@/components/ui/Heading";
+import { Settings, ExternalLink, Calculator } from 'lucide-react';
 import type { LoyaltyConfig } from '@/services';
 
 /** Monto de compra simulada para la calculadora de ROI (MXN) */
@@ -18,10 +19,10 @@ export function LoyaltySimulator({ config }: { config: LoyaltyConfig }) {
             </div>
             
             <div className="flex-1 relative z-10 space-y-4 w-full">
-                <h3 className="text-xl font-black text-theme-primary flex items-center gap-2">
+                <Heading as="h3" className="text-xl font-black text-theme-primary flex items-center gap-2">
                     <Settings className="w-5 h-5 text-amber-400" />
                     Simulador V-Coins
-                </h3>
+                </Heading>
                 <p className="text-sm text-theme-secondary leading-relaxed">
                     Así funcionará el sistema para un cliente que realiza una compra promedio de <strong>${examplePurchase.toLocaleString('es-MX')} MXN</strong> hoy:
                 </p>

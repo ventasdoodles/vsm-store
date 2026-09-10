@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: FlashDealsTable ───
  * // Arquitectura: Dumb Component (Visual)
@@ -167,15 +168,15 @@ const columns = [
 
             return (
                 <div className="flex items-center justify-end gap-0.5">
-                    <button
+                    <Button
                         onClick={() => meta.onEdit(deal)}
                         className="rounded-lg p-2.5 text-white/40 hover:bg-orange-500/10 hover:text-orange-400 transition-all"
                         aria-label="Editar oferta"
                         title="Editar"
                     >
                         <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => meta.onToggle(deal.id, deal.is_active)}
                         disabled={isToggling}
                         className="rounded-lg p-2.5 transition-all disabled:opacity-50"
@@ -187,8 +188,8 @@ const columns = [
                         ) : (
                             <ToggleLeft className="h-5 w-5 text-white/40" />
                         )}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={() => meta.onDelete(deal.id, deal.product?.name ?? 'Oferta')}
                         disabled={isDeleting}
                         className="rounded-lg p-2.5 text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
@@ -196,7 +197,7 @@ const columns = [
                         title="Eliminar"
                     >
                         <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                 </div>
             );
         }

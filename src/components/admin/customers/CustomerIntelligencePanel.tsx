@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from 'react';
 import {
     Activity, Calendar, CreditCard,
@@ -149,7 +151,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                         )}
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-white tracking-tight">{intelligence.full_name}</h3>
+                        <Heading as="h3" className="text-xl font-black text-white tracking-tight">{intelligence.full_name}</Heading>
                         <p className="text-xs text-white/40 font-medium">{intelligence.email}</p>
                     </div>
                 </div>
@@ -211,7 +213,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                             </div>
                             <span className="text-2xs font-black uppercase tracking-widest opacity-40">Segmento</span>
                         </div>
-                        <button
+                        <Button
                             onClick={handleAISuggestTags}
                             disabled={isGeneratingTags}
                             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all disabled:opacity-30"
@@ -222,7 +224,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                             ) : (
                                 <Sparkles className="h-3 w-3" />
                             )}
-                        </button>
+                        </Button>
                     </div>
                     <p className="text-2xl font-black">{intelligence?.segment ?? 'Prospecto'}</p>
                     <div className="flex items-center gap-1.5 mt-2 opacity-60">
@@ -255,11 +257,11 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                         {insight.type === 'critical' ? <AlertCircle className="h-6 w-6" /> : <Sparkles className="h-5 w-5" />}
                                     </div>
                                     <div className="flex flex-col justify-center">
-                                        <h5 className="text-sm font-bold text-white mb-1">{insight.title}</h5>
+                                        <Heading as="h5" className="text-sm font-bold text-white mb-1">{insight.title}</Heading>
                                         <p className="text-xs text-white/50 leading-relaxed mb-2">{insight.description}</p>
                                         <div className="flex items-center gap-4">
                                             {insight.actionLabel && (
-                                                <button 
+                                                <Button 
                                                     onClick={() => {
                                                         if (insight.actionLabel === 'Preparar WhatsApp') {
                                                             handleGenerateWhatsApp(insight.description);
@@ -269,17 +271,17 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                 >
                                                     {insight.actionLabel}
                                                     <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                                                </button>
+                                                </Button>
                                             )}
                                             {insight.actionLabel === 'Preparar WhatsApp' && (
-                                                <button 
+                                                <Button 
                                                     onClick={() => handleGenerateWhatsApp(insight.description)}
                                                     disabled={isGeneratingWhatsApp}
                                                     className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
                                                 >
                                                     {isGeneratingWhatsApp ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                                                     Generar con IA
-                                                </button>
+                                                </Button>
                                             )}
                                         </div>
                                     </div>
@@ -298,7 +300,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                     <Sparkles className={cn("h-7 w-7", loadingNarrative && "animate-spin-slow")} />
                                 </div>
                                 <div className="flex flex-col justify-center w-full">
-                                    <h5 className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300/80 mb-2">Análisis de Comportamiento</h5>
+                                    <Heading as="h5" className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300/80 mb-2">Análisis de Comportamiento</Heading>
                                     {loadingNarrative ? (
                                         <div className="space-y-2">
                                             <div className="h-2 w-3/4 bg-white/10 rounded-full" />
@@ -339,15 +341,15 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                         <Sparkles className="h-32 w-32 text-indigo-500" />
                     </div>
                     
-                    <h4 className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
+                    <Heading as="h4" className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
                         <Sparkles className="h-5 w-5 text-indigo-400" />
                         Identidad Neural (IA Insights)
-                    </h4>
+                    </Heading>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
                         {/* Preferences */}
                         <div className="space-y-4">
-                           <h5 className="text-2xs font-black uppercase tracking-widest text-indigo-300/80">Preferencias Cognitivas</h5>
+                           <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-indigo-300/80">Preferencias Cognitivas</Heading>
                            <div className="flex flex-wrap gap-2">
                                {intelligence.ai_preferences?.interests?.map((interest, i) => (
                                    <span key={i} className="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-2xs font-bold text-indigo-300">
@@ -369,7 +371,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                         {/* AI Context / Propensity */}
                         <div className="space-y-4">
-                            <h5 className="text-2xs font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</h5>
+                            <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</Heading>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
                                     <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Score de Propensión</p>
@@ -397,10 +399,10 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     <Activity className="h-32 w-32 text-vape-500" />
                 </div>
                 
-                <h4 className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
+                <Heading as="h4" className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
                     <Activity className="h-5 w-5 text-vape-400" />
                     Memoria de Cesarin
-                </h4>
+                </Heading>
 
                 {!customerMemory || customerMemory.detected_interests.length === 0 ? (
                     <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 text-center relative z-10">
@@ -409,7 +411,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 ) : (
                     <div className="space-y-6 relative z-10">
                         <div>
-                            <h5 className="text-2xs font-black uppercase tracking-widest text-vape-300/80 mb-4">Intereses Detectados (Aprendizaje Activo)</h5>
+                            <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-vape-300/80 mb-4">Intereses Detectados (Aprendizaje Activo)</Heading>
                             <div className="flex flex-wrap gap-3">
                                 {[...customerMemory.detected_interests]
                                     .sort((a, b) => {
@@ -510,10 +512,10 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
             {/* 2. Timeline Unificada */}
             <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl">
-                <h4 className="flex items-center gap-3 text-sm font-bold text-white mb-8">
+                <Heading as="h4" className="flex items-center gap-3 text-sm font-bold text-white mb-8">
                     <Activity className="h-5 w-5 text-vape-400" />
                     Línea de Tiempo 360
-                </h4>
+                </Heading>
 
                 <div className="relative space-y-8 before:absolute before:inset-0 before:ml-[1.25rem] before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-vape-500/50 before:via-white/5 before:to-transparent">
                     {timeline.length === 0 ? (
@@ -542,9 +544,9 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                 {/* Content */}
                                 <div className="flex-1 pt-1">
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
-                                        <h5 className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">
+                                        <Heading as="h5" className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">
                                             {event.title}
-                                        </h5>
+                                        </Heading>
                                         <span className="text-2xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded-full">
                                             {format(new Date(event.date), "PPP p", { locale: es })}
                                         </span>

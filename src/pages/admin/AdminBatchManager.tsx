@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -50,7 +52,7 @@ const columns = [
     }),
     columnHelper.accessor('name', {
         header: ({ column }) => (
-            <button
+            <Button
                 onClick={column.getToggleSortingHandler()}
                 className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
@@ -59,7 +61,7 @@ const columns = [
                     asc: <ArrowUp className="h-3 w-3" />,
                     desc: <ArrowDown className="h-3 w-3" />,
                 }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-3 w-3 opacity-50" />}
-            </button>
+            </Button>
         ),
         cell: ({ row, getValue }) => (
             <div className="flex items-center gap-3">
@@ -72,7 +74,7 @@ const columns = [
     }),
     columnHelper.accessor('price', {
         header: ({ column }) => (
-            <button
+            <Button
                 onClick={column.getToggleSortingHandler()}
                 className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
@@ -81,7 +83,7 @@ const columns = [
                     asc: <ArrowUp className="h-3 w-3" />,
                     desc: <ArrowDown className="h-3 w-3" />,
                 }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-3 w-3 opacity-50" />}
-            </button>
+            </Button>
         ),
         cell: ({ row, getValue, table }) => {
             const meta = table.options.meta as TableMetaType;
@@ -102,7 +104,7 @@ const columns = [
     }),
     columnHelper.accessor('stock', {
         header: ({ column }) => (
-            <button
+            <Button
                 onClick={column.getToggleSortingHandler()}
                 className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
@@ -111,7 +113,7 @@ const columns = [
                     asc: <ArrowUp className="h-3 w-3" />,
                     desc: <ArrowDown className="h-3 w-3" />,
                 }[column.getIsSorted() as string] ?? <ArrowUpDown className="h-3 w-3 opacity-50" />}
-            </button>
+            </Button>
         ),
         cell: ({ row, getValue, table }) => {
             const meta = table.options.meta as TableMetaType;
@@ -128,13 +130,13 @@ const columns = [
                         )}
                     />
                     {stock < 5 && (
-                        <button 
+                        <Button 
                             onClick={() => meta.setSelectedProductForOrder(row.original)}
                             className="absolute -right-12 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all animate-pulse"
                             title="Sugerencia de Reorden de Sistema"
                         >
                             <Truck className="h-4 w-4" />
-                        </button>
+                        </Button>
                     )}
                 </div>
             );
@@ -147,7 +149,7 @@ const columns = [
             const isActive = getValue() ?? false;
             return (
                 <div className="text-center">
-                    <button 
+                    <Button 
                         onClick={() => meta.handleUpdateLocal(row.original.id, 'is_active', !isActive)}
                         className={cn(
                             "px-3 py-1.5 rounded-xl text-2xs font-black uppercase tracking-widest border transition-all",
@@ -157,7 +159,7 @@ const columns = [
                         )}
                     >
                         {isActive ? 'Activo' : 'Inactivo'}
-                    </button>
+                    </Button>
                 </div>
             );
         }
@@ -244,7 +246,7 @@ export function AdminBatchManager() {
             {/* Toolbar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/5 backdrop-blur-xl">
                 <div>
-                    <h1 className="text-2xl font-black text-white tracking-tight">Batch Manager</h1>
+                    <Heading as="h1" className="text-2xl font-black text-white tracking-tight">Batch Manager</Heading>
                     <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Edición de alta densidad</p>
                 </div>
 
@@ -267,21 +269,21 @@ export function AdminBatchManager() {
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 className="flex items-center gap-3"
                             >
-                                <button 
+                                <Button 
                                     onClick={() => setLocalProducts(resetBatchProductRows(products || []))}
                                     className="p-3 rounded-2xl bg-white/5 text-white/40 hover:text-white transition-all border border-white/10"
                                     title="Descartar cambios"
                                 >
                                     <RotateCcw className="h-5 w-5" />
-                                </button>
-                                <button 
+                                </Button>
+                                <Button 
                                     onClick={handleSave}
                                     disabled={mutation.isPending}
                                     className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-vape-500 text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-vape-500/20 hover:bg-vape-400 transition-all disabled:opacity-50"
                                 >
                                     {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                                     Aplicar {countModifiedBatchRows(localProducts)} cambios
-                                </button>
+                                </Button>
                             </m.div>
                         )}
                     </AnimatePresence>

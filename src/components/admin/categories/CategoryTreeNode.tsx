@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: CategoryTreeNode ───
  * // Arquitectura: Dumb Component (Visual + Recursion)
@@ -83,7 +84,7 @@ export function CategoryTreeNode({
                 style={{ marginLeft: `${level * LEVEL_INDENT}px` }}
             >
                 {/* Expand chevron */}
-                <button
+                <Button
                     onClick={() => setExpanded(p => !p)}
                     className={cn(
                         'flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-all',
@@ -96,7 +97,7 @@ export function CategoryTreeNode({
                         ? <ChevronDown className="h-3.5 w-3.5" />
                         : <ChevronRight className="h-3.5 w-3.5" />
                     }
-                </button>
+                </Button>
 
                 {/* Thumbnail with glow */}
                 <div className={cn(
@@ -255,7 +256,7 @@ function ActionButton({
     disabled?: boolean;
 }) {
     return (
-        <button
+        <Button
             onClick={onClick}
             disabled={disabled}
             title={title}
@@ -266,6 +267,6 @@ function ActionButton({
             )}
         >
             {children}
-        </button>
+        </Button>
     );
 }

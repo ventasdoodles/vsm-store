@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * FlashDeals Component — VSM Store
  *
@@ -106,9 +107,9 @@ export const FlashDeals = () => {
                         <Zap className="w-4 h-4 text-red-500 fill-current" />
                         <span className="text-red-500 font-black text-xs uppercase tracking-[0.2em]">Live Now</span>
                     </div>
-                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
+                    <Heading as="h2" className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
                         Ofertas <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">Relámpago</span>
-                    </h2>
+                    </Heading>
                 </m.div>
 
                 {timeLeft && (
@@ -214,9 +215,9 @@ export const FlashDeals = () => {
 
                                     {/* Content Section */}
                                     <div className="p-8 flex flex-col flex-1 relative">
-                                        <h3 className="text-xl font-black text-white mb-2 line-clamp-1 group-hover/card:text-red-400 transition-colors tracking-tight">
+                                        <Heading as="h3" className="text-xl font-black text-white mb-2 line-clamp-1 group-hover/card:text-red-400 transition-colors tracking-tight">
                                             {product.name}
-                                        </h3>
+                                        </Heading>
 
                                         <div className="flex items-baseline gap-3 mb-8">
                                             <span className="text-4xl font-black text-white tracking-tighter">

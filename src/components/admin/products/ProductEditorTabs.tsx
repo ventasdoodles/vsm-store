@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { Package2, FolderTree, Layers, BrainCircuit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +18,7 @@ export function ProductEditorTabs({ activeTab, setActiveTab }: ProductEditorTabs
                 { id: 'configuracion', icon: Layers, label: 'Configuración' },
                 { id: 'inteligencia', icon: BrainCircuit, label: 'Inteligencia' }
             ].map(tab => (
-                <button
+                <Button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as EditorTab)}
                     className={cn(
@@ -29,7 +30,7 @@ export function ProductEditorTabs({ activeTab, setActiveTab }: ProductEditorTabs
                 >
                     <tab.icon className="h-3.5 w-3.5" />
                     {tab.label}
-                </button>
+                </Button>
             ))}
         </div>
     );

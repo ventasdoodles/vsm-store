@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * PromoSection — Banner promocional de envío por DHL.
  *
@@ -30,9 +31,9 @@ export function PromoSection() {
                                     <Truck className="w-10 h-10 text-white drop-shadow-glow" />
                                 </div>
                                 <div className="space-y-3">
-                                    <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
+                                    <Heading as="h3" className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
                                         Envíos por DHL <br className="hidden md:block" /> con cobertura por confirmar
-                                    </h3>
+                                    </Heading>
                                     <p className="text-theme-tertiary font-bold uppercase tracking-[0.2em] text-xs md:text-sm opacity-60">
                                         Productos importados de <span className="text-vape-400 font-black">China y USA</span>
                                     </p>

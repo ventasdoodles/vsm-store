@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: WheelGamePrizeList ───
  * // Arquitectura: Dumb Component (Visual)
@@ -145,7 +146,7 @@ export function WheelGamePrizeList({
                 
                 return (
                     <div className="flex justify-center">
-                        <button
+                        <Button
                             aria-label={prize.is_active ? 'Desactivar' : 'Activar'}
                             onClick={() => meta.onToggle(prize.id, prize.is_active)}
                             disabled={isToggling}
@@ -166,7 +167,7 @@ export function WheelGamePrizeList({
                                     )} />
                                 </div>
                             )}
-                        </button>
+                        </Button>
                     </div>
                 );
             }
@@ -181,14 +182,14 @@ export function WheelGamePrizeList({
 
                 return (
                     <div className="flex justify-end gap-1">
-                        <button
+                        <Button
                             aria-label="Editar"
                             onClick={() => meta.onEdit(prize)}
                             className="p-2 rounded-xl transition-colors hover:bg-indigo-500/20 text-white/40 hover:text-indigo-400"
                         >
                             <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             aria-label="Eliminar"
                             onClick={() => meta.onDelete(prize.id, prize.label)}
                             disabled={isDeleting}
@@ -198,7 +199,7 @@ export function WheelGamePrizeList({
                                 ? <Loader2 className="h-4 w-4 animate-spin" />
                                 : <Trash2 className="h-4 w-4" />
                             }
-                        </button>
+                        </Button>
                     </div>
                 );
             }

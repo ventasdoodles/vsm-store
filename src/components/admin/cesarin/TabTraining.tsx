@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { m } from 'framer-motion';
 import { Brain, UploadCloud, Link2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
@@ -12,10 +14,10 @@ export function TabTraining() {
             className="space-y-8"
         >
             <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                <Heading as="h2" className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                     <Brain className="h-8 w-8 text-emerald-400" />
                     Cerebro y Entrenamiento
-                </h2>
+                </Heading>
                 <p className="text-white/50 text-sm">
                     Enséñale cosas nuevas a Cesarin. Sube documentos, manuales o dale URLs para que estudie y mejore sus respuestas.
                 </p>
@@ -34,13 +36,13 @@ export function TabTraining() {
                     <div className="h-20 w-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6">
                         <UploadCloud className="h-10 w-10" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Sube documentos PDF o TXT</h3>
+                    <Heading as="h3" className="text-xl font-bold text-white mb-2">Sube documentos PDF o TXT</Heading>
                     <p className="text-white/40 text-sm mb-6 max-w-sm">
                         Arrastra tus archivos aquí o haz clic para buscar en tu equipo. Cesarin los leerá automáticamente.
                     </p>
-                    <button className="px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors font-semibold">
+                    <Button className="px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors font-semibold">
                         Seleccionar Archivo
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Settings & Links Section */}
@@ -48,7 +50,7 @@ export function TabTraining() {
                     <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02]">
                         <div className="flex items-center gap-3 mb-4">
                             <Link2 className="h-6 w-6 text-vape-400" />
-                            <h3 className="text-lg font-bold text-white">Aprender de Enlace Web</h3>
+                            <Heading as="h3" className="text-lg font-bold text-white">Aprender de Enlace Web</Heading>
                         </div>
                         <p className="text-white/40 text-sm mb-4">
                             Pega la URL de una página web, manual online o FAQ para que Cesarin la analice.
@@ -59,16 +61,16 @@ export function TabTraining() {
                                 placeholder="https://..."
                                 className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-vape-500 outline-none"
                             />
-                            <button className="px-6 py-3 bg-vape-500 text-white rounded-xl hover:bg-vape-400 transition-colors font-semibold">
+                            <Button className="px-6 py-3 bg-vape-500 text-white rounded-xl hover:bg-vape-400 transition-colors font-semibold">
                                 Ingerir
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
                     <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02]">
                         <div className="flex items-center gap-3 mb-4">
                             <Settings2 className="h-6 w-6 text-indigo-400" />
-                            <h3 className="text-lg font-bold text-white">Personalidad Básica</h3>
+                            <Heading as="h3" className="text-lg font-bold text-white">Personalidad Básica</Heading>
                         </div>
                         <div className="space-y-4">
                             <div>
@@ -87,9 +89,9 @@ export function TabTraining() {
                                     className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none"
                                 />
                             </div>
-                            <button className="w-full px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors font-semibold">
+                            <Button className="w-full px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors font-semibold">
                                 Guardar Personalidad
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

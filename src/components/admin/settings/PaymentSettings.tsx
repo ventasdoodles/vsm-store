@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * // ─── COMPONENTE: PaymentSettings ───
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Card glassmorphism para metodos de pago con toggles visuales
@@ -57,7 +58,7 @@ export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps
                     <CreditCard className="h-5 w-5 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.4)]" />
                 </div>
                 <div>
-                    <h2 className="text-base font-bold text-white">Métodos de Pago</h2>
+                    <Heading as="h2" className="text-base font-bold text-white">Métodos de Pago</Heading>
                     <p className="text-xs text-theme-secondary/70">Habilita las formas de pago para tus clientes</p>
                 </div>
             </div>

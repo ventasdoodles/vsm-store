@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
@@ -142,7 +143,7 @@ export function HomeEditorSlotCard({
                     <label className="mb-1 block text-sm font-medium text-theme-secondary">Tono / Gradiente</label>
                     <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mt-2">
                         {CATEGORY_GRADIENTS.map((preset) => (
-                            <button
+                            <Button
                                 key={preset.id}
                                 type="button"
                                 onClick={() => onUpdateSlot(index, 'presetId', preset.id)}
@@ -154,7 +155,7 @@ export function HomeEditorSlotCard({
                                 title={preset.name}
                             >
                                 <div className={`w-full h-full rounded-md ${preset.colorCode} opacity-90`} />
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 </div>

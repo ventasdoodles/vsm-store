@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: SettingsHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -25,9 +26,9 @@ export function SettingsHeader() {
                             Panel Admin
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
                         Configuración de la Tienda
-                    </h1>
+                    </Heading>
                     <p className="mt-1 text-sm font-medium text-theme-secondary/80">
                         Personaliza cada aspecto de tu tienda — contacto, pagos, ubicación y más.
                     </p>

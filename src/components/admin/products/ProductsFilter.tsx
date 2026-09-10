@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: ProductsFilter ───
  * // Arquitectura: Dumb Component (Visual)
@@ -67,7 +68,7 @@ export function ProductsFilter({
                 {/* Section tabs */}
                 <div className="flex gap-1 rounded-[1rem] border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
                     {SECTION_TABS.map(tab => (
-                        <button
+                        <Button
                             key={tab.value}
                             onClick={() => onSectionChange(tab.value)}
                             className={cn(
@@ -78,12 +79,12 @@ export function ProductsFilter({
                             )}
                         >
                             {tab.label}
-                        </button>
+                        </Button>
                     ))}
                 </div>
 
                 {/* Inactive toggle */}
-                <button
+                <Button
                     onClick={onToggleInactive}
                     className={cn(
                         'inline-flex items-center gap-1.5 rounded-[1rem] border px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm',
@@ -94,7 +95,7 @@ export function ProductsFilter({
                 >
                     {showInactive ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                     Inactivos
-                </button>
+                </Button>
             </div>
 
             {/* Quick Filters */}
@@ -105,7 +106,7 @@ export function ProductsFilter({
                     { label: '🖼️ Sin Foto', value: 'no-image' as const },
                     { label: '🔥 Best Sellers', value: 'bestsellers' as const },
                 ].map(f => (
-                    <button
+                    <Button
                         key={f.value}
                         onClick={() => onQuickFilterChange(quickFilter === f.value ? '' : f.value)}
                         className={cn(
@@ -116,7 +117,7 @@ export function ProductsFilter({
                         )}
                     >
                         {f.label}
-                    </button>
+                    </Button>
                 ))}
             </div>
         </div>

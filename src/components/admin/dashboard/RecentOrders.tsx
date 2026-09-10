@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: RecentOrders ───
  * // Arquitectura: Dumb Component (Visual Flex List)
@@ -109,9 +110,9 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
             <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
                     <div className="h-5 w-1.5 rounded-full bg-accent-primary" />
-                    <h2 className="text-xl font-black text-white tracking-tight drop-shadow-md">
+                    <Heading as="h2" className="text-xl font-black text-white tracking-tight drop-shadow-md">
                         Pedidos Recientes
-                    </h2>
+                    </Heading>
                 </div>
                 <Link
                     to={"/admin/orders" as any}

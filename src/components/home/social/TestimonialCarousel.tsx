@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * TestimonialCarousel — Carrusel interactivo para navegar entre testimonios.
  * 
@@ -111,7 +112,7 @@ export function TestimonialCarousel({ items }: TestimonialCarouselProps) {
             {/* Pagination Dots */}
             <div className="flex items-center justify-center gap-1.5 mt-6">
                 {Array.from({ length: totalDots }).map((_, i) => (
-                    <button
+                    <Button
                         key={i}
                         onClick={() => {
                             const el = scrollRef.current;

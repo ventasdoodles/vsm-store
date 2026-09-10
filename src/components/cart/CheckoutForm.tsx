@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
@@ -48,7 +50,7 @@ const FormCard = ({ children, title, icon: Icon }: { children: React.ReactNode, 
         {title && (
             <div className="flex items-center gap-3 border-b border-white/5 bg-white/[0.02] px-6 py-4">
                 {Icon && <Icon className="h-4 w-4 text-vape-400" />}
-                <h4 className="text-sm font-bold tracking-tight text-white">{title}</h4>
+                <Heading as="h4" className="text-sm font-bold tracking-tight text-white">{title}</Heading>
             </div>
         )}
         <div className="p-6">{children}</div>
@@ -255,7 +257,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                 >
                     <CheckCircle className="h-10 w-10 text-slate-900" strokeWidth={3} />
                 </m.div>
-                <h3 className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</h3>
+                <Heading as="h3" className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</Heading>
                 {handoffOnly ? (
                     <p className="text-theme-secondary">Tu solicitud fue enviada por WhatsApp. No se registro un pedido en el sistema.</p>
                 ) : (
@@ -310,7 +312,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
 
                         <FormCard title="Tipo de Entrega" icon={Truck}>
                             <div className="grid grid-cols-2 gap-4">
-                                <button
+                                <Button
                                     onClick={() => setFormData({ ...formData, deliveryType: 'pickup' })}
                                     className={cn(
                                         "group flex flex-col items-center gap-3 rounded-2xl border p-5 transition-all text-center",
@@ -321,8 +323,8 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 >
                                     <StoreIcon className={cn("h-6 w-6", formData.deliveryType === 'pickup' ? "text-vape-400" : "text-white/20")} />
                                     <span className="text-xs font-bold uppercase tracking-widest">Recoger</span>
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     onClick={() => setFormData({ ...formData, deliveryType: 'delivery' })}
                                     className={cn(
                                         "group flex flex-col items-center gap-3 rounded-2xl border p-5 transition-all text-center",
@@ -333,7 +335,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 >
                                     <Truck className={cn("h-6 w-6", formData.deliveryType === 'delivery' ? "text-vape-400" : "text-white/20")} />
                                     <span className="text-xs font-bold uppercase tracking-widest">Domicilio</span>
-                                </button>
+                                </Button>
                             </div>
                         </FormCard>
                     </m.div>
@@ -392,7 +394,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                     disabled={!!appliedCoupon}
                                     className="mb-0 flex-1"
                                 />
-                                <button
+                                <Button
                                     onClick={appliedCoupon ? () => { checkout.setAppliedCoupon(null); setCouponCode(''); } : handleValidateCoupon}
                                     className={cn(
                                         "rounded-2xl px-6 text-xs font-black uppercase tracking-widest transition-all",
@@ -402,7 +404,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                     )}
                                 >
                                     {appliedCoupon ? 'Quitar' : 'Aplicar'}
-                                </button>
+                                </Button>
                             </div>
                             {couponError && <p className="mt-2 text-2xs text-red-500 font-bold uppercase text-center">{couponError}</p>}
                             {appliedCoupon?.valid && (
@@ -446,23 +448,23 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
             {/* Navigation Footer */}
             <div className="mt-10 flex gap-4">
                 {currentStep > 1 && (
-                    <button
+                    <Button
                         onClick={prevStep}
                         className="flex h-16 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-theme-secondary hover:bg-white/10 transition-all active:scale-95"
                     >
                         <ArrowLeft className="h-6 w-6" />
-                    </button>
+                    </Button>
                 )}
                 {currentStep < 3 ? (
-                    <button
+                    <Button
                         onClick={nextStep}
                         className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-vape-500 shadow-xl shadow-vape-500/20 transition-all hover:bg-vape-400 active:scale-95"
                     >
                         <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Continuar</span>
                         <ChevronRight className="h-5 w-5 text-slate-900 transition-transform group-hover:translate-x-1" />
-                    </button>
+                    </Button>
                 ) : (
-                    <button
+                    <Button
                         onClick={onSubmit}
                         disabled={sending || isValidating || !canSubmitCheckout}
                         className={cn(
@@ -489,7 +491,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                 </m.div>
                             )}
                         </AnimatePresence>
-                    </button>
+                    </Button>
                 )}
             </div>
 

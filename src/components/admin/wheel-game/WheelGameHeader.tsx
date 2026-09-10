@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: WheelGameHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -70,7 +72,7 @@ export function WheelGameHeader({ prizes, stats, onAdd }: WheelGameHeaderProps) 
                         <Dices className="h-7 w-7 text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black tracking-tight text-white">Ruleta de Premios</h1>
+                        <Heading as="h1" className="text-2xl font-black tracking-tight text-white">Ruleta de Premios</Heading>
                         <p className="text-sm text-white/40 mt-0.5">
                             Gestiona segmentos, probabilidades y mecánicas de gamificación
                         </p>
@@ -83,14 +85,14 @@ export function WheelGameHeader({ prizes, stats, onAdd }: WheelGameHeaderProps) 
                 </div>
 
                 {/* Add button */}
-                <button
+                <Button
                     onClick={onAdd}
                     className="group relative inline-flex flex-shrink-0 items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98]"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 opacity-0 transition-opacity group-hover:opacity-100" />
                     <Plus className="relative z-10 h-4 w-4" />
                     <span className="relative z-10">Nuevo Premio</span>
-                </button>
+                </Button>
             </div>
 
             {/* Stats grid */}

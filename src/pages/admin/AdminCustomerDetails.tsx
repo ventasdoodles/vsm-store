@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * AdminCustomerDetails — Orquestador de Perfil CRM Premium
  * 
@@ -48,7 +49,7 @@ export function AdminCustomerDetails() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 bg-surface-base rounded-[2rem] border border-white/5 mx-auto max-w-2xl mt-10">
                 <div className="text-4xl">🕵️</div>
-                <h2 className="text-xl font-black text-theme-primary">Cliente no encontrado</h2>
+                <Heading as="h2" className="text-xl font-black text-theme-primary">Cliente no encontrado</Heading>
                 <p className="text-sm text-theme-secondary">El ID proporcionado no pertenece a ningún usuario registrado.</p>
             </div>
         );

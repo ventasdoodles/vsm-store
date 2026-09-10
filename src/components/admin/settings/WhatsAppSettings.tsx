@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * // ─── COMPONENTE: WhatsAppSettings ───
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Card glassmorphism para la configuracion de WhatsApp y checkout.
@@ -28,7 +29,7 @@ export function WhatsAppSettings({ formData, handleChange }: WhatsAppSettingsPro
                     <MessageCircle className="h-5 w-5 text-green-400 drop-shadow-[0_0_6px_rgba(34,197,94,0.4)]" />
                 </div>
                 <div>
-                    <h2 className="text-base font-bold text-white">WhatsApp & Checkout</h2>
+                    <Heading as="h2" className="text-base font-bold text-white">WhatsApp & Checkout</Heading>
                     <p className="text-xs text-theme-secondary/70">Canal principal de pedidos</p>
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: SettingsSaveBar ───
  * // Arquitectura: Dumb Component (Visual)
@@ -14,7 +15,7 @@ interface SettingsSaveBarProps {
 export function SettingsSaveBar({ isPending }: SettingsSaveBarProps) {
     return (
         <div className="col-span-1 lg:col-span-2 flex justify-end pt-2">
-            <button
+            <Button
                 type="submit"
                 disabled={isPending}
                 className="
@@ -38,7 +39,7 @@ export function SettingsSaveBar({ isPending }: SettingsSaveBarProps) {
                     )}
                     {isPending ? 'Guardando...' : 'Guardar Cambios'}
                 </span>
-            </button>
+            </Button>
         </div>
     );
 }

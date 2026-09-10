@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 // ─── MegaHero Sliders Header ──────────────────────────────────────────────────
 // Muestra el título del módulo, stats rápidas y el botón de creación principal.
 import { Image as ImageIcon, Plus, Eye, EyeOff } from 'lucide-react';
@@ -20,12 +22,12 @@ export function SlidersHeader({ onCreateNew, total, activeCount }: SlidersHeader
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-pink-500/5 rounded-full blur-[100px] pointer-events-none" />
 
             <div className="relative z-10 w-full sm:w-auto">
-                <h1 className="text-3xl font-black text-theme-primary flex items-center gap-3 drop-shadow-sm">
+                <Heading as="h1" className="text-3xl font-black text-theme-primary flex items-center gap-3 drop-shadow-sm">
                     <div className="p-2.5 bg-pink-500/10 rounded-2xl border border-pink-500/20">
                         <ImageIcon className="h-7 w-7 text-pink-400" />
                     </div>
                     MegaHero Sliders
-                </h1>
+                </Heading>
                 <p className="text-sm font-medium text-theme-secondary mt-2 max-w-2xl">
                     Gestiona los banners principales de la tienda (Home). Modifica fondos premium, textos y enlaces CTA para maximizar la experiencia.
                 </p>
@@ -48,13 +50,13 @@ export function SlidersHeader({ onCreateNew, total, activeCount }: SlidersHeader
                 )}
             </div>
             
-            <button
+            <Button
                 onClick={onCreateNew}
                 className="relative z-10 w-full md:w-auto group flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-white px-6 py-3.5 rounded-2xl font-black tracking-wide transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-pink-500/25 active:scale-95"
             >
                 <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" />
                 <span>NUEVO SLIDE</span>
-            </button>
+            </Button>
         </div>
     );
 }

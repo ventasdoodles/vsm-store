@@ -1,4 +1,6 @@
-﻿// AdminErrorBoundary — Captura errores en páginas admin sin romper el layout
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+// AdminErrorBoundary — Captura errores en páginas admin sin romper el layout
 import React from 'react';
 import { AlertTriangle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { logError } from '@/services';
@@ -35,7 +37,7 @@ export class AdminErrorBoundary extends React.Component<Props, State> {
                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 border border-red-500/30">
                         <AlertTriangle className="h-7 w-7 text-red-400" />
                     </div>
-                    <h2 className="text-lg font-bold text-theme-primary mb-2">Error en este módulo</h2>
+                    <Heading as="h2" className="text-lg font-bold text-theme-primary mb-2">Error en este módulo</Heading>
                     <p className="text-sm text-theme-secondary mb-6">
                         Ocurrió un error inesperado. El resto del panel sigue funcionando.
                     </p>
@@ -50,18 +52,18 @@ export class AdminErrorBoundary extends React.Component<Props, State> {
                     )}
 
                     <div className="flex gap-3 justify-center">
-                        <button
+                        <Button
                             onClick={() => window.history.back()}
                             className="inline-flex items-center gap-2 rounded-xl border border-theme px-4 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 transition-colors"
                         >
                             <ArrowLeft className="h-4 w-4" /> Atrás
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={this.handleRetry}
                             className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-vape-500 transition-colors"
                         >
                             <RefreshCw className="h-4 w-4" /> Reintentar
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

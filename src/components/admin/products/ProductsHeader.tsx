@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: ProductsHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -37,7 +39,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
                             Catalogo
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Productos</h1>
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Productos</Heading>
                     <p className="mt-1 text-sm font-medium text-theme-secondary/80">
                         Gestiona tu inventario completo desde aqui.
                     </p>
@@ -56,15 +58,15 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
 
                     {/* Action buttons */}
                     <div className="flex items-center gap-2">
-                        <button
+                        <Button
                             onClick={onExportCSV}
                             className="inline-flex items-center gap-2 rounded-[1rem] border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
                             title="Exportar lista filtrada a CSV"
                         >
                             <Download className="h-4 w-4" />
                             CSV
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={onAddProduct}
                             className="
                                 group relative inline-flex items-center gap-2 rounded-[1rem] px-5 py-2.5
@@ -79,7 +81,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
                             <div className="pointer-events-none absolute inset-0 rounded-[1rem] bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
                             <Plus className="relative z-10 h-4 w-4" />
                             <span className="relative z-10">Nuevo</span>
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

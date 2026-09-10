@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: FlashDealsSettings ───
  * // Arquitectura: Dumb Component (Visual)
@@ -27,7 +29,7 @@ export function FlashDealsSettings({ flashDealsEnd, onChangeDate }: FlashDealsSe
                     <Zap className="h-5 w-5 text-orange-400 drop-shadow-[0_0_6px_rgba(251,146,60,0.4)]" />
                 </div>
                 <div>
-                    <h2 className="text-base font-bold text-white">Ofertas Flash</h2>
+                    <Heading as="h2" className="text-base font-bold text-white">Ofertas Flash</Heading>
                     <p className="text-xs text-theme-secondary/70">Countdown para promociones urgentes</p>
                 </div>
             </div>
@@ -54,14 +56,14 @@ export function FlashDealsSettings({ flashDealsEnd, onChangeDate }: FlashDealsSe
                 </div>
 
                 {hasDate && (
-                    <button
+                    <Button
                         type="button"
                         onClick={() => onChangeDate('')}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-1.5 text-xs font-medium text-red-400 transition-all hover:bg-red-500/10 hover:border-red-500/30"
                     >
                         <Trash2 className="h-3 w-3" />
                         Limpiar (usar timer automático)
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

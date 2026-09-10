@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 // Gestión de Cupones (Admin) - VSM Store
 // CRUD de cupones con validación inline y arquitectura de Legos
 import { useState, useMemo } from 'react';
@@ -153,7 +154,7 @@ export function AdminCoupons() {
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="h-4 w-1.5 rounded-full bg-fuchsia-500" />
-                            <h2 className="text-xl font-black text-theme-primary tracking-tight">Directorio de Cupones</h2>
+                            <Heading as="h2" className="text-xl font-black text-theme-primary tracking-tight">Directorio de Cupones</Heading>
                         </div>
                         <p className="text-sm font-medium text-theme-secondary/70">
                             Administra aquí todos tus códigos promocionales vigentes y pasados.

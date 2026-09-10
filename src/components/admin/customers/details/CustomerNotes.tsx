@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * CustomerNotes — CRM Insights y Segmentación de Perfil
  * 
@@ -110,7 +112,7 @@ export function CustomerNotes({ customer }: Props) {
                     <Library className="h-5 w-5 text-indigo-400" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">CRM Insights</h3>
+                    <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">CRM Insights</Heading>
                     <p className="text-xs text-theme-secondary/70">Anotaciones y segmentación de perfil</p>
                 </div>
             </div>
@@ -151,9 +153,9 @@ export function CustomerNotes({ customer }: Props) {
                         {customer.admin_notes?.tags?.map(tag => (
                             <span key={tag} className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-card border border-white/5 text-xs font-medium text-theme-secondary hover:text-white hover:border-white/20 transition-colors shadow-sm">
                                 {tag}
-                                <button onClick={() => handleRemoveTag(tag)} className="text-theme-secondary/50 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+                                <Button onClick={() => handleRemoveTag(tag)} className="text-theme-secondary/50 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
                                     <X className="h-3 w-3" />
-                                </button>
+                                </Button>
                             </span>
                         ))}
                     </div>
@@ -166,9 +168,9 @@ export function CustomerNotes({ customer }: Props) {
                             className="flex-1 bg-surface-card border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
                             onKeyDown={e => e.key === 'Enter' && handleAddTag()}
                         />
-                        <button onClick={handleAddTag} className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs font-medium transition-colors flex items-center gap-1">
+                        <Button onClick={handleAddTag} className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs font-medium transition-colors flex items-center gap-1">
                             <Plus className="h-3.5 w-3.5" /> Tag
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
@@ -187,9 +189,9 @@ export function CustomerNotes({ customer }: Props) {
                                     <span className="text-theme-secondary/50 w-24 truncate" title={key}>{key}</span>
                                     <span className="text-theme-secondary font-medium tracking-wide">{value as string}</span>
                                 </div>
-                                <button onClick={() => handleRemoveField(key)} className="text-red-400/50 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button onClick={() => handleRemoveField(key)} className="text-red-400/50 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <Trash2 className="h-3.5 w-3.5" />
-                                </button>
+                                </Button>
                             </div>
                         ))}
                     </div>
@@ -210,9 +212,9 @@ export function CustomerNotes({ customer }: Props) {
                             className="flex-1 bg-surface-card border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
                             onKeyDown={e => e.key === 'Enter' && handleAddField()}
                         />
-                        <button onClick={handleAddField} className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs font-medium transition-colors flex items-center">
+                        <Button onClick={handleAddField} className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs font-medium transition-colors flex items-center">
                             <Plus className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

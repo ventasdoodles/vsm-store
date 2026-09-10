@@ -1,4 +1,6 @@
-﻿import { Gift } from 'lucide-react';
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+import { Gift } from 'lucide-react';
 import type { LoyaltyConfig } from '@/services';
 
 interface LoyaltyHeaderProps {
@@ -21,29 +23,29 @@ export function LoyaltyHeader({ loyaltyConfig, onToggleEnable }: LoyaltyHeaderPr
                         Pro
                     </span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-black text-theme-primary drop-shadow-sm tracking-tight mb-2">
+                <Heading as="h1" className="text-3xl sm:text-4xl font-black text-theme-primary drop-shadow-sm tracking-tight mb-2">
                     Programa V-Coins
-                </h1>
+                </Heading>
                 <p className="text-sm font-medium text-theme-secondary max-w-2xl leading-relaxed">
                     Gestiona las reglas de tu programa de lealtad. Configura cuántos puntos ganan tus clientes por compra y equivale su valor en pesos para canjes automáticos en el checkout.
                 </p>
             </div>
             
             <div className="relative z-10 w-full md:w-auto bg-surface-base/80 p-1.5 rounded-2xl border border-white/5 flex items-center shadow-inner">
-                 <button
+                 <Button
                     type="button"
                     onClick={() => onToggleEnable(true)}
                     className={`flex-1 md:w-32 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${loyaltyConfig.enable_loyalty ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-theme-secondary hover:text-theme-primary'}`}
                  >
                      Activo
-                 </button>
-                 <button
+                 </Button>
+                 <Button
                     type="button"
                     onClick={() => onToggleEnable(false)}
                     className={`flex-1 md:w-32 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${!loyaltyConfig.enable_loyalty ? 'bg-red-500/20 text-red-400 border border-red-500/20 shadow-inner' : 'text-theme-secondary hover:text-theme-primary'}`}
                  >
                      Apagado
-                 </button>
+                 </Button>
             </div>
         </div>
     );

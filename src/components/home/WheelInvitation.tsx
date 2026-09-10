@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: WheelInvitation ───
  * // Arquitectura: Presentational Component con hook de auth
@@ -126,12 +127,12 @@ export function WheelInvitation() {
 
                     {/* Title with Gradient Polish */}
                     <div className="space-y-1">
-                        <h2 className="text-5xl sm:text-7xl font-black text-white tracking-tighter uppercase italic leading-[0.85]">
+                        <Heading as="h2" className="text-5xl sm:text-7xl font-black text-white tracking-tighter uppercase italic leading-[0.85]">
                             The Wheel
-                        </h2>
-                        <h2 className="text-5xl sm:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                        </Heading>
+                        <Heading as="h2" className="text-5xl sm:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]">
                             of Destiny
-                        </h2>
+                        </Heading>
                     </div>
 
                     {/* Description */}

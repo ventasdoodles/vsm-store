@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { Ticket, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import type { AdminCoupon } from '@/services/admin';
 
@@ -34,8 +35,8 @@ export function CouponStats({ coupons }: Props) {
                     <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                         <CheckCircle className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest hidden sm:block">Cupones Activos</h3>
-                    <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest sm:hidden">Activos</h3>
+                    <Heading as="h3" className="text-xs font-bold text-theme-secondary uppercase tracking-widest hidden sm:block">Cupones Activos</Heading>
+                    <Heading as="h3" className="text-xs font-bold text-theme-secondary uppercase tracking-widest sm:hidden">Activos</Heading>
                 </div>
                 <div className="relative z-10 mt-2">
                     <div className="text-3xl md:text-4xl font-black text-theme-primary tracking-tighter">
@@ -51,8 +52,8 @@ export function CouponStats({ coupons }: Props) {
                     <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400">
                         <AlertCircle className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest hidden sm:block">Límite Alcanzado</h3>
-                    <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest sm:hidden">Agotados</h3>
+                    <Heading as="h3" className="text-xs font-bold text-theme-secondary uppercase tracking-widest hidden sm:block">Límite Alcanzado</Heading>
+                    <Heading as="h3" className="text-xs font-bold text-theme-secondary uppercase tracking-widest sm:hidden">Agotados</Heading>
                 </div>
                 <div className="relative z-10 mt-2">
                     <div className="text-3xl md:text-4xl font-black text-theme-primary tracking-tighter">
@@ -68,7 +69,7 @@ export function CouponStats({ coupons }: Props) {
                     <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500">
                         <Clock className="w-5 h-5" />
                     </div>
-                    <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest">Expirados</h3>
+                    <Heading as="h3" className="text-xs font-bold text-theme-secondary uppercase tracking-widest">Expirados</Heading>
                 </div>
                 <div className="relative z-10 mt-2">
                     <div className="text-3xl md:text-4xl font-black text-theme-primary tracking-tighter">
@@ -84,7 +85,7 @@ export function CouponStats({ coupons }: Props) {
                     <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 shadow-inner">
                         <Ticket className="w-5 h-5 drop-shadow-sm" />
                     </div>
-                    <h3 className="text-xs font-bold text-purple-500/80 uppercase tracking-widest">Usos Totales</h3>
+                    <Heading as="h3" className="text-xs font-bold text-purple-500/80 uppercase tracking-widest">Usos Totales</Heading>
                 </div>
                 <div className="relative z-10 mt-2">
                     <div className="text-3xl md:text-4xl font-black text-theme-primary tracking-tighter">

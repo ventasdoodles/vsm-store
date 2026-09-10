@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── ADMIN: Attributes Governance ───
  * // Arquitectura: Admin Orchestrator / Catalog Ontology
@@ -130,29 +132,29 @@ export function AdminAttributes() {
         <div className="space-y-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white sm:text-4xl">
                         Atributos <span className="text-violet-500">Globales</span>
-                    </h1>
+                    </Heading>
                     <p className="mt-2 text-white/40 max-w-2xl">
                         Define las propiedades (color, tamaño, etc.) que podrán tener tus productos variables.
                     </p>
                 </div>
-                <button
+                <Button
                     onClick={() => setIsCreatingAttr(true)}
                     className="group relative flex items-center gap-2 overflow-hidden rounded-2xl bg-violet-600 px-6 py-3 font-bold text-white shadow-lg shadow-violet-500/25 transition-all hover:bg-violet-500 hover:shadow-violet-500/40 active:scale-95"
                 >
                     <Plus className="h-5 w-5" />
                     Nuevo Atributo
-                </button>
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                 {/* Atributos List */}
                 <div className="lg:col-span-5 space-y-4">
-                    <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/30">
+                    <Heading as="h2" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/30">
                         <Layers className="h-4 w-4" />
                         Lista de Propiedades
-                    </h2>
+                    </Heading>
 
                     <div className="space-y-3">
                         {isCreatingAttr && (
@@ -170,12 +172,12 @@ export function AdminAttributes() {
                                         onChange={(e) => setNewAttrName(e.target.value)}
                                     />
                                     <div className="flex gap-1">
-                                        <button type="button" onClick={() => setIsCreatingAttr(false)} className="p-1 text-white/30 hover:text-white/50">
+                                        <Button type="button" onClick={() => setIsCreatingAttr(false)} className="p-1 text-white/30 hover:text-white/50">
                                             <X className="h-5 w-5" />
-                                        </button>
-                                        <button type="submit" disabled={createAttrMutation.isPending} className="p-1 text-violet-400 hover:text-violet-300">
+                                        </Button>
+                                        <Button type="submit" disabled={createAttrMutation.isPending} className="p-1 text-violet-400 hover:text-violet-300">
                                             {createAttrMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </form>
@@ -210,7 +212,7 @@ export function AdminAttributes() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button
+                                    <Button
                                         onClick={async (e) => {
                                             e.stopPropagation();
                                             const isConfirmed = await confirm({
@@ -227,7 +229,7 @@ export function AdminAttributes() {
                                         className="p-2 text-white/10 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all rounded-lg hover:bg-red-500/10"
                                     >
                                         <Trash2 className="h-4 w-4" />
-                                    </button>
+                                    </Button>
                                     <ChevronRight className={cn("h-5 w-5 transition-transform", selectedAttrId === attr.id ? "translate-x-1 text-violet-400" : "text-white/10 group-hover:translate-x-0.5 group-hover:text-white/30")} />
                                 </div>
                             </div>
@@ -237,16 +239,16 @@ export function AdminAttributes() {
 
                 {/* Valores List / Editor */}
                 <div className="lg:col-span-7 space-y-4">
-                    <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/30">
+                    <Heading as="h2" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/30">
                         <Hash className="h-4 w-4" />
                         Valores del Atributo
-                    </h2>
+                    </Heading>
 
                     {selectedAttribute ? (
                         <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl animate-in fade-in duration-500">
                             <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-6">
                                 <div>
-                                    <h3 className="text-2xl font-black text-white">{selectedAttribute.name}</h3>
+                                    <Heading as="h3" className="text-2xl font-black text-white">{selectedAttribute.name}</Heading>
                                     <p className="text-sm text-white/30 tracking-tight">Gestiona los valores y la aplicabilidad de esta propiedad.</p>
                                 </div>
 
@@ -276,7 +278,7 @@ export function AdminAttributes() {
                                         {adminSectionCatalog.sections.map((section) => {
                                             const isActive = selectedAttribute.applicability?.sections?.includes(section.slug);
                                             return (
-                                                <button
+                                                <Button
                                                     key={section.slug}
                                                     onClick={() => {
                                                         updateAttrMutation.mutate(buildAttributeUpdatePayload(
@@ -292,7 +294,7 @@ export function AdminAttributes() {
                                                     )}
                                                 >
                                                     {section.shortLabel}
-                                                </button>
+                                                </Button>
                                             );
                                         })}
                                     </div>
@@ -303,14 +305,14 @@ export function AdminAttributes() {
                                 <div className="mt-8 border-t border-white/5 pt-6">
                                     <div className="flex items-center gap-2 mb-4">
                                         <FolderTree className="h-4 w-4 text-violet-400" />
-                                        <h4 className="text-2xs font-black uppercase tracking-[0.2em] text-white/40">Restringir a Categorías Específicas</h4>
+                                        <Heading as="h4" className="text-2xs font-black uppercase tracking-[0.2em] text-white/40">Restringir a Categorías Específicas</Heading>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {(categories || []).length === 0 && <p className="text-2xs text-white/20 italic">No hay categorías cargadas.</p>}
                                         {(categories || []).map(cat => {
                                             const isActive = selectedAttribute.applicability?.categories?.includes(cat.id);
                                             return (
-                                                <button
+                                                <Button
                                                     key={cat.id}
                                                     onClick={() => {
                                                         updateAttrMutation.mutate(buildAttributeUpdatePayload(
@@ -330,11 +332,11 @@ export function AdminAttributes() {
                                                         isActive ? "bg-violet-400 animate-pulse" : "bg-white/10"
                                                     )} />
                                                     {cat.name}
-                                                </button>
+                                                </Button>
                                             );
                                         })}
                                         {((selectedAttribute.applicability?.categories || []).length > 0) && (
-                                            <button
+                                            <Button
                                                 onClick={() => {
                                                     updateAttrMutation.mutate(buildAttributeUpdatePayload(
                                                         selectedAttribute.id,
@@ -344,7 +346,7 @@ export function AdminAttributes() {
                                                 className="px-3 py-1.5 rounded-xl text-2xs font-bold text-white/20 hover:text-red-400 transition-colors"
                                             >
                                                 Limpiar Filtros
-                                            </button>
+                                            </Button>
                                         )}
                                     </div>
                                     <p className="mt-3 text-2xs text-white/20 italic">Si no seleccionas ninguna, el atributo estará disponible en todas las categorías de su sección.</p>
@@ -358,14 +360,14 @@ export function AdminAttributes() {
                                     value={newValue}
                                     onChange={(e) => setNewValue(e.target.value)}
                                 />
-                                <button
+                                <Button
                                     type="submit"
                                     disabled={createValueMutation.isPending || !newValue.trim()}
                                     className="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-bold text-black transition-all hover:bg-white/90 active:scale-95 disabled:opacity-50"
                                 >
                                     {createValueMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     Añadir
-                                </button>
+                                </Button>
                             </form>
 
                             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -375,7 +377,7 @@ export function AdminAttributes() {
                                         className="group relative flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3 transition-all hover:border-white/10 hover:bg-white/10"
                                     >
                                         <span className="text-sm font-medium text-white/80">{val.value}</span>
-                                        <button
+                                        <Button
                                             onClick={async () => {
                                                 const isConfirmed = await confirm({
                                                     title: '¿Borrar este valor?',
@@ -391,7 +393,7 @@ export function AdminAttributes() {
                                             className="opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                                         >
                                             <Trash2 className="h-4 w-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
                                 {(!selectedAttribute.values || selectedAttribute.values.length === 0) && (

@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { useLoyaltyStats } from '@/hooks/useLoyaltyStats';
 import { Loader2, TrendingUp, History, Trophy, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,7 +26,7 @@ export function LoyaltyStats() {
                     <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                         <TrendingUp className="w-5 h-5" />
                     </div>
-                    <h3 className="text-sm font-bold text-theme-secondary uppercase tracking-widest">Emitidos Hoy</h3>
+                    <Heading as="h3" className="text-sm font-bold text-theme-secondary uppercase tracking-widest">Emitidos Hoy</Heading>
                 </div>
                 <div className="relative z-10 mt-2">
                     <div className="text-4xl font-black text-theme-primary tracking-tighter">
@@ -42,7 +43,7 @@ export function LoyaltyStats() {
                     <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
                         <History className="w-5 h-5" />
                     </div>
-                    <h3 className="text-sm font-bold text-theme-secondary uppercase tracking-widest">Último Canje</h3>
+                    <Heading as="h3" className="text-sm font-bold text-theme-secondary uppercase tracking-widest">Último Canje</Heading>
                 </div>
                 <div className="relative z-10 mt-2">
                     {data.ultimo_canje?.created_at ? (
@@ -76,7 +77,7 @@ export function LoyaltyStats() {
                     <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 shadow-inner">
                         <Trophy className="w-5 h-5 drop-shadow-sm" />
                     </div>
-                    <h3 className="text-sm font-bold text-amber-500/80 uppercase tracking-widest">Top 3 Holders</h3>
+                    <Heading as="h3" className="text-sm font-bold text-amber-500/80 uppercase tracking-widest">Top 3 Holders</Heading>
                 </div>
 
                 <div className="flex-1 relative z-10 space-y-3 mt-1">

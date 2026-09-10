@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { Shield, Truck, Zap, RotateCcw, Star, CreditCard } from 'lucide-react';
 import { m } from 'framer-motion';
 
@@ -105,9 +106,9 @@ export const TrustBadges = () => {
 
                         {/* Text Content */}
                         <div className="space-y-2">
-                            <h3 className="font-black text-white/90 uppercase tracking-wider text-2xs sm:text-xs leading-none">
+                            <Heading as="h3" className="font-black text-white/90 uppercase tracking-wider text-2xs sm:text-xs leading-none">
                                 {badge.title}
-                            </h3>
+                            </Heading>
                             <p className="text-2xs sm:text-2xs text-white/40 font-bold uppercase tracking-[0.2em] leading-tight px-2">
                                 {badge.description}
                             </p>

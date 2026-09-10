@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { ShieldCheck, Sparkles, CheckCircle2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,10 +25,10 @@ export function ProductSpecsBuilder({
 }: ProductSpecsBuilderProps) {
     return (
         <section className="space-y-3">
-            <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+            <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-400" />
                 Especificaciones Técnicas (Specs)
-            </h3>
+            </Heading>
             <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-5">
                 {/* Sugerencias Guardrails */}
                 {specSuggestions.length > 0 && (
@@ -39,7 +41,7 @@ export function ProductSpecsBuilder({
                             {specSuggestions.map(s => {
                                 const isUsed = !!specs[s];
                                 return (
-                                    <button
+                                    <Button
                                         key={s}
                                         type="button"
                                         onClick={() => onAddSpec(s)}
@@ -53,7 +55,7 @@ export function ProductSpecsBuilder({
                                     >
                                         {isUsed && <CheckCircle2 className="h-2.5 w-2.5" />}
                                         {s}
-                                    </button>
+                                    </Button>
                                 );
                             })}
                         </div>
@@ -75,12 +77,12 @@ export function ProductSpecsBuilder({
                                 onChange={(e) => onUpdateSpec(key, e.target.value)}
                                 className={cn(INPUT_CLS, "flex-1")} 
                             />
-                            <button 
+                            <Button 
                                 onClick={() => onRemoveSpec(key)} 
                                 className="p-2 text-white/20 hover:text-red-400"
                             >
                                 <X className="h-4 w-4" />
-                            </button>
+                            </Button>
                         </div>
                     ))}
                 </div>
@@ -98,7 +100,7 @@ export function ProductSpecsBuilder({
                             }
                         }}
                     />
-                    <button 
+                    <Button 
                         type="button"
                         onClick={() => {
                             const keyInput = document.getElementById('new-spec-key') as HTMLInputElement;
@@ -107,7 +109,7 @@ export function ProductSpecsBuilder({
                         className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all font-bold text-2xs uppercase tracking-wider"
                     >
                         Añadir
-                    </button>
+                    </Button>
                 </div>
                 <p className="text-2xs text-white/20 italic">Las specs son propiedades técnicas fijas que no crean variaciones de stock.</p>
             </div>

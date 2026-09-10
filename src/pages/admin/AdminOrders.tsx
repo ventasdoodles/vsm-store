@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: AdminOrders ─── [Wave 90 - Thin Component Refactor]
  */
@@ -129,16 +130,16 @@ export function AdminOrders() {
                         <span className="text-xs font-bold text-white/70 pr-4 border-r border-white/10">{admin.selectedIds.length} Seleccionados</span>
                         <div className="flex items-center gap-2 overflow-x-auto max-w-[50vw] no-scrollbar">
                             {['pending', 'processing', 'shipped', 'delivered'].map((st) => (
-                                <button
+                                <Button
                                     key={st}
                                     onClick={() => admin.bulkUpdateStatus(st as OrderStatus)}
                                     disabled={admin.isBulkUpdating}
                                     className="btn-vsm-bulk text-white hover:text-accent-primary"
                                 >
                                     {st}
-                                </button>
+                                </Button>
                             ))}
-                            <button onClick={() => admin.setSelectedIds([])} className="ml-2 text-xs font-bold text-white/30 hover:text-white/60 px-2 transition-colors">Cancelar</button>
+                            <Button onClick={() => admin.setSelectedIds([])} className="ml-2 text-xs font-bold text-white/30 hover:text-white/60 px-2 transition-colors">Cancelar</Button>
                         </div>
                     </div>
                 </div>

@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { m } from 'framer-motion';
 import { Sparkles, ShoppingCart, Power } from 'lucide-react';
 import { 
@@ -23,9 +25,9 @@ import { Link } from '@tanstack/react-router';
                 <div className="w-8 h-8 rounded-lg bg-accent-primary flex items-center justify-center shadow-lg shadow-accent-primary/20">
                     <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
+                <Heading as="h3" className="text-sm font-black uppercase tracking-widest text-white italic">
                     Insights del Oráculo VSM AI
-                </h3>
+                </Heading>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -67,9 +69,9 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
                     </span>
                 </div>
 
-                <h4 className="text-sm font-black text-theme-primary">
+                <Heading as="h4" className="text-sm font-black text-theme-primary">
                     {product.name}
-                </h4>
+                </Heading>
 
                 <p className="text-xs text-theme-secondary leading-relaxed opacity-80">
                     {prediction.adminRecommendation}
@@ -84,9 +86,9 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
                     <ShoppingCart className="w-3 h-3" />
                     Reabastecer
                 </Link>
-                <button className="flex items-center justify-center p-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-red-400 hover:bg-red-400/10 transition-all">
+                <Button className="flex items-center justify-center p-2 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-red-400 hover:bg-red-400/10 transition-all">
                     <Power className="w-3.5 h-3.5" />
-                </button>
+                </Button>
             </div>
         </m.div>
     );

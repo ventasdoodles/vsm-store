@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * CustomerAddress — Dirección Principal del Cliente
  * 
  * Muestra la dirección de entrega predeterminada del cliente
@@ -37,7 +38,7 @@ export function CustomerAddress({ customer }: Props) {
                         <MapPin className="h-4 w-4 text-emerald-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-white uppercase tracking-wider">Dirección Principal</h3>
+                        <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">Dirección Principal</Heading>
                         <p className="text-2xs text-emerald-400 font-bold uppercase tracking-wider">Predeterminada</p>
                     </div>
                 </div>

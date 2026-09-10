@@ -1,4 +1,6 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+/**
  * CustomerTimeline — Línea de Tiempo Transaccional
  * 
  * Historial visual tipo timeline de todos los pedidos del cliente.
@@ -77,7 +79,7 @@ export function CustomerTimeline({ customer }: Props) {
                         <Route className="h-5 w-5 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-white uppercase tracking-wider">Línea de Tiempo</h3>
+                        <Heading as="h3" className="text-sm font-black text-white uppercase tracking-wider">Línea de Tiempo</Heading>
                         <p className="text-xs text-theme-secondary/70">Historial transaccional inteligente</p>
                     </div>
                 </div>
@@ -144,12 +146,12 @@ export function CustomerTimeline({ customer }: Props) {
                                                     <ShoppingBag className="w-4 h-4" />
                                                     {order.items.length} {order.items.length === 1 ? 'artículo' : 'artículos'}
                                                 </div>
-                                                <button 
+                                                <Button 
                                                     onClick={() => navigate({ to: `/admin/orders/${order.id}` as any })}
                                                     className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
                                                 >
                                                     Ver detalles &rarr;
-                                                </button>
+                                                </Button>
                                             </div>
                                         )}
                                     </div>

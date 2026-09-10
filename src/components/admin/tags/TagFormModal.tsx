@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: TagFormModal ───
  * // Arquitectura: Dumb Component (Controlled Modal)
@@ -95,16 +97,16 @@ export function TagFormModal({
                                 <div className="p-2 rounded-xl bg-accent-primary/10 ring-1 ring-inset ring-accent-primary/20">
                                     <Tag className="h-5 w-5 text-accent-primary" />
                                 </div>
-                                <h2 className="text-lg font-black text-white tracking-tight">
+                                <Heading as="h2" className="text-lg font-black text-white tracking-tight">
                                     {isEditing ? 'Editar Etiqueta' : 'Nueva Etiqueta'}
-                                </h2>
+                                </Heading>
                             </div>
-                            <button
+                            <Button
                                 onClick={onCancel}
                                 className="p-2 rounded-xl text-theme-secondary hover:text-white hover:bg-white/5 transition-colors"
                             >
                                 <X className="h-5 w-5" />
-                            </button>
+                            </Button>
                         </div>
 
                         {/* Form */}
@@ -158,21 +160,21 @@ export function TagFormModal({
 
                         {/* Actions */}
                         <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-white/5">
-                            <button
+                            <Button
                                 onClick={onCancel}
                                 disabled={isPending}
                                 className="px-5 py-2.5 rounded-xl text-sm font-bold text-theme-secondary hover:text-white hover:bg-white/5 transition-colors disabled:opacity-50"
                             >
                                 Cancelar
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={onSubmit}
                                 disabled={isPending || !form.label.trim() || !form.name.trim()}
                                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-primary text-black text-sm font-black hover:bg-accent-primary/90 transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100"
                             >
                                 {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                                 {isEditing ? 'Guardar Cambios' : 'Crear Etiqueta'}
-                            </button>
+                            </Button>
                         </div>
                     </m.div>
                 </m.div>

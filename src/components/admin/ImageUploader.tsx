@@ -214,17 +214,17 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                                 />
 
                                 {/* Delete Button - Always visible slightly, fully visible on hover */}
-                                <button
+                                <Button
                                     type="button"
                                     onClick={() => handleRemove(url)}
                                     className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500 transition-colors z-10"
                                     aria-label="Eliminar imagen"
                                 >
                                     <X className="h-3.5 w-3.5" />
-                                </button>
+                                </Button>
 
                                 {/* Cover Selection Button */}
-                                <button
+                                <Button
                                     type="button"
                                     onClick={() => onCoverChange?.(isCover ? null : url)}
                                     className={cn(
@@ -235,7 +235,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                                     )}
                                 >
                                     {isCover ? "⭐ Portada" : "Usar Portada"}
-                                </button>
+                                </Button>
 
                                 {isCover && (
                                     <div className="absolute inset-0 border-2 border-vape-500/30 rounded-xl pointer-events-none" />

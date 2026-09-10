@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { useNavigate } from '@tanstack/react-router';
 import { AlertTriangle, CreditCard, Loader2, Package } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -58,7 +59,7 @@ export function OpenRecoverableOrderNotice({
                     </div>
 
                     <div className={cn('mt-4 flex gap-3', compact ? 'flex-col' : 'flex-col sm:flex-row')}>
-                        <button
+                        <Button
                             type="button"
                             onClick={() => void continuePayment(order)}
                             disabled={continuingPayment}
@@ -66,16 +67,16 @@ export function OpenRecoverableOrderNotice({
                         >
                             {continuingPayment ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
                             {continuingPayment ? 'Abriendo Mercado Pago...' : view.primaryCtaLabel}
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
                             type="button"
                             onClick={() => navigate({ to: `/orders/${order.id}` as any })}
                             className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-2xs font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
                         >
                             <Package className="h-4 w-4" />
                             {view.secondaryCtaLabel}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

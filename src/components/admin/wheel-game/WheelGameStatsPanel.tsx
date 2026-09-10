@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: WheelGameStatsPanel ───
  * // Arquitectura: Dumb Component (Visual)
@@ -84,9 +85,9 @@ export function WheelGameStatsPanel({ stats, isLoading }: WheelGameStatsPanelPro
 
     return (
         <div className="rounded-[1.5rem] border border-white/5 bg-theme-primary/5 p-6 backdrop-blur-sm">
-            <h2 className="text-sm font-black uppercase tracking-widest text-white/40 mb-4">
+            <Heading as="h2" className="text-sm font-black uppercase tracking-widest text-white/40 mb-4">
                 Estadísticas de Participación
-            </h2>
+            </Heading>
             <div className="grid grid-cols-2 gap-3">
                 {cards.map((card) => (
                     <StatCard key={card.label} {...card} isLoading={isLoading} />

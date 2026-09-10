@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useNotification } from '@/hooks/useNotification';
@@ -107,7 +109,7 @@ export function AdminLoyalty() {
                 <div className="bg-surface-base rounded-[2.5rem] p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="h-4 w-1.5 rounded-full bg-amber-500" />
-                        <h2 className="text-xl font-black text-theme-primary tracking-tight uppercase">Reglas del Programa V-Coins</h2>
+                        <Heading as="h2" className="text-xl font-black text-theme-primary tracking-tight uppercase">Reglas del Programa V-Coins</Heading>
                     </div>
 
                     <LoyaltyRulesForm
@@ -132,14 +134,14 @@ export function AdminLoyalty() {
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-5">
                     <div className="bg-surface-base/90 backdrop-blur-xl border border-amber-500/30 p-2.5 rounded-2xl shadow-[0_10px_40px_rgba(251,191,36,0.15)] flex items-center gap-4">
                         <span className="text-sm font-bold text-theme-secondary ml-4 hidden sm:block">Hay cambios sin guardar</span>
-                        <button
+                        <Button
                             onClick={handleSave}
                             disabled={updateMutation.isPending}
                             className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-6 py-2.5 rounded-xl font-black tracking-wide transition-all active:scale-95 disabled:opacity-50"
                         >
                             {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             GUARDAR AJUSTES
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}

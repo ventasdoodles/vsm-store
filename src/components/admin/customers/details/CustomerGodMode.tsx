@@ -1,4 +1,6 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+/**
  * CustomerGodMode — Controles Críticos de Cuenta
  * 
  * Zona de peligro del CRM con capacidades de admin nivel Dios:
@@ -68,7 +70,7 @@ export function CustomerGodMode({ customer }: Props) {
                     <ShieldAlert className="h-5 w-5 text-red-500 animate-pulse-slow" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-rose-500 uppercase tracking-wider">God Mode</h3>
+                    <Heading as="h3" className="text-sm font-black text-rose-500 uppercase tracking-wider">God Mode</Heading>
                     <p className="text-xs text-rose-400/60">Controles críticos de cuenta</p>
                 </div>
             </div>
@@ -81,7 +83,7 @@ export function CustomerGodMode({ customer }: Props) {
                         <AlertOctagon className="h-3.5 w-3.5" /> Estado de Cuenta
                     </label>
                     <div className="grid grid-cols-3 gap-2">
-                        <button
+                        <Button
                             disabled={updateStatusMutation.isPending}
                             onClick={() => updateStatusMutation.mutate({ status: 'active' })}
                             className={`relative flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition-all duration-300
@@ -92,9 +94,9 @@ export function CustomerGodMode({ customer }: Props) {
                         >
                             <CheckCircle className="h-4 w-4 mb-1" />
                             LIBRE
-                        </button>
+                        </Button>
                         
-                        <button
+                        <Button
                             disabled={updateStatusMutation.isPending}
                             onClick={() => updateStatusMutation.mutate({ status: 'suspended' })}
                             className={`relative flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition-all duration-300
@@ -105,9 +107,9 @@ export function CustomerGodMode({ customer }: Props) {
                         >
                             <ShieldAlert className="h-4 w-4 mb-1" />
                             JAULA
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
                             disabled={updateStatusMutation.isPending}
                             onClick={() => updateStatusMutation.mutate({ status: 'banned' })}
                             className={`relative flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition-all duration-300
@@ -118,7 +120,7 @@ export function CustomerGodMode({ customer }: Props) {
                         >
                             <Ban className="h-4 w-4 mb-1" />
                             BAN
-                        </button>
+                        </Button>
                     </div>
 
                     {customer.account_status === 'suspended' && (
@@ -155,14 +157,14 @@ export function CustomerGodMode({ customer }: Props) {
                             value={notifMessage}
                             onChange={e => setNotifMessage(e.target.value)}
                         />
-                        <button
+                        <Button
                             onClick={handleSendNotification}
                             disabled={sendNotificationMutation.isPending}
                             className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:border-rose-500/40 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(244,63,94,0.1)] active:scale-[0.98]"
                         >
                             {sendNotificationMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                             {sendNotificationMutation.isPending ? 'Transmitiendo...' : 'Ejecutar Transmisión'}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

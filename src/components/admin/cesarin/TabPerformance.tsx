@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { m } from 'framer-motion';
 import { TrendingUp, Users, MessageSquare, ThumbsUp } from 'lucide-react';
 
@@ -9,10 +10,10 @@ export function TabPerformance() {
             className="space-y-8"
         >
             <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                <Heading as="h2" className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                     <TrendingUp className="h-8 w-8 text-blue-400" />
                     Desempeño Global
-                </h2>
+                </Heading>
                 <p className="text-white/50 text-sm">
                     Un vistazo rápido a cómo está rindiendo Cesarin y qué impacto tiene en tus clientes.
                 </p>

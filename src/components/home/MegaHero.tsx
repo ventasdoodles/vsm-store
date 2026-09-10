@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: MEGA HERO ───
  * // Propósito: Slider principal de alto impacto para la Home.
@@ -190,7 +192,7 @@ export const MegaHero = () => {
                                 {slide.tag}
                             </m.div>
 
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] md:leading-[1.05] tracking-tight drop-shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
+                            <Heading as="h1" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] md:leading-[1.05] tracking-tight drop-shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
                                 {slide.title}
                                 <br />
                                 <m.span
@@ -201,7 +203,7 @@ export const MegaHero = () => {
                                 >
                                     {slide.subtitle}
                                 </m.span>
-                            </h1>
+                            </Heading>
 
                             <p className="text-base md:text-xl text-white/90 max-w-xl leading-relaxed md:leading-relaxed font-bold drop-shadow-[0_6px_18px_rgba(0,0,0,0.8)]">
                                 {slide.description}
@@ -244,14 +246,14 @@ export const MegaHero = () => {
             <div className="absolute bottom-12 right-6 lg:right-12 z-20 flex items-center gap-8 pointer-events-auto">
                 <div className="hidden md:flex items-center gap-4">
                     {activeSlides.map((_, i) => (
-                        <button
+                        <Button
                             key={i}
                             onClick={() => setCurrentIndex(i)}
                             className="group relative px-2 py-4"
                             aria-label={`Slide ${i + 1}`}
                         >
                             <div className={`h-1.5 transition-all duration-500 rounded-full ${currentIndex === i ? 'w-12 bg-white shadow-[0_0_20px_white]' : 'w-4 bg-white/20 group-hover:bg-white/40'}`} />
-                        </button>
+                        </Button>
                     ))}
                 </div>
 

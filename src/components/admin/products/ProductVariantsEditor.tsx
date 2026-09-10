@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── ADMIN: Product Variants Matrix ───
  * // Arquitectura: Admin Component / Catalog Ontology
@@ -194,10 +196,10 @@ export function ProductVariantsEditor({
             <div className="rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-md">
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h4 className="flex items-center gap-2 text-sm font-bold text-white">
+                        <Heading as="h4" className="flex items-center gap-2 text-sm font-bold text-white">
                             <Settings2 className="h-4 w-4 text-violet-400" />
                             Configurar Propiedades
-                        </h4>
+                        </Heading>
                         <p className="text-2xs text-white/30 uppercase tracking-wider font-black mt-1">
                             Selecciona los atributos que definen este producto
                         </p>
@@ -212,7 +214,7 @@ export function ProductVariantsEditor({
                     )}
                     {filteredAttributes.map((attr: ProductAttribute) => (
                         <div key={attr.id} className="space-y-3">
-                            <button
+                            <Button
                                 type="button"
                                 onClick={() => handleToggleAttribute(attr.id)}
                                 className={cn(
@@ -222,12 +224,12 @@ export function ProductVariantsEditor({
                             >
                                 <span className="text-xs font-bold uppercase tracking-tight">{attr.name}</span>
                                 <ChevronDown className={cn("h-4 w-4 transition-transform", selectedAttributes.includes(attr.id) ? "rotate-180" : "")} />
-                            </button>
+                            </Button>
 
                             {selectedAttributes.includes(attr.id) && (
                                 <div className="ml-2 flex flex-wrap gap-2 animate-in fade-in zoom-in-95 duration-200">
                                     {attr.values?.map(val => (
-                                        <button
+                                        <Button
                                             key={val.id}
                                             type="button"
                                             onClick={() => handleValueToggle(attr.id, val.id)}
@@ -239,7 +241,7 @@ export function ProductVariantsEditor({
                                             )}
                                         >
                                             {val.value}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             )}
@@ -247,7 +249,7 @@ export function ProductVariantsEditor({
                     ))}
                 </div>
 
-                <button
+                <Button
                     type="button"
                     onClick={generateMatrix}
                     disabled={selectedAttributes.length === 0}
@@ -255,16 +257,16 @@ export function ProductVariantsEditor({
                 >
                     <RefreshCw className="h-4 w-4" />
                     Generar Tabla de Variantes
-                </button>
+                </Button>
             </div>
 
             {/* 2. Tabla de Variantes */}
             {variants.length > 0 && (
                 <div className="space-y-4">
-                    <h4 className="flex items-center gap-2 text-sm font-bold text-white/50 px-2 uppercase tracking-wide">
+                    <Heading as="h4" className="flex items-center gap-2 text-sm font-bold text-white/50 px-2 uppercase tracking-wide">
                         <Layers className="h-4 w-4" />
                         Matriz Resultante ({variants.length})
-                    </h4>
+                    </Heading>
 
                     <div className="space-y-3">
                         {variants.map((v, idx) => (
@@ -311,7 +313,7 @@ export function ProductVariantsEditor({
                                                 onChange={e => updateVariant(idx, 'stock', Number(e.target.value))}
                                             />
                                         </div>
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={() => {
                                                 const next = variants.filter((_, i) => i !== idx);
@@ -321,7 +323,7 @@ export function ProductVariantsEditor({
                                             className="mt-5 p-2 text-white/10 hover:text-red-400 transition-colors"
                                         >
                                             <Trash2 className="h-4 w-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

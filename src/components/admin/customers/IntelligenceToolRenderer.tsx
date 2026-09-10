@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { Sparkles, Ticket, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StrategicAIResponse } from '@/services/admin/admin-crm.service';
@@ -27,19 +29,19 @@ export function IntelligenceToolRenderer({
                         <Sparkles className={cn("h-6 w-6", loadingStrategic && "animate-spin-slow")} />
                     </div>
                     <div>
-                        <h4 className="text-lg font-black text-white tracking-tight">Analista Estratégico Pro</h4>
+                        <Heading as="h4" className="text-lg font-black text-white tracking-tight">Analista Estratégico Pro</Heading>
                         <p className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400 opacity-80">Motor de Retención Gemini 2.5 Flash Lite</p>
                     </div>
                 </div>
 
                 {!strategicAnalysis && (
-                    <button
+                    <Button
                         onClick={() => loadStrategicAI()}
                         disabled={loadingStrategic}
                         className="px-6 py-3 rounded-2xl bg-indigo-500 text-white text-2xs font-black uppercase tracking-widest transition-all hover:bg-indigo-400 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 shadow-lg shadow-indigo-500/40"
                     >
                         {loadingStrategic ? 'Analizando Historial...' : 'Ejecutar Análisis Profundo'}
-                    </button>
+                    </Button>
                 )}
             </div>
 
@@ -54,7 +56,7 @@ export function IntelligenceToolRenderer({
                         {/* Next Steps */}
                         {strategicAnalysis.next_steps && (
                             <div className="space-y-3 mt-6">
-                                <h6 className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400">Pasos Recomendados</h6>
+                                <Heading as="h6" className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400">Pasos Recomendados</Heading>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {strategicAnalysis.next_steps.map((step: string, i: number) => (
                                         <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 group/step hover:bg-white/10 transition-colors">
@@ -77,7 +79,7 @@ export function IntelligenceToolRenderer({
                                         <Ticket className="h-7 w-7" />
                                     </div>
                                     <div>
-                                        <h5 className="text-sm font-black text-white uppercase tracking-wider">Incentivo Sugerido</h5>
+                                        <Heading as="h5" className="text-sm font-black text-white uppercase tracking-wider">Incentivo Sugerido</Heading>
                                         <p className="text-xs text-indigo-300/80 font-medium">{strategicAnalysis.suggested_coupon.reason}</p>
                                     </div>
                                 </div>
@@ -101,8 +103,8 @@ export function IntelligenceToolRenderer({
                     {strategicAnalysis.recovery_message && (
                         <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/20 space-y-4">
                             <div className="flex items-center justify-between">
-                                <h5 className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300">Mensaje de Recuperación Sugerido</h5>
-                                <button
+                                <Heading as="h5" className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300">Mensaje de Recuperación Sugerido</Heading>
+                                <Button
                                     onClick={() => {
                                         if (strategicAnalysis.recovery_message) {
                                             navigator.clipboard.writeText(strategicAnalysis.recovery_message);
@@ -113,7 +115,7 @@ export function IntelligenceToolRenderer({
                                 >
                                     Copiar para WhatsApp
                                     <MessageSquare className="h-3 w-3" />
-                                </button>
+                                </Button>
                             </div>
                             <div className="p-4 rounded-2xl bg-black/40 border border-white/5 italic text-sm text-white/70 leading-relaxed">
                                 "{strategicAnalysis.recovery_message}"
@@ -121,12 +123,12 @@ export function IntelligenceToolRenderer({
                         </div>
                     )}
 
-                    <button 
+                    <Button 
                         onClick={() => {/* Strategic Analysis is managed by query cache now, we could invalidate it if needed */}}
                         className="text-2xs font-black uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors mx-auto block"
                     >
                         Resetear Análisis IA
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * // ─── COMPONENTE: SalesChart ───
  * // Arquitectura: Dumb Component (Visual Graphic)
  * // Propósito principal: Mostrar gráfica de barras de ventas con Tooltips interactivos y base glassmorphism.
@@ -32,9 +33,9 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                         <BarChart3 className="h-5 w-5 text-accent-primary" />
                     </div>
                     <div>
-                        <h2 className="text-sm font-bold text-white tracking-wide">
+                        <Heading as="h2" className="text-sm font-bold text-white tracking-wide">
                             Ingresos de Ventas
-                        </h2>
+                        </Heading>
                         <p className="text-2xs font-medium text-theme-secondary mt-0.5">
                             {new Date(dateRange.start).toLocaleDateString()} - {new Date(dateRange.end).toLocaleDateString()}
                         </p>

@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import React from 'react';
 /**
  * // ─── COMPONENTE: DashboardPulse ───
@@ -34,14 +36,14 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                             <Activity className="h-5 w-5 text-violet-400" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-white/90">
+                            <Heading as="h3" className="text-sm font-black uppercase tracking-widest text-white/90">
                                 Business Pulse <span className="text-2xs ml-1 text-violet-400/60 font-medium tracking-normal">(Beta AI)</span>
-                            </h3>
+                            </Heading>
                             <p className="text-2xs text-white/40 font-medium">Análisis en tiempo real de tendencias y anomalías</p>
                         </div>
                     </div>
 
-                    <button
+                    <Button
                         onClick={() => refetch()}
                         disabled={isLoading}
                         className="flex items-center gap-2 rounded-xl bg-violet-500/10 px-4 py-2 text-2xs font-black uppercase tracking-widest text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
@@ -52,7 +54,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                             <Sparkles className="h-3 w-3" />
                         )}
                         Sincronizar IA
-                    </button>
+                    </Button>
                 </div>
 
                 <AnimatePresence>

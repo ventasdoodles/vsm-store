@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 // Formulario de Producto (Admin) - VSM Store
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from '@tanstack/react-router';
@@ -124,11 +126,11 @@ export function AdminProductForm() {
     return (
         <div className="mx-auto max-w-3xl space-y-6">
             <div className="flex items-center gap-4">
-                <button onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme p-2 text-theme-secondary hover:bg-theme-secondary/50 transition-colors">
+                <Button onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme p-2 text-theme-secondary hover:bg-theme-secondary/50 transition-colors">
                     <ArrowLeft className="h-4 w-4" />
-                </button>
+                </Button>
                 <div>
-                    <h1 className="text-xl font-bold text-theme-primary">{isEditing ? 'Editar producto' : 'Nuevo producto'}</h1>
+                    <Heading as="h1" className="text-xl font-bold text-theme-primary">{isEditing ? 'Editar producto' : 'Nuevo producto'}</Heading>
                     <p className="text-sm text-theme-secondary">{isEditing ? 'Modifica los datos' : 'Completa los datos'}</p>
                 </div>
             </div>
@@ -136,7 +138,7 @@ export function AdminProductForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold text-theme-secondary"><Package className="h-4 w-4 text-vape-400" />Información básica</h2>
+                    <Heading as="h2" className="flex items-center gap-2 text-sm font-semibold text-theme-secondary"><Package className="h-4 w-4 text-vape-400" />Información básica</Heading>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-theme-secondary">Nombre *</label><input type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} placeholder="Nombre del producto" /></div>
                         <div>
@@ -158,7 +160,7 @@ export function AdminProductForm() {
 
                 {/* Pricing */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-theme-secondary">💰 Precio e Inventario</h2>
+                    <Heading as="h2" className="text-sm font-semibold text-theme-secondary">💰 Precio e Inventario</Heading>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Precio *</label><input type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} className={inputCls} /></div>
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Precio anterior</label><input type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} className={inputCls} /></div>
@@ -169,12 +171,12 @@ export function AdminProductForm() {
 
                 {/* Section & Category */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-theme-secondary">📂 Sección y Categoría</h2>
+                    <Heading as="h2" className="text-sm font-semibold text-theme-secondary">📂 Sección y Categoría</Heading>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Sección *</label>
                             <div className="flex gap-2">
                                 {adminSectionCatalog.sections.map((section) => (
-                                    <button
+                                    <Button
                                         key={section.slug}
                                         type="button"
                                         onClick={() => set('section', section.slug)}
@@ -186,7 +188,7 @@ export function AdminProductForm() {
                                         )}
                                     >
                                         {section.displayLabel}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         </div>
@@ -201,7 +203,7 @@ export function AdminProductForm() {
 
                 {/* Flags */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-theme-secondary">🏷️ Badges</h2>
+                    <Heading as="h2" className="text-sm font-semibold text-theme-secondary">🏷️ Badges</Heading>
                     <div className="space-y-6">
                         {([
                             { key: 'is_featured' as const, until: 'is_featured_until' as const, label: '⭐ Destacado', active: 'border-amber-500/30 text-amber-400 bg-amber-500/10' },
@@ -210,7 +212,7 @@ export function AdminProductForm() {
                         ]).map(({ key, until, label, active }) => (
                             <div key={key} className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-b border-theme-subtle pb-4 last:border-0 last:pb-0">
                                 <div className="flex items-center gap-3">
-                                    <button
+                                    <Button
                                         type="button"
                                         onClick={() => set(key, !form[key])}
                                         className={cn(
@@ -219,7 +221,7 @@ export function AdminProductForm() {
                                         )}
                                     >
                                         {label}
-                                    </button>
+                                    </Button>
                                     <div className="flex flex-col">
                                         <span className="text-xs text-theme-secondary font-medium">{label.split(' ')[1]}</span>
                                         <span className="text-xs text-accent-primary italic">
@@ -239,7 +241,7 @@ export function AdminProductForm() {
                                             { l: '30d', v: 30 }
                                         ].map((d) => {
                                             return (
-                                                <button
+                                                <Button
                                                     key={d.l}
                                                     type="button"
                                                     onClick={() => {
@@ -258,7 +260,7 @@ export function AdminProductForm() {
                                                     )}
                                                 >
                                                     {d.l}
-                                                </button>
+                                                </Button>
                                             )
                                         })}
                                     </div>
@@ -266,7 +268,7 @@ export function AdminProductForm() {
                             </div>
                         ))}
                         <div className="flex items-center gap-3 pt-2">
-                            <button
+                            <Button
                                 type="button"
                                 onClick={() => set('is_active', !form.is_active)}
                                 className={cn(
@@ -275,7 +277,7 @@ export function AdminProductForm() {
                                 )}
                             >
                                 {form.is_active ? '✅ Producto Visible' : '❌ Producto Oculto'}
-                            </button>
+                            </Button>
                             <p className="text-xs text-accent-primary">Controla si el producto aparece en la tienda.</p>
                         </div>
                     </div>
@@ -284,7 +286,7 @@ export function AdminProductForm() {
                 {/* Tags */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
                     <div className="flex items-center gap-2">
-                        <h2 className="text-sm font-semibold text-theme-secondary">🔖 Tags</h2>
+                        <Heading as="h2" className="text-sm font-semibold text-theme-secondary">🔖 Tags</Heading>
                     </div>
                     <div className="relative flex gap-2">
                         <input
@@ -297,29 +299,29 @@ export function AdminProductForm() {
                             className={cn(inputCls, 'flex-1')}
                             placeholder="Escribe o elige un tag..."
                         />
-                        <button type="button" onClick={addTag} className="rounded-xl border border-theme bg-theme-primary/60 px-3 text-theme-secondary hover:bg-theme-secondary/50"><Plus className="h-4 w-4" /></button>
+                        <Button type="button" onClick={addTag} className="rounded-xl border border-theme bg-theme-primary/60 px-3 text-theme-secondary hover:bg-theme-secondary/50"><Plus className="h-4 w-4" /></Button>
                         {/* Autocomplete dropdown */}
                         {showTagSuggestions && tagSuggestions.length > 0 && (
                             <div className="absolute top-full left-0 z-20 mt-1 w-full rounded-xl border border-theme bg-theme-primary shadow-lg">
                                 {tagSuggestions.map(t => (
-                                    <button
+                                    <Button
                                         key={t}
                                         type="button"
                                         onMouseDown={() => { set('tags', appendProductTag(form.tags, t)); setTagInput(''); setShowTagSuggestions(false); }}
                                         className="flex w-full items-center px-3 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 first:rounded-t-xl last:rounded-b-xl"
                                     >
                                         {t}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         )}
                     </div>
-                    {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<button type="button" onClick={() => set('tags', removeProductTag(form.tags, tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
+                    {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<Button type="button" onClick={() => set('tags', removeProductTag(form.tags, tag))} className="hover:text-red-400"><X className="h-3 w-3" /></Button></span>))}</div>}
                 </section>
 
                 {/* Images */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-theme-secondary">📷 Imágenes</h2>
+                    <Heading as="h2" className="text-sm font-semibold text-theme-secondary">📷 Imágenes</Heading>
                     <ImageUploader
                         images={form.images}
                         coverImage={form.cover_image}
@@ -330,11 +332,11 @@ export function AdminProductForm() {
 
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</button>
-                    <button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
+                    <Button type="button" onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</Button>
+                    <Button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
                         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isEditing ? 'Guardar cambios' : 'Crear producto'}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>

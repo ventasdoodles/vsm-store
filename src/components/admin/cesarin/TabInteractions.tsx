@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { m } from 'framer-motion';
 import { MessageSquare, ThumbsUp, ThumbsDown, Save } from 'lucide-react';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
@@ -19,10 +21,10 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
             className="space-y-8"
         >
             <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                <Heading as="h2" className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                     <MessageSquare className="h-8 w-8 text-indigo-400" />
                     Chats de Clientes
-                </h2>
+                </Heading>
                 <p className="text-white/50 text-sm">
                     Revisa las conversaciones reales de tus clientes con Cesarin. Califica su desempeño o déjale una nota para que aprenda.
                 </p>
@@ -49,12 +51,12 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
                             
                             <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
                                 <div className="flex gap-2">
-                                    <button className="p-3 rounded-xl bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 text-white/50 transition-colors">
+                                    <Button className="p-3 rounded-xl bg-white/5 hover:bg-emerald-500/20 hover:text-emerald-400 text-white/50 transition-colors">
                                         <ThumbsUp className="w-5 h-5" />
-                                    </button>
-                                    <button className="p-3 rounded-xl bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-white/50 transition-colors">
+                                    </Button>
+                                    <Button className="p-3 rounded-xl bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-white/50 transition-colors">
                                         <ThumbsDown className="w-5 h-5" />
-                                    </button>
+                                    </Button>
                                 </div>
                                 
                                 <div className="flex items-center gap-3 w-1/2">
@@ -68,7 +70,7 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
                                             setNote(e.target.value);
                                         }}
                                     />
-                                    <button 
+                                    <Button 
                                         onClick={() => {
                                             if (onAddNote && note) onAddNote(interaction.id, note);
                                             setNote('');
@@ -77,7 +79,7 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
                                         disabled={activeInteractionId !== interaction.id || !note}
                                     >
                                         <Save className="w-5 h-5" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </div>

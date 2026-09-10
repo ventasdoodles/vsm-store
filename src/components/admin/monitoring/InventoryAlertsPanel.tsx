@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 import { useQuery } from '@tanstack/react-query';
 import { Package, AlertTriangle, ExternalLink } from 'lucide-react';
 import { getOracleLowStockProducts } from '@/services/admin';
@@ -14,9 +15,9 @@ export function InventoryAlertsPanel() {
         <div className="space-y-4 mt-8">
             <div className="flex items-center gap-3 px-1">
                 <div className="h-5 w-1.5 rounded-full bg-amber-500" />
-                <h2 className="text-lg font-black text-white tracking-tight">
+                <Heading as="h2" className="text-lg font-black text-white tracking-tight">
                     Alertas de Inventario
-                </h2>
+                </Heading>
             </div>
             
             <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl overflow-hidden p-5 shadow-2xl">

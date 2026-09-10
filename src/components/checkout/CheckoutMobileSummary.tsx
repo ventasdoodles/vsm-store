@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { useState } from 'react';
 import { ShoppingBag, ChevronDown } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
@@ -46,7 +47,7 @@ export function CheckoutMobileSummary({
                     onDependencyAction={onDependencyAction}
                 />
             </div>
-            <button
+            <Button
                 onClick={() => setShowSummaryMobile(!showSummaryMobile)}
                 className="flex w-full items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-4 backdrop-blur-md"
             >
@@ -56,7 +57,7 @@ export function CheckoutMobileSummary({
                     <ChevronDown className={cn("h-4 w-4 text-theme-tertiary transition-transform", showSummaryMobile && "rotate-180")} />
                 </div>
                 <span className="font-black text-white">{formatPrice(displaySubtotal)}</span>
-            </button>
+            </Button>
 
             <AnimatePresence>
                 {showSummaryMobile && (

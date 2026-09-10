@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search, X, User } from 'lucide-react';
@@ -43,13 +44,13 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                         <p className="text-sm font-medium text-blue-100 truncate">{selectedCustomer.full_name}</p>
                         <p className="text-xs text-blue-300 truncate">{selectedCustomer.phone}</p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => onChange(null)}
                         className="rounded-lg p-1.5 text-blue-300 hover:bg-accent-primary/20 transition-colors"
                         title="Quitar cliente"
                     >
                         <X className="h-4 w-4" />
-                    </button>
+                    </Button>
                 </div>
             ) : (
                 <div className="relative">
@@ -75,7 +76,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                             ) : filteredCustomers.length > 0 ? (
                                 <div className="p-1">
                                     {filteredCustomers.map((customer) => (
-                                        <button
+                                        <Button
                                             key={customer.id}
                                             onClick={() => {
                                                 onChange(customer.id);
@@ -91,7 +92,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                                                 <p className="text-sm font-medium text-theme-primary truncate">{customer.full_name || 'Sin nombre'}</p>
                                                 <p className="text-xs text-theme-secondary truncate">{customer.phone}</p>
                                             </div>
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             ) : (

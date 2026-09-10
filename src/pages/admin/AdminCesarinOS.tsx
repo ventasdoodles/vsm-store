@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { Bot, Power, PowerOff, RefreshCcw, MessageSquare, Brain, TrendingUp } from 'lucide-react';
@@ -78,7 +80,7 @@ export function AdminCesarinOS() {
                         </div>
 
                         <div className="space-y-3">
-                            <h1 className="text-4xl font-black tracking-tighter text-white">Cesarin OS</h1>
+                            <Heading as="h1" className="text-4xl font-black tracking-tighter text-white">Cesarin OS</Heading>
                             <p className="max-w-2xl text-sm font-medium leading-relaxed text-theme-secondary">
                                 El cerebro de tu tienda. Supervisa sus chats, dale nuevos manuales para estudiar y mira qué impacto está teniendo en tus clientes. Todo sin tocar una sola línea de código.
                             </p>
@@ -106,7 +108,7 @@ export function AdminCesarinOS() {
                                 </div>
                             </div>
 
-                            <button
+                            <Button
                                 onClick={handleToggleStorefrontAI}
                                 disabled={updateSettingsMutation.isPending || isLoadingSettings}
                                 className={cn(
@@ -124,7 +126,7 @@ export function AdminCesarinOS() {
                                 ) : (
                                     <PowerOff className="h-4 w-4" />
                                 )}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -136,7 +138,7 @@ export function AdminCesarinOS() {
                     const isActive = activeTab === tab.id;
                     const Icon = tab.icon;
                     return (
-                        <button
+                        <Button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={cn(
@@ -164,7 +166,7 @@ export function AdminCesarinOS() {
                                     {tab.description}
                                 </div>
                             </div>
-                        </button>
+                        </Button>
                     );
                 })}
             </nav>

@@ -1,4 +1,6 @@
-﻿// â”€â”€â”€ SliderFormModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+// â”€â”€â”€ SliderFormModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Modal de creación/edición de slides. Puramente presentacional, recibe toda
 // la lógica y callbacks del orquestador (AdminHomeSliders).
 import { Loader2, Save, X, Image as ImageIcon, Zap } from 'lucide-react';
@@ -43,21 +45,21 @@ export function SliderFormModal({
 
                 <div className="flex items-center justify-between p-6 sm:p-8 border-b border-white/[0.08] relative z-10 shrink-0">
                     <div>
-                        <h2 className="text-2xl font-black text-theme-primary drop-shadow-sm flex items-center gap-3">
+                        <Heading as="h2" className="text-2xl font-black text-theme-primary drop-shadow-sm flex items-center gap-3">
                             <span className="w-2 h-8 bg-pink-500 rounded-full inline-block shadow-[0_0_10px_rgba(236,72,153,0.5)]"></span>
                             {isEditing ? 'Editar Slide' : 'Nuevo Slide'}
-                        </h2>
+                        </Heading>
                         <p className="text-sm font-medium text-theme-secondary mt-1 ml-5">
                             Configura el diseño y datos del MegaHero
                         </p>
                     </div>
-                    <button
+                    <Button
                         type="button"
                         onClick={onCancel}
                         className="p-2.5 rounded-xl hover:bg-theme-secondary/20 transition-all border border-transparent hover:border-white/10 active:scale-95 group"
                     >
                         <X className="w-5 h-5 text-theme-secondary group-hover:text-theme-primary transition-colors" />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="overflow-y-auto p-6 sm:p-8 custom-scrollbar relative z-10 flex-1">
@@ -70,7 +72,7 @@ export function SliderFormModal({
                             </label>
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                                 {PREMIUM_GRADIENTS.map((preset) => (
-                                    <button
+                                    <Button
                                         key={preset.id}
                                         type="button"
                                         onClick={() => setForm({ 
@@ -97,7 +99,7 @@ export function SliderFormModal({
                                                 </div>
                                             )}
                                         </div>
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         </div>
@@ -237,14 +239,14 @@ export function SliderFormModal({
 
                 {/* Footer Actions */}
                 <div className="flex items-center gap-4 p-6 sm:p-8 border-t border-white/[0.08] shrink-0 bg-surface-base">
-                    <button
+                    <Button
                         type="button"
                         onClick={onCancel}
                         className="flex-1 px-6 py-4 rounded-2xl text-theme-primary bg-theme-secondary/20 hover:bg-theme-secondary/40 border border-white/5 hover:border-white/10 transition-all font-bold tracking-wide active:scale-95"
                     >
                         CANCELAR
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         form="slider-form"
                         disabled={isPending}
@@ -256,7 +258,7 @@ export function SliderFormModal({
                             <Save className="w-5 h-5" />
                         )}
                         {isEditing ? 'GUARDAR CAMBIOS' : 'CREAR SLIDE'}
-                    </button>
+                    </Button>
                 </div>
 
             </div>
@@ -278,7 +280,7 @@ function ToggleSwitch({
     return (
         <label className="flex flex-col items-center justify-center gap-3 cursor-pointer select-none w-full h-full group">
              <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
-            <button
+            <Button
                 type="button"
                 onClick={() => onChange(!checked)}
                 className={cn(
@@ -292,7 +294,7 @@ function ToggleSwitch({
                         checked ? 'translate-x-8 scale-100' : 'translate-x-0 scale-90 opacity-80',
                     )}
                 />
-            </button>
+            </Button>
         </label>
     );
 }

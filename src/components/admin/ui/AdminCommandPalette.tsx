@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { 
@@ -193,7 +194,7 @@ export function AdminCommandPalette() {
                             }}
                         />
                         <div className="flex items-center gap-3">
-                            <button
+                            <Button
                                 onClick={() => {
                                     playClick();
                                     toggleRecording();
@@ -215,7 +216,7 @@ export function AdminCommandPalette() {
                                     />
                                 )}
                                 {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                            </button>
+                            </Button>
 
                             {(loading || nlpLoading || isSearching || isParsing) && <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />}
                             
@@ -236,7 +237,7 @@ export function AdminCommandPalette() {
 
                         <div className="space-y-1">
                             {results.map((result, index) => (
-                                <button
+                                <Button
                                     key={`${result.type}-${result.id}`}
                                     onClick={() => handleSelect(result)}
                                     onMouseEnter={() => setSelectedIndex(index)}
@@ -272,7 +273,7 @@ export function AdminCommandPalette() {
                                             <ArrowRight className="h-4 w-4" />
                                         </div>
                                     )}
-                                </button>
+                                </Button>
                             ))}
                         </div>
                     </div>

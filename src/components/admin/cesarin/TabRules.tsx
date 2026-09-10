@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, ShieldCheck, Plus, Trash2, Power, AlertTriangle } from 'lucide-react';
@@ -32,10 +34,10 @@ export function TabRules() {
             className="space-y-8"
         >
             <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                <Heading as="h2" className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                     <ShieldCheck className="h-8 w-8 text-indigo-400" />
                     Reglas de Comportamiento
-                </h2>
+                </Heading>
                 <p className="text-white/50 text-sm max-w-2xl">
                     Define directrices estrictas que Cesarin deberá seguir en todas sus conversaciones. Estas reglas tienen máxima prioridad sobre su personalidad base.
                 </p>
@@ -48,7 +50,7 @@ export function TabRules() {
                         <div>
                             <label className="block text-xs font-bold text-white/50 uppercase mb-4">Nueva Directriz</label>
                             <div className="flex gap-4 mb-4">
-                                <button
+                                <Button
                                     type="button"
                                     onClick={() => setNewRuleType('MUST_DO')}
                                     className={cn(
@@ -60,8 +62,8 @@ export function TabRules() {
                                 >
                                     <ShieldCheck className="w-4 h-4" />
                                     Debe hacer
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     type="button"
                                     onClick={() => setNewRuleType('NEVER_DO')}
                                     className={cn(
@@ -73,7 +75,7 @@ export function TabRules() {
                                 >
                                     <ShieldAlert className="w-4 h-4" />
                                     Nunca hacer
-                                </button>
+                                </Button>
                             </div>
                             <textarea
                                 value={newRuleText}
@@ -82,14 +84,14 @@ export function TabRules() {
                                 className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none resize-none h-32 placeholder:text-white/20"
                             />
                         </div>
-                        <button 
+                        <Button 
                             type="submit"
                             disabled={!newRuleText.trim() || createRuleMutation.isPending}
                             className="w-full py-4 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             <Plus className="w-5 h-5" />
                             Agregar Regla
-                        </button>
+                        </Button>
                     </form>
 
                     <div className="p-6 rounded-[2rem] bg-amber-500/10 border border-amber-500/20 text-amber-200/80 text-sm flex items-start gap-3">
@@ -107,7 +109,7 @@ export function TabRules() {
                     ) : rules.length === 0 ? (
                         <div className="border border-dashed border-white/10 rounded-[2rem] p-20 flex flex-col items-center justify-center text-center">
                             <ShieldCheck className="w-16 h-16 text-white/10 mb-4" />
-                            <h3 className="text-xl font-bold text-white mb-2">No hay reglas activas</h3>
+                            <Heading as="h3" className="text-xl font-bold text-white mb-2">No hay reglas activas</Heading>
                             <p className="text-white/40 text-sm max-w-sm">
                                 Cesarin se guiará únicamente por su personalidad base y el catálogo.
                             </p>
@@ -148,7 +150,7 @@ export function TabRules() {
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0">
-                                        <button
+                                        <Button
                                             onClick={() => toggleRuleMutation.mutate({ id: rule.id, is_active: !rule.is_active })}
                                             className={cn(
                                                 "p-3 rounded-xl transition-all",
@@ -156,13 +158,13 @@ export function TabRules() {
                                             )}
                                         >
                                             <Power className="w-5 h-5" />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             onClick={() => deleteRuleMutation.mutate(rule.id)}
                                             className="p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
                                         >
                                             <Trash2 className="w-5 h-5" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </m.div>
                             ))}

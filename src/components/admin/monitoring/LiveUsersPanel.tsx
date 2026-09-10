@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * // ─── COMPONENTE: LiveUsersPanel ───
  * // Arquitectura: Dumb Component (Visual Card List)
@@ -26,9 +27,9 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
             {/* Section Title */}
             <div className="flex items-center gap-3 px-1">
                 <div className="h-5 w-1.5 rounded-full bg-emerald-400" />
-                <h2 className="text-lg font-black text-white tracking-tight">
+                <Heading as="h2" className="text-lg font-black text-white tracking-tight">
                     Usuarios en Vivo
-                </h2>
+                </Heading>
                 <span className="ml-auto text-2xs font-black uppercase tracking-widest text-emerald-400/60 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
                     {users.length} conectados
                 </span>

@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import React from 'react';
 import { Edit2, Copy, Trash2, EyeOff, Image as ImageIcon, Eye } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -57,9 +59,9 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
 
             {/* Info Footer */}
             <div className="p-5 border-t border-white/5 bg-gradient-to-b from-transparent to-theme-primary/10 relative z-10">
-                <h3 className={cn("font-black text-lg truncate tracking-tight", brand.is_active ? "text-theme-primary" : "text-theme-secondary")}>
+                <Heading as="h3" className={cn("font-black text-lg truncate tracking-tight", brand.is_active ? "text-theme-primary" : "text-theme-secondary")}>
                     {brand.name}
-                </h3>
+                </Heading>
                 <div className="flex items-center gap-2 mt-2">
                     <span className="text-2xs font-mono font-bold text-white/50 bg-black/30 px-2 py-1 rounded-md border border-white/5">
                         NO. {brand.sort_order}
@@ -72,12 +74,12 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
             
             {/* Mobile Actions (Always visible on touch) */}
             <div className="flex md:hidden border-t border-white/5 p-2 bg-surface-base justify-around">
-                 <button onClick={() => onEdit(brand)} className="p-3 text-blue-400"><Edit2 className="w-5 h-5"/></button>
-                 <button onClick={() => onDuplicate(brand)} className="p-3 text-gray-400"><Copy className="w-5 h-5"/></button>
-                 <button onClick={() => onToggleActive(brand.id, !brand.is_active)} className="p-3 text-amber-400">
+                 <Button onClick={() => onEdit(brand)} className="p-3 text-blue-400"><Edit2 className="w-5 h-5"/></Button>
+                 <Button onClick={() => onDuplicate(brand)} className="p-3 text-gray-400"><Copy className="w-5 h-5"/></Button>
+                 <Button onClick={() => onToggleActive(brand.id, !brand.is_active)} className="p-3 text-amber-400">
                     {brand.is_active ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                 </button>
-                 <button onClick={() => onDelete(brand)} className="p-3 text-red-400"><Trash2 className="w-5 h-5"/></button>
+                 </Button>
+                 <Button onClick={() => onDelete(brand)} className="p-3 text-red-400"><Trash2 className="w-5 h-5"/></Button>
             </div>
         </div>
     );
@@ -92,7 +94,7 @@ function ActionBtn({ icon, onClick, color, tooltip }: { icon: React.ReactNode, o
     };
 
     return (
-        <button
+        <Button
             onClick={onClick}
             title={tooltip}
             className={cn(
@@ -101,6 +103,6 @@ function ActionBtn({ icon, onClick, color, tooltip }: { icon: React.ReactNode, o
             )}
         >
             {icon}
-        </button>
+        </Button>
     );
 }

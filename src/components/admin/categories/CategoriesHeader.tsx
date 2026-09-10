@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: CategoriesHeader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -55,9 +57,9 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                             Taxonomía
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                    <Heading as="h1" className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
                         Categorías
-                    </h1>
+                    </Heading>
                     <p className="mt-1 text-sm font-medium text-theme-secondary/80">
                         Organiza el árbol completo de tu catálogo.
                     </p>
@@ -77,7 +79,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                     {/* Section Filter Tabs */}
                     <div className="flex gap-1 rounded-[1rem] border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
                         {sectionTabs.map(tab => (
-                            <button
+                            <Button
                                 key={tab.value}
                                 onClick={() => onSectionChange(tab.value)}
                                 className={`rounded-[0.75rem] px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${
@@ -91,12 +93,12 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                                 }`}
                             >
                                 {tab.label}
-                            </button>
+                            </Button>
                         ))}
                     </div>
 
                     {/* New Button */}
-                    <button
+                    <Button
                         onClick={onNew}
                         className="
                             group relative inline-flex items-center gap-2 rounded-[1rem] px-5 py-2.5
@@ -111,7 +113,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                         <div className="pointer-events-none absolute inset-0 rounded-[1rem] bg-gradient-to-r from-emerald-500 to-lime-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
                         <Plus className="relative z-10 h-4 w-4" />
                         <span className="relative z-10">Nueva</span>
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

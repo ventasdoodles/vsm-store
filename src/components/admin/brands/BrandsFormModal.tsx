@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { Loader2, Save, X, ImageIcon } from 'lucide-react';
 import type { Brand } from '@/services/admin';
 import { cn } from '@/lib/utils';
@@ -43,21 +45,21 @@ export function BrandsFormModal({
 
                 <div className="flex items-center justify-between shadow-sm border-b border-white/[0.08] pb-6 mb-6">
                     <div>
-                        <h2 className="text-2xl font-black text-theme-primary drop-shadow-sm flex items-center gap-3">
+                        <Heading as="h2" className="text-2xl font-black text-theme-primary drop-shadow-sm flex items-center gap-3">
                             <span className="w-2 h-8 bg-blue-500 rounded-full inline-block shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
                             {editingId ? 'Editar Marca' : 'Nueva Marca'}
-                        </h2>
+                        </Heading>
                         <p className="text-sm font-medium text-theme-secondary mt-1 ml-5">
                             Configuración global de la marca
                         </p>
                     </div>
-                    <button
+                    <Button
                         type="button"
                         onClick={onCancel}
                         className="p-2.5 rounded-xl hover:bg-theme-secondary/20 transition-all border border-transparent hover:border-white/10 active:scale-95 group"
                     >
                         <X className="w-5 h-5 text-theme-secondary group-hover:text-theme-primary transition-colors" />
-                    </button>
+                    </Button>
                 </div>
 
                 <form onSubmit={onSubmit} className="space-y-6 relative z-10">
@@ -121,14 +123,14 @@ export function BrandsFormModal({
 
                     {/* Action Buttons */}
                     <div className="flex gap-4 pt-6 border-t border-white/[0.08]">
-                        <button
+                        <Button
                             type="button"
                             onClick={onCancel}
                             className="flex-1 px-6 py-4 rounded-2xl text-theme-primary bg-theme-secondary/20 hover:bg-theme-secondary/40 border border-white/5 hover:border-white/10 transition-all font-bold tracking-wide active:scale-95"
                         >
                             CANCELAR
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={isPending}
                             className="flex-[2] flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-8 py-4 rounded-2xl font-black tracking-wide transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none"
@@ -139,7 +141,7 @@ export function BrandsFormModal({
                                 <Save className="w-5 h-5" />
                             )}
                             {editingId ? 'GUARDAR CAMBIOS' : 'CREAR MARCA'}
-                        </button>
+                        </Button>
                     </div>
 
                 </form>
@@ -162,7 +164,7 @@ function ToggleSwitch({
     return (
         <label className="flex flex-col items-center justify-center gap-2 cursor-pointer select-none w-full h-full group">
              <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
-            <button
+            <Button
                 type="button"
                 onClick={() => onChange(!checked)}
                 className={cn(
@@ -176,7 +178,7 @@ function ToggleSwitch({
                         checked ? 'translate-x-7 scale-100' : 'translate-x-0 scale-90 opacity-80',
                     )}
                 />
-            </button>
+            </Button>
         </label>
     );
 }

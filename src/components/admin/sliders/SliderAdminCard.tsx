@@ -1,4 +1,6 @@
-﻿// â”€â”€â”€ SliderAdminCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
+// â”€â”€â”€ SliderAdminCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Tarjeta visual que muestra una preview real del slider con su gradiente,
 // imagen, badges de estado y controles de acción. Puramente presentacional.
 import { Pencil, Trash2, Eye, EyeOff, GripVertical } from 'lucide-react';
@@ -81,9 +83,9 @@ export function SliderAdminCard({
             {/* Info Area (Right side) */}
             <div className="flex-1 p-6 flex flex-col">
                 <div className="flex-1">
-                    <h3 className="text-xl font-black text-theme-primary mb-1 line-clamp-1">
+                    <Heading as="h3" className="text-xl font-black text-theme-primary mb-1 line-clamp-1">
                         {slider.title || 'Sin título'}
-                    </h3>
+                    </Heading>
                     <p className={`font-bold text-sm bg-gradient-to-r ${currentPreset.textGradient} bg-clip-text text-transparent line-clamp-1 mb-3`}>
                         {slider.subtitle || 'Sin subtítulo'}
                     </p>
@@ -126,23 +128,23 @@ export function SliderAdminCard({
 
                     {/* Order Controls */}
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-black/30 rounded-xl border border-white/5">
-                        <button 
+                        <Button 
                             disabled={isFirst} 
                             onClick={onMoveUp}
                             className="p-1 text-theme-secondary hover:text-white disabled:opacity-30 transition-colors"
                         >
                             <GripVertical className="w-4 h-4 mr-0.5" />
                             <span className="sr-only">Subir</span>
-                        </button>
+                        </Button>
                         <span className="text-2xs font-black text-theme-secondary w-6 text-center tabular-nums">#{slider.order ?? 0}</span>
-                        <button 
+                        <Button 
                             disabled={isLast} 
                             onClick={onMoveDown}
                             className="p-1 text-theme-secondary hover:text-white disabled:opacity-30 transition-colors"
                         >
                             <GripVertical className="w-4 h-4 ml-0.5" />
                             <span className="sr-only">Bajar</span>
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -159,7 +161,7 @@ function ActionBtn({ icon, onClick, color, title }: { icon: React.ReactNode, onC
     };
 
     return (
-        <button
+        <Button
             onClick={onClick}
             title={title}
             className={cn(
@@ -168,7 +170,7 @@ function ActionBtn({ icon, onClick, color, title }: { icon: React.ReactNode, onC
             )}
         >
             {icon}
-        </button>
+        </Button>
     );
 }
 

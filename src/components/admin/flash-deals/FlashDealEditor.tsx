@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: FlashDealEditor ───
  * // Arquitectura: Dumb Component (Visual)
@@ -266,22 +268,22 @@ export function FlashDealEditor({
                                             )}
                                         </p>
                                     </div>
-                                    <button
+                                    <Button
                                         type="button"
                                         onClick={() => setShowProductPicker(true)}
                                         className="text-xs text-orange-400 hover:text-orange-300 font-semibold"
                                     >
                                         Cambiar
-                                    </button>
+                                    </Button>
                                 </div>
                             ) : (
-                                <button
+                                <Button
                                     type="button"
                                     onClick={() => setShowProductPicker(true)}
                                     className="w-full rounded-[0.75rem] border border-dashed border-white/15 bg-white/[0.02] p-6 text-center text-sm text-white/30 hover:border-orange-500/30 hover:text-orange-400/60 transition-all"
                                 >
                                     Click para seleccionar producto
-                                </button>
+                                </Button>
                             )}
 
                             {showProductPicker && (
@@ -302,7 +304,7 @@ export function FlashDealEditor({
                                             <p className="p-3 text-xs text-white/30 text-center">Sin resultados</p>
                                         ) : (
                                             filteredProducts.map(p => (
-                                                <button
+                                                <Button
                                                     key={p.id}
                                                     type="button"
                                                     onClick={() => selectProduct(p)}
@@ -313,7 +315,7 @@ export function FlashDealEditor({
                                                         <p className="text-sm font-medium text-white truncate">{p.name}</p>
                                                         <p className="text-2xs text-white/30">{formatPrice(p.price)} · Stock: {p.stock}</p>
                                                     </div>
-                                                </button>
+                                                </Button>
                                             ))
                                         )}
                                     </div>
@@ -331,7 +333,7 @@ export function FlashDealEditor({
                                     <div className="flex items-center justify-between mb-1.5">
                                         <label className="text-2xs font-bold uppercase tracking-wider text-white/40">Precio flash ($)</label>
                                         {selectedProduct && (
-                                            <button
+                                            <Button
                                                 type="button"
                                                 onClick={handleSystemSuggestion}
                                                 disabled={isSuggesting}
@@ -339,7 +341,7 @@ export function FlashDealEditor({
                                             >
                                                 {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
                                                 Sugerencia del Sistema
-                                            </button>
+                                            </Button>
                                         )}
                                     </div>
                                     <input
@@ -406,7 +408,7 @@ export function FlashDealEditor({
                             <div>
                                 <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">¿Cuándo empieza?</label>
                                 <div className="grid grid-cols-2 gap-2">
-                                    <button
+                                    <Button
                                         type="button"
                                         onClick={() => setStartMode('now')}
                                         className={cn(
@@ -418,8 +420,8 @@ export function FlashDealEditor({
                                     >
                                         {startMode === 'now' && <CheckCircle className="h-3.5 w-3.5" />}
                                         Ahora mismo
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         type="button"
                                         onClick={() => {
                                             setStartMode('custom');
@@ -438,7 +440,7 @@ export function FlashDealEditor({
                                     >
                                         {startMode === 'custom' && <CheckCircle className="h-3.5 w-3.5" />}
                                         Programar inicio
-                                    </button>
+                                    </Button>
                                 </div>
                                 {startMode === 'custom' && (
                                     <div className="mt-2">
@@ -460,7 +462,7 @@ export function FlashDealEditor({
                                 <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">¿Cuánto dura?</label>
                                 <div className="grid grid-cols-6 gap-1.5">
                                     {DURATION_PRESETS.map((preset) => (
-                                        <button
+                                        <Button
                                             key={preset.label}
                                             type="button"
                                             onClick={() => handleDurationSelect(preset)}
@@ -472,7 +474,7 @@ export function FlashDealEditor({
                                             )}
                                         >
                                             {preset.label}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
 
@@ -521,7 +523,7 @@ export function FlashDealEditor({
 
                 {/* Footer — sticky */}
                 <div className="sticky bottom-0 border-t border-white/5 bg-[#0d0d1a]/95 backdrop-blur-xl p-4">
-                    <button
+                    <Button
                         type="button"
                         onClick={handleSubmit}
                         disabled={isSaving || !formData.product_id || formData.flash_price <= 0}
@@ -543,7 +545,7 @@ export function FlashDealEditor({
                                 <span className="relative z-10">{isEditMode ? 'Guardar Cambios' : 'Crear Oferta'}</span>
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </SideDrawer>
@@ -567,12 +569,12 @@ const COLOR_MAP = {
 function SectionHeader({ icon: Icon, label, color }: SectionHeaderProps) {
     const c = COLOR_MAP[color];
     return (
-        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
+        <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
             <div className={cn('rounded-lg bg-gradient-to-br p-1.5 border', c.wrap)}>
                 <Icon className={cn('h-4 w-4', c.icon)} />
             </div>
             {label}
-        </h3>
+        </Heading>
     );
 }
 

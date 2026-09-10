@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from 'react';
 import { LoyaltyTier } from '@/services';
 import { Edit2, Shield, TrendingUp, Star, Award, Zap, CheckCircle, Save, X } from 'lucide-react';
@@ -51,17 +53,17 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="h-4 w-1.5 rounded-full bg-indigo-500" />
-                    <h2 className="text-xl font-black text-theme-primary tracking-tight uppercase">Configuración de Tiers</h2>
+                    <Heading as="h2" className="text-xl font-black text-theme-primary tracking-tight uppercase">Configuración de Tiers</Heading>
                 </div>
                 {JSON.stringify(tiers) !== JSON.stringify(localTiers) && (
-                    <button
+                    <Button
                         onClick={handleGlobalSave}
                         disabled={isUpdating}
                         className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-95"
                     >
                         {isUpdating ? <span className="animate-spin text-lg">â—Œ</span> : <Save className="h-4 w-4" />}
                         PUBLICAR CAMBIOS DE TIERS
-                    </button>
+                    </Button>
                 )}
             </div>
 
@@ -83,16 +85,16 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                 >
                                     {getIcon(tier.id)}
                                 </div>
-                                <button
+                                <Button
                                     onClick={() => handleEdit(tier)}
                                     className="p-2 rounded-xl bg-white/5 text-theme-tertiary hover:bg-white/10 hover:text-theme-primary transition-all"
                                 >
                                     <Edit2 className="h-4 w-4" />
-                                </button>
+                                </Button>
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-black text-theme-primary uppercase tracking-tight">{tier.name}</h3>
+                                <Heading as="h3" className="text-lg font-black text-theme-primary uppercase tracking-tight">{tier.name}</Heading>
                                 <p className="text-2xs text-theme-tertiary font-bold tracking-widest uppercase opacity-50">Gasto Min: ${tier.threshold.toLocaleString()}</p>
                             </div>
 
@@ -123,10 +125,10 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
                     <div className="bg-surface-base border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
                         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-                            <h3 className="text-lg font-black text-theme-primary tracking-tight">EDITAR NIVEL {editingTier.name.toUpperCase()}</h3>
-                            <button onClick={() => setEditingTier(null)} className="text-theme-tertiary hover:text-white transition-colors">
+                            <Heading as="h3" className="text-lg font-black text-theme-primary tracking-tight">EDITAR NIVEL {editingTier.name.toUpperCase()}</Heading>
+                            <Button onClick={() => setEditingTier(null)} className="text-theme-tertiary hover:text-white transition-colors">
                                 <X className="h-5 w-5" />
-                            </button>
+                            </Button>
                         </div>
 
                         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
@@ -167,7 +169,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                                 }}
                                                 className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-theme-primary focus:border-indigo-500 focus:outline-none transition-colors"
                                             />
-                                            <button
+                                            <Button
                                                 onClick={() => {
                                                     const newBenefits = editingTier.benefits.filter((_, idx) => idx !== i);
                                                     setEditingTier({ ...editingTier, benefits: newBenefits });
@@ -175,32 +177,32 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                                 className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
                                             >
                                                 <X className="h-4 w-4" />
-                                            </button>
+                                            </Button>
                                         </div>
                                     ))}
-                                    <button
+                                    <Button
                                         onClick={() => setEditingTier({ ...editingTier, benefits: [...editingTier.benefits, ''] })}
                                         className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest py-2"
                                     >
                                         + Añadir beneficio
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </div>
 
                         <div className="p-6 bg-white/[0.02] border-t border-white/5 flex gap-3">
-                            <button
+                            <Button
                                 onClick={() => setEditingTier(null)}
                                 className="flex-1 px-4 py-2.5 rounded-xl text-xs font-black text-theme-tertiary hover:bg-white/5 transition-colors"
                             >
                                 CANCELAR
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={handleSaveLocal}
                                 className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-black transition-all active:scale-95"
                             >
                                 ACTUALIZAR LOCALMENTE
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

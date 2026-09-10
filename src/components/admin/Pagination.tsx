@@ -1,4 +1,5 @@
-﻿// Componente de paginación reutilizable - VSM Store Admin
+import { Button } from "@/components/ui/Button";
+// Componente de paginación reutilizable - VSM Store Admin
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -32,23 +33,23 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
             )}
             <div className="flex items-center gap-1">
                 {/* First */}
-                <button
+                <Button
                     onClick={() => onPageChange(1)}
                     disabled={currentPage === 1}
                     className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Primera página"
                 >
                     <ChevronsLeft className="h-4 w-4" />
-                </button>
+                </Button>
                 {/* Prev */}
-                <button
+                <Button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                     className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Anterior"
                 >
                     <ChevronLeft className="h-4 w-4" />
-                </button>
+                </Button>
 
                 {/* Page Numbers */}
                 {pages.map((p, i) =>
@@ -57,7 +58,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                             ···
                         </span>
                     ) : (
-                        <button
+                        <Button
                             key={p}
                             onClick={() => onPageChange(p)}
                             className={cn(
@@ -68,28 +69,28 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                             )}
                         >
                             {p}
-                        </button>
+                        </Button>
                     )
                 )}
 
                 {/* Next */}
-                <button
+                <Button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Siguiente"
                 >
                     <ChevronRight className="h-4 w-4" />
-                </button>
+                </Button>
                 {/* Last */}
-                <button
+                <Button
                     onClick={() => onPageChange(totalPages)}
                     disabled={currentPage === totalPages}
                     className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Última página"
                 >
                     <ChevronsRight className="h-4 w-4" />
-                </button>
+                </Button>
             </div>
         </div>
     );

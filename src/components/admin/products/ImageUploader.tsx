@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: ImageUploader ───
  * // Arquitectura: Dumb Component (Visual)
@@ -82,13 +83,13 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                                     Portada
                                 </div>
                             )}
-                            <button
+                            <Button
                                 type="button"
                                 onClick={() => removeImage(index)}
                                 className="absolute right-2 top-2 rounded-full bg-red-500/80 p-1.5 text-white opacity-0 backdrop-blur-sm transition-all group-hover:opacity-100 hover:bg-red-600 hover:scale-110"
                             >
                                 <X className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                         </div>
                     ))}
 

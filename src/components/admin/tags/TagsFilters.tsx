@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 /**
  * // ─── COMPONENTE: TagsFilters ───
  * // Arquitectura: Dumb Component (Visual + Controlled)
@@ -24,12 +25,12 @@ export function TagsFilters({ search, onSearchChange }: TagsFiltersProps) {
                     className="w-full rounded-xl border border-white/5 bg-surface-base/70 py-2.5 pl-10 pr-9 text-sm font-semibold text-white placeholder-theme-secondary/50 focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/50 focus:outline-none transition-all backdrop-blur-md"
                 />
                 {search && (
-                    <button
+                    <Button
                         onClick={() => onSearchChange('')}
                         className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-theme-secondary/50 hover:text-white transition-colors"
                     >
                         <X className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

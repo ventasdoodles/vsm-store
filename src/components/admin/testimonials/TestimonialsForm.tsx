@@ -1,3 +1,5 @@
+import { Heading } from "@/components/ui/Heading";
+import { Button } from "@/components/ui/Button";
 import { Loader2, Save, X, Star } from 'lucide-react';
 import type { TestimonialFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
@@ -34,21 +36,21 @@ export function TestimonialsForm({
 
             <div className="flex items-center justify-between shadow-sm border-b border-white/[0.08] pb-6 mb-6">
                 <div>
-                    <h2 className="text-2xl font-black text-theme-primary drop-shadow-sm flex items-center gap-3">
+                    <Heading as="h2" className="text-2xl font-black text-theme-primary drop-shadow-sm flex items-center gap-3">
                         <span className="w-2 h-8 bg-accent-primary rounded-full inline-block shadow-[0_0_10px_rgba(var(--color-accent-primary),0.5)]"></span>
                         {editingId ? 'Editar Testimonio' : 'Nuevo Testimonio'}
-                    </h2>
+                    </Heading>
                     <p className="text-sm font-medium text-theme-secondary mt-1 ml-5">
                         Los testimonios aumentan la confianza de los clientes en tus productos.
                     </p>
                 </div>
-                <button
+                <Button
                     type="button"
                     onClick={onCancel}
                     className="p-2.5 rounded-xl hover:bg-theme-secondary/20 transition-all border border-transparent hover:border-white/10 active:scale-95 group"
                 >
                     <X className="w-5 h-5 text-theme-secondary group-hover:text-theme-primary transition-colors" />
-                </button>
+                </Button>
             </div>
 
             {/* Row 1: Name + Location + Rating */}
@@ -84,7 +86,7 @@ export function TestimonialsForm({
                     </label>
                     <div className="flex items-center gap-1.5 pt-2 bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-3 h-[58px] shadow-inner">
                         {[1, 2, 3, 4, 5].map((n) => (
-                            <button
+                            <Button
                                 key={n}
                                 type="button"
                                 onClick={() => setForm({ ...form, rating: n })}
@@ -98,7 +100,7 @@ export function TestimonialsForm({
                                             : 'text-zinc-600 hover:text-zinc-400'
                                     )}
                                 />
-                            </button>
+                            </Button>
                         ))}
                         <div className="ml-auto w-10 h-10 flex items-center justify-center bg-black/50 border border-white/5 rounded-xl text-lg font-black text-amber-400 tabular-nums shadow-inner">
                             {form.rating}
@@ -208,7 +210,7 @@ export function TestimonialsForm({
 
             {/* Submit */}
             <div className="flex gap-4 pt-4 border-t border-white/[0.08] relative z-10">
-                <button
+                <Button
                     type="submit"
                     disabled={isPending}
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-accent-primary to-accent-primary/80 hover:from-accent-primary/90 hover:to-accent-primary/70 text-white px-8 py-3.5 rounded-2xl font-black tracking-wide transition-all shadow-lg shadow-accent-primary/20 hover:shadow-accent-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none"
@@ -219,14 +221,14 @@ export function TestimonialsForm({
                         <Save className="w-5 h-5" />
                     )}
                     {editingId ? 'GUARDAR CAMBIOS' : 'CREAR TESTIMONIO'}
-                </button>
-                <button
+                </Button>
+                <Button
                     type="button"
                     onClick={onCancel}
                     className="flex-1 sm:flex-none px-8 py-3.5 rounded-2xl text-theme-primary bg-theme-secondary/20 hover:bg-theme-secondary/40 border border-white/5 hover:border-white/10 transition-all font-bold tracking-wide active:scale-95"
                 >
                     CANCELAR
-                </button>
+                </Button>
             </div>
         </form>
     );
@@ -246,7 +248,7 @@ function ToggleSwitch({
     return (
         <label className="flex flex-col items-center gap-2 cursor-pointer select-none group">
              <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors">{label}</span>
-            <button
+            <Button
                 type="button"
                 onClick={() => onChange(!checked)}
                 className={cn(
@@ -260,7 +262,7 @@ function ToggleSwitch({
                         checked ? 'translate-x-6 scale-100' : 'translate-x-0 scale-90 opacity-80',
                     )}
                 />
-            </button>
+            </Button>
         </label>
     );
 }

@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * TestimonialCard — Tarjeta individual de testimonio con avatar e indicadores de confianza.
  * 
@@ -114,9 +115,9 @@ export function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
             </div>
 
             {testimonial.title && (
-                <h3 className="text-sm font-semibold text-theme-primary mb-2">
+                <Heading as="h3" className="text-sm font-semibold text-theme-primary mb-2">
                     {testimonial.title}
-                </h3>
+                </Heading>
             )}
 
             <p className="text-sm text-theme-secondary leading-relaxed line-clamp-4">

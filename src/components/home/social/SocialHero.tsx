@@ -1,3 +1,4 @@
+import { Heading } from "@/components/ui/Heading";
 /**
  * SocialHero — Cabecera de la sección de prueba social.
  * 
@@ -26,9 +27,9 @@ export function SocialHero({ avgRating, totalCount }: SocialHeroProps) {
                     Clientes Verificados
                 </div>
 
-                <h2 className="text-2xl md:text-4xl font-bold text-theme-primary">
+                <Heading as="h2" className="text-2xl md:text-4xl font-bold text-theme-primary">
                     Lo Que Dicen Nuestros Clientes
-                </h2>
+                </Heading>
             </m.div>
 
             {/* Rating Badge */}

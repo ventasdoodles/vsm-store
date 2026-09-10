@@ -1,4 +1,5 @@
-﻿/**
+import { Heading } from "@/components/ui/Heading";
+/**
  * // ─── COMPONENTE: TopProducts ───
  * // Arquitectura: Dumb Component (Visual List)
  * // Propósito principal: Listado de los productos más vendidos con barras de proporción de ingresos.
@@ -19,7 +20,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                 <div className="p-2 rounded-[0.75rem] bg-amber-500/10">
                     <Trophy className="h-5 w-5 text-amber-500" />
                 </div>
-                <h2 className="text-sm font-bold text-white tracking-wide">Top Productos</h2>
+                <Heading as="h2" className="text-sm font-bold text-white tracking-wide">Top Productos</Heading>
             </div>
             
             {(!products || products.length === 0) ? (
