@@ -3,6 +3,9 @@
  * Resilient, crash-proof wrappers around window.localStorage and window.sessionStorage
  * with in-memory fallback for environments with blocked storage, SSR, private browsing,
  * or exceeded storage quota.
+ *
+ * Design note: Never performs write-tests on read operations, ensuring zero I/O overhead
+ * and preserving reads of existing stored values even under QuotaExceededError conditions.
  */
 
 class MemoryStorage implements Storage {
@@ -36,47 +39,39 @@ class MemoryStorage implements Storage {
 const memoryLocalStorage = new MemoryStorage();
 const memorySessionStorage = new MemoryStorage();
 
-function getStorage(type: 'localStorage' | 'sessionStorage'): Storage {
-    if (typeof window === 'undefined') {
-        return type === 'localStorage' ? memoryLocalStorage : memorySessionStorage;
-    }
-    try {
-        const storage = window[type];
-        if (!storage) {
-            return type === 'localStorage' ? memoryLocalStorage : memorySessionStorage;
-        }
-        const testKey = '__vsm_storage_test__';
-        storage.setItem(testKey, '1');
-        storage.removeItem(testKey);
-        return storage;
-    } catch {
-        return type === 'localStorage' ? memoryLocalStorage : memorySessionStorage;
-    }
-}
-
 export const safeLocalStorage = {
     getItem(key: string): string | null {
         try {
-            return getStorage('localStorage').getItem(key);
+            if (typeof window !== 'undefined' && window.localStorage) {
+                const val = window.localStorage.getItem(key);
+                if (val !== null) return val;
+            }
         } catch {
-            return memoryLocalStorage.getItem(key);
+            // Storage access blocked or restricted (e.g. strict private mode)
         }
+        return memoryLocalStorage.getItem(key);
     },
     setItem(key: string, value: string): boolean {
         try {
-            getStorage('localStorage').setItem(key, value);
-            return true;
+            if (typeof window !== 'undefined' && window.localStorage) {
+                window.localStorage.setItem(key, value);
+                return true;
+            }
         } catch {
-            memoryLocalStorage.setItem(key, value);
-            return false;
+            // QuotaExceededError or security policy restriction
         }
+        memoryLocalStorage.setItem(key, value);
+        return false;
     },
     removeItem(key: string): void {
         try {
-            getStorage('localStorage').removeItem(key);
+            if (typeof window !== 'undefined' && window.localStorage) {
+                window.localStorage.removeItem(key);
+            }
         } catch {
-            memoryLocalStorage.removeItem(key);
+            // noop
         }
+        memoryLocalStorage.removeItem(key);
     },
     getJSON<T>(key: string, fallback: T): T {
         try {
@@ -99,26 +94,36 @@ export const safeLocalStorage = {
 export const safeSessionStorage = {
     getItem(key: string): string | null {
         try {
-            return getStorage('sessionStorage').getItem(key);
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+                const val = window.sessionStorage.getItem(key);
+                if (val !== null) return val;
+            }
         } catch {
-            return memorySessionStorage.getItem(key);
+            // Storage access blocked or restricted
         }
+        return memorySessionStorage.getItem(key);
     },
     setItem(key: string, value: string): boolean {
         try {
-            getStorage('sessionStorage').setItem(key, value);
-            return true;
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+                window.sessionStorage.setItem(key, value);
+                return true;
+            }
         } catch {
-            memorySessionStorage.setItem(key, value);
-            return false;
+            // QuotaExceededError or security policy restriction
         }
+        memorySessionStorage.setItem(key, value);
+        return false;
     },
     removeItem(key: string): void {
         try {
-            getStorage('sessionStorage').removeItem(key);
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+                window.sessionStorage.removeItem(key);
+            }
         } catch {
-            memorySessionStorage.removeItem(key);
+            // noop
         }
+        memorySessionStorage.removeItem(key);
     },
     getJSON<T>(key: string, fallback: T): T {
         try {
