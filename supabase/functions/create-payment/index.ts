@@ -2,21 +2,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import mercadopago from 'npm:mercadopago@2.0.8'
 
-const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN')!
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || "http://127.0.0.1:54321";
-const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU";
-const FRONTEND_URL = Deno.env.get('FRONTEND_URL') || 'https://vsm-store.pages.dev'
-
-const client = new mercadopago.MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
-
 interface CreatePaymentRequest {
     order_id: string
 }
 
-async function getExistingPreferenceInitPoint(preferenceId: string): Promise<string | null> {
+async function getExistingPreferenceInitPoint(preferenceId: string, accessToken: string): Promise<string | null> {
     const response = await fetch(`https://api.mercadopago.com/checkout/preferences/${preferenceId}`, {
         headers: {
-            Authorization: `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${accessToken}`,
         },
     })
 
@@ -43,6 +36,26 @@ serve(async (req) => {
     }
 
     try {
+        const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
+        const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+        const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        const FRONTEND_URL = Deno.env.get('FRONTEND_URL') || 'https://vsm-store.pages.dev';
+
+        if (!MERCADOPAGO_ACCESS_TOKEN || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+            return new Response(
+                JSON.stringify({ error: 'Configuracion de servidor incompleta' }),
+                {
+                    status: 500,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            );
+        }
+
+        const client = new mercadopago.MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
+
         const authHeader = req.headers.get('Authorization') || ''
         const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
 
@@ -148,7 +161,7 @@ serve(async (req) => {
         }
 
         if (typeof order.mp_preference_id === 'string' && order.mp_preference_id.length > 0) {
-            const existingInitPoint = await getExistingPreferenceInitPoint(order.mp_preference_id)
+            const existingInitPoint = await getExistingPreferenceInitPoint(order.mp_preference_id, MERCADOPAGO_ACCESS_TOKEN)
 
             if (existingInitPoint) {
                 return new Response(

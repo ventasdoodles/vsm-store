@@ -3,13 +3,24 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import mercadopago from 'npm:mercadopago@2.0.8'
 import { handleMercadoPagoWebhookRequest, processMercadoPagoWebhook } from './webhook-contract.ts'
 
-const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN')!
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || "http://127.0.0.1:54321";
-const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU";
+serve((req) => {
+    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-const client = new mercadopago.MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
+    if (!MERCADOPAGO_ACCESS_TOKEN || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+        return new Response(
+            JSON.stringify({ error: 'Configuracion de servidor incompleta' }),
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+    }
 
-serve((req) => handleMercadoPagoWebhookRequest(req, {
+    const client = new mercadopago.MercadoPagoConfig({ accessToken: MERCADOPAGO_ACCESS_TOKEN });
+
+    return handleMercadoPagoWebhookRequest(req, {
     processWebhook: async (notification) => {
         const paymentClient = new mercadopago.Payment(client);
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
@@ -63,6 +74,7 @@ serve((req) => handleMercadoPagoWebhookRequest(req, {
                 if (error) throw error
             },
             now: () => new Date().toISOString(),
-        })
+        });
     },
-}))
+    });
+});
