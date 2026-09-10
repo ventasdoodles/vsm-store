@@ -144,12 +144,12 @@ export function TagFormModal({
                                     />
                                 </div>
                                 {!isEditing && (
-                                    <p className="mt-1 text-[10px] text-theme-secondary/50">
+                                    <p className="mt-1 text-2xs text-theme-secondary/50">
                                         {autoSlug ? 'Auto-generado desde el nombre' : 'Personalizado'}
                                     </p>
                                 )}
                                 {isEditing && (
-                                    <p className="mt-1 text-[10px] text-theme-secondary/50">
+                                    <p className="mt-1 text-2xs text-theme-secondary/50">
                                         El slug se actualiza automáticamente al renombrar
                                     </p>
                                 )}

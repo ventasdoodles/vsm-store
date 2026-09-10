@@ -164,7 +164,7 @@ export function PrizeWheel() {
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-vape-600/30 to-orange-500/20 border border-vape-500/30"
                 >
                     <Zap className="w-3 h-3 text-vape-400 fill-current" />
-                    <span className="text-[10px] font-black text-vape-300 uppercase tracking-[0.2em]">Giro Diario Gratis</span>
+                    <span className="text-2xs font-black text-vape-300 uppercase tracking-[0.2em]">Giro Diario Gratis</span>
                 </m.div>
 
                 <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
@@ -332,7 +332,7 @@ export function PrizeWheel() {
                 {prizes.filter(p => p.type !== 'empty').slice(0, 6).map((p) => (
                     <div
                         key={p.id}
-                        className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold text-white/70 border border-white/10 bg-white/[0.03]"
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-full text-2xs font-bold text-white/70 border border-white/10 bg-white/[0.03]"
                     >
                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
                         {p.label}
@@ -353,7 +353,7 @@ export function PrizeWheel() {
                             className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-center space-y-2"
                         >
                             <p className="text-red-400 text-sm font-bold">{error}</p>
-                            <button onClick={reset} className="text-[10px] text-white/40 hover:text-white/60 underline">Cerrar</button>
+                            <button onClick={reset} className="text-2xs text-white/40 hover:text-white/60 underline">Cerrar</button>
                         </m.div>
                     ) : result ? (
                         <m.div
@@ -372,12 +372,12 @@ export function PrizeWheel() {
                                 <ResultIcon className="w-12 h-12" style={{ color: result.color }} />
                             </m.div>
                             <div>
-                                <div className="text-[10px] font-black uppercase tracking-widest text-white/35 mb-1">¡Felicidades!</div>
+                                <div className="text-2xs font-black uppercase tracking-widest text-white/35 mb-1">¡Felicidades!</div>
                                 <div className="text-2xl font-black text-white uppercase tracking-tight">{result.label}</div>
                                 <div className="text-lg font-black mt-0.5" style={{ color: result.color }}>{formatPrizeValue(result)}</div>
                             </div>
-                            <div className="text-[10px] text-white/25 font-medium">Tu premio ha sido aplicado a tu perfil.</div>
-                            <button onClick={reset} className="text-[10px] text-white/30 hover:text-white/60 underline">Volver</button>
+                            <div className="text-2xs text-white/25 font-medium">Tu premio ha sido aplicado a tu perfil.</div>
+                            <button onClick={reset} className="text-2xs text-white/30 hover:text-white/60 underline">Volver</button>
                         </m.div>
                     ) : (
                         <m.button
@@ -416,7 +416,7 @@ export function PrizeWheel() {
                 </AnimatePresence>
 
                 {!result && !error && (
-                    <p className="text-center text-[10px] text-white/20 italic">
+                    <p className="text-center text-2xs text-white/20 italic">
                         Un giro gratis cada 24 horas · Solo para usuarios registrados
                     </p>
                 )}

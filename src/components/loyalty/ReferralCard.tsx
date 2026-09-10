@@ -81,7 +81,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                         <div className="absolute -inset-1 bg-gradient-to-r from-accent-primary via-accent-secondary to-accent-primary rounded-2xl blur-xl opacity-10 group-hover/code:opacity-30 transition duration-1000 animate-pulse-slow" />
                         <div className="relative flex items-center justify-between bg-white/[0.02] border border-white/5 rounded-2xl p-6 overflow-hidden backdrop-blur-xl">
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] mb-2 opacity-50">Tu código maestro</span>
+                                <span className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] mb-2 opacity-50">Tu código maestro</span>
                                 <span className="text-3xl font-black text-white tracking-[0.25em] italic uppercase">{referralCode}</span>
                             </div>
                             <div className="flex gap-3">
@@ -164,7 +164,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
 
                 {/* Footer interactivo */}
                 <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-theme-tertiary uppercase">¿Cómo funciona?</span>
+                    <span className="text-2xs font-bold text-theme-tertiary uppercase">¿Cómo funciona?</span>
                     <button className="flex items-center gap-1.5 text-xs font-bold text-accent-primary hover:gap-2 transition-all duration-300">
                         Ver términos <ArrowRight className="h-3 w-3" />
                     </button>

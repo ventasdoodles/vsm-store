@@ -107,7 +107,7 @@ export function DeliveryLocation() {
                     <MapPin className="h-4 w-4 text-emerald-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 )}
                 <div className="flex flex-col items-start leading-none">
-                    <span className="text-[10px] text-white/40 font-medium">Envío a</span>
+                    <span className="text-2xs text-white/40 font-medium">Envío a</span>
                     <span className="text-xs font-bold text-white/80 tracking-wide">
                         {postalCode ?? 'Detectar'}
                     </span>

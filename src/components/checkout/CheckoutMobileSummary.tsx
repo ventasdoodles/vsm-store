@@ -80,7 +80,7 @@ export function CheckoutMobileSummary({
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-bold text-white truncate">{item.product.name}</p>
-                                        <p className="text-[10px] text-theme-tertiary">Cantidad: {item.quantity}</p>
+                                        <p className="text-2xs text-theme-tertiary">Cantidad: {item.quantity}</p>
                                     </div>
                                     <span className="text-xs font-bold text-white">{formatPrice(item.product.price * item.quantity)}</span>
                                 </div>

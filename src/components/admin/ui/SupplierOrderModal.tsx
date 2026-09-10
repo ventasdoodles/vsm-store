@@ -88,7 +88,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                             </div>
                             <div>
                                 <h2 className="text-xl font-black text-white italic uppercase tracking-tight">Reordenar Stock</h2>
-                                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-none mt-1">Smart Supplier Connect</p>
+                                <p className="text-2xs font-bold text-white/40 uppercase tracking-widest leading-none mt-1">Smart Supplier Connect</p>
                             </div>
                         </div>
                         <button 
@@ -104,14 +104,14 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                         <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-bold text-white">{product.name}</span>
-                                <span className="text-[10px] font-black text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg">STOCK: {product.stock}</span>
+                                <span className="text-2xs font-black text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg">STOCK: {product.stock}</span>
                             </div>
-                            <p className="text-[10px] font-medium text-white/20 uppercase tracking-tighter">SKU: {product.sku}</p>
+                            <p className="text-2xs font-medium text-white/20 uppercase tracking-tighter">SKU: {product.sku}</p>
                         </div>
 
                         {/* Phone Input */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Teléfono del Proveedor</label>
+                            <label className="text-2xs font-black text-white/40 uppercase tracking-widest ml-1">Teléfono del Proveedor</label>
                             <input 
                                 type="text"
                                 placeholder="Ej: 5212281234567"
@@ -124,7 +124,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                         {/* AI Message Area */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between ml-1">
-                                <label className="text-[10px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-2xs font-black text-amber-400 uppercase tracking-widest flex items-center gap-2">
                                     <MessageSquare className="h-3 w-3" /> Propuesta de la IA
                                 </label>
                                 {loading && <Loader2 className="h-3 w-3 text-amber-500 animate-spin" />}

@@ -40,7 +40,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
                                             {brand.name[0]?.toUpperCase()}
                                         </span>
                                     </div>
-                                    <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
+                                    <span className="text-2xs sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
                                         {brand.name}
                                     </span>
                                 </div>
@@ -53,7 +53,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
                                     {brand.name[0]?.toUpperCase()}
                                 </span>
                             </div>
-                            <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
+                            <span className="text-2xs sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
                                 {brand.name}
                             </span>
                         </div>
@@ -91,7 +91,7 @@ export const BrandsCarousel = () => {
                 >
                     <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/[0.03] border border-white/[0.1] backdrop-blur-2xl">
                         <Award className="w-4 h-4 text-accent-primary animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/70">
+                        <span className="text-2xs font-black uppercase tracking-[0.4em] text-white/70">
                             Partner Network 2026
                         </span>
                     </div>
@@ -152,7 +152,7 @@ export const BrandsCarousel = () => {
             >
                 <div className="inline-flex items-center gap-4">
                     <div className="h-px w-12 bg-white/10" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/10">
+                    <span className="text-2xs font-black uppercase tracking-[0.4em] text-white/10">
                         {brands.length} Verified Brands
                     </span>
                     <div className="h-px w-12 bg-white/10" />

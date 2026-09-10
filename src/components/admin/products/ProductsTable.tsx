@@ -143,7 +143,7 @@ export function ProductsTable({
                                     {headerGroup.headers.map(header => (
                                         <th 
                                             key={header.id} 
-                                            className="px-4 py-3.5 text-left text-[11px] font-bold text-white/30 uppercase tracking-wider"
+                                            className="px-4 py-3.5 text-left text-2xs font-bold text-white/30 uppercase tracking-wider"
                                             style={{
                                                 width: header.column.id === 'select' ? '40px' : 'auto',
                                                 textAlign: ['stock', 'is_active', 'flags'].includes(header.column.id) ? 'center' : 

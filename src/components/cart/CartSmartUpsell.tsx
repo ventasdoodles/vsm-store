@@ -41,7 +41,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
                         <Zap className="h-3.5 w-3.5 fill-current" />
                     </div>
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90">
+                    <h3 className="text-2xs font-black uppercase tracking-[0.2em] text-white/90">
                         IA Suggestion
                     </h3>
                 </div>
@@ -75,7 +75,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     </div>
 
                     <div className="flex flex-col justify-center flex-1">
-                        <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">
+                        <h4 className="text-2xs font-black text-white/40 uppercase tracking-[0.2em] mb-1">
                             {bundleName}
                         </h4>
                         <h3 className="text-sm font-bold text-white mb-3 line-clamp-1">
@@ -103,7 +103,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                                         notify.success('Bundle Creado', `¡${bundleName} listo! Descuento aplicado.`);
                                     }
                                 }}
-                                className="px-4 py-2 rounded-xl bg-vape-500 text-white text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] border border-white/20"
+                                className="px-4 py-2 rounded-xl bg-vape-500 text-white text-2xs font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] border border-white/20"
                             >
                                 Armar Combo
                             </m.button>

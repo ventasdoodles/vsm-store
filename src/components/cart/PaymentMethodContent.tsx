@@ -55,7 +55,7 @@ export function PaymentMethodContent({
                         <Award className="h-4 w-4 text-blue-400" />
                         <span className="text-xs font-black uppercase text-blue-400 tracking-tighter">Cuenta Bancaria</span>
                     </div>
-                    <pre className="text-[11px] font-mono text-theme-secondary whitespace-pre-wrap leading-relaxed">
+                    <pre className="text-2xs font-mono text-theme-secondary whitespace-pre-wrap leading-relaxed">
                         {settings?.bank_account_info || SITE_CONFIG.bankAccount}
                     </pre>
                 </m.div>

@@ -79,7 +79,7 @@ export function CustomerList({ customers }: Props) {
                             </div>
                         )}
                         {!customer.phone && !customer.whatsapp && (
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-amber-500/80 bg-amber-500/10 px-2 py-0.5 rounded-md">
+                            <span className="text-2xs uppercase tracking-wider font-bold text-amber-500/80 bg-amber-500/10 px-2 py-0.5 rounded-md">
                                 Sin contacto
                             </span>
                         )}
@@ -157,7 +157,7 @@ export function CustomerList({ customers }: Props) {
             <table className="w-full text-left border-collapse">
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id} className="border-b border-white/5 uppercase text-[10px] tracking-widest text-theme-secondary/60">
+                        <tr key={headerGroup.id} className="border-b border-white/5 uppercase text-2xs tracking-widest text-theme-secondary/60">
                             {headerGroup.headers.map(header => (
                                 <th 
                                     key={header.id} 

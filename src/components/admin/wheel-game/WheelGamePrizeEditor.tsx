@@ -105,7 +105,7 @@ export function WheelGamePrizeEditor({
                             <h2 className="text-base font-black text-white">
                                 {prize ? 'Editar Premio' : 'Nuevo Premio'}
                             </h2>
-                            <p className="text-[11px] text-white/35">Segmento de la Ruleta de VSM</p>
+                            <p className="text-2xs text-white/35">Segmento de la Ruleta de VSM</p>
                         </div>
                     </div>
                     <button
@@ -153,7 +153,7 @@ export function WheelGamePrizeEditor({
                             maxLength={30}
                             className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-indigo-500/50 focus:bg-indigo-500/5 transition-all"
                         />
-                        <p className="text-[10px] text-white/25 text-right">{form.label.length}/30 chars</p>
+                        <p className="text-2xs text-white/25 text-right">{form.label.length}/30 chars</p>
                     </div>
 
                     {/* Tipo */}
@@ -186,7 +186,7 @@ export function WheelGamePrizeEditor({
                                     )} />
                                     <div>
                                         <p className="text-sm font-black text-white">{label}</p>
-                                        <p className="text-[11px] text-white/35">{desc}</p>
+                                        <p className="text-2xs text-white/35">{desc}</p>
                                     </div>
                                 </button>
                             ))}
@@ -273,7 +273,7 @@ export function WheelGamePrizeEditor({
                             onChange={e => setField('probability', Number(e.target.value))}
                             className="w-full accent-indigo-500"
                         />
-                        <div className="flex justify-between text-[10px] text-white/25">
+                        <div className="flex justify-between text-2xs text-white/25">
                             <span>0%</span>
                             <span className={cn(remainingPct < 10 ? 'text-amber-400' : '')}>
                                 Disponible: {remainingPct}%
@@ -286,7 +286,7 @@ export function WheelGamePrizeEditor({
                     <div className="flex items-center justify-between p-4 rounded-2xl border border-white/8 bg-white/[0.02]">
                         <div>
                             <p className="text-sm font-black text-white">Premio activo</p>
-                            <p className="text-[11px] text-white/35">Disponible para aparecer en la ruleta</p>
+                            <p className="text-2xs text-white/35">Disponible para aparecer en la ruleta</p>
                         </div>
                         <button
                             type="button"

@@ -73,7 +73,7 @@ export function CustomerGodMode({ customer }: Props) {
                 </div>
             </div>
 
-            <div className="space-y-6 relative z-10 bg-[#13141f]/40 p-4 rounded-2xl border border-red-500/10">
+            <div className="space-y-6 relative z-10 bg-surface-base/40 p-4 rounded-2xl border border-red-500/10">
                 
                 {/* Status Toggles */}
                 <div>
@@ -87,7 +87,7 @@ export function CustomerGodMode({ customer }: Props) {
                             className={`relative flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition-all duration-300
                                 ${customer.account_status === 'active' || !customer.account_status 
                                 ? 'bg-green-500/10 border-green-500/40 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.1)] scale-100' 
-                                : 'bg-[#1a1c29] border-white/5 text-theme-secondary/50 hover:border-green-500/20 hover:text-green-400/50 hover:bg-green-500/5 hover:scale-95'}
+                                : 'bg-surface-card border-white/5 text-theme-secondary/50 hover:border-green-500/20 hover:text-green-400/50 hover:bg-green-500/5 hover:scale-95'}
                             `}
                         >
                             <CheckCircle className="h-4 w-4 mb-1" />
@@ -100,7 +100,7 @@ export function CustomerGodMode({ customer }: Props) {
                             className={`relative flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition-all duration-300
                                 ${customer.account_status === 'suspended' 
                                 ? 'bg-orange-500/10 border-orange-500/40 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.1)] scale-100' 
-                                : 'bg-[#1a1c29] border-white/5 text-theme-secondary/50 hover:border-orange-500/20 hover:text-orange-400/50 hover:bg-orange-500/5 hover:scale-95'}
+                                : 'bg-surface-card border-white/5 text-theme-secondary/50 hover:border-orange-500/20 hover:text-orange-400/50 hover:bg-orange-500/5 hover:scale-95'}
                             `}
                         >
                             <ShieldAlert className="h-4 w-4 mb-1" />
@@ -113,7 +113,7 @@ export function CustomerGodMode({ customer }: Props) {
                             className={`relative flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition-all duration-300
                                 ${customer.account_status === 'banned' 
                                 ? 'bg-red-500/10 border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)] scale-100' 
-                                : 'bg-[#1a1c29] border-white/5 text-theme-secondary/50 hover:border-red-500/20 hover:text-red-500/50 hover:bg-red-500/5 hover:scale-95'}
+                                : 'bg-surface-card border-white/5 text-theme-secondary/50 hover:border-red-500/20 hover:text-red-500/50 hover:bg-red-500/5 hover:scale-95'}
                             `}
                         >
                             <Ban className="h-4 w-4 mb-1" />
@@ -126,7 +126,7 @@ export function CustomerGodMode({ customer }: Props) {
                             <label className="text-xs font-medium text-orange-400/80 mb-2 block">Levantar jaula automáticamente el:</label>
                             <input
                                 type="date"
-                                className="w-full bg-[#13141f] border border-orange-500/30 rounded-lg px-3 py-2 text-sm text-orange-400 focus:outline-none focus:border-orange-400"
+                                className="w-full bg-surface-base border border-orange-500/30 rounded-lg px-3 py-2 text-sm text-orange-400 focus:outline-none focus:border-orange-400"
                                 onChange={(e) => updateStatusMutation.mutate({ status: 'suspended', end: new Date(e.target.value).toISOString() })}
                             />
                         </div>
@@ -144,14 +144,14 @@ export function CustomerGodMode({ customer }: Props) {
                         <input
                             type="text"
                             placeholder="Asunto (ej. Alerta de Seguridad)"
-                            className="w-full bg-[#1a1c29]/80 border border-white/5 focus:border-rose-500/50 rounded-xl px-4 py-2.5 text-sm text-rose-100 placeholder-rose-400/20 transition-colors focus:outline-none"
+                            className="w-full bg-surface-card/80 border border-white/5 focus:border-rose-500/50 rounded-xl px-4 py-2.5 text-sm text-rose-100 placeholder-rose-400/20 transition-colors focus:outline-none"
                             value={notifTitle}
                             onChange={e => setNotifTitle(e.target.value)}
                         />
                         <textarea
                             placeholder="Mensaje de solo-lectura para el usuario..."
                             rows={3}
-                            className="w-full bg-[#1a1c29]/80 border border-white/5 focus:border-rose-500/50 rounded-xl px-4 py-3 text-sm text-rose-100 placeholder-rose-400/20 transition-colors focus:outline-none resize-none"
+                            className="w-full bg-surface-card/80 border border-white/5 focus:border-rose-500/50 rounded-xl px-4 py-3 text-sm text-rose-100 placeholder-rose-400/20 transition-colors focus:outline-none resize-none"
                             value={notifMessage}
                             onChange={e => setNotifMessage(e.target.value)}
                         />

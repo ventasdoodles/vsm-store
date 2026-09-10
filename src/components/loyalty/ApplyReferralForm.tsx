@@ -47,7 +47,7 @@ export function ApplyReferralForm() {
             </div>
             <div>
                 <p className="text-xs font-black text-herbal-400 uppercase tracking-[0.15em]">¡Código Maestro Activado!</p>
-                <p className="text-[10px] text-herbal-400/60 font-medium">Has desbloqueado tus recompensas de bienvenida.</p>
+                <p className="text-2xs text-herbal-400/60 font-medium">Has desbloqueado tus recompensas de bienvenida.</p>
             </div>
         </div>
     );
@@ -61,7 +61,7 @@ export function ApplyReferralForm() {
                     </div>
                     <div>
                         <h4 className="text-sm font-black text-white uppercase tracking-tight">¿Tienes un código?</h4>
-                        <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Gana {REWARD_POINTS_REFERRED} V-Coins al instante</p>
+                        <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Gana {REWARD_POINTS_REFERRED} V-Coins al instante</p>
                     </div>
                 </div>
 
@@ -93,7 +93,7 @@ export function ApplyReferralForm() {
                             <button
                                 type="submit"
                                 disabled={!code.trim() || applyMutation.isPending || status === 'success'}
-                                className="absolute right-2.5 top-2.5 bottom-2.5 px-6 rounded-xl bg-accent-primary text-white text-[10px] font-black uppercase tracking-widest hover:bg-accent-secondary disabled:opacity-0 disabled:translate-x-4 transition-all duration-500 flex items-center gap-2 group/btn shadow-xl shadow-accent-primary/20"
+                                className="absolute right-2.5 top-2.5 bottom-2.5 px-6 rounded-xl bg-accent-primary text-white text-2xs font-black uppercase tracking-widest hover:bg-accent-secondary disabled:opacity-0 disabled:translate-x-4 transition-all duration-500 flex items-center gap-2 group/btn shadow-xl shadow-accent-primary/20"
                             >
                                 {applyMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -115,7 +115,7 @@ export function ApplyReferralForm() {
                                 className="flex items-center gap-2 text-red-400/80 px-2"
                             >
                                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{errorMsg}</span>
+                                <span className="text-2xs font-black uppercase tracking-widest">{errorMsg}</span>
                             </m.div>
                         )}
                     </AnimatePresence>

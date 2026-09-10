@@ -34,7 +34,7 @@ export function FlashDealsSettings({ flashDealsEnd, onChangeDate }: FlashDealsSe
 
             {/* Content */}
             <div className="relative z-10 space-y-4">
-                <p className="text-[11px] text-theme-secondary/60 leading-relaxed">
+                <p className="text-2xs text-theme-secondary/60 leading-relaxed">
                     Configura la hora de fin del countdown. Si está vacío, se usa un timer automático de 6 horas.
                 </p>
 

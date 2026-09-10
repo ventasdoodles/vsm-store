@@ -70,7 +70,7 @@ function FooterLink({ to, children }: { to: string; children: React.ReactNode })
                 className="group flex items-center gap-2 text-sm text-theme-tertiary hover:text-white transition-all duration-500"
             >
                 <div className="h-px w-0 bg-accent-primary group-hover:w-3 transition-all duration-500" />
-                <span className="group-hover:translate-x-1 transition-transform duration-500 font-bold uppercase tracking-widest text-[10px] opacity-60 group-hover:opacity-100">
+                <span className="group-hover:translate-x-1 transition-transform duration-500 font-bold uppercase tracking-widest text-2xs opacity-60 group-hover:opacity-100">
                     {children}
                 </span>
             </Link>
@@ -105,7 +105,7 @@ function ColumnWithSpotlight({ title, icon: Icon, colorClass, children }: { titl
                     `,
                 }}
             />
-            <h4 className="text-white font-black mb-8 uppercase tracking-[0.2em] text-[10px] flex items-center gap-3 relative z-10 opacity-40 group-hover:opacity-100 transition-opacity">
+            <h4 className="text-white font-black mb-8 uppercase tracking-[0.2em] text-2xs flex items-center gap-3 relative z-10 opacity-40 group-hover:opacity-100 transition-opacity">
                 <Icon className={cn("w-4 h-4", colorClass)} />
                 {title}
             </h4>
@@ -184,7 +184,7 @@ export const Footer = memo(function Footer() {
                     
                     <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6 text-center lg:text-left">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 animate-pulse">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-2xs font-black uppercase tracking-[0.2em] text-yellow-500 animate-pulse">
                                 <Zap className="h-3 w-3 fill-current" />
                                 Protocolo VIP VSM
                             </div>
@@ -250,13 +250,13 @@ export const Footer = memo(function Footer() {
                             Redefiniendo el lujo en <span className="text-white">Vape & 420 Culture</span>. Calidad suprema, discreción absoluta y curaduría de marcas globales para cada entrega.
                         </p>
                         <div className="space-y-4">
-                            <a href="mailto:hq@vsmstore.com" className="flex items-center gap-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-accent-primary transition-all group">
+                            <a href="mailto:hq@vsmstore.com" className="flex items-center gap-5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-accent-primary transition-all group">
                                 <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-accent-primary/10 group-hover:border-accent-primary/30 group-hover:scale-110 transition-all duration-500">
                                     <Mail size={16} />
                                 </div>
                                 hq@vsmstore.com
                             </a>
-                            <a href="tel:+528100000000" className="flex items-center gap-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-emerald-400 transition-all group">
+                            <a href="tel:+528100000000" className="flex items-center gap-5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-emerald-400 transition-all group">
                                 <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-emerald-400/10 group-hover:border-emerald-400/30 group-hover:scale-110 transition-all duration-500">
                                     <Phone size={16} />
                                 </div>
@@ -287,7 +287,7 @@ export const Footer = memo(function Footer() {
                     <div className="lg:col-span-3">
                         <ColumnWithSpotlight title="Conexión Social" icon={ShieldCheck} colorClass="text-emerald-400">
                             <div className="space-y-8">
-                                <p className="text-[10px] font-bold text-theme-tertiary uppercase tracking-widest leading-relaxed opacity-60">
+                                <p className="text-2xs font-bold text-theme-tertiary uppercase tracking-widest leading-relaxed opacity-60">
                                     Únete a nuestra élite. Drops, eventos y preventas exclusivas a través de nuestros canales oficiales.
                                 </p>
                                 <div className="flex gap-4">

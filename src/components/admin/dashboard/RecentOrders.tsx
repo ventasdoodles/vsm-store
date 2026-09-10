@@ -72,7 +72,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                         <p className="text-sm font-black text-white drop-shadow-sm">
                             {formatPrice(order.total ?? 0)}
                         </p>
-                        <p className="text-[11px] font-medium text-theme-secondary mt-0.5">
+                        <p className="text-2xs font-medium text-theme-secondary mt-0.5">
                             {new Date(order.created_at).toLocaleDateString('es-MX', {
                                 day: '2-digit',
                                 month: 'short',
@@ -124,7 +124,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
 
             {/* Listado de Pedidos en Formato Tarjeta usando TanStack Table */}
             {table.getRowModel().rows.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md">
+                <div className="flex flex-col items-center justify-center py-16 text-center rounded-[1.5rem] border border-white/5 bg-surface-base/70 backdrop-blur-md">
                     <Package className="h-12 w-12 text-theme-secondary/30 mb-4" />
                     <p className="text-sm font-medium text-theme-secondary">No hay pedidos recientes aun</p>
                 </div>

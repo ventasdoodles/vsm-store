@@ -89,7 +89,7 @@ export function AdminProducts() {
 
             {admin.selectedIds.length > 0 && (
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
-                    <div className="flex items-center gap-4 rounded-[2rem] border border-vape-500/30 bg-[#13141f]/90 px-6 py-3 backdrop-blur-xl shadow-2xl">
+                    <div className="flex items-center gap-4 rounded-[2rem] border border-vape-500/30 bg-surface-base/90 px-6 py-3 backdrop-blur-xl shadow-2xl">
                         <span className="text-xs font-bold text-white/70 pr-4 border-r border-white/10">
                             {admin.selectedIds.length} Seleccionados
                         </span>

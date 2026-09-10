@@ -124,7 +124,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             };
                             return (
                                 <div key={key} className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                                    <span className="text-2xs font-black uppercase tracking-widest text-theme-tertiary">
                                         {labels[key] || key.replace(/_/g, ' ')}
                                     </span>
                                     <span className="text-sm font-bold text-theme-primary">
@@ -148,7 +148,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             <span
                                 key={tag}
                                 className={cn(
-                                    'vsm-tag border-theme bg-theme-secondary/5 text-theme-secondary text-[10px]',
+                                    'vsm-tag border-theme bg-theme-secondary/5 text-theme-secondary text-2xs',
                                     productDetailConfig.productInfoTagHoverClassName
                                 )}
                             >

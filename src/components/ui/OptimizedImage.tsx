@@ -53,7 +53,7 @@ export function OptimizedImage({
                     <div className="w-16 h-16 rounded-full bg-black/40 border border-white/5 flex items-center justify-center transition-transform duration-500 hover:scale-105">
                         {fallbackIcon || <ImageOff className="h-8 w-8 text-white/30" strokeWidth={1.5} />}
                     </div>
-                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">Sin imagen</span>
+                    <span className="text-2xs text-white/40 font-bold uppercase tracking-[0.2em]">Sin imagen</span>
                 </div>
             </div>
         );
@@ -79,7 +79,7 @@ export function OptimizedImage({
                     <div className="relative z-10 w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner">
                         {fallbackIcon || <ImageOff className="h-8 w-8 text-white/30" strokeWidth={1.5} />}
                     </div>
-                    <span className="relative z-10 text-[10px] text-white/40 font-black uppercase tracking-[0.3em] italic">VSM Artistic Selection</span>
+                    <span className="relative z-10 text-2xs text-white/40 font-black uppercase tracking-[0.3em] italic">VSM Artistic Selection</span>
                 </div>
             ) : (
                 <img

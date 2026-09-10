@@ -80,7 +80,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                         </span>
                         <span
                             className={cn(
-                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide border",
+                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-bold tracking-wide border",
                                 getSubtleBadgeClasses(statusInfo?.color)
                             )}
                         >
@@ -93,7 +93,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                 </div>
                 <div className="text-right shrink-0">
                     <p className="text-sm font-black text-theme-primary">{formatPrice(order.total ?? 0)}</p>
-                    <p className="text-[11px] text-theme-secondary/60 mt-0.5">
+                    <p className="text-2xs text-theme-secondary/60 mt-0.5">
                         {new Date(order.created_at).toLocaleDateString('es-MX', {
                             day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
                         })}
@@ -128,9 +128,9 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                             <table className="w-full text-xs">
                                 <thead>
                                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                                        <th className="px-3 py-2 text-left text-[10px] font-black tracking-widest text-theme-secondary/50 uppercase">Producto</th>
-                                        <th className="px-3 py-2 text-center text-[10px] font-black tracking-widest text-theme-secondary/50 uppercase">Cant.</th>
-                                        <th className="px-3 py-2 text-right text-[10px] font-black tracking-widest text-theme-secondary/50 uppercase">Total</th>
+                                        <th className="px-3 py-2 text-left text-2xs font-black tracking-widest text-theme-secondary/50 uppercase">Producto</th>
+                                        <th className="px-3 py-2 text-center text-2xs font-black tracking-widest text-theme-secondary/50 uppercase">Cant.</th>
+                                        <th className="px-3 py-2 text-right text-2xs font-black tracking-widest text-theme-secondary/50 uppercase">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/[0.03]">
@@ -150,12 +150,12 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-2 border-t border-white/5">
                         {/* Status Selector */}
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-black uppercase tracking-widest text-theme-secondary/50">Status:</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-theme-secondary/50">Status:</span>
                             <select
                                 value={order.status}
                                 onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
                                 disabled={isUpdating}
-                                className="rounded-lg border border-white/10 bg-[#1a1c29] px-3 py-1.5 text-xs font-medium text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50 transition-colors hover:border-white/20"
+                                className="rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs font-medium text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50 transition-colors hover:border-white/20"
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.map((s) => {
                                     const isCurrent = order.status === s.value;
@@ -168,7 +168,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                                 })}
                             </select>
                             {isUpdating && (
-                                <span className="flex items-center gap-1 text-[11px] text-blue-400/80">
+                                <span className="flex items-center gap-1 text-2xs text-blue-400/80">
                                     <Loader2 className="h-3 w-3 animate-spin" /> Guardando...
                                 </span>
                             )}
@@ -182,7 +182,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                                 placeholder="Número de guía..."
                                 value={trackingInput}
                                 onChange={(e) => setTrackingInput(e.target.value)}
-                                className="w-36 rounded-lg border border-white/10 bg-[#1a1c29] px-3 py-1.5 text-xs text-theme-primary placeholder-theme-secondary/30 focus:border-vape-500/50 focus:outline-none transition-colors hover:border-white/20"
+                                className="w-36 rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs text-theme-primary placeholder-theme-secondary/30 focus:border-vape-500/50 focus:outline-none transition-colors hover:border-white/20"
                             />
                             <button
                                 onClick={handleSaveTracking}
@@ -205,7 +205,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                     </div>
 
                     {/* Badges */}
-                    <div className="flex flex-wrap gap-2 text-[11px]">
+                    <div className="flex flex-wrap gap-2 text-2xs">
                         {order.payment_method && (
                             <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-0.5 text-theme-secondary/70">
                                 Pago: {order.payment_method}

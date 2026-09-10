@@ -103,7 +103,7 @@ export function Header() {
                                     className={cn(
                                         "w-full rounded-full transition-all duration-300",
                                         scrolled
-                                            ? "bg-[#1e2538]/60 backdrop-blur-md border border-white/20 shadow-none group-focus-within:border-accent-primary/60"
+                                            ? "bg-surface-elevated/60 backdrop-blur-md border border-white/20 shadow-none group-focus-within:border-accent-primary/60"
                                             : "bg-[#161d2e] border-2 border-white/10 shadow-[0_0_0_1px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(0,0,0,0.6)] group-focus-within:border-accent-primary/70 group-focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(59,130,246,0.2)] group-hover:border-white/20 group-hover:bg-[#1c2438]"
                                     )}
                                 />

@@ -63,8 +63,8 @@ export function OrderSummaryCard({
                         </div>
                         <h2 className="text-2xl font-black text-white uppercase italic tracking-[0.2em]">Resumen del pedido</h2>
                         <div className="flex flex-col items-center gap-1 opacity-60">
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">Cod. Reg: {orderNumber}</p>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">Estado persistido del pedido</p>
+                            <p className="text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary">Cod. Reg: {orderNumber}</p>
+                            <p className="text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary">Estado persistido del pedido</p>
                         </div>
                     </div>
 
@@ -81,7 +81,7 @@ export function OrderSummaryCard({
                                         {item.image ? (
                                             <img src={item.image} className="w-full h-full object-cover grayscale group-hover/item:grayscale-0 transition-all duration-500" alt="" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-[10px] text-theme-tertiary opacity-30">📦</div>
+                                            <div className="w-full h-full flex items-center justify-center text-2xs text-theme-tertiary opacity-30">📦</div>
                                         )}
                                     </div>
                                     <div className="space-y-0.5">
@@ -96,18 +96,18 @@ export function OrderSummaryCard({
 
                     {/* Totales */}
                     <div className="border-t border-dashed border-white/10 pt-8 space-y-4">
-                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                        <div className="flex justify-between text-2xs font-black uppercase tracking-widest text-theme-tertiary">
                             <span>Subtotal</span>
                             <span className="text-white opacity-80">{formatPrice(subtotal)}</span>
                         </div>
                         {shippingCost > 0 && (
-                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                            <div className="flex justify-between text-2xs font-black uppercase tracking-widest text-theme-tertiary">
                                 <span>Envío registrado</span>
                                 <span className="text-white opacity-80">{formatPrice(shippingCost)}</span>
                             </div>
                         )}
                         {discount > 0 && (
-                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-herbal-500">
+                            <div className="flex justify-between text-2xs font-black uppercase tracking-widest text-herbal-500">
                                 <span>Bonificación Digital</span>
                                 <span>-{formatPrice(discount)}</span>
                             </div>
@@ -133,19 +133,19 @@ export function OrderSummaryCard({
                         </div>
                         <div>
                             <h3 className="text-sm font-black text-white uppercase tracking-widest">Pago</h3>
-                            <p className="text-[10px] text-theme-tertiary font-bold uppercase opacity-60">Estado persistido</p>
+                            <p className="text-2xs text-theme-tertiary font-bold uppercase opacity-60">Estado persistido</p>
                         </div>
                     </div>
 
                     <div className="grid gap-3">
                         <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Método de pago</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-theme-tertiary opacity-40">Método de pago</span>
                             <span className="text-xs font-black text-white uppercase italic">
                                 {{ cash: 'Efectivo', transfer: 'Transferencia', mercadopago: 'Mercado Pago', card: 'Tarjeta', whatsapp: 'WhatsApp' }[paymentMethod] ?? paymentMethod}
                             </span>
                         </div>
                         <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Estado de pago</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-theme-tertiary opacity-40">Estado de pago</span>
                             <span className={cn(
                                 'text-xs font-black uppercase italic tracking-widest',
                                 paymentView.paymentTone === 'success'
@@ -162,10 +162,10 @@ export function OrderSummaryCard({
                     </div>
 
                     <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-60">
+                        <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-60">
                             Siguiente paso real
                         </p>
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">
+                        <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">
                             {continuationView.detail}
                         </p>
                     </div>

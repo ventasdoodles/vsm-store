@@ -38,7 +38,7 @@ export function CustomerTimeline({ customer }: Props) {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-[#13141f]/50 border border-white/5 rounded-3xl min-h-[200px]">
+            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-3xl min-h-[200px]">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-3" />
                 <p className="text-sm text-theme-secondary">Analizando historial de pedidos...</p>
             </div>
@@ -67,7 +67,7 @@ export function CustomerTimeline({ customer }: Props) {
     };
 
     return (
-        <div className="rounded-[2rem] border border-white/5 bg-[#13141f]/80 backdrop-blur-xl p-6 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl relative overflow-hidden">
             {/* Ambient Background */}
             <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -translate-y-1/2 -translate-x-1/2 opacity-50 pointer-events-none" />
 
@@ -90,7 +90,7 @@ export function CustomerTimeline({ customer }: Props) {
             </div>
             
             {orders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-8 bg-[#1a1c29]/50 border border-white/5 rounded-2xl">
+                <div className="flex flex-col items-center justify-center p-8 bg-surface-card/50 border border-white/5 rounded-2xl">
                     <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
                         <Clock className="w-6 h-6 text-theme-secondary/50" />
                     </div>
@@ -115,7 +115,7 @@ export function CustomerTimeline({ customer }: Props) {
                                     </div>
                                     
                                     {/* Content Card */}
-                                    <div className="relative bg-[#1a1c29]/80 border border-white/5 hover:border-white/10 p-5 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-xl group-hover:-translate-y-1">
+                                    <div className="relative bg-surface-card/80 border border-white/5 hover:border-white/10 p-5 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-xl group-hover:-translate-y-1">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-3">
                                             <div className="flex items-center gap-3">
                                                 <div 
@@ -124,7 +124,7 @@ export function CustomerTimeline({ customer }: Props) {
                                                 >
                                                     {order.display_id || order.id.slice(0, 8)}
                                                 </div>
-                                                <span className={`px-2.5 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.border} ${config.color}`}>
+                                                <span className={`px-2.5 py-0.5 rounded-md border text-2xs font-bold uppercase tracking-wider ${config.bg} ${config.border} ${config.color}`}>
                                                     {order.status}
                                                 </span>
                                             </div>

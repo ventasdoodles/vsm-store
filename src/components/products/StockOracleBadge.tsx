@@ -64,7 +64,7 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
                 <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                         <span className={cn(
-                            "text-[10px] font-black uppercase tracking-[0.2em]",
+                            "text-2xs font-black uppercase tracking-[0.2em]",
                             isCritical ? "text-red-400" : "text-vape-400"
                         )}>
                             Profecía de Stock VSM IA
@@ -79,7 +79,7 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
                     </h4>
                     
                     <div className="flex items-center gap-2 mt-2">
-                        <p className="text-[11px] text-white/50 italic font-medium">
+                        <p className="text-2xs text-white/50 italic font-medium">
                             Agotamiento estimado: {new Date(prediction.depletionDate).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })}
                         </p>
                     </div>

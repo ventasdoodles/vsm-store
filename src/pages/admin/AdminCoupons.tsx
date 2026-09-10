@@ -148,7 +148,7 @@ export function AdminCoupons() {
             )}
 
             {/* Buscador de Cupones */}
-            <div className="bg-[#13141f] rounded-[2.5rem] p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+            <div className="bg-surface-base rounded-[2.5rem] p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
                 <div className="flex flex-col sm:flex-row gap-6 mb-8">
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">

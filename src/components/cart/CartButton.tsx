@@ -42,7 +42,7 @@ export function CartButton() {
                         animate={{ scale: 1, y: 0 }}
                         exit={{ scale: 0, y: 10 }}
                         transition={{ type: "spring", stiffness: 600, damping: 20 }}
-                        className="absolute -top-2 -right-2 flex h-6 min-w-[24px] items-center justify-center rounded-full bg-gradient-to-tr from-accent-primary to-blue-400 px-1.5 text-[11px] font-black text-white shadow-lg shadow-accent-primary/40 border-2 border-theme-primary"
+                        className="absolute -top-2 -right-2 flex h-6 min-w-[24px] items-center justify-center rounded-full bg-gradient-to-tr from-accent-primary to-blue-400 px-1.5 text-2xs font-black text-white shadow-lg shadow-accent-primary/40 border-2 border-theme-primary"
                     >
                         {count > 99 ? '99+' : count}
                     </m.span>

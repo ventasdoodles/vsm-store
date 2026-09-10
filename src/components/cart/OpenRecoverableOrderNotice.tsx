@@ -37,17 +37,17 @@ export function OpenRecoverableOrderNotice({
                     <AlertTriangle className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400">
+                    <p className="text-2xs font-black uppercase tracking-[0.2em] text-yellow-400">
                         Orden abierta recuperable
                     </p>
                     <p className={cn('mt-2 font-black uppercase italic text-white', compact ? 'text-sm' : 'text-lg')}>
                         {view.headline}
                     </p>
-                    <p className="mt-2 text-[10px] font-bold uppercase tracking-wider leading-relaxed text-white/80">
+                    <p className="mt-2 text-2xs font-bold uppercase tracking-wider leading-relaxed text-white/80">
                         {view.detail}
                     </p>
 
-                    <div className="mt-4 flex flex-wrap items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/70">
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-2xs font-black uppercase tracking-widest text-white/70">
                         <span className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2">
                             <Package className="h-3.5 w-3.5 text-yellow-400" />
                             {order.order_number}
@@ -62,7 +62,7 @@ export function OpenRecoverableOrderNotice({
                             type="button"
                             onClick={() => void continuePayment(order)}
                             disabled={continuingPayment}
-                            className="flex items-center justify-center gap-2 rounded-2xl bg-yellow-600 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="flex items-center justify-center gap-2 rounded-2xl bg-yellow-600 px-4 py-3 text-2xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {continuingPayment ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
                             {continuingPayment ? 'Abriendo Mercado Pago...' : view.primaryCtaLabel}
@@ -71,7 +71,7 @@ export function OpenRecoverableOrderNotice({
                         <button
                             type="button"
                             onClick={() => navigate({ to: `/orders/${order.id}` as any })}
-                            className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
+                            className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-2xs font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
                         >
                             <Package className="h-4 w-4" />
                             {view.secondaryCtaLabel}

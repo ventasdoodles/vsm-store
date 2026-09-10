@@ -228,7 +228,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             <span className="text-xl text-white/30 line-through font-bold">
                                                 {formatPrice(product.compare_at_price)}
                                             </span>
-                                            <span className="text-[11px] font-black text-red-400 uppercase tracking-widest">
+                                            <span className="text-2xs font-black text-red-400 uppercase tracking-widest">
                                                 -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% OFF
                                             </span>
                                         </div>
@@ -259,7 +259,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
 
                                 {hasVariations && (
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                                        <label className="text-2xs font-black uppercase tracking-[0.2em] text-white/40">
                                             Selecciona una opción
                                         </label>
                                         <div className="grid grid-cols-2 gap-2">
@@ -380,7 +380,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 <Link
                                     to={`/${product.section}/${product.slug}` as any}
                                     onClick={onClose}
-                                    className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-[10px] uppercase tracking-[0.2em] transition-colors"
+                                    className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-2xs uppercase tracking-[0.2em] transition-colors"
                                 >
                                     Ver detalles completos
                                     <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

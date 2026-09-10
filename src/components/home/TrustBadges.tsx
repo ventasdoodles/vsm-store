@@ -105,10 +105,10 @@ export const TrustBadges = () => {
 
                         {/* Text Content */}
                         <div className="space-y-2">
-                            <h3 className="font-black text-white/90 uppercase tracking-wider text-[10px] sm:text-xs leading-none">
+                            <h3 className="font-black text-white/90 uppercase tracking-wider text-2xs sm:text-xs leading-none">
                                 {badge.title}
                             </h3>
-                            <p className="text-[10px] sm:text-[11px] text-white/40 font-bold uppercase tracking-[0.2em] leading-tight px-2">
+                            <p className="text-2xs sm:text-2xs text-white/40 font-bold uppercase tracking-[0.2em] leading-tight px-2">
                                 {badge.description}
                             </p>
                         </div>

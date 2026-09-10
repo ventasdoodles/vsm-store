@@ -72,7 +72,7 @@ const LINKS: QuickLink[] = [
 export function ProfileQuickLinks() {
     return (
         <section className="space-y-4">
-            <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] px-2 opacity-40">
+            <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] px-2 opacity-40">
                 Accesos de cuenta
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -95,7 +95,7 @@ export function ProfileQuickLinks() {
                             <p className="text-sm font-black text-white uppercase italic group-hover:text-accent-primary transition-colors duration-500">
                                 {link.label}
                             </p>
-                            <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60 truncate">
+                            <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60 truncate">
                                 {link.description}
                             </p>
                         </div>

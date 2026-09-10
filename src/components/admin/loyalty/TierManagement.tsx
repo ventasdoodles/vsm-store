@@ -93,7 +93,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
 
                             <div>
                                 <h3 className="text-lg font-black text-theme-primary uppercase tracking-tight">{tier.name}</h3>
-                                <p className="text-[10px] text-theme-tertiary font-bold tracking-widest uppercase opacity-50">Gasto Min: ${tier.threshold.toLocaleString()}</p>
+                                <p className="text-2xs text-theme-tertiary font-bold tracking-widest uppercase opacity-50">Gasto Min: ${tier.threshold.toLocaleString()}</p>
                             </div>
 
                             <div className="space-y-2">
@@ -103,7 +103,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                 </p>
                                 <div className="space-y-1.5 pt-2">
                                     {tier.benefits.slice(0, 3).map((benefit, i) => (
-                                        <div key={i} className="flex items-start gap-2 text-[10px] text-theme-tertiary">
+                                        <div key={i} className="flex items-start gap-2 text-2xs text-theme-tertiary">
                                             <CheckCircle className="h-3 w-3 mt-0.5 text-indigo-400 shrink-0" />
                                             <span className="leading-tight">{benefit}</span>
                                         </div>
@@ -121,7 +121,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
             {/* Editor Modal Overlay */}
             {editingTier && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-[#13141f] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                    <div className="bg-surface-base border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
                         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                             <h3 className="text-lg font-black text-theme-primary tracking-tight">EDITAR NIVEL {editingTier.name.toUpperCase()}</h3>
                             <button onClick={() => setEditingTier(null)} className="text-theme-tertiary hover:text-white transition-colors">
@@ -132,7 +132,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-theme-secondary uppercase tracking-widest">Umbral de Gasto (Threshold)</label>
+                                    <label className="text-2xs font-bold text-theme-secondary uppercase tracking-widest">Umbral de Gasto (Threshold)</label>
                                     <input
                                         type="number"
                                         value={editingTier.threshold}
@@ -141,7 +141,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-theme-secondary uppercase tracking-widest">Multiplicador de Puntos</label>
+                                    <label className="text-2xs font-bold text-theme-secondary uppercase tracking-widest">Multiplicador de Puntos</label>
                                     <input
                                         type="number"
                                         step="0.1"
@@ -153,7 +153,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                             </div>
 
                             <div className="space-y-4">
-                                <label className="text-[10px] font-bold text-theme-secondary uppercase tracking-widest">Beneficios del Nivel</label>
+                                <label className="text-2xs font-bold text-theme-secondary uppercase tracking-widest">Beneficios del Nivel</label>
                                 <div className="space-y-2">
                                     {editingTier.benefits.map((benefit, i) => (
                                         <div key={i} className="flex gap-2">

@@ -163,12 +163,12 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                             <Calendar className="h-5 w-5" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Recencia</span>
+                        <span className="text-2xs font-black uppercase tracking-widest text-white/30">Recencia</span>
                     </div>
                     <p className="text-2xl font-black text-white">
                         {intelligence?.recency_days ?? '—'} <span className="text-xs text-white/20 font-medium">días</span>
                     </p>
-                    <p className="text-[10px] text-white/20 mt-1 uppercase font-bold">Desde última compra</p>
+                    <p className="text-2xs text-white/20 mt-1 uppercase font-bold">Desde última compra</p>
                 </div>
 
                 {/* Frequency Card */}
@@ -177,12 +177,12 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                             <TrendingUp className="h-5 w-5" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Frecuencia</span>
+                        <span className="text-2xs font-black uppercase tracking-widest text-white/30">Frecuencia</span>
                     </div>
                     <p className="text-2xl font-black text-white">
                         {intelligence?.frequency ?? 0} <span className="text-xs text-white/20 font-medium">órdenes</span>
                     </p>
-                    <p className="text-[10px] text-white/20 mt-1 uppercase font-bold">Totales completadas</p>
+                    <p className="text-2xs text-white/20 mt-1 uppercase font-bold">Totales completadas</p>
                 </div>
 
                 {/* Monetary Card */}
@@ -191,12 +191,12 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
                             <CreditCard className="h-5 w-5" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Valor</span>
+                        <span className="text-2xs font-black uppercase tracking-widest text-white/30">Valor</span>
                     </div>
                     <p className="text-2xl font-black text-white">
                         ${intelligence?.monetary?.toLocaleString() ?? '0'}
                     </p>
-                    <p className="text-[10px] text-white/20 mt-1 uppercase font-bold">Gasto acumulado</p>
+                    <p className="text-2xs text-white/20 mt-1 uppercase font-bold">Gasto acumulado</p>
                 </div>
 
                 {/* Segment Card */}
@@ -209,7 +209,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-current opacity-10">
                                 <Heart className="h-5 w-5" />
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Segmento</span>
+                            <span className="text-2xs font-black uppercase tracking-widest opacity-40">Segmento</span>
                         </div>
                         <button
                             onClick={handleAISuggestTags}
@@ -227,7 +227,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     <p className="text-2xl font-black">{intelligence?.segment ?? 'Prospecto'}</p>
                     <div className="flex items-center gap-1.5 mt-2 opacity-60">
                         {getHealthIcon(intelligence?.health_status || '')}
-                        <span className="text-[10px] font-bold uppercase tracking-tighter">{intelligence?.health_status}</span>
+                        <span className="text-2xs font-bold uppercase tracking-tighter">{intelligence?.health_status}</span>
                     </div>
                 </div>
             </div>
@@ -239,7 +239,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     <div className="relative p-6 px-8">
                         <div className="flex items-center gap-2 mb-4">
                             <Sparkles className="h-4 w-4 text-vape-400 animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400/80">Recomendaciones del Sistema</span>
+                            <span className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/80">Recomendaciones del Sistema</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -265,7 +265,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                             handleGenerateWhatsApp(insight.description);
                                                         }
                                                     }}
-                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors w-fit group/btn"
+                                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors w-fit group/btn"
                                                 >
                                                     {insight.actionLabel}
                                                     <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
@@ -275,7 +275,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                 <button 
                                                     onClick={() => handleGenerateWhatsApp(insight.description)}
                                                     disabled={isGeneratingWhatsApp}
-                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
+                                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
                                                 >
                                                     {isGeneratingWhatsApp ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                                                     Generar con IA
@@ -298,7 +298,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                     <Sparkles className={cn("h-7 w-7", loadingNarrative && "animate-spin-slow")} />
                                 </div>
                                 <div className="flex flex-col justify-center w-full">
-                                    <h5 className="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-300/80 mb-2">Análisis de Comportamiento</h5>
+                                    <h5 className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300/80 mb-2">Análisis de Comportamiento</h5>
                                     {loadingNarrative ? (
                                         <div className="space-y-2">
                                             <div className="h-2 w-3/4 bg-white/10 rounded-full" />
@@ -347,15 +347,15 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
                         {/* Preferences */}
                         <div className="space-y-4">
-                           <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-300/80">Preferencias Cognitivas</h5>
+                           <h5 className="text-2xs font-black uppercase tracking-widest text-indigo-300/80">Preferencias Cognitivas</h5>
                            <div className="flex flex-wrap gap-2">
                                {intelligence.ai_preferences?.interests?.map((interest, i) => (
-                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-300">
+                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-2xs font-bold text-indigo-300">
                                        {interest}
                                    </span>
                                ))}
                                {intelligence.ai_preferences?.preferred_styles?.map((style, i) => (
-                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-vape-500/10 border border-vape-500/20 text-[10px] font-bold text-vape-300">
+                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-vape-500/10 border border-vape-500/20 text-2xs font-bold text-vape-300">
                                        {style}
                                    </span>
                                ))}
@@ -369,7 +369,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                         {/* AI Context / Propensity */}
                         <div className="space-y-4">
-                            <h5 className="text-[10px] font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</h5>
+                            <h5 className="text-2xs font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</h5>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
                                     <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Score de Propensión</p>
@@ -409,7 +409,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 ) : (
                     <div className="space-y-6 relative z-10">
                         <div>
-                            <h5 className="text-[10px] font-black uppercase tracking-widest text-vape-300/80 mb-4">Intereses Detectados (Aprendizaje Activo)</h5>
+                            <h5 className="text-2xs font-black uppercase tracking-widest text-vape-300/80 mb-4">Intereses Detectados (Aprendizaje Activo)</h5>
                             <div className="flex flex-wrap gap-3">
                                 {[...customerMemory.detected_interests]
                                     .sort((a, b) => {
@@ -439,7 +439,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                     "group/interest flex flex-col gap-1.5 p-3 px-4 rounded-2xl transition-all border",
                                                     isLeading 
                                                         ? "bg-vape-500/10 border-vape-500/30 ring-1 ring-vape-500/10 shadow-lg shadow-vape-500/10" 
-                                                        : "bg-[#13141f]/40 border-white/5 hover:border-white/10",
+                                                        : "bg-surface-base/40 border-white/5 hover:border-white/10",
                                                     isLowSignal && "opacity-40 hover:opacity-60"
                                                 )}
                                             >
@@ -498,7 +498,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                             </div>
                             
                             <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                                <p className="text-[10px] text-white/30 leading-relaxed italic">
+                                <p className="text-2xs text-white/30 leading-relaxed italic">
                                     Estos intereses ayudan a orientar recomendaciones cuando la consulta del cliente es ambigua. 
                                     La frecuencia y la recencia influyen en qué intereses aparecen primero en esta vista.
                                 </p>
@@ -545,7 +545,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                         <h5 className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">
                                             {event.title}
                                         </h5>
-                                        <span className="text-[10px] font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded-full">
+                                        <span className="text-2xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded-full">
                                             {format(new Date(event.date), "PPP p", { locale: es })}
                                         </span>
                                     </div>

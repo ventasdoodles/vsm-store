@@ -63,7 +63,7 @@ export const columns = [
                         <p className="truncate font-semibold text-white max-w-[200px]">{getValue()}</p>
                         <p className="flex items-center gap-1.5 text-xs text-white/40">
                             <span className={cn(
-                                'inline-block rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
+                                'inline-block rounded-md px-1.5 py-0.5 text-2xs font-bold uppercase tracking-wider',
                                 sectionBadgeClassName
                             )}>
                                 {sectionBadgeLabel}

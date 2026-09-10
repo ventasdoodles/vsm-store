@@ -34,7 +34,7 @@ export function AIInsights() {
                         </div>
                         <div>
                             <h2 className="text-lg font-black text-white tracking-tight">AI Insights</h2>
-                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Optimización: VSM Intelligent Core</p>
+                            <p className="text-2xs font-bold text-white/20 uppercase tracking-[0.2em]">Optimización: VSM Intelligent Core</p>
                         </div>
                     </div>
                     
@@ -80,7 +80,7 @@ export function AIInsights() {
                                 </p>
 
                                 {insight.actionLabel && (
-                                    <button className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 text-[10px] font-black text-white/60 uppercase tracking-widest group-hover/card:bg-vape-500 group-hover/card:text-white transition-all">
+                                    <button className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 text-2xs font-black text-white/60 uppercase tracking-widest group-hover/card:bg-vape-500 group-hover/card:text-white transition-all">
                                         {insight.actionLabel}
                                         <ChevronRight className="h-3 w-3" />
                                     </button>
@@ -94,7 +94,7 @@ export function AIInsights() {
                             <AlertCircle className="h-12 w-12 mb-4" />
                             <p className="text-sm font-bold uppercase tracking-widest text-center">
                                 Error al cargar inteligencia<br/>
-                                <span className="text-[10px] opacity-70 mt-1 block">La cuota de IA podría estar agotada</span>
+                                <span className="text-2xs opacity-70 mt-1 block">La cuota de IA podría estar agotada</span>
                             </p>
                         </div>
                     )}

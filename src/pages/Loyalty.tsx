@@ -217,7 +217,7 @@ export function Loyalty() {
 
             {/* ─── SECCIÓN 3: Beneficios por tier ─── */}
             <div className="space-y-4">
-                <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-60 px-1">
+                <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-60 px-1">
                     Niveles del programa
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -244,13 +244,13 @@ export function Loyalty() {
                                     )}
                                 </div>
                                 {threshold > 0 && (
-                                    <p className="text-[10px] font-bold text-accent-primary uppercase tracking-tight">
+                                    <p className="text-2xs font-bold text-accent-primary uppercase tracking-tight">
                                         Desde {formatPrice(threshold)} gastados
                                     </p>
                                 )}
                                 <ul className="space-y-2">
                                     {(tierItem.benefits || []).map((b: string, i: number) => (
-                                        <li key={i} className="flex items-start gap-2 text-[11px] text-theme-secondary group-hover:text-theme-primary transition-colors">
+                                        <li key={i} className="flex items-start gap-2 text-2xs text-theme-secondary group-hover:text-theme-primary transition-colors">
                                             <Star className="h-3 w-3 text-yellow-500 mt-0.5 flex-shrink-0 animate-pulse-slow" /> {b}
                                         </li>
                                     ))}

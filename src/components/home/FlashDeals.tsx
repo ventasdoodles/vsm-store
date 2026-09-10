@@ -142,7 +142,7 @@ export const FlashDeals = () => {
                                             </m.div>
                                         ))}
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-white/30">{t.label}</span>
+                                    <span className="text-2xs font-black uppercase tracking-widest mt-2 text-white/30">{t.label}</span>
                                 </div>
                             ))}
                         </div>
@@ -195,7 +195,7 @@ export const FlashDeals = () => {
 
                                     {/* Image Section */}
                                     <div className="relative aspect-[4/5] overflow-hidden">
-                                        <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-xl flex items-center gap-2">
+                                        <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-red-600 text-white text-2xs font-black uppercase tracking-[0.2em] rounded-full shadow-xl flex items-center gap-2">
                                             <Flame className="w-3.5 h-3.5 fill-current" />
                                             -{discountPercent}% OFF
                                         </div>
@@ -229,7 +229,7 @@ export const FlashDeals = () => {
 
                                         {/* Stock Progress with Breathing Animation */}
                                         <div className="space-y-3 mt-auto">
-                                            <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em]">
+                                            <div className="flex justify-between text-2xs font-black uppercase tracking-[0.2em]">
                                                 <span className="text-white/40">Inventario</span>
                                                 <span className={cn(
                                                     "transition-colors",

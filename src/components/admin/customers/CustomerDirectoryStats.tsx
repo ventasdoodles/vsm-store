@@ -86,7 +86,7 @@ export function CustomerDirectoryStats({ customers }: Props) {
                     <div 
                         key={idx} 
                         className={cn(
-                            "relative overflow-hidden rounded-3xl bg-[#13141f]/80 backdrop-blur-xl border p-5 group transition-all duration-300 hover:-translate-y-1 hover:bg-[#181825]",
+                            "relative overflow-hidden rounded-3xl bg-surface-base/80 backdrop-blur-xl border p-5 group transition-all duration-300 hover:-translate-y-1 hover:bg-[#181825]",
                             s.border
                         )}
                     >

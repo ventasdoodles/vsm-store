@@ -101,7 +101,7 @@ export function ProfileHero() {
                         'p-0.5', // Edge for gradient border
                         visualConfig.gradient, visualConfig.glow
                     )}>
-                        <div className="h-full w-full rounded-[14px] bg-theme-primary flex items-center justify-center overflow-hidden">
+                        <div className="h-full w-full rounded-xl bg-theme-primary flex items-center justify-center overflow-hidden">
                             {profile?.avatar_url ? (
                                 <img
                                     src={profile.avatar_url}
@@ -156,7 +156,7 @@ export function ProfileHero() {
                         {/* Progress Bar Container */}
                         {tierProgress && tierProgress.nextTier && (
                             <div className="space-y-1.5 max-w-sm mx-auto sm:mx-0">
-                                <div className="flex justify-between text-[10px] font-black uppercase tracking-wider text-theme-tertiary">
+                                <div className="flex justify-between text-2xs font-black uppercase tracking-wider text-theme-tertiary">
                                     <span>Progreso al nivel {settings?.loyalty_tiers_config?.find(t => t.id === tierProgress.nextTier)?.name || tierProgress.nextTier}</span>
                                     <span className={visualConfig.text}>{tierProgress.progress}%</span>
                                 </div>
@@ -171,7 +171,7 @@ export function ProfileHero() {
                                         style={{ left: `${tierProgress.progress - 10}%` }}
                                     />
                                 </div>
-                                <p className="text-[10px] font-medium text-theme-tertiary opacity-60">
+                                <p className="text-2xs font-medium text-theme-tertiary opacity-60">
                                     Te faltan <span className="text-theme-primary font-bold">{formatPrice(tierProgress.remaining)}</span> para subir de nivel
                                 </p>
                             </div>

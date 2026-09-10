@@ -34,7 +34,7 @@ export const ProactiveAISuggestions = memo(({
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
                     <Zap className="h-3 w-3 fill-current" />
                 </div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">
+                <h4 className="text-2xs font-black uppercase tracking-[0.2em] text-white/90">
                     {title}
                 </h4>
             </div>
@@ -63,7 +63,7 @@ export const ProactiveAISuggestions = memo(({
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-xs font-bold text-white truncate">{product.name}</p>
-                                <p className="text-[10px] text-vape-400 font-black">{formatPrice(product.price)}</p>
+                                <p className="text-2xs text-vape-400 font-black">{formatPrice(product.price)}</p>
                             </div>
                             <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
                         </Link>

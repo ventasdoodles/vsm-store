@@ -55,7 +55,7 @@ export function OrderStatusBanner({
 
             <div className="relative z-10 p-4 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
                 <p className={cn(
-                    'text-[10px] font-bold leading-relaxed uppercase tracking-wider',
+                    'text-2xs font-bold leading-relaxed uppercase tracking-wider',
                     paymentView.paymentTone === 'success'
                         ? 'text-herbal-500'
                         : paymentView.paymentTone === 'danger'
@@ -66,11 +66,11 @@ export function OrderStatusBanner({
                 )}>
                     Estado de pago:
                 </p>
-                <p className="mt-2 text-[10px] font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
+                <p className="mt-2 text-2xs font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
                     {paymentView.detail}
                 </p>
                 {freshnessView.isFreshnessSensitive && (
-                    <p className="mt-3 text-[10px] font-bold text-yellow-400/70 leading-relaxed uppercase tracking-wider italic">
+                    <p className="mt-3 text-2xs font-bold text-yellow-400/70 leading-relaxed uppercase tracking-wider italic">
                         {freshnessView.freshnessNote}
                     </p>
                 )}

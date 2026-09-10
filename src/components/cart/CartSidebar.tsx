@@ -321,7 +321,7 @@ export function CartSidebar() {
 
                                     <div className="flex justify-between items-center mb-3.5 relative z-10">
                                         <div className="flex flex-col gap-0.5">
-                                            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Envío revisado en checkout</span>
+                                            <span className="text-2xs font-black text-white/30 uppercase tracking-widest">Envío revisado en checkout</span>
                                             <span className="text-sm font-black text-white tracking-tight">Costo final confirmado antes de cerrar</span>
                                         </div>
                                         <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 shadow-inner">
@@ -431,7 +431,7 @@ export function CartSidebar() {
                                     <div className="absolute inset-0 -translate-x-full animate-shimmer-slow bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
                                     <div className="relative z-10 flex items-center justify-center gap-3 w-full h-full text-slate-900 font-black">
-                                        <span className="text-[14px] uppercase tracking-[0.25em]">
+                                        <span className="text-sm uppercase tracking-[0.25em]">
                                             {openOrderRecoveryView?.shouldRecover
                                                 ? openOrderRecoveryView.sidebarActionLabel
                                                 : transitionView.status === 'blocked'
@@ -447,7 +447,7 @@ export function CartSidebar() {
                                 </m.button>
 
 
-                                <div className="mt-5 flex items-center justify-center gap-4 text-[10px] font-bold text-white/30 uppercase tracking-widest">
+                                <div className="mt-5 flex items-center justify-center gap-4 text-2xs font-bold text-white/30 uppercase tracking-widest">
                                     <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-green-500" /> Revisión previa al pago</div>
                                     <div className="w-px h-3 bg-white/10" />
                                     <div className="flex items-center gap-1.5">Pagos Encriptados <Zap className="h-3 w-3" /></div>

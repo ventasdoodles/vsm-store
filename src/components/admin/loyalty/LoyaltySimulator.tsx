@@ -28,14 +28,14 @@ export function LoyaltySimulator({ config }: { config: LoyaltyConfig }) {
 
                 <div className="grid sm:grid-cols-2 gap-4 mt-6">
                     <div className="bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
-                        <span className="text-[10px] font-black uppercase text-theme-secondary/60 tracking-widest block mb-2">1. Gana Puntos</span>
+                        <span className="text-2xs font-black uppercase text-theme-secondary/60 tracking-widest block mb-2">1. Gana Puntos</span>
                         <div className="text-2xl font-black text-theme-primary tabular-nums tracking-tighter">
                             +{pointsGained.toLocaleString('es-MX')} <span className="text-sm font-bold text-emerald-400 tracking-normal">V-Coins</span>
                         </div>
                     </div>
                     
                     <div className="bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
-                        <span className="text-[10px] font-black uppercase text-theme-secondary/60 tracking-widest block mb-2">2. Futuro Descuento</span>
+                        <span className="text-2xs font-black uppercase text-theme-secondary/60 tracking-widest block mb-2">2. Futuro Descuento</span>
                         <div className="text-2xl font-black text-theme-primary tabular-nums tracking-tighter">
                             -${discountValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })} <span className="text-sm font-bold text-amber-400 tracking-normal">MXN</span>
                         </div>

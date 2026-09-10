@@ -42,7 +42,7 @@ export function ProfileInfo() {
             <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-accent-primary/5 blur-[80px] transition-transform duration-1000 group-hover:scale-150" />
             
             <header className="flex justify-between items-center mb-8">
-                <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">
+                <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">
                     Información de contacto
                 </h2>
                 <ShieldCheck className="h-4 w-4 text-herbal-500 animate-pulse" />

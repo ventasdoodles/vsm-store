@@ -70,7 +70,7 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
             <label className={cn(
                 "absolute left-11 transition-all duration-300 pointer-events-none select-none z-10",
                 (focused || hasValue) 
-                    ? "-top-2 text-[10px] font-black text-vape-400 uppercase tracking-widest bg-[var(--concierge-bg-border)] px-2 rounded-sm border border-white/10" 
+                    ? "-top-2 text-2xs font-black text-vape-400 uppercase tracking-widest bg-[var(--concierge-bg-border)] px-2 rounded-sm border border-white/10" 
                     : "top-1/2 -translate-y-1/2 text-sm text-white/30"
             )}>
                 {label}
@@ -100,7 +100,7 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
-                        className="absolute -bottom-5 left-4 text-[10px] font-black uppercase tracking-widest text-red-500/90 flex items-center gap-1.5"
+                        className="absolute -bottom-5 left-4 text-2xs font-black uppercase tracking-widest text-red-500/90 flex items-center gap-1.5"
                     >
                         <AlertCircle className="h-3 w-3" /> {error}
                     </m.p>
@@ -404,7 +404,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                     {appliedCoupon ? 'Quitar' : 'Aplicar'}
                                 </button>
                             </div>
-                            {couponError && <p className="mt-2 text-[10px] text-red-500 font-bold uppercase text-center">{couponError}</p>}
+                            {couponError && <p className="mt-2 text-2xs text-red-500 font-bold uppercase text-center">{couponError}</p>}
                             {appliedCoupon?.valid && (
                                 <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-center text-xs font-bold text-herbal-400">
                                     ¡Cupón aplicado exitosamente! -{formatPrice(appliedCoupon.discount)}
@@ -502,7 +502,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                             <Award className="h-5 w-5 text-vape-400" />
                             <div className="absolute inset-0 blur-lg bg-vape-500/50 scale-150 animate-pulse" />
                         </div>
-                        <span className="text-[11px] font-black uppercase tracking-widest text-vape-400">
+                        <span className="text-2xs font-black uppercase tracking-widest text-vape-400">
                             {pointsBalance} V-Coins disponibles
                         </span>
                     </div>

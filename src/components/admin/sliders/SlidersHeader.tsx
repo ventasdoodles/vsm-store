@@ -33,14 +33,14 @@ export function SlidersHeader({ onCreateNew, total, activeCount }: SlidersHeader
                 {/* Quick Stats Badges */}
                 {total > 0 && (
                     <div className="flex items-center gap-3 mt-3">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 text-[11px] font-black tracking-wider uppercase">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 text-2xs font-black tracking-wider uppercase">
                             {total} total
                         </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-black tracking-wider uppercase">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-2xs font-black tracking-wider uppercase">
                             <Eye className="w-3 h-3" /> {activeCount} activos
                         </span>
                         {inactiveCount > 0 && (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-black tracking-wider uppercase">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-2xs font-black tracking-wider uppercase">
                                 <EyeOff className="w-3 h-3" /> {inactiveCount} ocultos
                             </span>
                         )}

@@ -103,7 +103,7 @@ export function CustomerNotes({ customer }: Props) {
     }, [debouncedNotes]);
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#13141f]/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col">
             
             <div className="relative mb-6 flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-blue-500/5 border border-indigo-500/20 shadow-inner">
@@ -123,10 +123,10 @@ export function CustomerNotes({ customer }: Props) {
                             <BookOpen className="h-3.5 w-3.5" /> Libreta de Cliente
                         </label>
                         {updateMutation.isPending && isDirty && (
-                            <span className="text-[10px] text-theme-secondary animate-pulse">Guardando...</span>
+                            <span className="text-2xs text-theme-secondary animate-pulse">Guardando...</span>
                         )}
                         {!updateMutation.isPending && !isDirty && notes && (
-                            <span className="text-[10px] text-green-400">Sincronizado</span>
+                            <span className="text-2xs text-green-400">Sincronizado</span>
                         )}
                     </div>
                     <textarea
@@ -149,7 +149,7 @@ export function CustomerNotes({ customer }: Props) {
                     </label>
                     <div className="flex flex-wrap gap-2 mb-3 min-h-[28px]">
                         {customer.admin_notes?.tags?.map(tag => (
-                            <span key={tag} className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1a1c29] border border-white/5 text-xs font-medium text-theme-secondary hover:text-white hover:border-white/20 transition-colors shadow-sm">
+                            <span key={tag} className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-card border border-white/5 text-xs font-medium text-theme-secondary hover:text-white hover:border-white/20 transition-colors shadow-sm">
                                 {tag}
                                 <button onClick={() => handleRemoveTag(tag)} className="text-theme-secondary/50 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
                                     <X className="h-3 w-3" />
@@ -163,7 +163,7 @@ export function CustomerNotes({ customer }: Props) {
                             value={newTag}
                             onChange={e => setNewTag(e.target.value)}
                             placeholder="Añadir tag (ej. Whale, Conflictivo)..."
-                            className="flex-1 bg-[#1a1c29] border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
+                            className="flex-1 bg-surface-card border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
                             onKeyDown={e => e.key === 'Enter' && handleAddTag()}
                         />
                         <button onClick={handleAddTag} className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs font-medium transition-colors flex items-center gap-1">
@@ -182,7 +182,7 @@ export function CustomerNotes({ customer }: Props) {
                     
                     <div className="space-y-2 mb-3">
                         {Object.entries(customer.admin_notes?.custom_fields || {}).map(([key, value]) => (
-                            <div key={key} className="group flex items-center justify-between bg-[#1a1c29]/50 hover:bg-[#1a1c29] p-2.5 rounded-lg border border-transparent hover:border-white/5 transition-colors">
+                            <div key={key} className="group flex items-center justify-between bg-surface-card/50 hover:bg-surface-card p-2.5 rounded-lg border border-transparent hover:border-white/5 transition-colors">
                                 <div className="flex items-center gap-4 text-xs font-mono">
                                     <span className="text-theme-secondary/50 w-24 truncate" title={key}>{key}</span>
                                     <span className="text-theme-secondary font-medium tracking-wide">{value as string}</span>
@@ -200,14 +200,14 @@ export function CustomerNotes({ customer }: Props) {
                             placeholder="Clave (ej. Equipo)"
                             value={newFieldKey}
                             onChange={e => setNewFieldKey(e.target.value)}
-                            className="w-1/3 bg-[#1a1c29] border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
+                            className="w-1/3 bg-surface-card border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
                         />
                         <input
                             type="text"
                             placeholder="Valor (ej. Dragones)"
                             value={newFieldValue}
                             onChange={e => setNewFieldValue(e.target.value)}
-                            className="flex-1 bg-[#1a1c29] border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
+                            className="flex-1 bg-surface-card border border-white/5 focus:border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 transition-colors focus:outline-none"
                             onKeyDown={e => e.key === 'Enter' && handleAddField()}
                         />
                         <button onClick={handleAddField} className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs font-medium transition-colors flex items-center">

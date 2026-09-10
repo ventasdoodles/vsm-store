@@ -43,7 +43,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                         <div className="p-2.5 bg-gradient-to-br from-accent-primary/20 to-blue-500/10 rounded-2xl border border-accent-primary/20 shadow-inner">
                             <LayoutDashboard className="h-7 w-7 text-accent-primary drop-shadow-[0_0_8px_rgba(var(--color-accent-primary),0.3)]" />
                         </div>
-                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-accent-primary/20 to-blue-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-accent-primary ring-1 ring-inset ring-accent-primary/30">
+                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-accent-primary/20 to-blue-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-accent-primary ring-1 ring-inset ring-accent-primary/30">
                             Analítica
                         </span>
                     </div>
@@ -57,7 +57,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     {/* Smart Insights (Urgencies) - Movido al lado izquierdo */}
                     <div className="mt-4 flex items-center gap-2 w-fit px-4 py-2 rounded-2xl bg-amber-500/5 border border-amber-500/10 animate-pulse-slow">
                         <div className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-500/80">Insights:</span>
+                        <span className="text-2xs font-black uppercase tracking-widest text-amber-500/80">Insights:</span>
                         <span className="text-xs font-bold text-amber-200/90 whitespace-nowrap">3 productos con bajo stock hoy</span>
                     </div>
                 </div>

@@ -220,7 +220,7 @@ export function AdminCommandPalette() {
                             {(loading || nlpLoading || isSearching || isParsing) && <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />}
                             
                             <div className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hidden sm:block">
-                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none">ESC</span>
+                                <span className="text-2xs font-black text-white/40 uppercase tracking-widest leading-none">ESC</span>
                             </div>
                         </div>
                     </div>
@@ -262,7 +262,7 @@ export function AdminCommandPalette() {
                                             <p className="text-sm font-bold text-white group-hover:text-white transition-colors">
                                                 {result.title}
                                             </p>
-                                            <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider">
+                                            <p className="text-2xs font-medium text-white/30 uppercase tracking-wider">
                                                 {result.subtitle}
                                             </p>
                                         </div>

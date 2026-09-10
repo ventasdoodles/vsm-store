@@ -28,7 +28,7 @@ export function TestimonialsForm({
     return (
         <form
             onSubmit={onSubmit}
-            className="p-8 rounded-3xl bg-[#13141f] border border-white/[0.08] shadow-2xl relative overflow-hidden"
+            className="p-8 rounded-3xl bg-surface-base border border-white/[0.08] shadow-2xl relative overflow-hidden"
         >
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-accent-primary/[0.03] rounded-full blur-[100px] pointer-events-none" />
 
@@ -54,7 +54,7 @@ export function TestimonialsForm({
             {/* Row 1: Name + Location + Rating */}
             <div className="grid md:grid-cols-3 gap-6 mb-6 relative z-10">
                 <div>
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Nombre del cliente *
                     </label>
                     <input
@@ -67,7 +67,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div>
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Ubicación
                     </label>
                     <input
@@ -79,7 +79,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div>
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Calificación
                     </label>
                     <div className="flex items-center gap-1.5 pt-2 bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-3 h-[58px] shadow-inner">
@@ -110,7 +110,7 @@ export function TestimonialsForm({
             {/* Row 2: Title + Section */}
             <div className="grid md:grid-cols-2 gap-6 mb-6 relative z-10">
                 <div>
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Título de reseña (opcional)
                     </label>
                     <input
@@ -122,7 +122,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div className="relative group">
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Sección (contexto visual)
                     </label>
                     <select
@@ -145,9 +145,9 @@ export function TestimonialsForm({
 
             {/* Row 3: Body */}
             <div className="mb-6 relative z-10">
-                <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1 flex justify-between">
+                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1 flex justify-between">
                     <span>Cuerpo de la reseña *</span>
-                    <span className="text-theme-secondary/40 font-mono tracking-normal text-[10px]">{form.body.length} caracteres</span>
+                    <span className="text-theme-secondary/40 font-mono tracking-normal text-2xs">{form.body.length} caracteres</span>
                 </label>
                 <textarea
                     value={form.body}
@@ -162,7 +162,7 @@ export function TestimonialsForm({
             {/* Row 4: Toggles + Sort + Date */}
             <div className="grid md:grid-cols-4 gap-6 mb-8 relative z-10">
                 <div>
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Fecha
                     </label>
                     <input
@@ -173,7 +173,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div>
-                    <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Orden (Prioridad)
                     </label>
                     <input
@@ -245,7 +245,7 @@ function ToggleSwitch({
 }) {
     return (
         <label className="flex flex-col items-center gap-2 cursor-pointer select-none group">
-             <span className="text-[10px] uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors">{label}</span>
+             <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors">{label}</span>
             <button
                 type="button"
                 onClick={() => onChange(!checked)}

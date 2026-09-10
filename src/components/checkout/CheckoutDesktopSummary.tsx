@@ -40,14 +40,14 @@ export function CheckoutDesktopSummary({
                                         containerClassName="h-full w-full"
                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
-                                    <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-vape-500 text-[10px] font-black text-slate-900 shadow-lg z-10">
+                                    <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-vape-500 text-2xs font-black text-slate-900 shadow-lg z-10">
                                         {item.quantity}
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-0 space-y-1">
                                     <h4 className="text-sm font-bold leading-tight text-white truncate">{item.product.name}</h4>
                                     {item.variant_name && (
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-vape-400">{item.variant_name}</p>
+                                        <p className="text-2xs font-black uppercase tracking-widest text-vape-400">{item.variant_name}</p>
                                     )}
                                     <p className="text-xs font-medium text-theme-tertiary">{formatPrice(item.product.price)} c/u</p>
                                 </div>
@@ -74,12 +74,12 @@ export function CheckoutDesktopSummary({
 
                         <div className="pt-4 border-t border-white/5 flex justify-between items-end">
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total estimado</p>
+                                <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total estimado</p>
                                 <p className="text-3xl font-black text-white tracking-tighter">{formatPrice(displaySubtotal)}</p>
                             </div>
                             {canContinueCheckout && (
                                 <div className="text-right">
-                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-vape-500/10 px-3 py-1 text-[10px] font-bold text-vape-400 border border-vape-500/20">
+                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-vape-500/10 px-3 py-1 text-2xs font-bold text-vape-400 border border-vape-500/20">
                                         Pagarás en MXN
                                     </span>
                                 </div>
@@ -90,7 +90,7 @@ export function CheckoutDesktopSummary({
 
                 {/* Trust Badge */}
                 <div className="rounded-2xl border border-white/5 bg-white/[0.01] p-6 text-center">
-                    <p className="text-[10px] font-medium text-theme-tertiary leading-relaxed italic">
+                    <p className="text-2xs font-medium text-theme-tertiary leading-relaxed italic">
                         Estás en una zona segura de VSM Store. Todos tus datos están encriptados y protegidos por Supabase 256-bit SSL.
                     </p>
                 </div>

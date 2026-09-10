@@ -119,7 +119,7 @@ export function WheelInvitation() {
                     {/* Elite Badge */}
                     <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
                         <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 animate-spin-slow" />
-                        <span className="text-[10px] font-black text-white/80 uppercase tracking-[0.3em]">
+                        <span className="text-2xs font-black text-white/80 uppercase tracking-[0.3em]">
                             Exclusivo Miembros Elite
                         </span>
                     </div>
@@ -154,7 +154,7 @@ export function WheelInvitation() {
                             <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
 </m.div>
                         
-                        <div className="hidden sm:flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                        <div className="hidden sm:flex items-center gap-2 text-2xs font-black text-white/30 uppercase tracking-[0.2em]">
                             <Dices className="w-3 h-3" />
                             Actualizado hace 2h
                         </div>

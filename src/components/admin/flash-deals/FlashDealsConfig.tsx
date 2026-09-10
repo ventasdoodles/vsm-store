@@ -139,12 +139,12 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
                             : 'border-orange-500/15 bg-orange-500/5'
                     )}>
                         <p className={cn(
-                            'text-[10px] font-black uppercase tracking-widest mb-3',
+                            'text-2xs font-black uppercase tracking-widest mb-3',
                             isUrgent ? 'text-red-400' : 'text-orange-400/70'
                         )}>
                             {isUrgent ? '⚠ Caduca pronto' : '⏱ Próxima caducidad'}
                         </p>
-                        <p className="text-[11px] text-white/40 mb-3 truncate">
+                        <p className="text-2xs text-white/40 mb-3 truncate">
                             {nextExpiring.product?.name ?? 'Oferta'}
                         </p>
 
@@ -164,7 +164,7 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
                                     )}>
                                         <span className="text-xl font-black tabular-nums">{pad(val)}</span>
                                     </div>
-                                    <span className="text-[10px] text-white/25 pb-0.5">{label}</span>
+                                    <span className="text-2xs text-white/25 pb-0.5">{label}</span>
                                 </div>
                             ))}
                         </div>

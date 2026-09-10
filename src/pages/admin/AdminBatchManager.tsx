@@ -43,7 +43,7 @@ const columns = [
         header: 'ID / SKU',
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="text-[10px] font-black text-white/60 lowercase">{row.original.id.slice(0, 8)}...</span>
+                <span className="text-2xs font-black text-white/60 lowercase">{row.original.id.slice(0, 8)}...</span>
                 <span className="text-[9px] font-bold text-vape-400 uppercase tracking-tighter">{row.original.sku}</span>
             </div>
         )
@@ -150,7 +150,7 @@ const columns = [
                     <button 
                         onClick={() => meta.handleUpdateLocal(row.original.id, 'is_active', !isActive)}
                         className={cn(
-                            "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all",
+                            "px-3 py-1.5 rounded-xl text-2xs font-black uppercase tracking-widest border transition-all",
                             isActive 
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
                                 : "bg-white/5 text-white/20 border-white/10"
@@ -298,7 +298,7 @@ export function AdminBatchManager() {
                                     <th 
                                         key={header.id} 
                                         className={cn(
-                                            "px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white/30",
+                                            "px-8 py-5 text-2xs font-black uppercase tracking-[0.2em] text-white/30",
                                             header.column.id === 'is_active' && "text-center"
                                         )}
                                     >

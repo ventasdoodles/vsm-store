@@ -39,7 +39,7 @@ function StatCard({ icon, label, value, gradient, to, isLoading }: StatCardProps
                     {icon}
                 </div>
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50 mb-1.5">{label}</p>
+                    <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50 mb-1.5">{label}</p>
                     {isLoading ? (
                         <div className="h-8 w-20 animate-pulse rounded-lg bg-white/5" />
                     ) : (

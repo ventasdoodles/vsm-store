@@ -55,12 +55,12 @@ export function CheckoutTransitionStatus({
                     {(view.blockingIssueCount > 0 || view.warningIssueCount > 0) && (
                         <div className="mt-3 flex flex-wrap gap-2">
                             {view.blockingIssueCount > 0 && (
-                                <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-red-300">
+                                <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-2xs font-bold uppercase tracking-widest text-red-300">
                                     {view.blockingIssueCount} cambio{view.blockingIssueCount === 1 ? '' : 's'} critico{view.blockingIssueCount === 1 ? '' : 's'}
                                 </span>
                             )}
                             {view.warningIssueCount > 0 && (
-                                <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-300">
+                                <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-2xs font-bold uppercase tracking-widest text-amber-300">
                                     {view.warningIssueCount} ajuste{view.warningIssueCount === 1 ? '' : 's'} aplicado{view.warningIssueCount === 1 ? '' : 's'}
                                 </span>
                             )}
@@ -68,7 +68,7 @@ export function CheckoutTransitionStatus({
                     )}
                     {view.dependencyGuidance && (
                         <div className="mt-4 rounded-2xl border border-amber-500/20 bg-black/20 p-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">
+                            <p className="text-2xs font-black uppercase tracking-widest text-amber-300">
                                 {view.dependencyGuidance.headline}
                             </p>
                             <p className={cn('mt-2 text-sm text-theme-secondary', compact && 'text-xs')}>
@@ -79,7 +79,7 @@ export function CheckoutTransitionStatus({
                                     type="button"
                                     onClick={() => onDependencyAction(view.dependencyGuidance!.missingProduct)}
                                     className={cn(
-                                        'mt-3 inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300 transition-colors hover:bg-amber-500/20',
+                                        'mt-3 inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-2xs font-black uppercase tracking-widest text-amber-300 transition-colors hover:bg-amber-500/20',
                                         compact && 'px-2.5 py-1 text-[9px]',
                                     )}
                                 >

@@ -25,7 +25,7 @@ export function OrderHeader({ orderNumber, createdAt, statusConfig }: OrderHeade
                         <h1 className="text-2xl font-black text-white uppercase italic tracking-tight">{orderNumber}</h1>
                         <Sparkles className="h-4 w-4 text-accent-primary animate-pulse" />
                     </div>
-                    <p className="text-[10px] text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60">
+                    <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60">
                         Registro de compra: {new Date(createdAt).toLocaleDateString('es-MX', {
                             day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                         })}
@@ -33,7 +33,7 @@ export function OrderHeader({ orderNumber, createdAt, statusConfig }: OrderHeade
                 </div>
             </div>
             <div className={cn(
-                'inline-flex items-center gap-3 rounded-2xl border px-6 py-3 text-[10px] font-black uppercase tracking-widest shadow-2xl',
+                'inline-flex items-center gap-3 rounded-2xl border px-6 py-3 text-2xs font-black uppercase tracking-widest shadow-2xl',
                 statusConfig.color, statusConfig.bg, statusConfig.border
             )}>
                 <div className={cn("h-2 w-2 rounded-full animate-pulse", statusConfig.bg.replace('/10', ''))} />

@@ -39,7 +39,7 @@ function StatCard({ label, value, icon: Icon, color, bg, border, isLoading }: St
             ) : (
                 <>
                     <p className="text-2xl font-black text-white">{value}</p>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-white/35 mt-0.5">{label}</p>
+                    <p className="text-2xs font-bold uppercase tracking-wider text-white/35 mt-0.5">{label}</p>
                 </>
             )}
         </div>

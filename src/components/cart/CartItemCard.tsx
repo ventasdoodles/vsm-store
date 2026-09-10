@@ -106,7 +106,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
                             {formatPrice(itemTotal)}
                         </m.span>
                         {item.quantity > 1 && (
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                            <span className="text-2xs text-gray-500 font-bold uppercase tracking-wider">
                                 {formatPrice(item.product.price)} c/u
                             </span>
                         )}

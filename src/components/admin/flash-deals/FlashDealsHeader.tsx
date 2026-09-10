@@ -68,7 +68,7 @@ export function FlashDealsHeader({ deals, onAdd }: FlashDealsHeaderProps) {
                         <Icon className={`h-5 w-5 ${color}`} />
                         <div>
                             <p className="text-lg font-black text-white">{value}</p>
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-white/35">{label}</p>
+                            <p className="text-2xs font-bold uppercase tracking-wider text-white/35">{label}</p>
                         </div>
                     </div>
                 ))}

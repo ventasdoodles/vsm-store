@@ -35,16 +35,16 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                         </div>
                         <div>
                             <h3 className="text-sm font-black uppercase tracking-widest text-white/90">
-                                Business Pulse <span className="text-[10px] ml-1 text-violet-400/60 font-medium tracking-normal">(Beta AI)</span>
+                                Business Pulse <span className="text-2xs ml-1 text-violet-400/60 font-medium tracking-normal">(Beta AI)</span>
                             </h3>
-                            <p className="text-[11px] text-white/40 font-medium">Análisis en tiempo real de tendencias y anomalías</p>
+                            <p className="text-2xs text-white/40 font-medium">Análisis en tiempo real de tendencias y anomalías</p>
                         </div>
                     </div>
 
                     <button
                         onClick={() => refetch()}
                         disabled={isLoading}
-                        className="flex items-center gap-2 rounded-xl bg-violet-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-xl bg-violet-500/10 px-4 py-2 text-2xs font-black uppercase tracking-widest text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-50"
                     >
                         {isLoading ? (
                             <Loader2 className="h-3 w-3 animate-spin" />
@@ -83,7 +83,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Anomalies */}
                                 <div className="space-y-2">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block">Detección de Anomalías</span>
+                                    <span className="text-2xs font-black uppercase tracking-widest text-white/30 block">Detección de Anomalías</span>
                                     <div className="space-y-2">
                                         {pulse.anomalies?.map((anomaly: string, idx: number) => (
                                             <div key={idx} className="flex items-center gap-2 text-xs font-bold text-amber-200/80">
@@ -102,7 +102,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
 
                                 {/* Score */}
                                 <div className="flex flex-col items-center justify-center p-4 rounded-2xl bg-gradient-to-br from-violet-500/5 to-transparent border border-violet-500/10">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Health Score</span>
+                                    <span className="text-2xs font-black uppercase tracking-widest text-white/30 mb-2">Health Score</span>
                                     <div className={cn("text-4xl font-black tracking-tighter", healthColor)}>
                                         {pulse.health_score}%
                                     </div>

@@ -33,7 +33,7 @@ export function CustomerDirectoryHeader({ onNewCustomer }: Props) {
             <div className="flex items-center gap-3 ml-14 sm:ml-0">
                 <button
                     onClick={() => notify.info('En Desarrollo', 'La exportación CSV/Excel estará disponible próximamente.')}
-                    className="flex items-center gap-2 rounded-xl bg-[#13141f] border border-white/10 px-4 py-2.5 text-sm font-bold text-theme-secondary hover:text-white hover:border-white/20 hover:bg-white/5 transition-all active:scale-95"
+                    className="flex items-center gap-2 rounded-xl bg-surface-base border border-white/10 px-4 py-2.5 text-sm font-bold text-theme-secondary hover:text-white hover:border-white/20 hover:bg-white/5 transition-all active:scale-95"
                 >
                     <FileDown className="h-4 w-4" />
                     <span className="hidden sm:inline">Exportar</span>

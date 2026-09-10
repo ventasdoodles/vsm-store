@@ -126,7 +126,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <Sparkles className="h-4 w-4 text-emerald-400" />
-                                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400/70">
+                                <span className="text-2xs font-black uppercase tracking-wider text-emerald-400/70">
                                     {editing ? 'Editar' : isChild ? 'Nueva Sub' : 'Nueva Categoría'}
                                 </span>
                             </div>
@@ -268,7 +268,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                                     <Flame className={cn('h-4 w-4 transition-colors', form.is_popular ? 'text-orange-400 drop-shadow-[0_0_4px_rgba(251,146,60,0.4)]' : 'text-white/20')} />
                                     Popular / Trending
                                 </p>
-                                <p className="text-[11px] text-white/30">Badge de llama en la tienda</p>
+                                <p className="text-2xs text-white/30">Badge de llama en la tienda</p>
                             </div>
                             <ToggleSwitch
                                 checked={form.is_popular ?? false}
@@ -281,7 +281,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-semibold text-white">Activa</p>
-                                <p className="text-[11px] text-white/30">Visible en la tienda</p>
+                                <p className="text-2xs text-white/30">Visible en la tienda</p>
                             </div>
                             <ToggleSwitch
                                 checked={form.is_active}
@@ -294,7 +294,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-semibold text-white">Orden</p>
-                                <p className="text-[11px] text-white/30">Menor = primero</p>
+                                <p className="text-2xs text-white/30">Menor = primero</p>
                             </div>
                             <input
                                 type="number"

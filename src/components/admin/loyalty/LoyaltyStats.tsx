@@ -7,7 +7,7 @@ export function LoyaltyStats() {
 
     if (isLoading) {
         return (
-            <div className="bg-[#13141f]/50 border border-white/5 rounded-[2.5rem] p-8 flex items-center justify-center min-h-[200px]">
+            <div className="bg-surface-base/50 border border-white/5 rounded-[2.5rem] p-8 flex items-center justify-center min-h-[200px]">
                 <Loader2 className="w-8 h-8 animate-spin text-amber-500/50" />
             </div>
         );
@@ -54,7 +54,7 @@ export function LoyaltyStats() {
                                 <User className="w-3 h-3" />
                                 {data.ultimo_canje.full_name || 'Desconocido'}
                             </p>
-                            <p className="text-[10px] text-theme-secondary/50 font-bold uppercase mt-2 tracking-wider">
+                            <p className="text-2xs text-theme-secondary/50 font-bold uppercase mt-2 tracking-wider">
                                 {new Date(data.ultimo_canje.created_at).toLocaleDateString('es-MX', { 
                                     day: '2-digit', 
                                     month: 'short', 
@@ -85,7 +85,7 @@ export function LoyaltyStats() {
                             <div key={user.id} className="flex items-center justify-between bg-black/20 rounded-xl px-3 py-2 border border-white/[0.02]">
                                 <div className="flex items-center gap-2 overflow-hidden">
                                     <span className={cn(
-                                        "text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shrink-0",
+                                        "text-2xs font-black w-5 h-5 rounded-full flex items-center justify-center shrink-0",
                                         idx === 0 ? "bg-amber-400 text-black shadow-[0_0_10px_rgba(251,191,36,0.4)]" :
                                         idx === 1 ? "bg-zinc-300 text-black" :
                                         "bg-amber-700/50 text-white"

@@ -103,7 +103,7 @@ export function WheelGameHeader({ prizes, stats, onAdd }: WheelGameHeaderProps) 
                         <Icon className={`h-5 w-5 flex-shrink-0 ${color}`} />
                         <div className="min-w-0">
                             <p className="text-base font-black text-white truncate">{value}</p>
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-white/35">{label}</p>
+                            <p className="text-2xs font-bold uppercase tracking-wider text-white/35">{label}</p>
                         </div>
                     </div>
                 ))}

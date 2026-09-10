@@ -21,7 +21,7 @@ export function TagsFilters({ search, onSearchChange }: TagsFiltersProps) {
                     placeholder="Buscar por nombre o slug..."
                     value={search}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full rounded-xl border border-white/5 bg-[#13141f]/70 py-2.5 pl-10 pr-9 text-sm font-semibold text-white placeholder-theme-secondary/50 focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/50 focus:outline-none transition-all backdrop-blur-md"
+                    className="w-full rounded-xl border border-white/5 bg-surface-base/70 py-2.5 pl-10 pr-9 text-sm font-semibold text-white placeholder-theme-secondary/50 focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/50 focus:outline-none transition-all backdrop-blur-md"
                 />
                 {search && (
                     <button

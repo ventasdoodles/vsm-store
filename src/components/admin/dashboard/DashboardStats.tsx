@@ -43,7 +43,7 @@ function StatCard({ card }: { card: StatCardData }) {
 
     return (
         <div
-            className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#13141f]/40 backdrop-blur-2xl p-6 transition-all duration-500 hover:border-white/20 hover:bg-[#13141f]/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+            className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/40 backdrop-blur-2xl p-6 transition-all duration-500 hover:border-white/20 hover:bg-surface-base/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
             onMouseMove={handleMouseMove}
             title={card.tooltip}
         >
@@ -64,7 +64,7 @@ function StatCard({ card }: { card: StatCardData }) {
             <div className="flex items-start justify-between relative z-10">
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                        <p className="text-[10px] font-black text-theme-secondary/60 uppercase tracking-[0.25em]">
+                        <p className="text-2xs font-black text-theme-secondary/60 uppercase tracking-[0.25em]">
                             {card.label}
                         </p>
                     </div>

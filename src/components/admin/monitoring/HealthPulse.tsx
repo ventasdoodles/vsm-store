@@ -75,7 +75,7 @@ export function HealthPulse({ isHealthy, lastCheckTime, uptimeMinutes }: HealthP
                 </p>
 
                 {/* Uptime */}
-                <p className="text-[10px] font-bold text-theme-secondary/50 mt-2 uppercase tracking-widest">
+                <p className="text-2xs font-bold text-theme-secondary/50 mt-2 uppercase tracking-widest">
                     Uptime: {formatUptime(uptimeMinutes)}
                 </p>
 

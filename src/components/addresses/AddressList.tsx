@@ -63,7 +63,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
         return (
             <div className="flex flex-col items-center justify-center py-20 space-y-4">
                 <Loader2 className="h-10 w-10 animate-spin text-accent-primary opacity-20" />
-                <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest">Sincronizando libreta...</p>
+                <p className="text-2xs font-black text-theme-tertiary uppercase tracking-widest">Sincronizando libreta...</p>
             </div>
         );
     }
@@ -92,7 +92,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                     </div>
                     <div className="space-y-2">
                         <p className="text-sm font-black text-white uppercase tracking-tight">Sin destinos registrados</p>
-                        <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Parece que aún no has guardado ninguna dirección.</p>
+                        <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Parece que aún no has guardado ninguna dirección.</p>
                     </div>
                     <button
                         onClick={() => setShowForm(true)}
@@ -131,7 +131,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                         <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:bg-accent-primary/10 group-hover:border-accent-primary/20 transition-all duration-500">
                              <Plus className="h-6 w-6 text-theme-tertiary group-hover:text-accent-primary transition-colors" />
                         </div>
-                        <span className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] group-hover:text-white transition-colors">Añadir Nueva Dirección</span>
+                        <span className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] group-hover:text-white transition-colors">Añadir Nueva Dirección</span>
                     </button>
                 </div>
             )}

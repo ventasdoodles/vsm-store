@@ -20,7 +20,7 @@ export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoard
                 : 'border-white/5 bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.05]'
         } p-3 cursor-grab active:cursor-grabbing`}>
             <div className="flex justify-between items-start mb-2.5">
-                <span className="font-mono text-[11px] font-bold text-theme-secondary/50">
+                <span className="font-mono text-2xs font-bold text-theme-secondary/50">
                     #{order.id.slice(-6).toUpperCase()}
                 </span>
                 <span className="text-xs font-black text-theme-primary">{formatPrice(order.total)}</span>
@@ -29,7 +29,7 @@ export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoard
             <p className="text-xs font-bold text-theme-primary truncate mb-0.5">
                 {order.customer_name || 'Sin nombre'}
             </p>
-            <p className="text-[11px] text-theme-secondary/50 truncate mb-3">
+            <p className="text-2xs text-theme-secondary/50 truncate mb-3">
                 {new Date(order.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
             </p>
 
@@ -45,7 +45,7 @@ export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoard
                     value={order.status}
                     onChange={(e) => onStatusChange(order.id, e.target.value as AdminOrderStatus)}
                     onClick={(e) => e.stopPropagation()}
-                    className="max-w-[110px] rounded-lg border border-white/10 bg-[#1a1c29] px-1.5 py-1 text-[11px] font-medium text-theme-secondary hover:border-white/20 focus:outline-none cursor-pointer transition-colors"
+                    className="max-w-[110px] rounded-lg border border-white/10 bg-surface-card px-1.5 py-1 text-2xs font-medium text-theme-secondary hover:border-white/20 focus:outline-none cursor-pointer transition-colors"
                 >
                     {ADMIN_ORDER_STATUSES_LIST.map(s => (
                         <option

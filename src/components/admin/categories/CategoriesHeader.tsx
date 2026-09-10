@@ -51,7 +51,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                         <div className="p-2.5 bg-gradient-to-br from-emerald-500/20 to-lime-500/10 rounded-[1rem] border border-emerald-500/20 shadow-inner">
                             <FolderTree className="h-7 w-7 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
                         </div>
-                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-500/20 to-lime-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
+                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-500/20 to-lime-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
                             Taxonomía
                         </span>
                     </div>

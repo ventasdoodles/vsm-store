@@ -330,23 +330,23 @@ export function ProductEditorDrawer({
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <div className="md:col-span-2">
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Nombre del Producto *</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Nombre del Producto *</label>
                                         <input type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Ej: Vaporesso XROS 3" className={INPUT_CLS} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">SKU (Interno)</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">SKU (Interno)</label>
                                         <input type="text" name="sku" value={formData.sku || ''} onChange={handleChange} className={INPUT_CLS} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Stock Disponible *</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Stock Disponible *</label>
                                         <input type="number" name="stock" value={formData.stock || 0} onChange={handleChange} className={INPUT_CLS} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Precio de Venta ($) *</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Precio de Venta ($) *</label>
                                         <input type="number" name="price" value={formData.price || 0} onChange={handleChange} className={`${INPUT_CLS} text-lg font-black text-emerald-400`} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Precio Comparación</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Precio Comparación</label>
                                         <input type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange} className={INPUT_CLS} />
                                     </div>
                                 </div>
@@ -375,7 +375,7 @@ export function ProductEditorDrawer({
                                 <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     {/* Seccion */}
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
                                         <select name="section" value={formData.section || DEFAULT_SECTION} onChange={handleChange} className={INPUT_CLS}>
                                             {SECTION_CATALOG?.sections.map((section) => (
                                                 <option key={section.slug} value={section.slug}>
@@ -386,7 +386,7 @@ export function ProductEditorDrawer({
                                     </div>
                                     {/* Estado */}
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Estado de Publicación</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Estado de Publicación</label>
                                         <select name="status" value={formData.status || 'draft'} onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as ProductStatus }))} className={INPUT_CLS}>
                                             <option value="active">Activo (Visible en tienda)</option>
                                             <option value="draft">Borrador (Interno)</option>
@@ -477,7 +477,7 @@ export function ProductEditorDrawer({
                                         type="button"
                                         onClick={handleAIGenerate}
                                         disabled={isGeneratingAI || !formData.name}
-                                        className="group flex items-center gap-2 rounded-lg bg-violet-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-400 transition-all hover:bg-violet-500/20 disabled:opacity-30"
+                                        className="group flex items-center gap-2 rounded-lg bg-violet-500/10 px-3 py-1 text-2xs font-black uppercase tracking-widest text-violet-400 transition-all hover:bg-violet-500/20 disabled:opacity-30"
                                     >
                                         {isGeneratingAI ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3 animate-pulse" />}
                                         Optimizar con IA
@@ -485,11 +485,11 @@ export function ProductEditorDrawer({
                                 </div>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Descripción Completa</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Descripción Completa</label>
                                         <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={6} className={INPUT_CLS} placeholder="Larga extensión con detalles para SEO..." />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Nota de Venta sugerida por IA</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Nota de Venta sugerida por IA</label>
                                         <textarea 
                                             name="ai_sales_note" 
                                             value={formData.ai_sales_note || ''} 
@@ -510,7 +510,7 @@ export function ProductEditorDrawer({
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-6">
                                     {/* Badges Array */}
                                     <div>
-                                        <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-white/40">Badges Promocionales (Ej: HOT, NEW, LIMITED)</label>
+                                        <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Badges Promocionales (Ej: HOT, NEW, LIMITED)</label>
                                         <div className="flex flex-wrap gap-2">
                                             {['HOT', 'NEW', 'LIMITADO', 'RECOMENDADO', 'OFERTA'].map(badge => {
                                                 const isActive = formData.badges?.includes(badge);
@@ -524,7 +524,7 @@ export function ProductEditorDrawer({
                                                             setFormData(p => ({ ...p, badges: next }));
                                                         }}
                                                         className={cn(
-                                                            "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            "px-3 py-1.5 rounded-lg text-2xs font-black uppercase tracking-widest transition-all",
                                                             isActive 
                                                                 ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20" 
                                                                 : "bg-white/5 text-white/20 hover:text-white/40"
@@ -539,7 +539,7 @@ export function ProductEditorDrawer({
 
                                     {/* Semantic Tags */}
                                     <div>
-                                        <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-white/40">Etiquetas Semánticas</label>
+                                        <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Etiquetas Semánticas</label>
                                         <div className="relative flex gap-2">
                                             <input
                                                 type="text"

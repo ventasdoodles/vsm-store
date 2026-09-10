@@ -14,7 +14,7 @@ interface TopProductsProps {
 
 export function TopProducts({ products = [] }: TopProductsProps) {
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md p-6 shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5 h-full flex flex-col">
+        <div className="rounded-[1.5rem] border border-white/5 bg-surface-base/70 backdrop-blur-md p-6 shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-[0.75rem] bg-amber-500/10">
                     <Trophy className="h-5 w-5 text-amber-500" />
@@ -36,7 +36,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                             <div key={product.name} className="group relative">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-3 min-w-0 pr-4">
-                                        <span className={`flex h-6 w-6 items-center justify-center rounded-[0.5rem] text-[10px] font-bold shrink-0 transition-colors ${
+                                        <span className={`flex h-6 w-6 items-center justify-center rounded-[0.5rem] text-2xs font-bold shrink-0 transition-colors ${
                                             i === 0 ? 'bg-amber-500/20 text-amber-500 shadow-inner' : 
                                             i === 1 ? 'bg-slate-300/20 text-slate-300' : 
                                             i === 2 ? 'bg-amber-700/20 text-amber-600' : 
@@ -52,7 +52,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                                         <span className="text-xs font-black text-white">
                                             {formatPrice(product.revenue)}
                                         </span>
-                                        <span className="text-[10px] font-medium text-theme-secondary">
+                                        <span className="text-2xs font-medium text-theme-secondary">
                                             {product.sold} uds
                                         </span>
                                     </div>

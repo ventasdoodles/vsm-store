@@ -46,7 +46,7 @@ export function AdminCustomerDetails() {
 
     if (!customer) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 bg-[#13141f] rounded-[2rem] border border-white/5 mx-auto max-w-2xl mt-10">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 bg-surface-base rounded-[2rem] border border-white/5 mx-auto max-w-2xl mt-10">
                 <div className="text-4xl">🕵️</div>
                 <h2 className="text-xl font-black text-theme-primary">Cliente no encontrado</h2>
                 <p className="text-sm text-theme-secondary">El ID proporcionado no pertenece a ningún usuario registrado.</p>

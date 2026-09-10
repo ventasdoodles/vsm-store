@@ -266,8 +266,8 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
 
                     {!query && !isLoading && (
-                        <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-black text-white/30 uppercase tracking-widest">
-                            <span className="text-[12px]">/</span>
+                        <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 border border-white/10 text-2xs font-black text-white/30 uppercase tracking-widest">
+                            <span className="text-xs">/</span>
                         </div>
                     )}
                     {query && (
@@ -288,7 +288,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                              <button
                                 type="button"
                                 onClick={handleSemanticSearch}
-                                className="hidden lg:flex items-center gap-2 h-10 px-4 rounded-full bg-white/5 border border-white/10 text-white text-[10px] font-black tracking-widest hover:bg-vape-500/20 hover:border-vape-500/50 transition-all uppercase"
+                                className="hidden lg:flex items-center gap-2 h-10 px-4 rounded-full bg-white/5 border border-white/10 text-white text-2xs font-black tracking-widest hover:bg-vape-500/20 hover:border-vape-500/50 transition-all uppercase"
                                 title="Búsqueda Semántica con IA"
                             >
                                 <Sparkles className="w-3 h-3 text-vape-400" />
@@ -327,7 +327,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                 {showRecent && (
                                     <button
                                         onClick={clearRecentSearches}
-                                        className="text-[10px] font-black uppercase tracking-widest text-theme-secondary hover:text-vape-400 transition-colors"
+                                        className="text-2xs font-black uppercase tracking-widest text-theme-secondary hover:text-vape-400 transition-colors"
                                     >
                                         Limpiar
                                     </button>
@@ -354,7 +354,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* Categories Suggestion (Omni-Pulse Power) */}
                             {categories.length > 0 && (
                                 <div className="px-1">
-                                    <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-black text-theme-secondary uppercase tracking-[0.2em]">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-2xs font-black text-theme-secondary uppercase tracking-[0.2em]">
                                         Categorías
                                     </div>
                                     <div className="flex flex-wrap gap-2 px-2">
@@ -374,7 +374,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* Products */}
                             {products.length > 0 && (
                                 <div className="px-1">
-                                    <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-black text-theme-secondary uppercase tracking-[0.2em]">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-2xs font-black text-theme-secondary uppercase tracking-[0.2em]">
                                         Productos
                                     </div>
                                     <div className="space-y-1">
@@ -435,7 +435,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* View All CTA */}
                             <button
                                 onClick={() => handleSubmit()}
-                                className="w-full p-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-vape-400 hover:bg-vape-500/5 transition-all border-t border-white/5"
+                                className="w-full p-4 text-center text-2xs font-black uppercase tracking-[0.3em] text-white/40 hover:text-vape-400 hover:bg-vape-500/5 transition-all border-t border-white/5"
                             >
                                 Ver todos los resultados
                             </button>
@@ -453,7 +453,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-xs font-black text-accent-primary uppercase tracking-widest">IA Insight: {query}</p>
-                                            <p className="text-[11px] text-white/60">¿Buscas algo específico? Deja que VSM AI lo encuentre por ti.</p>
+                                            <p className="text-2xs text-white/60">¿Buscas algo específico? Deja que VSM AI lo encuentre por ti.</p>
                                         </div>
                                         <ChevronRight className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />
                                     </div>
@@ -480,7 +480,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             
                             <button
                                 onClick={() => navigate({ to: `/chat?q=${encodeURIComponent(query)}` as any })}
-                                className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white hover:bg-vape-500 hover:text-slate-950 transition-all"
+                                className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-2xs font-black uppercase tracking-widest text-white hover:bg-vape-500 hover:text-slate-950 transition-all"
                             >
                                 Consultar con VSM AI
                             </button>

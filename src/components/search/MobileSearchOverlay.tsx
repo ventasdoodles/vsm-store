@@ -185,7 +185,7 @@ function SearchResultItem({ product, onClick }: { product: Product; onClick: (p:
                     )}>
                         {formatPrice(product.price)}
                     </span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary bg-white/[0.03] px-2 py-0.5 rounded-lg border border-white/5">
+                    <span className="text-2xs font-black uppercase tracking-widest text-theme-secondary bg-white/[0.03] px-2 py-0.5 rounded-lg border border-white/5">
                         {product.section === 'vape' ? 'Vape' : 'Nature'}
                     </span>
                 </div>

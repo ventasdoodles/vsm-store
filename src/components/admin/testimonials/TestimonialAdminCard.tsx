@@ -60,11 +60,11 @@ export function TestimonialAdminCard({
                     {t.customer_name}
                 </p>
                 {t.customer_location ? (
-                    <p className="text-[11px] font-semibold text-theme-secondary/70 truncate flex items-center gap-1">
+                    <p className="text-2xs font-semibold text-theme-secondary/70 truncate flex items-center gap-1">
                         📍 {t.customer_location}
                     </p>
                 ) : (
-                    <p className="text-[11px] font-semibold text-theme-secondary/30">Sin ubicación</p>
+                    <p className="text-2xs font-semibold text-theme-secondary/30">Sin ubicación</p>
                 )}
             </div>
 
@@ -84,14 +84,14 @@ export function TestimonialAdminCard({
                 {section && (
                     <span
                         className={cn(
-                            'text-[10px] font-black uppercase tracking-[0.1em] px-2.5 py-1 rounded-md shadow-inner border border-white/5',
+                            'text-2xs font-black uppercase tracking-[0.1em] px-2.5 py-1 rounded-md shadow-inner border border-white/5',
                             section.badgeClassName
                         )}
                     >
                         {section.shortLabel}
                     </span>
                 )}
-                <span className="text-[10px] font-mono text-theme-secondary/40 ml-auto whitespace-nowrap bg-black/20 px-2 py-0.5 rounded-md">
+                <span className="text-2xs font-mono text-theme-secondary/40 ml-auto whitespace-nowrap bg-black/20 px-2 py-0.5 rounded-md">
                     #{t.sort_order}
                 </span>
             </div>
@@ -110,14 +110,14 @@ export function TestimonialAdminCard({
 
             {/* Date */}
             <div className="mt-4 pt-4 border-t border-white/[0.04]">
-                 <p className="text-[10px] font-bold tracking-wider uppercase text-theme-secondary/50">
+                 <p className="text-2xs font-bold tracking-wider uppercase text-theme-secondary/50">
                     {t.review_date ? new Date(t.review_date).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric'}) : '—'}
                 </p>
             </div>
 
             {/* Action Bar (Hover reveal on Desktop) */}
             <div className="absolute left-0 right-0 -bottom-1 translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-2 transition-all duration-300 z-20 hidden md:flex justify-center pointer-events-none group-hover:pointer-events-auto">
-                <div className="flex items-center gap-1.5 p-1.5 bg-[#13141f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl scale-95 group-hover:scale-100 transition-transform">
+                <div className="flex items-center gap-1.5 p-1.5 bg-surface-base/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl scale-95 group-hover:scale-100 transition-transform">
                     <ActionBtn icon={<Pencil className="w-4 h-4" />} label="Editar" onClick={() => onEdit(t)} color="accent" />
                     <ActionBtn icon={<Copy className="w-4 h-4" />} label="Duplicar" onClick={() => onDuplicate(t)} color="blue" />
                     
@@ -150,7 +150,7 @@ export function TestimonialAdminCard({
             </div>
 
             {/* Mobile Action Bar (Always visible on touch) */}
-            <div className="flex md:hidden border-t border-white/5 -mx-6 -mb-6 mt-4 bg-[#13141f] justify-around rounded-b-3xl">
+            <div className="flex md:hidden border-t border-white/5 -mx-6 -mb-6 mt-4 bg-surface-base justify-around rounded-b-3xl">
                 <button onClick={() => onEdit(t)} className="p-3 text-accent-primary" aria-label="Editar"><Pencil className="w-5 h-5" /></button>
                 <button onClick={() => onDuplicate(t)} className="p-3 text-blue-400" aria-label="Duplicar"><Copy className="w-5 h-5" /></button>
                 <button onClick={() => onToggleFeatured(t.id, !t.is_featured)} className="p-3 text-amber-400" aria-label={t.is_featured ? 'Quitar destacado' : 'Destacar'}>

@@ -38,7 +38,7 @@ export function BrandsFormModal({
             />
             
             {/* Modal */}
-            <div className="relative w-full max-w-lg bg-[#13141f] border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar animate-in slide-in-from-bottom-8 duration-300">
+            <div className="relative w-full max-w-lg bg-surface-base border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar animate-in slide-in-from-bottom-8 duration-300">
                 <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="flex items-center justify-between shadow-sm border-b border-white/[0.08] pb-6 mb-6">
@@ -64,7 +64,7 @@ export function BrandsFormModal({
                     
                     {/* Name */}
                     <div>
-                        <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                        <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                             Nombre de la Marca *
                         </label>
                         <input
@@ -79,7 +79,7 @@ export function BrandsFormModal({
 
                     {/* Logo */}
                     <div>
-                        <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                        <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                             Logo de la Marca
                         </label>
                         <div className="bg-theme-primary/[0.03] border border-white/10 rounded-2xl p-5 shadow-inner">
@@ -89,7 +89,7 @@ export function BrandsFormModal({
                                 onChange={(urls) => setForm({ ...form, logo_url: urls[0] || '' })}
                                 onUpload={onUploadLogo}
                             />
-                            <div className="flex items-center justify-center gap-2 mt-4 text-[10px] text-theme-secondary/60 uppercase tracking-wider font-bold bg-black/20 py-2 rounded-lg border border-white/5">
+                            <div className="flex items-center justify-center gap-2 mt-4 text-2xs text-theme-secondary/60 uppercase tracking-wider font-bold bg-black/20 py-2 rounded-lg border border-white/5">
                                  <ImageIcon className="w-3.5 h-3.5" />
                                  <span>Recomendado: PNG fondo transparente (Blanco)</span>
                             </div>
@@ -99,7 +99,7 @@ export function BrandsFormModal({
                     {/* Sort Order & Active */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                                 Orden
                             </label>
                             <input
@@ -161,7 +161,7 @@ function ToggleSwitch({
 }) {
     return (
         <label className="flex flex-col items-center justify-center gap-2 cursor-pointer select-none w-full h-full group">
-             <span className="text-[10px] uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
+             <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
             <button
                 type="button"
                 onClick={() => onChange(!checked)}

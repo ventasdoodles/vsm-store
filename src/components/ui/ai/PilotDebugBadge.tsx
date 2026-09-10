@@ -73,7 +73,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     "h-2 w-2 rounded-full",
                     isAuthorized ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
                 )} />
-                <span className="text-[10px] font-black uppercase tracking-widest">
+                <span className="text-2xs font-black uppercase tracking-widest">
                     PILOT: {isAuthorized ? 'ACTIVE' : 'REQUESTED'}
                 </span>
                 <Activity className="h-3 w-3" />
@@ -90,7 +90,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Search className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Param Detected</span>
+                            <span className="text-2xs font-medium">Param Detected</span>
                         </div>
                         <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", requested ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
                             {requested ? 'YES' : 'NO'}
@@ -100,7 +100,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Database className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Durable Persisted</span>
+                            <span className="text-2xs font-medium">Durable Persisted</span>
                         </div>
                         <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", persisted ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
                             {persisted ? 'YES' : 'NO'}
@@ -110,7 +110,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Layout className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Global Exposure</span>
+                            <span className="text-2xs font-medium">Global Exposure</span>
                         </div>
                         <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", isGlobalEnabled ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
                             {isGlobalEnabled ? 'OPEN' : 'CLOSED'}
@@ -120,7 +120,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
                         <div className="flex items-center gap-2 text-white">
                             <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                            <span className="text-[11px] font-black">Exposure Result</span>
+                            <span className="text-2xs font-black">Exposure Result</span>
                         </div>
                         <span className={cn("text-[9px] font-black px-1.5 py-0.5 rounded uppercase", exposure.isVisible ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
                             {exposure.isVisible ? 'VISIBLE' : 'HIDDEN'}
@@ -130,7 +130,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <ShieldCheck className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Access Path</span>
+                            <span className="text-2xs font-medium">Access Path</span>
                         </div>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
                             {exposureSourceLabel}
@@ -140,7 +140,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Activity className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Shell Freshness</span>
+                            <span className="text-2xs font-medium">Shell Freshness</span>
                         </div>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
                             {shellFreshness}
@@ -150,7 +150,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Database className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Deployed Build</span>
+                            <span className="text-2xs font-medium">Deployed Build</span>
                         </div>
                         <span className="max-w-[90px] truncate text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70" title={deployedFingerprint ?? ''}>
                             {deployedFingerprint ?? 'N/A'}

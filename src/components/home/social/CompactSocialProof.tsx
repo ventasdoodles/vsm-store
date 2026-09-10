@@ -63,7 +63,7 @@ export function CompactSocialProof({
                             <p className="text-xs text-theme-secondary line-clamp-2">
                                 {'\u201C'}{t.body}{'\u201D'}
                             </p>
-                            <p className="text-[10px] text-theme-secondary mt-1 font-medium">
+                            <p className="text-2xs text-theme-secondary mt-1 font-medium">
                                 {'\u2014'} {t.customer_name}
                                 {t.verified_purchase && (
                                     <ShieldCheck className="inline w-3 h-3 ml-1 text-emerald-400" />

@@ -47,7 +47,7 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
             <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-vape-400" />
                 <h3 className="text-sm font-black text-white uppercase tracking-widest">Kitting Sugerido</h3>
-                <span className="ml-auto px-2 py-0.5 rounded-full bg-vape-500/20 text-vape-400 border border-vape-500/20 text-[10px] font-bold uppercase tracking-widest">
+                <span className="ml-auto px-2 py-0.5 rounded-full bg-vape-500/20 text-vape-400 border border-vape-500/20 text-2xs font-bold uppercase tracking-widest">
                     Ahorra {discountPercentage}%
                 </span>
             </div>
@@ -66,7 +66,7 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
                             className="w-full h-full object-contain"
                         />
                     </div>
-                    <span className="text-[10px] font-bold text-center text-white line-clamp-2">{product.name}</span>
+                    <span className="text-2xs font-bold text-center text-white line-clamp-2">{product.name}</span>
                 </div>
 
                 <Plus className="w-6 h-6 text-white/20 shrink-0" />
@@ -81,13 +81,13 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
                             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                         />
                     </div>
-                    <span className="text-[10px] font-bold text-center text-vape-100 line-clamp-2 z-10">{suggestedProduct.name}</span>
+                    <span className="text-2xs font-bold text-center text-vape-100 line-clamp-2 z-10">{suggestedProduct.name}</span>
                 </div>
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-white/5">
                 <div>
-                    <div className="text-[11px] text-theme-tertiary mb-1">Total del Bundle</div>
+                    <div className="text-2xs text-theme-tertiary mb-1">Total del Bundle</div>
                     <div className="flex items-end gap-2">
                         <span className="text-sm text-white/40 line-through">{formatPrice(originalTotal)}</span>
                         <span className="text-xl font-black text-vape-400">{formatPrice(discountedTotal)}</span>

@@ -38,11 +38,11 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
                         <div key={interaction.id} className="p-6 rounded-[2rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all group">
                             <div className="space-y-4">
                                 <div className="bg-vape-500/10 text-vape-300 p-4 rounded-2xl w-3/4 ml-auto rounded-tr-sm">
-                                    <span className="text-[10px] font-black uppercase opacity-50 block mb-1">Cliente</span>
+                                    <span className="text-2xs font-black uppercase opacity-50 block mb-1">Cliente</span>
                                     {interaction.query}
                                 </div>
                                 <div className="bg-indigo-500/10 text-indigo-300 p-4 rounded-2xl w-3/4 rounded-tl-sm">
-                                    <span className="text-[10px] font-black uppercase opacity-50 block mb-1">Cesarin</span>
+                                    <span className="text-2xs font-black uppercase opacity-50 block mb-1">Cesarin</span>
                                     {interaction.response_text}
                                 </div>
                             </div>

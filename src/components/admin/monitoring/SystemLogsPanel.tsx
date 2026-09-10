@@ -105,10 +105,10 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`relative rounded-[1rem] border px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all duration-300 ${
+                            className={`relative rounded-[1rem] border px-4 py-2 text-2xs font-black uppercase tracking-widest transition-all duration-300 ${
                                 isActive
                                     ? `${config.border} ${config.bg} ${config.text} shadow-lg`
-                                    : 'border-white/5 bg-[#13141f]/40 text-theme-secondary/50 hover:text-theme-secondary hover:border-white/10'
+                                    : 'border-white/5 bg-surface-base/40 text-theme-secondary/50 hover:text-theme-secondary hover:border-white/10'
                             }`}
                         >
                             {f === 'all' ? 'Todos' : f}
@@ -123,14 +123,14 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
             {/* Logs Feed */}
             <div className="max-h-[600px] overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 bg-[#13141f]/40 backdrop-blur-md">
+                    <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 bg-surface-base/40 backdrop-blur-md">
                         <Search className="h-8 w-8 text-theme-secondary/30 animate-pulse" />
                         <p className="text-xs font-black uppercase tracking-widest text-theme-secondary/40 mt-3">
                             Cargando registros...
                         </p>
                     </div>
                 ) : filteredLogs.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 border-dashed bg-[#13141f]/40 backdrop-blur-md">
+                    <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 border-dashed bg-surface-base/40 backdrop-blur-md">
                         <Terminal className="h-8 w-8 text-theme-secondary/20 mb-3" />
                         <p className="text-sm font-black text-theme-secondary/40 uppercase tracking-widest">
                             Sin registros

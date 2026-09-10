@@ -311,7 +311,7 @@ export function FlashDealEditor({
                                                     <ProductThumb product={p} size="sm" />
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm font-medium text-white truncate">{p.name}</p>
-                                                        <p className="text-[10px] text-white/30">{formatPrice(p.price)} · Stock: {p.stock}</p>
+                                                        <p className="text-2xs text-white/30">{formatPrice(p.price)} · Stock: {p.stock}</p>
                                                     </div>
                                                 </button>
                                             ))
@@ -329,13 +329,13 @@ export function FlashDealEditor({
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <div className="flex items-center justify-between mb-1.5">
-                                        <label className="text-[11px] font-bold uppercase tracking-wider text-white/40">Precio flash ($)</label>
+                                        <label className="text-2xs font-bold uppercase tracking-wider text-white/40">Precio flash ($)</label>
                                         {selectedProduct && (
                                             <button
                                                 type="button"
                                                 onClick={handleSystemSuggestion}
                                                 disabled={isSuggesting}
-                                                className="flex items-center gap-1.5 text-[10px] font-black uppercase text-orange-400 hover:text-orange-300 transition-colors disabled:opacity-50"
+                                                className="flex items-center gap-1.5 text-2xs font-black uppercase text-orange-400 hover:text-orange-300 transition-colors disabled:opacity-50"
                                             >
                                                 {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
                                                 Sugerencia del Sistema
@@ -351,7 +351,7 @@ export function FlashDealEditor({
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
+                                    <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">
                                         Cantidad máxima
                                     </label>
                                     <input
@@ -404,7 +404,7 @@ export function FlashDealEditor({
 
                             {/* Start mode */}
                             <div>
-                                <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-white/40">¿Cuándo empieza?</label>
+                                <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">¿Cuándo empieza?</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         type="button"
@@ -457,7 +457,7 @@ export function FlashDealEditor({
 
                             {/* Duration presets */}
                             <div>
-                                <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-white/40">¿Cuánto dura?</label>
+                                <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">¿Cuánto dura?</label>
                                 <div className="grid grid-cols-6 gap-1.5">
                                     {DURATION_PRESETS.map((preset) => (
                                         <button
@@ -479,7 +479,7 @@ export function FlashDealEditor({
                                 {/* Custom end datetime */}
                                 {selectedDuration === null && (
                                     <div className="mt-3">
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Fecha y hora de fin</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Fecha y hora de fin</label>
                                         <input
                                             type="datetime-local"
                                             value={customEndsAt || toLocalInput(formData.ends_at)}
@@ -503,7 +503,7 @@ export function FlashDealEditor({
 
                             {/* Priority */}
                             <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
+                                <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">
                                     Prioridad (orden de aparición)
                                 </label>
                                 <input

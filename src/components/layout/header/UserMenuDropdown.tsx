@@ -41,7 +41,7 @@ export function UserMenuDropdown() {
         <div ref={ref} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="flex items-center gap-2 rounded-full px-2 py-1.5 sm:px-3 sm:py-2 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all shadow-inner bg-[#1e2538]/50 border border-white/10 backdrop-blur-sm"
+                className="flex items-center gap-2 rounded-full px-2 py-1.5 sm:px-3 sm:py-2 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all shadow-inner bg-surface-elevated/50 border border-white/10 backdrop-blur-sm"
             >
                 <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/30 text-vape-400 overflow-hidden">
                     {profile?.avatar_url ? (
@@ -65,11 +65,11 @@ export function UserMenuDropdown() {
                     <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex items-center justify-between">
                         <div className="flex-1 min-w-0 pr-2">
                             <p className="text-sm font-bold text-white truncate">{profile?.full_name ?? 'Mi cuenta'}</p>
-                            <p className="text-[11px] text-white/50 truncate font-medium">{user?.email}</p>
+                            <p className="text-2xs text-white/50 truncate font-medium">{user?.email}</p>
                         </div>
                         <div className="flex flex-col items-end justify-center pl-3 border-l border-white/10 shrink-0">
                             <span className="text-[9px] font-black uppercase tracking-widest text-vape-400">V-Coins</span>
-                            <span className="text-[13px] font-black text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">{points.toLocaleString()}</span>
+                            <span className="text-sm font-black text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">{points.toLocaleString()}</span>
                         </div>
                     </div>
                     <Link to={"/profile" as any} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">

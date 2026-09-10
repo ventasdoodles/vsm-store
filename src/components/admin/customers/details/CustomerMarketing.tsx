@@ -78,7 +78,7 @@ export function CustomerMarketing({ customer }: Props) {
     };
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#13141f]/80 backdrop-blur-xl p-6 shadow-2xl">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl">
             {/* Ambient Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 
@@ -94,7 +94,7 @@ export function CustomerMarketing({ customer }: Props) {
 
             <div className="space-y-4 relative z-10">
                 {/* V-Coins Controller */}
-                <div className="p-5 rounded-2xl border border-white/5 bg-[#1a1c29]/50 hover:bg-[#1a1c29]/80 transition-colors group">
+                <div className="p-5 rounded-2xl border border-white/5 bg-surface-card/50 hover:bg-surface-card/80 transition-colors group">
                     <div className="flex items-center justify-between mb-4">
                         <h4 className="text-sm font-bold text-white flex items-center gap-2">
                             <Coins className="h-4 w-4 text-yellow-400" /> Controlador V-Coins
@@ -113,7 +113,7 @@ export function CustomerMarketing({ customer }: Props) {
                                     placeholder="0"
                                     value={pointsAmount}
                                     onChange={e => setPointsAmount(e.target.value)}
-                                    className="w-full bg-[#13141f] border border-white/10 focus:border-yellow-400/50 rounded-xl pl-7 pr-3 py-2.5 text-sm text-white font-medium placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
+                                    className="w-full bg-surface-base border border-white/10 focus:border-yellow-400/50 rounded-xl pl-7 pr-3 py-2.5 text-sm text-white font-medium placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
                                 />
                             </div>
                             <input
@@ -121,7 +121,7 @@ export function CustomerMarketing({ customer }: Props) {
                                 placeholder="Motivo (ej. Compensación VIP)"
                                 value={pointsReason}
                                 onChange={e => setPointsReason(e.target.value)}
-                                className="flex-1 bg-[#13141f] border border-white/10 focus:border-yellow-400/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
+                                className="flex-1 bg-surface-base border border-white/10 focus:border-yellow-400/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
                             />
                         </div>
                         <button
@@ -138,12 +138,12 @@ export function CustomerMarketing({ customer }: Props) {
                 </div>
 
                 {/* Cupón Único */}
-                <div className="p-5 rounded-2xl border border-white/5 bg-[#1a1c29]/50 hover:bg-[#1a1c29]/80 transition-colors">
+                <div className="p-5 rounded-2xl border border-white/5 bg-surface-card/50 hover:bg-surface-card/80 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                         <h4 className="text-sm font-bold text-white flex items-center gap-2">
                             <Ticket className="h-4 w-4 text-blue-400" /> Cupón Dedicado One-Click
                         </h4>
-                        <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-md border border-blue-500/20">Nuevo</span>
+                        <span className="text-2xs font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-md border border-blue-500/20">Nuevo</span>
                     </div>
                     <p className="text-xs text-theme-secondary/80 mb-4 leading-relaxed">
                         Genera un cupón de 10% de descuento irrepetible (1 uso) anclado estrictamente a este correo. Ideal para carritos abandonados o disculpas.

@@ -88,7 +88,7 @@ export function StickyAddToCart({
                 <div className="flex-1 min-w-0">
                     <p className="truncate text-xs text-theme-secondary">{product.name}</p>
                     {selectedVariant && (
-                        <p className="truncate text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                        <p className="truncate text-2xs font-black uppercase tracking-widest text-theme-tertiary">
                             {getVariantDisplayName(selectedVariant)}
                         </p>
                     )}

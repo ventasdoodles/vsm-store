@@ -303,7 +303,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 {/* Sidebar */}
                 <aside
                     className={cn(
-                        'fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/5 bg-[#0a0a0f]/80 backdrop-blur-2xl transition-transform lg:static lg:translate-x-0 lg:w-64',
+                        'fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/5 bg-surface-overlay/80 backdrop-blur-2xl transition-transform lg:static lg:translate-x-0 lg:w-64',
                         !sidebarOpen && '-translate-x-full lg:translate-x-0'
                     )}
                     style={{
@@ -320,7 +320,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                 <span className="text-sm font-black tracking-tight text-white uppercase italic">VSM Admin</span>
                                 <div className="flex items-center gap-1.5">
                                     <span className="h-1.5 w-1.5 rounded-full bg-vape-400 animate-pulse" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400/80">
+                                    <span className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/80">
                                         Control
                                     </span>
                                 </div>
@@ -377,7 +377,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                 {/* Main Content */}
                 <div className="flex flex-1 flex-col overflow-hidden">
-                    <header className="relative z-20 flex h-16 items-center gap-4 border-b border-white/5 bg-[#0a0a0f]/40 backdrop-blur-xl px-6 lg:px-8">
+                    <header className="relative z-20 flex h-16 items-center gap-4 border-b border-white/5 bg-surface-overlay/40 backdrop-blur-xl px-6 lg:px-8">
                         <button
                             onClick={() => setSidebarOpen(true)}
                             className="rounded-xl p-2 text-theme-secondary hover:bg-theme-secondary/50 lg:hidden"
@@ -395,7 +395,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                 placeholder="Buscar pedido o cliente..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-xl border border-white/5 bg-white/5 py-2 pl-10 pr-4 text-[11px] text-white placeholder-white/20 focus:border-vape-500/30 focus:bg-white/[0.07] focus:outline-none transition-all"
+                                className="w-full rounded-xl border border-white/5 bg-white/5 py-2 pl-10 pr-4 text-2xs text-white placeholder-white/20 focus:border-vape-500/30 focus:bg-white/[0.07] focus:outline-none transition-all"
                             />
                         </form>
 
@@ -410,7 +410,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                 {user?.email?.charAt(0).toUpperCase() ?? 'A'}
                             </div>
                             <div className="hidden flex-col sm:flex">
-                                <span className="text-[11px] font-bold text-white leading-tight">Admin</span>
+                                <span className="text-2xs font-bold text-white leading-tight">Admin</span>
                                 <span className="text-xs text-theme-secondary leading-tight">
                                     {user?.email ?? 'admin@vsm.store'}
                                 </span>

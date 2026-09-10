@@ -80,7 +80,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xl animate-in fade-in duration-300">
-            <div className="w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#13141f] shadow-2xl relative">
+            <div className="w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-surface-base shadow-2xl relative">
                 {/* Glow ambiental */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -104,7 +104,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                 <form id="customer-form" onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[75vh] md:h-auto overflow-hidden relative z-10">
                     {/* Col 1: Datos Personales */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 border-b md:border-b-0 md:border-r border-white/5 custom-scrollbar">
-                        <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <h3 className="text-2xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                             <Mail className="h-3 w-3" />
                             Datos de Cuenta
                         </h3>
@@ -174,7 +174,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                     {/* Col 2: Dirección */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-white/[0.02] custom-scrollbar">
-                        <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <h3 className="text-2xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                             <MapPin className="h-3 w-3" />
                             Dirección de Entrega
                         </h3>

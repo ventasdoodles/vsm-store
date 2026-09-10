@@ -137,7 +137,7 @@ const columns = [
             const status = getDealStatus(row.original);
             return (
                 <span className={cn(
-                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 ring-inset',
+                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-bold ring-1 ring-inset',
                     status.cls,
                 )}>
                     {status.label}
@@ -269,7 +269,7 @@ export function FlashDealsTable({
                                     <th 
                                         key={header.id} 
                                         className={cn(
-                                            "px-4 py-3.5 text-[11px] font-bold text-white/30 uppercase tracking-wider",
+                                            "px-4 py-3.5 text-2xs font-bold text-white/30 uppercase tracking-wider",
                                             header.column.id === 'product' && "text-left",
                                             (header.column.id === 'originalPrice' || header.column.id === 'flash_price' || header.column.id === 'actions') && "text-right",
                                             (header.column.id === 'discount' || header.column.id === 'stock' || header.column.id === 'status' || header.column.id === 'time') && "text-center"
@@ -338,17 +338,17 @@ function TimeLeftCell({ deal }: { deal: FlashDeal }) {
     const status = getDealStatus(deal);
 
     if (!deal.is_active || status.label === 'Inactiva') {
-        return <span className="text-[10px] text-white/20">—</span>;
+        return <span className="text-2xs text-white/20">—</span>;
     }
     if (status.label === 'Agotada') {
-        return <span className="text-[10px] text-amber-400/60">Agotada</span>;
+        return <span className="text-2xs text-amber-400/60">Agotada</span>;
     }
     if (status.label === 'Programada') {
         const diff = new Date(deal.starts_at).getTime() - now;
         const h = Math.floor(diff / 3_600_000);
         const m = Math.floor((diff % 3_600_000) / 60_000);
         return (
-            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold text-blue-400 bg-blue-500/10 border-blue-500/20">
+            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-bold text-blue-400 bg-blue-500/10 border-blue-500/20">
                 En {h > 0 ? `${h}h ` : ''}{m}m
             </span>
         );
@@ -372,7 +372,7 @@ function TimeLeftCell({ deal }: { deal: FlashDeal }) {
 
     return (
         <span className={cn(
-            'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold',
+            'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-bold',
             URGENCY_CLS[urgency],
         )}>
             <Zap className="h-2.5 w-2.5" />

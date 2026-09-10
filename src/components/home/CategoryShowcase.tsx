@@ -133,7 +133,7 @@ function CategoryCard({ category, priority }: { category: FeaturedCategory, prio
                         </h3>
                         <div className="flex items-center gap-2">
                             <div className="h-px w-8 bg-vape-500/50 group-hover:w-12 transition-all duration-500" />
-                            <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
+                            <p className="text-white/40 text-2xs font-black uppercase tracking-[0.3em]">
                                 Explore Collection
                             </p>
                         </div>

@@ -177,7 +177,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     <Link
                                         to={`/vape/${cat.slug}` as any}
                                         onClick={onClose}
-                                        className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-[11px] font-black uppercase tracking-wider text-white/60 hover:bg-vape-500/20 hover:text-vape-400 hover:border-vape-500/30 transition-all text-center"
+                                        className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-2xs font-black uppercase tracking-wider text-white/60 hover:bg-vape-500/20 hover:text-vape-400 hover:border-vape-500/30 transition-all text-center"
                                     >
                                         {cat.name}
                                     </Link>
@@ -222,7 +222,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     <Link
                                         to={`/420/${cat.slug}` as any}
                                         onClick={onClose}
-                                        className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-[11px] font-black uppercase tracking-wider text-white/60 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-center"
+                                        className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-2xs font-black uppercase tracking-wider text-white/60 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-center"
                                     >
                                         {cat.name}
                                     </Link>

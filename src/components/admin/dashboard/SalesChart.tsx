@@ -25,7 +25,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
     };
 
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md p-6 shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5 h-full flex flex-col">
+        <div className="rounded-[1.5rem] border border-white/5 bg-surface-base/70 backdrop-blur-md p-6 shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5 h-full flex flex-col">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-[0.75rem] bg-accent-primary/10">
@@ -35,14 +35,14 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                         <h2 className="text-sm font-bold text-white tracking-wide">
                             Ingresos de Ventas
                         </h2>
-                        <p className="text-[11px] font-medium text-theme-secondary mt-0.5">
+                        <p className="text-2xs font-medium text-theme-secondary mt-0.5">
                             {new Date(dateRange.start).toLocaleDateString()} - {new Date(dateRange.end).toLocaleDateString()}
                         </p>
                     </div>
                 </div>
                 <div className="text-right">
                     <p className="text-xl font-black text-white tracking-tight">{formatPrice(totalWeekSales)}</p>
-                    <p className="text-[11px] font-medium text-accent-primary bg-accent-primary/10 px-2 py-0.5 rounded-full inline-block mt-1">
+                    <p className="text-2xs font-medium text-accent-primary bg-accent-primary/10 px-2 py-0.5 rounded-full inline-block mt-1">
                         {totalWeekOrders} pedidos
                     </p>
                 </div>
@@ -55,10 +55,10 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                     return (
                         <div key={day.date} className="flex-1 flex flex-col items-center gap-2 group relative h-full justify-end">
                             {/* Tooltip on hover */}
-                            <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 bg-white/10 backdrop-blur-lg border border-white/10 text-white text-[10px] font-bold px-3 py-1.5 rounded-[0.5rem] pointer-events-none whitespace-nowrap z-20 shadow-xl">
+                            <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 bg-white/10 backdrop-blur-lg border border-white/10 text-white text-2xs font-bold px-3 py-1.5 rounded-[0.5rem] pointer-events-none whitespace-nowrap z-20 shadow-xl">
                                 {day.count} pedidos
                             </div>
-                            <span className="text-[10px] text-theme-secondary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-2xs text-theme-secondary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                                 {day.total > 0 ? formatPrice(day.total) : ''}
                             </span>
                             <div className="w-full flex items-end relative h-[120px]">
@@ -73,7 +73,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                                 </div>
                             </div>
                             <span
-                                className={`text-[11px] font-bold uppercase tracking-wider ${isToday ? 'text-accent-primary' : 'text-theme-secondary/70'
+                                className={`text-2xs font-bold uppercase tracking-wider ${isToday ? 'text-accent-primary' : 'text-theme-secondary/70'
                                     }`}
                             >
                                 {formatDay(day.date)}

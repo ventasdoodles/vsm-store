@@ -230,7 +230,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <TrendingUp className="h-5 w-5 text-indigo-400" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Sugerencia del Sistema</span>
+                                <span className="text-2xs font-black uppercase tracking-widest text-indigo-400">Sugerencia del Sistema</span>
                             </div>
                             <button
                                 type="button"
@@ -258,7 +258,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 <p className="text-xs text-white/60 leading-relaxed italic">"{forecast.recommendation}"</p>
                             </div>
                         ) : (
-                            <p className="text-[10px] text-white/30 font-medium italic">Configure un cupón para ver la sugerencia de impacto basada en heurísticas del sistema.</p>
+                            <p className="text-2xs text-white/30 font-medium italic">Configure un cupón para ver la sugerencia de impacto basada en heurísticas del sistema.</p>
                         )}
                     </div>
 

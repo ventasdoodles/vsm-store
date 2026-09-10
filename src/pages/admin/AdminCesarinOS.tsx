@@ -64,7 +64,7 @@ export function AdminCesarinOS() {
     return (
         <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
             {/* Header Lujoso Glassmorphism */}
-            <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-[#0a0a0f] p-10 shadow-2xl">
+            <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-surface-overlay p-10 shadow-2xl">
                 <div className="absolute right-0 top-0 -mr-20 -mt-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-[120px]" />
                 <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-[100px]" />
 
@@ -95,7 +95,7 @@ export function AdminCesarinOS() {
                             )}
                         >
                             <div className="flex-1">
-                                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
+                                <div className="text-2xs font-black uppercase tracking-[0.25em] text-white/40">
                                     Visibilidad
                                 </div>
                                 <div className="mt-1 flex items-center gap-2">
@@ -170,7 +170,7 @@ export function AdminCesarinOS() {
             </nav>
 
             {/* Contenido Principal */}
-            <div className="rounded-[3rem] border border-white/5 bg-[#0a0a0f] p-10 min-h-[500px]">
+            <div className="rounded-[3rem] border border-white/5 bg-surface-overlay p-10 min-h-[500px]">
                 <AnimatePresence mode="wait">
                     {renderActiveTab()}
                 </AnimatePresence>

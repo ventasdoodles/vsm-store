@@ -108,7 +108,7 @@ export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps
                                         {method.label}
                                     </p>
                                 </div>
-                                <p className="text-[11px] text-theme-secondary/60 mt-1">{method.desc}</p>
+                                <p className="text-2xs text-theme-secondary/60 mt-1">{method.desc}</p>
                             </div>
                         </label>
                     );
@@ -122,7 +122,7 @@ export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps
                         <Landmark className="h-3.5 w-3.5" />
                         Datos Bancarios (para Transferencias)
                     </label>
-                    <p className="text-[11px] text-theme-secondary/60 mb-3">
+                    <p className="text-2xs text-theme-secondary/60 mb-3">
                         Se mostrará al cliente al finalizar su pedido.
                     </p>
                     <textarea

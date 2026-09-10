@@ -51,7 +51,7 @@ export function TagsStats({ total, productsTagged, mostUsedTag }: TagsStatsProps
                         <s.icon className={`h-5 w-5 ${s.color}`} />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-theme-secondary/60">
+                        <p className="text-2xs font-black uppercase tracking-wider text-theme-secondary/60">
                             {s.label}
                         </p>
                         <p className={`text-lg font-black ${typeof s.value === 'number' ? 'text-white' : 'text-white truncate'}`}>

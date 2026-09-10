@@ -17,12 +17,12 @@ export function EnrichmentFieldRow({ fieldKey, label, approved, onToggle, childr
             approved ? 'border-violet-500/20 bg-violet-500/5' : 'border-white/5 bg-white/[0.01] opacity-40'
         )}>
             <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{label}</span>
+                <span className="text-2xs font-black uppercase tracking-widest text-white/40">{label}</span>
                 <button
                     type="button"
                     onClick={() => onToggle(fieldKey)}
                     className={cn(
-                        'h-5 w-5 rounded flex items-center justify-center border transition-all text-[10px] font-black',
+                        'h-5 w-5 rounded flex items-center justify-center border transition-all text-2xs font-black',
                         approved
                             ? 'bg-violet-500 border-violet-500 text-white'
                             : 'bg-transparent border-white/20 text-white/20'
@@ -74,7 +74,7 @@ export function ProductEnrichmentReview({
                 {/* Warnings */}
                 {enrichmentResult.warnings.length > 0 && (
                     <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 space-y-2">
-                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-amber-400">
+                        <div className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-amber-400">
                             <AlertTriangle className="h-3.5 w-3.5" />
                             Verificación Manual Requerida
                         </div>
@@ -151,7 +151,7 @@ export function ProductEnrichmentReview({
                     >
                         <div className="flex flex-wrap gap-1.5 mt-1">
                             {Object.entries(enrichmentResult.specs).map(([k, v]) => (
-                                <span key={k} className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-white/60 border border-white/5">
+                                <span key={k} className="px-2 py-0.5 rounded-md bg-white/5 text-2xs text-white/60 border border-white/5">
                                     {k}: <span className="text-white/80 font-semibold">{v}</span>
                                 </span>
                             ))}
@@ -174,7 +174,7 @@ export function ProductEnrichmentReview({
                     >
                         <div className="flex flex-wrap gap-1.5 mt-1">
                             {enrichmentResult.tags.map(t => (
-                                <span key={t} className="px-2 py-0.5 rounded-full bg-violet-500/10 text-[10px] text-violet-400 ring-1 ring-inset ring-violet-500/20">
+                                <span key={t} className="px-2 py-0.5 rounded-full bg-violet-500/10 text-2xs text-violet-400 ring-1 ring-inset ring-violet-500/20">
                                     {t}
                                 </span>
                             ))}

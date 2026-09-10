@@ -29,7 +29,7 @@ export function MonitoringHeader({ onlineCount, errorCount, warnCount }: Monitor
                         <div className="p-2.5 bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 rounded-[1rem] border border-emerald-500/20 shadow-inner">
                             <Activity className="h-7 w-7 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
                         </div>
-                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
+                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
                             Tiempo Real
                         </span>
                     </div>
@@ -52,7 +52,7 @@ export function MonitoringHeader({ onlineCount, errorCount, warnCount }: Monitor
                         </div>
                         <div>
                             <p className="text-2xl font-black text-emerald-400 leading-none">{onlineCount}</p>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/60 mt-0.5">Online</p>
+                            <p className="text-2xs font-bold uppercase tracking-widest text-emerald-400/60 mt-0.5">Online</p>
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@ export function MonitoringHeader({ onlineCount, errorCount, warnCount }: Monitor
                             <p className={`text-2xl font-black leading-none ${systemHealthy ? 'text-emerald-400' : 'text-rose-400'}`}>
                                 {errorCount}
                             </p>
-                            <p className={`text-[10px] font-bold uppercase tracking-widest mt-0.5 ${systemHealthy ? 'text-emerald-400/60' : 'text-rose-400/60'}`}>
+                            <p className={`text-2xs font-bold uppercase tracking-widest mt-0.5 ${systemHealthy ? 'text-emerald-400/60' : 'text-rose-400/60'}`}>
                                 Errores
                             </p>
                         </div>
@@ -79,7 +79,7 @@ export function MonitoringHeader({ onlineCount, errorCount, warnCount }: Monitor
                             <AlertTriangle className="h-5 w-5 text-amber-400" />
                             <div>
                                 <p className="text-2xl font-black text-amber-400 leading-none">{warnCount}</p>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/60 mt-0.5">Warns</p>
+                                <p className="text-2xs font-bold uppercase tracking-widest text-amber-400/60 mt-0.5">Warns</p>
                             </div>
                         </div>
                     )}

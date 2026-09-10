@@ -204,7 +204,7 @@ export function AdminAttributes() {
                                     </div>
                                     <div className="text-left">
                                         <p className="font-bold text-white tracking-wide">{attr.name}</p>
-                                        <p className="text-[10px] text-white/30 uppercase font-black">
+                                        <p className="text-2xs text-white/30 uppercase font-black">
                                             {(attr.values?.length || 0)} valores disponibles
                                         </p>
                                     </div>
@@ -254,7 +254,7 @@ export function AdminAttributes() {
                                     {/* Variant Capable Toggle */}
                                     <div className="flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
                                         <div className="text-right">
-                                            <p className="text-[10px] font-black uppercase text-white/40 leading-none mb-1">Tipo de Uso</p>
+                                            <p className="text-2xs font-black uppercase text-white/40 leading-none mb-1">Tipo de Uso</p>
                                             <p className="text-xs font-bold text-white leading-none">Genera Variantes</p>
                                         </div>
                                         <label className="relative inline-flex cursor-pointer items-center">
@@ -272,7 +272,7 @@ export function AdminAttributes() {
                                     </div>
                                     {/* Applicability Toggles (Sections) */}
                                     <div className="flex items-center gap-2 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
-                                        <p className="text-[10px] font-black uppercase text-white/40 mr-2">Visible en:</p>
+                                        <p className="text-2xs font-black uppercase text-white/40 mr-2">Visible en:</p>
                                         {adminSectionCatalog.sections.map((section) => {
                                             const isActive = selectedAttribute.applicability?.sections?.includes(section.slug);
                                             return (
@@ -285,7 +285,7 @@ export function AdminAttributes() {
                                                         ));
                                                     }}
                                                     className={cn(
-                                                        "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        "px-3 py-1 rounded-lg text-2xs font-black uppercase tracking-widest transition-all",
                                                         isActive 
                                                             ? section.selectedButtonClassName
                                                             : section.idleButtonClassName
@@ -303,10 +303,10 @@ export function AdminAttributes() {
                                 <div className="mt-8 border-t border-white/5 pt-6">
                                     <div className="flex items-center gap-2 mb-4">
                                         <FolderTree className="h-4 w-4 text-violet-400" />
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Restringir a Categorías Específicas</h4>
+                                        <h4 className="text-2xs font-black uppercase tracking-[0.2em] text-white/40">Restringir a Categorías Específicas</h4>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
-                                        {(categories || []).length === 0 && <p className="text-[10px] text-white/20 italic">No hay categorías cargadas.</p>}
+                                        {(categories || []).length === 0 && <p className="text-2xs text-white/20 italic">No hay categorías cargadas.</p>}
                                         {(categories || []).map(cat => {
                                             const isActive = selectedAttribute.applicability?.categories?.includes(cat.id);
                                             return (
@@ -319,7 +319,7 @@ export function AdminAttributes() {
                                                         ));
                                                     }}
                                                     className={cn(
-                                                        "px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-2",
+                                                        "px-3 py-1.5 rounded-xl text-2xs font-bold border transition-all flex items-center gap-2",
                                                         isActive 
                                                             ? "border-violet-500/50 bg-violet-500/10 text-violet-400" 
                                                             : "border-white/5 bg-white/5 text-white/30 hover:border-white/10"
@@ -341,13 +341,13 @@ export function AdminAttributes() {
                                                         { applicability: clearAttributeCategories(selectedAttribute.applicability) },
                                                     ));
                                                 }}
-                                                className="px-3 py-1.5 rounded-xl text-[10px] font-bold text-white/20 hover:text-red-400 transition-colors"
+                                                className="px-3 py-1.5 rounded-xl text-2xs font-bold text-white/20 hover:text-red-400 transition-colors"
                                             >
                                                 Limpiar Filtros
                                             </button>
                                         )}
                                     </div>
-                                    <p className="mt-3 text-[10px] text-white/20 italic">Si no seleccionas ninguna, el atributo estará disponible en todas las categorías de su sección.</p>
+                                    <p className="mt-3 text-2xs text-white/20 italic">Si no seleccionas ninguna, el atributo estará disponible en todas las categorías de su sección.</p>
                                 </div>
 
                             <form onSubmit={handleAddValue} className="mb-8 flex gap-3 mt-8">

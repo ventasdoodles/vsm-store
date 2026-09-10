@@ -28,19 +28,19 @@ export function PostPurchaseReceiptCard({
         <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 text-left shadow-2xl backdrop-blur-xl">
             <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/60">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-black uppercase tracking-[0.2em] text-white/60">
                         <ReceiptText className="h-3.5 w-3.5" />
                         Resumen persistido
                     </div>
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/35">Pedido</p>
+                        <p className="text-2xs font-black uppercase tracking-[0.24em] text-white/35">Pedido</p>
                         <h2 className="text-xl font-black uppercase italic tracking-tight text-white">
                             {order.order_number}
                         </h2>
                     </div>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/35">Total registrado</p>
+                    <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Total registrado</p>
                     <p className="mt-1 text-lg font-black text-vape-400">{formatPrice(order.total)}</p>
                 </div>
             </div>
@@ -49,7 +49,7 @@ export function PostPurchaseReceiptCard({
                 <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-black/20 p-4">
                     <Calendar className="mt-0.5 h-4 w-4 text-white/45" />
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/35">Fecha registrada</p>
+                        <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Fecha registrada</p>
                         <p className="mt-1 text-sm font-bold text-white/85">
                             {new Date(order.created_at).toLocaleDateString('es-MX', {
                                 day: 'numeric',
@@ -62,7 +62,7 @@ export function PostPurchaseReceiptCard({
                 <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-black/20 p-4">
                     <Package className="mt-0.5 h-4 w-4 text-white/45" />
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/35">Compra registrada</p>
+                        <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Compra registrada</p>
                         <p className="mt-1 text-sm font-bold text-white/85">{confidenceView.itemsLabel}</p>
                     </div>
                 </div>
@@ -70,7 +70,7 @@ export function PostPurchaseReceiptCard({
 
             {previewItems.length > 0 && (
                 <div className="mt-5 rounded-[1.5rem] border border-white/5 bg-black/20 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/35">Lo que ya quedo registrado</p>
+                    <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Lo que ya quedo registrado</p>
                     <div className="mt-3 space-y-2">
                         {previewItems.map((item, index) => (
                             <div
@@ -87,7 +87,7 @@ export function PostPurchaseReceiptCard({
                             </div>
                         ))}
                         {Array.isArray(order.items) && order.items.length > previewItems.length && (
-                            <p className="pt-1 text-[11px] font-bold text-white/45">
+                            <p className="pt-1 text-2xs font-bold text-white/45">
                                 +{order.items.length - previewItems.length} articulo(s) adicional(es) en el pedido
                             </p>
                         )}
@@ -96,12 +96,12 @@ export function PostPurchaseReceiptCard({
             )}
 
             <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/35">Que sigue ahora</p>
+                <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Que sigue ahora</p>
                 <p className="mt-2 text-sm font-black uppercase tracking-[0.16em] text-white">
                     {confidenceView.receiptTitle}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">{confidenceView.receiptDetail}</p>
-                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.18em] text-white/35">
+                <p className="mt-4 text-2xs font-black uppercase tracking-[0.18em] text-white/35">
                     {confidenceView.revisitTitle}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-white/70">{confidenceView.revisitDetail}</p>

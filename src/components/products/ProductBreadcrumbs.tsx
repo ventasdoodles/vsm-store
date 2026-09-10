@@ -46,7 +46,7 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
     });
 
     return (
-        <nav className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-medium text-white/50 overflow-x-auto whitespace-nowrap scrollbar-none bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 shadow-xl shadow-black/20">
+        <nav className="inline-flex items-center gap-2 text-2xs sm:text-xs font-medium text-white/50 overflow-x-auto whitespace-nowrap scrollbar-none bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 shadow-xl shadow-black/20">
             <BreadcrumbJsonLd items={breadcrumbItems} />
             <Link
                 to={"/" as any}

@@ -112,7 +112,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                             {/* COL 1: Main Categories */}
                             <div className="w-1/3 border-r border-white/5 bg-white/[0.02] p-4">
                                 <div className="mb-4 px-4 pt-2">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Explorar {label}</span>
+                                    <span className="text-2xs font-black uppercase tracking-[0.2em] text-white/30">Explorar {label}</span>
                                 </div>
                                 <div className="space-y-1">
                                     {categories.map((cat) => (
@@ -152,7 +152,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                 >
                                     <div>
                                         <p className="text-xs font-black uppercase text-vape-400">Ver Colección</p>
-                                        <p className="text-[10px] text-white/40">Todos los productos {label}</p>
+                                        <p className="text-2xs text-white/40">Todos los productos {label}</p>
                                     </div>
                                     <Sparkles className="h-5 w-5 text-vape-400 transition-transform group-hover:rotate-12 group-hover:scale-110" />
                                 </Link>

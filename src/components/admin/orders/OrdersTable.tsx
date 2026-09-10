@@ -92,7 +92,7 @@ const columns = [
                     {row.original.customer_name || 'Sin nombre'}
                 </p>
                 {row.original.customer_phone && (
-                    <p className="text-[10px] text-theme-secondary/50 mt-0.5 font-mono">
+                    <p className="text-2xs text-theme-secondary/50 mt-0.5 font-mono">
                         {row.original.customer_phone}
                     </p>
                 )}
@@ -103,7 +103,7 @@ const columns = [
         header: 'Pago',
         cell: ({ row }) => (
             <span className={cn(
-                'inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold capitalize border',
+                'inline-flex items-center rounded-lg px-2 py-0.5 text-2xs font-bold capitalize border',
                 row.original.payment_status === 'paid'
                     ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
                     : 'border-amber-500/20 bg-amber-500/10 text-amber-400'
@@ -150,7 +150,7 @@ const columns = [
                             <select
                                 value={row.original.status}
                                 onChange={e => meta.handleStatusChange(row.original, e.target.value)}
-                                className={cn("appearance-none rounded-lg border border-white/10 bg-[#1a1c29] pl-7 pr-6 py-1.5 text-xs font-bold text-theme-primary focus:outline-none focus:border-accent-primary/40 cursor-pointer transition-colors hover:border-white/20 border-l-[2px]", getBorderHighlightClass(statusInfo?.color))}
+                                className={cn("appearance-none rounded-lg border border-white/10 bg-surface-card pl-7 pr-6 py-1.5 text-xs font-bold text-theme-primary focus:outline-none focus:border-accent-primary/40 cursor-pointer transition-colors hover:border-white/20 border-l-[2px]", getBorderHighlightClass(statusInfo?.color))}
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.map(s => {
                                     const isCurrent = s.value === row.original.status;
@@ -188,7 +188,7 @@ const columns = [
             </button>
         ),
         cell: ({ getValue }) => (
-            <span className="text-[11px] text-theme-secondary/50 font-mono tabular-nums">
+            <span className="text-2xs text-theme-secondary/50 font-mono tabular-nums">
                 {new Date(getValue() as string).toLocaleDateString('es-MX', {
                     day: '2-digit',
                     month: 'short',
@@ -269,7 +269,7 @@ export function OrdersTable({
     }
 
     return (
-        <div className="rounded-2xl border border-white/5 bg-[#13141f]/60 backdrop-blur-sm overflow-hidden">
+        <div className="rounded-2xl border border-white/5 bg-surface-base/60 backdrop-blur-sm overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead>
@@ -279,7 +279,7 @@ export function OrdersTable({
                                     <th 
                                         key={header.id} 
                                         className={cn(
-                                            "px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-theme-secondary/50",
+                                            "px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-theme-secondary/50",
                                             header.column.id === 'select' && "w-10",
                                             header.column.id === 'payment_method' && "hidden lg:table-cell",
                                             header.column.id === 'created_at' && "hidden md:table-cell",

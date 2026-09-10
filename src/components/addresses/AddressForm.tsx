@@ -59,7 +59,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                     <h3 className="text-xl font-black text-white uppercase tracking-tight">
                         {address ? 'Refinar Dirección' : 'Nueva Ubicación'}
                     </h3>
-                    <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60 mt-1">
+                    <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60 mt-1">
                         Define los parámetros de tu punto de entrega
                     </p>
                 </div>
@@ -79,7 +79,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         type="button"
                         onClick={() => setValue('type', 'shipping')}
                         className={cn(
-                            "relative z-10 flex items-center justify-center gap-3 py-4 rounded-[1.75rem] text-[10px] font-black uppercase tracking-widest transition-all duration-500",
+                            "relative z-10 flex items-center justify-center gap-3 py-4 rounded-[1.75rem] text-2xs font-black uppercase tracking-widest transition-all duration-500",
                             isShipping ? "text-white" : "text-theme-tertiary hover:text-white"
                         )}
                     >
@@ -91,7 +91,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         type="button"
                         onClick={() => setValue('type', 'billing')}
                         className={cn(
-                            "relative z-10 flex items-center justify-center gap-3 py-4 rounded-[1.75rem] text-[10px] font-black uppercase tracking-widest transition-all duration-500",
+                            "relative z-10 flex items-center justify-center gap-3 py-4 rounded-[1.75rem] text-2xs font-black uppercase tracking-widest transition-all duration-500",
                             !isShipping ? "text-white" : "text-theme-tertiary hover:text-white"
                         )}
                     >
@@ -226,7 +226,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         </div>
                         <div>
                             <p className="text-xs font-black text-white uppercase tracking-tight">Dirección Principal</p>
-                            <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Usar por defecto en mis compras</p>
+                            <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Usar por defecto en mis compras</p>
                         </div>
                     </div>
                     <div className="relative inline-flex items-center">
@@ -245,14 +245,14 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 py-5 rounded-[2rem] bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:bg-white/10 hover:text-white transition-all duration-500"
+                    className="flex-1 py-5 rounded-[2rem] bg-white/5 border border-white/5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:bg-white/10 hover:text-white transition-all duration-500"
                 >
                     Cancelar
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
-                    className="flex-[2] py-5 rounded-[2rem] bg-accent-primary text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-accent-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3 shadow-2xl shadow-accent-primary/30"
+                    className="flex-[2] py-5 rounded-[2rem] bg-accent-primary text-white text-2xs font-black uppercase tracking-[0.2em] hover:bg-accent-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3 shadow-2xl shadow-accent-primary/30"
                 >
                     {loading ? (
                         <>

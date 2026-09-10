@@ -198,7 +198,7 @@ export function ProductVariantsEditor({
                             <Settings2 className="h-4 w-4 text-violet-400" />
                             Configurar Propiedades
                         </h4>
-                        <p className="text-[11px] text-white/30 uppercase tracking-wider font-black mt-1">
+                        <p className="text-2xs text-white/30 uppercase tracking-wider font-black mt-1">
                             Selecciona los atributos que definen este producto
                         </p>
                     </div>
@@ -206,7 +206,7 @@ export function ProductVariantsEditor({
 
                 <div className="space-y-4">
                     {filteredAttributes.length === 0 && (
-                        <p className="py-4 text-center text-[10px] text-white/20 italic uppercase font-black">
+                        <p className="py-4 text-center text-2xs text-white/20 italic uppercase font-black">
                             No hay atributos disponibles para esta sección/categoría
                         </p>
                     )}
@@ -232,7 +232,7 @@ export function ProductVariantsEditor({
                                             type="button"
                                             onClick={() => handleValueToggle(attr.id, val.id)}
                                             className={cn(
-                                                "rounded-lg px-3 py-1.5 text-[11px] font-bold border transition-all",
+                                                "rounded-lg px-3 py-1.5 text-2xs font-bold border transition-all",
                                                 (selectedValues[attr.id] || []).includes(val.id)
                                                     ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
                                                     : "border-white/5 bg-white/5 text-white/30 hover:border-white/10"
@@ -284,7 +284,7 @@ export function ProductVariantsEditor({
                                             <div className="flex gap-2">
                                                 <input
                                                     placeholder="SKU"
-                                                    className="bg-transparent text-[10px] text-white/30 outline-none w-24"
+                                                    className="bg-transparent text-2xs text-white/30 outline-none w-24"
                                                     value={v.sku}
                                                     onChange={e => updateVariant(idx, 'sku', e.target.value)}
                                                 />

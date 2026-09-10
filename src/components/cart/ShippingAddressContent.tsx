@@ -48,7 +48,7 @@ export function ShippingAddressContent({
                             </div>
                             <div className="flex-1">
                                 <p className="text-xs font-bold uppercase tracking-widest text-vape-400">{a.label}</p>
-                                <p className="text-[11px] text-theme-tertiary">{a.street} #{a.number}, {a.colony}</p>
+                                <p className="text-2xs text-theme-tertiary">{a.street} #{a.number}, {a.colony}</p>
                             </div>
                             {selectedAddressId === a.id && <CheckCircle className="h-5 w-5 text-vape-400" />}
                         </button>
@@ -77,7 +77,7 @@ export function ShippingAddressContent({
                         errors.address && "border-red-500/50"
                     )}
                 />
-                {errors.address && <p className="mt-2 text-[11px] text-red-500 ml-2">{errors.address}</p>}
+                {errors.address && <p className="mt-2 text-2xs text-red-500 ml-2">{errors.address}</p>}
             </div>
             {isAuthenticated && (
                 <button

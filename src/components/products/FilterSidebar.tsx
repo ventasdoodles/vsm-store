@@ -65,7 +65,7 @@ export function FilterSidebar({ products, section, activeFilters, onChange, onCl
                 {hasActiveFilters && (
                     <button
                         onClick={clearFilters}
-                        className="text-[10px] font-bold uppercase tracking-tighter text-theme-tertiary hover:text-theme-primary transition-colors"
+                        className="text-2xs font-bold uppercase tracking-tighter text-theme-tertiary hover:text-theme-primary transition-colors"
                     >
                         Limpiar todos
                     </button>
@@ -77,13 +77,13 @@ export function FilterSidebar({ products, section, activeFilters, onChange, onCl
                 <div className="space-y-4 pt-2">
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex-1 space-y-1">
-                            <span className="text-[10px] text-theme-tertiary uppercase font-bold">Min</span>
+                            <span className="text-2xs text-theme-tertiary uppercase font-bold">Min</span>
                             <div className="rounded-lg bg-theme-secondary/30 border border-theme p-2 text-xs font-mono text-theme-primary">
                                 {formatPrice(activeFilters.priceRange[0])}
                             </div>
                         </div>
                         <div className="flex-1 space-y-1 text-right">
-                            <span className="text-[10px] text-theme-tertiary uppercase font-bold">Max</span>
+                            <span className="text-2xs text-theme-tertiary uppercase font-bold">Max</span>
                             <div className="rounded-lg bg-theme-secondary/30 border border-theme p-2 text-xs font-mono text-theme-primary">
                                 {formatPrice(activeFilters.priceRange[1])}
                             </div>
@@ -115,7 +115,7 @@ export function FilterSidebar({ products, section, activeFilters, onChange, onCl
                                     key={val}
                                     onClick={() => toggleAttribute(attrName, val)}
                                     className={cn(
-                                        "px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border",
+                                        "px-3 py-1.5 rounded-lg text-2xs font-bold transition-all border",
                                         isActive
                                             ? isVape
                                                 ? "bg-vape-500/20 border-vape-500/40 text-vape-400"
@@ -155,7 +155,7 @@ function FilterGroup({ title, children }: { title: string; children: React.React
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-between w-full group"
             >
-                <span className="text-[11px] font-bold uppercase tracking-widest text-theme-secondary group-hover:text-theme-primary transition-colors">
+                <span className="text-2xs font-bold uppercase tracking-widest text-theme-secondary group-hover:text-theme-primary transition-colors">
                     {title}
                 </span>
                 <ChevronDown className={cn("h-3.5 w-3.5 text-theme-tertiary transition-transform", !isOpen && "-rotate-90")} />

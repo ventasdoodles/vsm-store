@@ -50,7 +50,7 @@ export function Wishlist() {
                             <Sparkles className="h-4 w-4 text-accent-primary animate-bounce-slow" />
                             <h1 className="text-4xl font-black text-white uppercase tracking-tight italic">Mis Favoritos</h1>
                         </div>
-                        <p className="text-[10px] text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60 mt-1">
+                        <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60 mt-1">
                             {items.length} {items.length === 1 ? 'objeto de deseo' : 'objetos de deseo'} guardados
                         </p>
                     </div>
@@ -60,7 +60,7 @@ export function Wishlist() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={handleAddAllToCart}
-                            className="group relative flex items-center gap-3 rounded-[2rem] bg-accent-primary px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white shadow-2xl shadow-accent-primary/30 transition-all hover:bg-accent-secondary hover:-translate-y-1 active:scale-95"
+                            className="group relative flex items-center gap-3 rounded-[2rem] bg-accent-primary px-8 py-4 text-2xs font-black uppercase tracking-widest text-white shadow-2xl shadow-accent-primary/30 transition-all hover:bg-accent-secondary hover:-translate-y-1 active:scale-95"
                         >
                             <ShoppingCart className="h-4 w-4 group-hover:rotate-12 transition-transform" />
                             Llevar Todo al Carrito
@@ -97,7 +97,7 @@ export function Wishlist() {
 
                         <div className="relative space-y-4 max-w-sm px-6">
                             <h2 className="text-2xl font-black text-white uppercase tracking-tight">Tu Bitácora de Deseos está Vacía</h2>
-                            <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest leading-relaxed opacity-60">
+                            <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest leading-relaxed opacity-60">
                                 No dejes que tus favoritos se escapen. Explora nuestra curación exclusiva y guarda lo que te inspire.
                             </p>
                             <div className="pt-6">

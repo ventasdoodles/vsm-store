@@ -39,7 +39,7 @@ export function CustomerEvidence({ customer }: Props) {
     };
 
     return (
-        <div className="rounded-[2rem] border border-white/5 bg-[#13141f]/80 backdrop-blur-xl p-6 shadow-2xl relative overflow-hidden">
+        <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl relative overflow-hidden">
             {/* Ambient Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 
@@ -61,7 +61,7 @@ export function CustomerEvidence({ customer }: Props) {
             <div className="relative z-10 space-y-4">
                 {/* Upload Zone */}
                 <label className={`relative flex flex-col items-center justify-center w-full min-h-[120px] rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden group
-                    ${uploadMutation.isPending ? 'border-cyan-500/50 bg-[#1a1c29]' : 'border-white/10 hover:border-cyan-500/30 hover:bg-cyan-500/5 bg-[#1a1c29]/50'}
+                    ${uploadMutation.isPending ? 'border-cyan-500/50 bg-surface-card' : 'border-white/10 hover:border-cyan-500/30 hover:bg-cyan-500/5 bg-surface-card/50'}
                 `}>
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     
@@ -77,7 +77,7 @@ export function CustomerEvidence({ customer }: Props) {
                                     <ImagePlus className="w-6 h-6 text-theme-secondary/70 group-hover:text-cyan-400 transition-colors" />
                                 </div>
                                 <p className="text-xs font-bold text-white mb-1">Subir nuevo documento</p>
-                                <p className="text-[10px] text-theme-secondary/50">PNG, JPG o PDF validado (Max 5MB)</p>
+                                <p className="text-2xs text-theme-secondary/50">PNG, JPG o PDF validado (Max 5MB)</p>
                             </>
                         )}
                     </div>
@@ -93,7 +93,7 @@ export function CustomerEvidence({ customer }: Props) {
                                 href={file.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
-                                className="block relative aspect-square rounded-xl overflow-hidden border border-white/10 bg-[#1a1c29] group transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:-translate-y-1"
+                                className="block relative aspect-square rounded-xl overflow-hidden border border-white/10 bg-surface-card group transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] hover:-translate-y-1"
                             >
                                 <img 
                                     src={file.url} 
@@ -108,7 +108,7 @@ export function CustomerEvidence({ customer }: Props) {
                                 <div className="absolute inset-0 flex flex-col items-center justify-end p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                                     <div className="flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-xl">
                                         <ExternalLink className="w-3.5 h-3.5 text-white" />
-                                        <span className="text-[10px] font-bold text-white uppercase tracking-wide">Expandir</span>
+                                        <span className="text-2xs font-bold text-white uppercase tracking-wide">Expandir</span>
                                     </div>
                                 </div>
                             </a>

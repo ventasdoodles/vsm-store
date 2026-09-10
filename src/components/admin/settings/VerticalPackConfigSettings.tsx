@@ -144,7 +144,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
 
     const PremiumInput = ({ label, value, onChange, icon: Icon, placeholder, mono = false }: PremiumInputProps) => (
         <div className="relative group">
-            <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
+            <label className="text-2xs font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
                 {Icon && <Icon className="w-3 h-3" />}
                 {label}
             </label>
@@ -170,7 +170,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
 
     const PremiumTextarea = ({ label, value, onChange, rows = 3, placeholder }: PremiumTextareaProps) => (
         <div className="relative group">
-            <label className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
+            <label className="text-2xs font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
                 {label}
             </label>
             <textarea
@@ -392,7 +392,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                                 className="bg-transparent border-none text-xl font-bold text-white focus:outline-none focus:ring-0 p-0 placeholder-white/20 w-full" 
                                                             />
                                                             <div className="flex items-center gap-2 mt-1">
-                                                                <span className="text-[10px] uppercase tracking-widest text-emerald-400/80 font-mono bg-emerald-400/10 px-2 py-0.5 rounded">SLUG</span>
+                                                                <span className="text-2xs uppercase tracking-widest text-emerald-400/80 font-mono bg-emerald-400/10 px-2 py-0.5 rounded">SLUG</span>
                                                                 <input 
                                                                     type="text" 
                                                                     value={section.slug || ''} 
@@ -407,25 +407,25 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                     <div className="space-y-5">
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Etiqueta Corta</label>
+                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Etiqueta Corta</label>
                                                                 <input type="text" value={section.shortLabel || ''} onChange={(e) => updateSection(idx, 'shortLabel', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Ruta Base</label>
+                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Ruta Base</label>
                                                                 <input type="text" value={section.routePrefix || ''} onChange={(e) => updateSection(idx, 'routePrefix', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 font-mono text-blue-300 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Descripción Breve</label>
+                                                            <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Descripción Breve</label>
                                                             <textarea value={section.description || ''} onChange={(e) => updateSection(idx, 'description', e.target.value)} rows={2} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white/70 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all resize-none" />
                                                         </div>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Descripción SEO</label>
+                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Descripción SEO</label>
                                                                 <textarea value={section.seoDescription || ''} onChange={(e) => updateSection(idx, 'seoDescription', e.target.value)} rows={2} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white/70 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all resize-none" />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Token de Tema</label>
+                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Token de Tema</label>
                                                                 <input type="text" value={section.themeToken || ''} onChange={(e) => updateSection(idx, 'themeToken', e.target.value)} placeholder="ej. blue, violet" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                         </div>
@@ -442,7 +442,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
                                             <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
-                                                JSON Raw <span className="text-[10px] bg-red-500/20 text-red-400 px-3 py-1 rounded-full uppercase tracking-widest border border-red-500/30">Modo Desarrollador</span>
+                                                JSON Raw <span className="text-2xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full uppercase tracking-widest border border-red-500/30">Modo Desarrollador</span>
                                             </h3>
                                             <p className="text-white/50 text-sm">Control total sobre el esquema subyacente. Útil para copiar/pegar configuraciones enteras.</p>
                                         </div>
@@ -454,7 +454,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                             value={formData.vertical_pack_config}
                                             onChange={handleChange}
                                             spellCheck={false}
-                                            className={`w-full h-[500px] bg-[#0a0a0f] border-2 rounded-3xl p-8 pt-10 font-mono text-sm leading-relaxed focus:outline-none transition-all shadow-inner resize-y ${parseError ? 'border-red-500/50 text-red-400 focus:border-red-500 focus:shadow-[0_0_30px_rgba(239,68,68,0.2)]' : 'border-white/5 text-emerald-400/90 focus:border-violet-500/50 focus:shadow-[0_0_40px_rgba(139,92,246,0.15)]'}`}
+                                            className={`w-full h-[500px] bg-surface-overlay border-2 rounded-3xl p-8 pt-10 font-mono text-sm leading-relaxed focus:outline-none transition-all shadow-inner resize-y ${parseError ? 'border-red-500/50 text-red-400 focus:border-red-500 focus:shadow-[0_0_30px_rgba(239,68,68,0.2)]' : 'border-white/5 text-emerald-400/90 focus:border-violet-500/50 focus:shadow-[0_0_40px_rgba(139,92,246,0.15)]'}`}
                                             placeholder='{"id": "...", ...}'
                                         />
                                         {parseError && (

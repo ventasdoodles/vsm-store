@@ -37,7 +37,7 @@ export function Addresses() {
                              <div className="h-2 w-2 rounded-full bg-accent-primary animate-pulse-slow" />
                              <h1 className="text-xl font-black text-white uppercase tracking-tight">Mis Direcciones</h1>
                         </div>
-                        <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Gestiona tus puntos de entrega</p>
+                        <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Gestiona tus puntos de entrega</p>
                     </div>
                 </div>
                 <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10">
@@ -48,7 +48,7 @@ export function Addresses() {
             {/* Layout de Direcciones */}
             <div className="grid gap-8">
                 <div className="space-y-4">
-                    <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 px-1">
+                    <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 px-1">
                         Libreta de direcciones
                     </h2>
                     <AddressList customerId={user.id} />

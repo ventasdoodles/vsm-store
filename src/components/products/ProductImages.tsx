@@ -171,7 +171,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
-                                className="vsm-pill bg-vape-500 text-slate-950 font-black text-[10px] uppercase tracking-tighter"
+                                className="vsm-pill bg-vape-500 text-slate-950 font-black text-2xs uppercase tracking-tighter"
                             >
                                 Immersivo
                             </m.div>

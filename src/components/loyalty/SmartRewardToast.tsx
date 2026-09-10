@@ -55,7 +55,7 @@ export function SmartRewardToast() {
                                     <div className="h-8 w-8 rounded-full bg-accent-primary flex items-center justify-center animate-pulse">
                                         <Sparkles className="h-4 w-4 text-white" />
                                     </div>
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Oferta Personalizada IA</span>
+                                    <span className="text-2xs font-black text-white uppercase tracking-widest">Oferta Personalizada IA</span>
                                 </div>
                                 <button
                                     onClick={handleDismiss}

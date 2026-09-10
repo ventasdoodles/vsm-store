@@ -21,7 +21,7 @@ export function ProductEditorTabs({ activeTab, setActiveTab }: ProductEditorTabs
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as EditorTab)}
                     className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                        "flex items-center gap-2 px-4 py-2 rounded-xl text-2xs font-black uppercase tracking-widest transition-all",
                         activeTab === tab.id 
                             ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" 
                             : "text-white/30 hover:bg-white/5 hover:text-white/60"

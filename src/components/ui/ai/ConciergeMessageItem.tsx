@@ -172,7 +172,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
         {message.role === 'assistant' && noWriteSmokeAudit && (
             <div
                 data-testid="ci-no-write-smoke-audit"
-                className="w-full rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-[10px] text-emerald-100/85"
+                className="w-full rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-2xs text-emerald-100/85"
             >
                 <div className="font-black uppercase tracking-[0.16em] text-emerald-300">
                     No-write smoke audit
@@ -204,7 +204,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                     {helpSurface.label}
                 </span>
                 {helpSurface.note ? (
-                    <span className="text-[10px] font-medium text-white/45">
+                    <span className="text-2xs font-medium text-white/45">
                         {helpSurface.note}
                     </span>
                 ) : null}
@@ -215,13 +215,13 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                             href={source.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-[10px] font-medium text-white/50 underline decoration-white/20 underline-offset-2 hover:text-white/75"
+                            className="text-2xs font-medium text-white/50 underline decoration-white/20 underline-offset-2 hover:text-white/75"
                         >
                             {source.title}
                         </a>
                     ))
                 ) : message.source_context?.brief && !helpSurface.note ? (
-                    <span className="text-[10px] font-medium text-white/45">
+                    <span className="text-2xs font-medium text-white/45">
                         {message.source_context.brief}
                     </span>
                 ) : null}
@@ -278,7 +278,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                         >
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-vape-500/50 to-vape-600/10" />
                             <div className="flex items-center justify-between mb-0.5">
-                                <h4 className="text-[11px] font-bold text-white tracking-wide">{chunk.title}</h4>
+                                <h4 className="text-2xs font-bold text-white tracking-wide">{chunk.title}</h4>
                                 <span className="text-[8px] font-black px-1.5 py-0.5 rounded-md bg-white/5 text-white/50 uppercase tracking-[0.1em]">
                                     {chunk.category}
                                 </span>
@@ -300,7 +300,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                             {getSuggestionGroupLabel(message.capsule_contract?.match_strategy)}
                         </p>
                         {showRecoveryHint && recoveryHint && (
-                            <p className="text-[10px] text-white/45 leading-relaxed font-medium">
+                            <p className="text-2xs text-white/45 leading-relaxed font-medium">
                                 {recoveryHint}
                             </p>
                         )}
@@ -330,7 +330,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                             {product.name}
                                         </p>
                                         <div className="mt-0.5 flex items-center gap-2">
-                                            <p className="text-[10px] font-black text-vape-400">
+                                            <p className="text-2xs font-black text-vape-400">
                                                 {getProductPriceLabel(product)}
                                             </p>
                                             {product.status_signal === 'LOW_STOCK' && (
@@ -364,7 +364,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                 )}
                 {hasSuggestedProducts && showProductSurfaces && activeRecovery?.messageId === message.id && (
                     <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3 space-y-2">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                        <p className="text-2xs font-bold uppercase tracking-[0.16em] text-white/45">
                             Afinemos esto
                         </p>
                         <div className="flex flex-col gap-2">
@@ -376,7 +376,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                     type="button"
                                     disabled={isLoading}
                                     onClick={() => handleRecoverySelection?.('closest', product.id)}
-                                    className="w-full rounded-xl border border-white/8 bg-black/25 px-3 py-2 text-left text-[11px] font-semibold text-white/80 hover:border-vape-400/40 hover:text-white transition-all disabled:opacity-60"
+                                    className="w-full rounded-xl border border-white/8 bg-black/25 px-3 py-2 text-left text-2xs font-semibold text-white/80 hover:border-vape-400/40 hover:text-white transition-all disabled:opacity-60"
                                 >
                                     Esta se parece mas: {product.name}
                                 </button>
@@ -386,7 +386,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                 type="button"
                                 disabled={isLoading}
                                 onClick={() => handleRecoverySelection?.('none')}
-                                className="w-full rounded-xl border border-white/8 bg-white/[0.04] px-3 py-2 text-[11px] font-semibold text-white/65 hover:border-white/20 hover:text-white transition-all disabled:opacity-60"
+                                className="w-full rounded-xl border border-white/8 bg-white/[0.04] px-3 py-2 text-2xs font-semibold text-white/65 hover:border-white/20 hover:text-white transition-all disabled:opacity-60"
                             >
                                 Ninguna
                             </button>
@@ -397,7 +397,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                     <div className="rounded-2xl border border-vape-400/20 bg-vape-500/[0.06] p-3 space-y-3">
                         <div className="space-y-1">
                             <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-vape-300/70">
+                                <p className="text-2xs font-black uppercase tracking-[0.16em] text-vape-300/70">
                                     Siguiente paso
                                 </p>
                                 {nextStepFamilyLabel && (
@@ -407,12 +407,12 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                 )}
                             </div>
                             {showNextStepTrustNote && (
-                                <p className="text-[10px] font-semibold text-vape-100/55 leading-relaxed">
+                                <p className="text-2xs font-semibold text-vape-100/55 leading-relaxed">
                                     {nextStepTrustNote}
                                 </p>
                             )}
                             {showNextStepGuidance && (
-                                <p className="text-[11px] font-medium text-white/80 leading-relaxed">
+                                <p className="text-2xs font-medium text-white/80 leading-relaxed">
                                     {nextStepView.guidance}
                                 </p>
                             )}
@@ -490,7 +490,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                                 if (handleOpenProduct) handleOpenProduct(action.product);
                                             }}
                                             className={cn(
-                                                'w-full rounded-xl border px-3 py-2 text-left text-[11px] font-semibold transition-all',
+                                                'w-full rounded-xl border px-3 py-2 text-left text-2xs font-semibold transition-all',
                                                 index === 0
                                                     ? renderedKind === 'ADD_TO_CART'
                                                         ? 'border-vape-400/25 bg-vape-500/15 text-white hover:border-vape-300/50 hover:bg-vape-500/22'
@@ -508,7 +508,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                     type="button"
                                     disabled={isLoading}
                                     onClick={() => void sendMessage(nextStepView.assistAction.message)}
-                                    className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-left text-[11px] font-semibold text-white/75 transition-all hover:border-white/20 hover:text-white disabled:opacity-60"
+                                    className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-left text-2xs font-semibold text-white/75 transition-all hover:border-white/20 hover:text-white disabled:opacity-60"
                                 >
                                     {nextStepView.assistAction.label}
                                 </button>
@@ -519,7 +519,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                 {cartFeedback && (
                     <div
                         className={cn(
-                            'rounded-2xl border px-3 py-2 text-[11px] font-semibold leading-relaxed',
+                            'rounded-2xl border px-3 py-2 text-2xs font-semibold leading-relaxed',
                             cartFeedback.tone === 'success'
                                 ? 'border-emerald-400/25 bg-emerald-500/10 text-emerald-100/85'
                                 : cartFeedback.tone === 'warning'

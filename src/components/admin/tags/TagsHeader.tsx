@@ -23,7 +23,7 @@ export function TagsHeader({ onNew }: TagsHeaderProps) {
                         <div className="p-2.5 bg-gradient-to-br from-accent-primary/20 to-pink-500/10 rounded-[1rem] border border-accent-primary/20 shadow-inner">
                             <Tags className="h-7 w-7 text-accent-primary drop-shadow-[0_0_8px_rgba(var(--color-accent-primary),0.3)]" />
                         </div>
-                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-accent-primary/20 to-pink-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-accent-primary ring-1 ring-inset ring-accent-primary/30">
+                        <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-accent-primary/20 to-pink-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-accent-primary ring-1 ring-inset ring-accent-primary/30">
                             Marketing & SEO
                         </span>
                     </div>

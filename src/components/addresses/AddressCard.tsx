@@ -49,7 +49,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                                 <MapPin size={20} />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary mb-0.5 opacity-50">
+                                <span className="block text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary mb-0.5 opacity-50">
                                     {isShipping ? 'Dirección de Envío' : 'Dirección de Facturación'}
                                 </span>
                                 <h3 className="text-sm font-black text-white uppercase tracking-tight truncate">
@@ -61,13 +61,13 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                         {/* Detalles */}
                         <div className="space-y-1 pl-[3.25rem]">
                             {address.full_name && !compact && (
-                                <p className="text-[11px] font-bold text-white uppercase tracking-wide">{address.full_name}</p>
+                                <p className="text-2xs font-bold text-white uppercase tracking-wide">{address.full_name}</p>
                             )}
                             <p className="text-xs text-theme-secondary leading-relaxed font-medium">
                                 {formatAddress(address)}
                             </p>
                             {address.phone && !compact && (
-                                <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                                <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
                                     <span className="h-1 w-1 rounded-full bg-theme-tertiary/30" />
                                     Tel: {address.phone}
                                 </p>
@@ -95,7 +95,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                         {onSetDefault && !address.is_default && (
                             <button
                                 onClick={(e) => { e.stopPropagation(); onSetDefault(address.id); }}
-                                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[10px] font-black uppercase tracking-widest text-theme-tertiary hover:bg-white/5 hover:text-white transition-all bg-white/[0.02]"
+                                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-2xs font-black uppercase tracking-widest text-theme-tertiary hover:bg-white/5 hover:text-white transition-all bg-white/[0.02]"
                             >
                                 <Star className="h-3.5 w-3.5" />
                                 Hacer Principal

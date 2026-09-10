@@ -85,7 +85,7 @@ function StatBadge({
                     {icon}
                     {value}
                 </div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-theme-secondary/80">
+                <p className="text-2xs font-bold uppercase tracking-[0.2em] text-theme-secondary/80">
                     {label}
                 </p>
             </div>

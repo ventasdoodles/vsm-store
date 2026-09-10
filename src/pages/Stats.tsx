@@ -29,7 +29,7 @@ export function Stats() {
         return (
             <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
                 <Loader2 className="h-10 w-10 animate-spin text-accent-primary" />
-                <p className="text-[10px] text-theme-tertiary font-black uppercase tracking-[0.3em] animate-pulse">Procesando Múltiples KPIs...</p>
+                <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.3em] animate-pulse">Procesando Múltiples KPIs...</p>
             </div>
         );
     }
@@ -41,7 +41,7 @@ export function Stats() {
                     <BarChart3 size={40} className="text-theme-tertiary opacity-20" />
                 </div>
                 <h2 className="text-3xl font-black text-white uppercase italic tracking-tight mb-4">Universo Paralelo de Datos</h2>
-                <p className="text-[10px] text-theme-tertiary font-black uppercase tracking-widest leading-relaxed opacity-60">
+                <p className="text-2xs text-theme-tertiary font-black uppercase tracking-widest leading-relaxed opacity-60">
                     Tu dimensión analítica está virgen. Inicia tu primera transacción para comenzar a trazar tu trayectoria de consumo.
                 </p>
                 <div className="pt-10">
@@ -71,7 +71,7 @@ export function Stats() {
                              <Sparkles className="h-4 w-4 text-accent-primary animate-bounce-slow" />
                              <h1 className="text-4xl font-black text-white uppercase italic tracking-tight">Vanguardia Analítica</h1>
                         </div>
-                        <p className="text-[10px] text-theme-tertiary font-black uppercase tracking-[0.3em] opacity-60 mt-1">Trayectoria transaccional y KPIs de consumo</p>
+                        <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.3em] opacity-60 mt-1">Trayectoria transaccional y KPIs de consumo</p>
                     </div>
                 </div>
             </header>
@@ -146,7 +146,7 @@ export function Stats() {
                                     >
                                          <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-white/20 to-transparent" />
                                     </m.div>
-                                    <span className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest">{s.label}</span>
+                                    <span className="text-2xs font-black text-theme-tertiary uppercase tracking-widest">{s.label}</span>
                                 </div>
                             );
                         })}
@@ -174,7 +174,7 @@ export function Stats() {
                                 className="flex items-center gap-6 p-4 rounded-[2rem] bg-white/[0.01] border border-white/5 transition-all duration-500 hover:bg-white/[0.03] group/item"
                             >
                                 <div className="relative">
-                                     <span className="absolute -top-3 -left-3 flex h-8 w-8 items-center justify-center rounded-full bg-black border border-white/10 text-[10px] font-black text-white italic z-20 shadow-2xl">
+                                     <span className="absolute -top-3 -left-3 flex h-8 w-8 items-center justify-center rounded-full bg-black border border-white/10 text-2xs font-black text-white italic z-20 shadow-2xl">
                                         #{i + 1}
                                      </span>
                                      <div className="h-16 w-16 rounded-2xl bg-black border border-white/5 overflow-hidden shadow-inner flex-shrink-0 relative">

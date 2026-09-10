@@ -45,7 +45,7 @@ export function ProductSpecsBuilder({
                                         onClick={() => onAddSpec(s)}
                                         disabled={isUsed}
                                         className={cn(
-                                            "px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all flex items-center gap-1.5",
+                                            "px-2.5 py-1 rounded-md text-2xs font-bold border transition-all flex items-center gap-1.5",
                                             isUsed 
                                                 ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-500/40 cursor-default" 
                                                 : "border-white/5 bg-white/5 text-white/40 hover:border-violet-500/30 hover:text-white"
@@ -104,12 +104,12 @@ export function ProductSpecsBuilder({
                             const keyInput = document.getElementById('new-spec-key') as HTMLInputElement;
                             if (onAddSpec(keyInput.value)) keyInput.value = '';
                         }}
-                        className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all font-bold text-[10px] uppercase tracking-wider"
+                        className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all font-bold text-2xs uppercase tracking-wider"
                     >
                         Añadir
                     </button>
                 </div>
-                <p className="text-[10px] text-white/20 italic">Las specs son propiedades técnicas fijas que no crean variaciones de stock.</p>
+                <p className="text-2xs text-white/20 italic">Las specs son propiedades técnicas fijas que no crean variaciones de stock.</p>
             </div>
         </section>
     );

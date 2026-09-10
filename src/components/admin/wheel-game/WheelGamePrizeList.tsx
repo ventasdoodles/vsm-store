@@ -110,7 +110,7 @@ export function WheelGamePrizeList({
                 const type = getValue();
                 return (
                     <span className={cn(
-                        'inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border',
+                        'inline-block px-2 py-0.5 rounded-full text-2xs font-black uppercase tracking-wider border',
                         TYPE_BADGE[type],
                     )}>
                         {TYPE_LABEL[type]}
@@ -230,7 +230,7 @@ export function WheelGamePrizeList({
                                     <th 
                                         key={header.id} 
                                         className={cn(
-                                            "px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/30",
+                                            "px-4 py-3 text-2xs font-black uppercase tracking-widest text-white/30",
                                             (header.column.id === 'color' || header.column.id === 'label' || header.column.id === 'type' || header.column.id === 'value') && "text-left",
                                             (header.column.id === 'probability' || header.column.id === 'active') && "text-center",
                                             header.column.id === 'actions' && "text-right"

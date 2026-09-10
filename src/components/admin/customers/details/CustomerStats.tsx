@@ -117,7 +117,7 @@ export function CustomerStats({ customer }: Props) {
             </div>
 
             {/* Total Gastado (LTV) */}
-            <div className="rounded-2xl border border-white/5 bg-[#13141f]/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
+            <div className="rounded-2xl border border-white/5 bg-surface-base/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
                 <div className="flex items-center justify-between mb-2">
                     <div className="text-xs text-theme-secondary font-medium uppercase tracking-wider">LTV (Lifetime Value)</div>
                     <CreditCard className="h-4 w-4 text-green-400 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -127,7 +127,7 @@ export function CustomerStats({ customer }: Props) {
             </div>
 
             {/* Pedidos Totales */}
-            <div className="rounded-2xl border border-white/5 bg-[#13141f]/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
+            <div className="rounded-2xl border border-white/5 bg-surface-base/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
                 <div className="flex items-center justify-between mb-2">
                     <div className="text-xs text-theme-secondary font-medium uppercase tracking-wider">Transacciones</div>
                     <ShoppingBag className="h-4 w-4 text-blue-400 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -137,7 +137,7 @@ export function CustomerStats({ customer }: Props) {
             </div>
 
             {/* Ticket Promedio (AOV) */}
-            <div className="rounded-2xl border border-white/5 bg-[#13141f]/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
+            <div className="rounded-2xl border border-white/5 bg-surface-base/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
                 <div className="flex items-center justify-between mb-2">
                     <div className="text-xs text-theme-secondary font-medium uppercase tracking-wider">Ticket Promedio</div>
                     <TrendingUp className="h-4 w-4 text-purple-400 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -147,7 +147,7 @@ export function CustomerStats({ customer }: Props) {
             </div>
 
             {/* Última Compra */}
-            <div className="rounded-2xl border border-white/5 bg-[#13141f]/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
+            <div className="rounded-2xl border border-white/5 bg-surface-base/80 p-5 flex flex-col justify-center shadow-lg hover:bg-white/5 transition-colors group">
                 <div className="flex items-center justify-between mb-2">
                     <div className="text-xs text-theme-secondary font-medium uppercase tracking-wider">Recencia</div>
                     <Clock className="h-4 w-4 text-amber-400 opacity-50 group-hover:opacity-100 transition-opacity" />

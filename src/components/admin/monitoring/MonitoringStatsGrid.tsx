@@ -92,7 +92,7 @@ export function MonitoringStatsGrid({
                             <p className={`text-3xl font-black leading-none tracking-tight ${card.textColor}`}>
                                 {card.value}
                             </p>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60 mt-2">
+                            <p className="text-2xs font-black uppercase tracking-widest text-theme-secondary/60 mt-2">
                                 {card.label}
                             </p>
                         </div>

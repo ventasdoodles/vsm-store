@@ -145,7 +145,7 @@ export function CategoryTreeNode({
                         {/* Section badge — solo en raiz */}
                         {isRoot && (
                         <span className={cn(
-                            'flex-shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider ring-1 ring-inset',
+                            'flex-shrink-0 rounded-md px-1.5 py-0.5 text-2xs font-black uppercase tracking-wider ring-1 ring-inset',
                                 sectionPresentation.badgeClassName,
                         )}>
                                 {category.section}
@@ -153,14 +153,14 @@ export function CategoryTreeNode({
                         )}
                         {/* Children count badge */}
                         {hasChildren && (
-                            <span className="flex-shrink-0 rounded-full bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-white/30 ring-1 ring-inset ring-white/10">
+                            <span className="flex-shrink-0 rounded-full bg-white/5 px-1.5 py-0.5 text-2xs font-bold text-white/30 ring-1 ring-inset ring-white/10">
                                 {children.length}
                             </span>
                         )}
                     </div>
                     {/* Description preview */}
                     {category.description && (
-                        <p className="mt-0.5 truncate text-[11px] text-white/30">
+                        <p className="mt-0.5 truncate text-2xs text-white/30">
                             {category.description}
                         </p>
                     )}

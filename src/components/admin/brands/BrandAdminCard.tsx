@@ -22,7 +22,7 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
         )}>
             {/* Status Badge */}
             {!brand.is_active && (
-                <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-500 text-[10px] uppercase font-black tracking-wider rounded-xl shadow-lg flex items-center gap-1.5">
+                <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-500 text-2xs uppercase font-black tracking-wider rounded-xl shadow-lg flex items-center gap-1.5">
                     <EyeOff className="w-3 h-3" />
                     Inactiva
                 </div>
@@ -42,7 +42,7 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
                 ) : (
                     <div className="flex flex-col items-center justify-center gap-2 opacity-30">
                         <ImageIcon className="h-10 w-10 text-theme-secondary shrink-0" />
-                        <span className="text-[10px] font-black uppercase tracking-wider text-theme-secondary">Sin logo</span>
+                        <span className="text-2xs font-black uppercase tracking-wider text-theme-secondary">Sin logo</span>
                     </div>
                 )}
 
@@ -61,17 +61,17 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
                     {brand.name}
                 </h3>
                 <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[10px] font-mono font-bold text-white/50 bg-black/30 px-2 py-1 rounded-md border border-white/5">
+                    <span className="text-2xs font-mono font-bold text-white/50 bg-black/30 px-2 py-1 rounded-md border border-white/5">
                         NO. {brand.sort_order}
                     </span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-theme-secondary/40">
+                    <span className="text-2xs uppercase font-bold tracking-wider text-theme-secondary/40">
                          Orden de aparición
                     </span>
                 </div>
             </div>
             
             {/* Mobile Actions (Always visible on touch) */}
-            <div className="flex md:hidden border-t border-white/5 p-2 bg-[#13141f] justify-around">
+            <div className="flex md:hidden border-t border-white/5 p-2 bg-surface-base justify-around">
                  <button onClick={() => onEdit(brand)} className="p-3 text-blue-400"><Edit2 className="w-5 h-5"/></button>
                  <button onClick={() => onDuplicate(brand)} className="p-3 text-gray-400"><Copy className="w-5 h-5"/></button>
                  <button onClick={() => onToggleActive(brand.id, !brand.is_active)} className="p-3 text-amber-400">

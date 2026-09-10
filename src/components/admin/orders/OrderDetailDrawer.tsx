@@ -114,13 +114,13 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                     <section className="rounded-2xl border border-white/5 bg-white/[0.02] p-5">
                         <div className="flex items-center gap-2 mb-4">
                             <div className={cn("h-5 w-1 rounded-full shrink-0", getSolidBackgroundClass(statusInfo?.color))} />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60">Estado del Pedido</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-theme-secondary/60">Estado del Pedido</span>
                         </div>
                         <div className="relative">
                             <select
                                 value={order.status}
                                 onChange={(e) => handleStatusChange(e.target.value)}
-                                className={cn("w-full appearance-none rounded-xl border border-white/10 bg-[#1a1c29] px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20 border-l-[3px]", getBorderHighlightClass(statusInfo?.color))}
+                                className={cn("w-full appearance-none rounded-xl border border-white/10 bg-surface-card px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20 border-l-[3px]", getBorderHighlightClass(statusInfo?.color))}
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.filter(s => s.value !== 'cancelled').map(s => {
                                     const isCurrent = s.value === order.status;
@@ -142,7 +142,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             <div className="p-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10">
                                 <User className="h-3.5 w-3.5 text-blue-400" />
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60">Cliente</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-theme-secondary/60">Cliente</span>
                         </div>
 
                         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
@@ -183,12 +183,12 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             <div className="p-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10">
                                 <Truck className="h-3.5 w-3.5 text-emerald-400" />
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60">Rastreo / Guía</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-theme-secondary/60">Rastreo / Guía</span>
                         </div>
 
                         {isEditingTracking ? (
                             <div className="space-y-3">
-                                <p className="text-[10px] font-black text-theme-secondary/40 uppercase tracking-widest mb-3">Editar Número de Guía</p>
+                                <p className="text-2xs font-black text-theme-secondary/40 uppercase tracking-widest mb-3">Editar Número de Guía</p>
                                 <input
                                     autoFocus
                                     type="text"
@@ -223,7 +223,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                 </div>
                                 <button
                                     onClick={() => setIsEditingTracking(true)}
-                                    className="shrink-0 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-theme-secondary/60 hover:border-white/15 hover:text-theme-primary transition-colors ml-3"
+                                    className="shrink-0 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-2xs font-black uppercase tracking-wider text-theme-secondary/60 hover:border-white/15 hover:text-theme-primary transition-colors ml-3"
                                 >
                                     {order.tracking_number ? 'Editar' : 'Agregar'}
                                 </button>
@@ -250,14 +250,14 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                 {order.payment_status !== 'paid' && (
                                     <button
                                         onClick={() => onPaymentStatusChange(order.id, 'paid')}
-                                        className="text-[10px] font-black uppercase tracking-tighter text-emerald-400 hover:text-emerald-300 transition-colors text-left"
+                                        className="text-2xs font-black uppercase tracking-tighter text-emerald-400 hover:text-emerald-300 transition-colors text-left"
                                     >
                                         [Confirmar Pago]
                                     </button>
                                 )}
                             </div>
                             {order.coupon_code && (
-                                <p className="mt-2 text-[11px] text-amber-400/60 font-mono">Cupón: {order.coupon_code}</p>
+                                <p className="mt-2 text-2xs text-amber-400/60 font-mono">Cupón: {order.coupon_code}</p>
                             )}
                         </section>
 
@@ -265,7 +265,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                         <section className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
                             <div className="flex items-center gap-1.5 mb-2">
                                 <MapPin className="h-3.5 w-3.5 text-purple-400/70" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/50">Envío</span>
+                                <span className="text-2xs font-black uppercase tracking-widest text-theme-secondary/50">Envío</span>
                             </div>
                             <p className="text-sm font-bold text-theme-primary capitalize">
                                 {order.delivery_method || 'N/A'}
@@ -279,7 +279,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             <div className="flex items-center gap-2.5">
                                 <Package className="h-4 w-4 text-theme-secondary/60" />
                                 <span className="text-sm font-black text-theme-primary">Productos del Pedido</span>
-                                <span className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-0.5 text-[11px] font-bold text-theme-secondary/60">
+                                <span className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-0.5 text-2xs font-bold text-theme-secondary/60">
                                     {order.items?.length ?? 0}
                                 </span>
                             </div>
@@ -308,7 +308,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                             {item.product_name || item.name || '—'}
                                         </p>
                                         {item.variant_name && (
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                                            <p className="text-2xs font-black uppercase tracking-widest text-emerald-400">
                                                 {item.variant_name}
                                             </p>
                                         )}
@@ -341,7 +341,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
 
                                 {showCancelConfirm ? (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                        <div className="rounded-xl border border-red-500/30 bg-[#1a1c29] p-4 space-y-3">
+                                        <div className="rounded-xl border border-red-500/30 bg-surface-card p-4 space-y-3">
                                             <h4 className="text-sm font-bold text-red-400 flex items-center gap-2">
                                                 <XCircle className="h-4 w-4" /> ¿Cancelar Pedido?
                                             </h4>
@@ -355,7 +355,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                             </div>
 
                                             <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60">
+                                                <label className="text-2xs font-black uppercase tracking-widest text-theme-secondary/60">
                                                     Motivo de cancelación *
                                                 </label>
                                                 <textarea
@@ -397,7 +397,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                             Cancelar Pedido
                                         </button>
                                         {order.payment_status === 'paid' && (
-                                            <p className="text-[10px] text-center text-red-400/60 mt-2 font-bold uppercase tracking-wider">
+                                            <p className="text-2xs text-center text-red-400/60 mt-2 font-bold uppercase tracking-wider">
                                                 Deshabilitado: El pedido está pagado. Reembolsos próximamente.
                                             </p>
                                         )}

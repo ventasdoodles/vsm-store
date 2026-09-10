@@ -57,7 +57,7 @@ export function CheckoutSteps({ currentStep, steps }: CheckoutStepsProps) {
                             )}
                         </m.div>
                         <span className={cn(
-                            "text-[10px] font-bold uppercase tracking-wider transition-colors",
+                            "text-2xs font-bold uppercase tracking-wider transition-colors",
                             isActive ? "text-theme-primary" : "text-theme-tertiary"
                         )}>
                             {step.label}

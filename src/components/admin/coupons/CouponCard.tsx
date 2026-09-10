@@ -47,7 +47,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
             <div className={cn("absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 pointer-events-none transition-all group-hover:opacity-40", status.glow)} />
 
             {/* Status Badge */}
-            <div className={cn("absolute top-5 right-5 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border", status.bg, status.color, status.border)}>                                                                                   
+            <div className={cn("absolute top-5 right-5 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-2xs font-black uppercase tracking-wider border", status.bg, status.color, status.border)}>                                                                                   
                 <StatusIcon className="h-3 w-3" /> {status.label}
             </div>
 
@@ -65,7 +65,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
             {/* Details Grid */}
             <div className="grid grid-cols-2 gap-3 mb-6 relative z-10 flex-1">
                 <div className="bg-black/20 p-3 rounded-xl border border-white/[0.03]">
-                    <div className="text-[10px] text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Descuento</div>                                                                     
+                    <div className="text-2xs text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Descuento</div>                                                                     
                     <div className="text-base font-black text-theme-primary flex items-center gap-1.5">                                                                                      
                         {coupon.discount_type === 'percentage' ? (
                             <><Percent className="h-3.5 w-3.5 text-fuchsia-400" /> {coupon.discount_value}%</>                                                                               
@@ -75,19 +75,19 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                     </div>
                 </div>
                 <div className="bg-black/20 p-3 rounded-xl border border-white/[0.03]">
-                    <div className="text-[10px] text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Usos</div>
+                    <div className="text-2xs text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Usos</div>
                     <div className="text-base font-black text-theme-primary flex items-baseline gap-1">      
                         {coupon.used_count} <span className="text-xs text-theme-secondary/50 font-medium">/ {coupon.max_uses || ''}</span>
                     </div>
                 </div>
                 <div className="bg-black/20 p-3 rounded-xl border border-white/[0.03]">
-                    <div className="text-[10px] text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Mínimo</div>
+                    <div className="text-2xs text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Mínimo</div>
                     <div className="text-sm font-bold text-theme-primary">      
                         {coupon.min_purchase > 0 ? formatPrice(coupon.min_purchase) : 'Sin mínimo'}
                     </div>
                 </div>
                 <div className="bg-black/20 p-3 rounded-xl border border-white/[0.03]">
-                    <div className="text-[10px] text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Audiencia</div>
+                    <div className="text-2xs text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Audiencia</div>
                     <div className="text-sm font-bold text-theme-primary flex items-center gap-1.5">                                                                                      
                         <User className="h-3.5 w-3.5 text-blue-400" />
                         {coupon.customer_id ? 'Específico' : 'Global'}

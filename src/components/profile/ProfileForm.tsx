@@ -66,7 +66,7 @@ export function ProfileForm() {
                 <h2 className="text-sm font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">
                     Editar Información
                 </h2>
-                <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60 mt-1">
+                <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60 mt-1">
                     Gestiona tu identidad digital
                 </p>
             </header>
@@ -128,7 +128,7 @@ export function ProfileForm() {
                         type="submit"
                         disabled={!isDirty || isSubmitting}
                         className={cn(
-                            "group relative flex w-full items-center justify-center gap-3 rounded-[2rem] py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden shadow-2xl active:scale-95",
+                            "group relative flex w-full items-center justify-center gap-3 rounded-[2rem] py-5 text-2xs font-black uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden shadow-2xl active:scale-95",
                             isDirty && !isSubmitting
                                 ? "bg-accent-primary text-white shadow-accent-primary/30 hover:bg-accent-secondary"
                                 : "bg-white/5 border border-white/5 text-theme-tertiary cursor-not-allowed opacity-50"

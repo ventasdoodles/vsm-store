@@ -51,7 +51,7 @@ export function AdminCustomers() {
             <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-pulse">
                 <div className="h-20 w-full mb-4 bg-white/5 rounded-[2.5rem]" />
                 <div className="h-32 w-full mb-4 bg-white/5 rounded-[2.5rem]" />
-                <div className="bg-[#13141f] rounded-[2.5rem] p-8 border border-white/5 space-y-4">
+                <div className="bg-surface-base rounded-[2.5rem] p-8 border border-white/5 space-y-4">
                     <div className="h-8 w-48 bg-white/10 rounded-xl mb-8" />
                     {[1, 2, 3, 4, 5].map(i => (
                         <div key={i} className="h-16 w-full bg-white/5 rounded-2xl" />
@@ -70,7 +70,7 @@ export function AdminCustomers() {
             <CustomerDirectoryStats customers={customers} />
 
             {/* Buscador y Directorio */}
-            <div className="bg-[#13141f] rounded-[2.5rem] p-4 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+            <div className="bg-surface-base rounded-[2.5rem] p-4 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
                 <div className="flex flex-col sm:flex-row gap-6 mb-8 px-2 sm:px-0">
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">

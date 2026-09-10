@@ -20,13 +20,13 @@ export function IntelligenceMessageBubble({
                         <MessageSquare className="h-5 w-5" />
                     </div>
                     <div>
-                        <h6 className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Mensaje de WhatsApp Generado</h6>
+                        <h6 className="text-2xs font-black uppercase tracking-widest text-emerald-400">Mensaje de WhatsApp Generado</h6>
                         <p className="text-xs text-white/40">Personalizado según el contexto del cliente</p>
                     </div>
                 </div>
                 <button 
                     onClick={() => setGeneratedWhatsApp(null)}
-                    className="text-[10px] font-bold text-white/20 hover:text-white/40 uppercase tracking-widest"
+                    className="text-2xs font-bold text-white/20 hover:text-white/40 uppercase tracking-widest"
                 >
                     Cerrar
                 </button>
@@ -49,7 +49,7 @@ export function IntelligenceMessageBubble({
                         const text = encodeURIComponent(generatedWhatsApp);
                         window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
                     }}
-                    className="flex-1 px-6 py-4 rounded-2xl bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                    className="flex-1 px-6 py-4 rounded-2xl bg-emerald-500 text-white text-2xs font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
                 >
                     <MessageSquare className="h-4 w-4" />
                     Enviar por WhatsApp
@@ -59,7 +59,7 @@ export function IntelligenceMessageBubble({
                         navigator.clipboard.writeText(generatedWhatsApp);
                         alert('Mensaje copiado al portapapeles');
                     }}
-                    className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95"
+                    className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-2xs font-black uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95"
                 >
                     Copiar
                 </button>

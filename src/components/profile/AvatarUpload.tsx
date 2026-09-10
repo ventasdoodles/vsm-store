@@ -103,7 +103,7 @@ export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUplo
                 className="hidden"
             />
 
-            <p className="text-[10px] font-medium text-theme-tertiary uppercase tracking-widest opacity-60">
+            <p className="text-2xs font-medium text-theme-tertiary uppercase tracking-widest opacity-60">
                 JPG, PNG o WEBP. Máx 2MB.
             </p>
         </div>

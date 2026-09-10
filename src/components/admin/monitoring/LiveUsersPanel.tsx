@@ -29,14 +29,14 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                 <h2 className="text-lg font-black text-white tracking-tight">
                     Usuarios en Vivo
                 </h2>
-                <span className="ml-auto text-[10px] font-black uppercase tracking-widest text-emerald-400/60 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                <span className="ml-auto text-2xs font-black uppercase tracking-widest text-emerald-400/60 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
                     {users.length} conectados
                 </span>
             </div>
 
             {/* Users List */}
             {users.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 bg-[#13141f]/40 backdrop-blur-md">
+                <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 bg-surface-base/40 backdrop-blur-md">
                     <div className="relative mb-4">
                         <Wifi className="h-12 w-12 text-theme-secondary/20" />
                         <div className="absolute inset-0 animate-ping">
@@ -59,7 +59,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                         return (
                             <div
                                 key={user.id}
-                                className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-[#13141f]/40 hover:bg-[#13141f]/70 backdrop-blur-md p-5 transition-all duration-500 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/5"
+                                className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-surface-base/40 hover:bg-surface-base/70 backdrop-blur-md p-5 transition-all duration-500 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/5"
                             >
                                 {/* Ambient Glow */}
                                 <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-emerald-500/5 blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -79,7 +79,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                                             {isAnonymous ? 'Visitante Anonimo' : user.email}
                                         </p>
                                         <div className="flex items-center gap-3 mt-1">
-                                            <span className="flex items-center gap-1 text-[11px] text-theme-secondary/60">
+                                            <span className="flex items-center gap-1 text-2xs text-theme-secondary/60">
                                                 <MapPin className="h-3 w-3" />
                                                 <span className="font-mono truncate max-w-[180px]">{user.path}</span>
                                             </span>

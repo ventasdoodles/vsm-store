@@ -66,12 +66,12 @@ export function SliderAdminCard({
                 {/* Status Badges */}
                 <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
                     {!slider.active && (
-                        <div className="px-3 py-1 bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-500 text-[10px] uppercase font-black tracking-wider rounded-xl shadow-lg flex items-center gap-1.5">
+                        <div className="px-3 py-1 bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-500 text-2xs uppercase font-black tracking-wider rounded-xl shadow-lg flex items-center gap-1.5">
                             <EyeOff className="w-3 h-3" /> Inactivo
                         </div>
                     )}
                     {slider.tag && slider.tag !== 'Ninguno' && (
-                        <div className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] uppercase font-black tracking-wider rounded-xl shadow-lg max-w-max">
+                        <div className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-2xs uppercase font-black tracking-wider rounded-xl shadow-lg max-w-max">
                             {slider.tag}
                         </div>
                     )}
@@ -95,11 +95,11 @@ export function SliderAdminCard({
                     )}
 
                     <div className="flex items-center gap-3 mt-auto">
-                        <div className={`px-4 py-2 rounded-xl text-[11px] font-black tracking-widest uppercase text-white shadow-lg bg-gradient-to-r ${currentPreset.buttonGradient}`}>
+                        <div className={`px-4 py-2 rounded-xl text-2xs font-black tracking-widest uppercase text-white shadow-lg bg-gradient-to-r ${currentPreset.buttonGradient}`}>
                             {slider.ctaText || 'Sin CTA'}
                         </div>
                         {slider.ctaLink && (
-                            <span className="text-[10px] font-mono text-theme-secondary/50 truncate max-w-[150px]">
+                            <span className="text-2xs font-mono text-theme-secondary/50 truncate max-w-[150px]">
                                 {slider.ctaLink}
                             </span>
                         )}
@@ -134,7 +134,7 @@ export function SliderAdminCard({
                             <GripVertical className="w-4 h-4 mr-0.5" />
                             <span className="sr-only">Subir</span>
                         </button>
-                        <span className="text-[10px] font-black text-theme-secondary w-6 text-center tabular-nums">#{slider.order ?? 0}</span>
+                        <span className="text-2xs font-black text-theme-secondary w-6 text-center tabular-nums">#{slider.order ?? 0}</span>
                         <button 
                             disabled={isLast} 
                             onClick={onMoveDown}

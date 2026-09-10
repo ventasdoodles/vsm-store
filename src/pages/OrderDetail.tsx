@@ -62,7 +62,7 @@ export function OrderDetail() {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center space-y-4">
                 <Loader2 className="h-10 w-10 animate-spin text-accent-primary" />
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary animate-pulse">Consultando Archivo...</p>
+                <p className="text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary animate-pulse">Consultando Archivo...</p>
             </div>
         );
     }

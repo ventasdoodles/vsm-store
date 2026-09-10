@@ -140,7 +140,7 @@ export function CategoryCascader({ categories, section, value, onChange }: Categ
         <div className="space-y-3">
             {levels.map((level, idx) => (
                 <div key={`level-${idx}-${level.parentId ?? 'root'}`}>
-                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
+                    <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">
                         {LEVEL_LABELS[Math.min(idx, LEVEL_LABELS.length - 1)]}
                     </label>
                     <select

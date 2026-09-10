@@ -160,7 +160,7 @@ export function PaymentSuccess() {
     const refreshLabel = lifecycleView?.refreshLabel ?? 'Revisar estado de pago';
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-[#0a0a0f] selection:bg-vape-500/30">
+        <div className="relative min-h-screen overflow-hidden bg-surface-overlay selection:bg-vape-500/30">
             <SEO
                 title={`${headline} | VSM Store`}
                 description="Consulta el estado real de tu pedido y de tu pago en VSM Store."
@@ -200,7 +200,7 @@ export function PaymentSuccess() {
                         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-8 text-left backdrop-blur-2xl">
                             <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-white/5 pb-6 sm:flex-row sm:items-center">
                                 <div className="space-y-1">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Numero de pedido</span>
+                                    <span className="text-2xs font-black uppercase tracking-[0.3em] text-white/30">Numero de pedido</span>
                                     <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">
                                         {order?.order_number || 'Consultando...'}
                                     </h3>
@@ -218,7 +218,7 @@ export function PaymentSuccess() {
                                         <Calendar className="h-5 w-5 text-white/40" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Fecha</p>
+                                        <p className="text-2xs font-black uppercase tracking-widest text-white/30">Fecha</p>
                                         <p className="truncate text-sm font-bold text-white/80">
                                             {order
                                                 ? new Date(order.created_at).toLocaleDateString('es-MX', {
@@ -235,7 +235,7 @@ export function PaymentSuccess() {
                                         <Package className="h-5 w-5 text-white/40" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Items</p>
+                                        <p className="text-2xs font-black uppercase tracking-widest text-white/30">Items</p>
                                         <p className="truncate text-sm font-bold text-white/80">
                                             {itemsLabel}
                                         </p>
@@ -247,7 +247,7 @@ export function PaymentSuccess() {
                                 <p className="text-xs font-bold leading-relaxed italic">
                                     {detail}
                                 </p>
-                                <p className="mt-3 text-[11px] font-black uppercase tracking-[0.18em] opacity-80">
+                                <p className="mt-3 text-2xs font-black uppercase tracking-[0.18em] opacity-80">
                                     {continuityNote}
                                 </p>
                             </div>

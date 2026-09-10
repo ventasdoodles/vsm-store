@@ -307,7 +307,7 @@ export const AIConcierge: React.FC = () => {
                                             CESAR
                                         </h3>
                                         <div className="flex items-center gap-1.5">
-                                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                                            <span className="text-2xs font-bold text-white/40 uppercase tracking-widest">
                                                 IA en linea
                                             </span>
                                         </div>
@@ -390,7 +390,7 @@ export const AIConcierge: React.FC = () => {
                                         <button
                                             key={hint}
                                             onClick={() => void sendMessage(hint)}
-                                            className="px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/5 text-[10px] font-bold text-white/50 hover:bg-vape-500/20 hover:text-vape-400 transition-all whitespace-nowrap"
+                                            className="px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/5 text-2xs font-bold text-white/50 hover:bg-vape-500/20 hover:text-vape-400 transition-all whitespace-nowrap"
                                         >
                                             {hint}
                                         </button>
@@ -408,7 +408,7 @@ export const AIConcierge: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={retryLastMessage}
-                                        className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all text-[11px] font-black uppercase tracking-widest shadow-lg shadow-red-500/10 border border-red-500/20 hover:border-red-500"
+                                        className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all text-2xs font-black uppercase tracking-widest shadow-lg shadow-red-500/10 border border-red-500/20 hover:border-red-500"
                                     >
                                         <RefreshCw className="h-3.5 w-3.5" />
                                         Reintentar

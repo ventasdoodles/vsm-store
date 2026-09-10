@@ -150,7 +150,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                     )}
                                 >
                                     {variant.options?.[0]?.attribute_name && (
-                                        <span className="text-[10px] font-black uppercase tracking-wider opacity-60 mb-0.5">
+                                        <span className="text-2xs font-black uppercase tracking-wider opacity-60 mb-0.5">
                                             {variant.options[0].attribute_name}
                                         </span>
                                     )}
@@ -158,11 +158,11 @@ export function ProductActions({ product }: ProductActionsProps) {
                                         {getVariantDisplayName(variant)}
                                     </span>
                                     {variant.price && variant.price !== product.price && (
-                                        <span className="text-[10px] opacity-60 mt-0.5">
+                                        <span className="text-2xs opacity-60 mt-0.5">
                                             Ref: {formatPrice(variant.price)}
                                         </span>
                                     )}
-                                    <span className="text-[10px] opacity-60 mt-1">
+                                    <span className="text-2xs opacity-60 mt-1">
                                         {variantUnavailable ? 'No disponible' : `${variant.stock} disponible(s)`}
                                     </span>
                                 </button>

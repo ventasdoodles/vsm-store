@@ -107,7 +107,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                         </div>
                         <div className="space-y-1">
                             <h3 className="text-lg font-black uppercase italic tracking-tight text-white">{order.order_number}</h3>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary/60">
+                            <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-secondary/60">
                                 {new Date(order.created_at).toLocaleDateString('es-MX', {
                                     day: 'numeric',
                                     month: 'short',
@@ -121,7 +121,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
 
                     <div className="flex flex-wrap items-center gap-3">
                         <span className={cn(
-                            'inline-flex rounded-xl border px-5 py-2 text-[10px] font-black uppercase tracking-widest shadow-inner transition-all duration-700 group-hover:px-6',
+                            'inline-flex rounded-xl border px-5 py-2 text-2xs font-black uppercase tracking-widest shadow-inner transition-all duration-700 group-hover:px-6',
                             status.color,
                             status.bg,
                             status.border,
@@ -129,7 +129,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                             {status.label}
                         </span>
                         <span className={cn(
-                            'inline-flex rounded-xl border px-5 py-2 text-[10px] font-black uppercase tracking-widest',
+                            'inline-flex rounded-xl border px-5 py-2 text-2xs font-black uppercase tracking-widest',
                             paymentView.paymentTone === 'success'
                                 ? 'border-herbal-500/30 bg-herbal-500/10 text-herbal-500'
                                 : paymentView.paymentTone === 'danger'
@@ -144,20 +144,20 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                 </div>
 
                 <div className="relative z-10 mt-8 rounded-[1.75rem] border border-white/5 bg-black/20 p-5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
+                    <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
                         Estado del pedido
                     </p>
                     <p className="mt-2 text-sm font-black uppercase italic text-white">
                         {actionView.actionHeadline}
                     </p>
-                    <p className="mt-2 text-[10px] font-bold uppercase tracking-wider leading-relaxed text-theme-secondary/80">
+                    <p className="mt-2 text-2xs font-bold uppercase tracking-wider leading-relaxed text-theme-secondary/80">
                         {actionView.actionDetail}
                     </p>
                 </div>
 
                 <div className="relative z-10 mt-6 grid grid-cols-2 gap-8 sm:grid-cols-4">
                     <div>
-                        <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
+                        <span className="mb-1 block text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
                             Articulos
                         </span>
                         <span className="text-sm font-black uppercase italic text-white">
@@ -165,7 +165,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                         </span>
                     </div>
                     <div>
-                        <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
+                        <span className="mb-1 block text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
                             Total
                         </span>
                         <span className="text-xl font-black text-vape-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">
@@ -173,7 +173,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                         </span>
                     </div>
                     <div>
-                        <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
+                        <span className="mb-1 block text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
                             Metodo
                         </span>
                         <span className="text-sm font-black uppercase italic text-white">
@@ -181,7 +181,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                         </span>
                     </div>
                     <div>
-                        <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
+                        <span className="mb-1 block text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40">
                             Siguiente accion
                         </span>
                         <span className="text-sm font-black uppercase italic text-white">
@@ -193,7 +193,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                 <div className="relative z-10 mt-8 flex flex-col gap-3 sm:flex-row">
                     <Link
                         to={`/orders/${order.id}` as any}
-                        className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-4 text-2xs font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white/10"
                     >
                         <ArrowRight className="h-4 w-4" />
                         {actionView.detailLabel}
@@ -204,7 +204,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                             type="button"
                             onClick={() => onReorder(order)}
                             disabled={reordering}
-                            className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-2xs font-black uppercase tracking-[0.2em] text-theme-secondary transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <Package className="h-4 w-4" />
                             {reordering ? 'Revisando catalogo...' : 'Reordenar con catalogo actual'}
@@ -216,7 +216,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                             type="button"
                             onClick={() => onContinuePayment(order)}
                             disabled={continuing}
-                            className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] bg-yellow-600 px-5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] bg-yellow-600 px-5 py-4 text-2xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <CreditCard className="h-4 w-4" />
                             {continuing ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
@@ -271,7 +271,7 @@ export function Orders() {
                     <Package className="h-10 w-10 text-red-500" />
                 </div>
                 <h2 className="mb-4 text-2xl font-black uppercase italic tracking-tighter text-white">No pudimos cargar tus pedidos</h2>
-                <p className="mx-auto max-w-sm text-[10px] font-black uppercase tracking-widest leading-relaxed text-red-400/60">
+                <p className="mx-auto max-w-sm text-2xs font-black uppercase tracking-widest leading-relaxed text-red-400/60">
                     {(error as Error)?.message || 'No se han podido recuperar tus pedidos. Por favor, reintenta.'}
                 </p>
             </div>
@@ -295,7 +295,7 @@ export function Orders() {
                             <Sparkles className="h-4 w-4 animate-pulse text-accent-primary" />
                             <h1 className="text-4xl font-black uppercase italic tracking-tight text-white">Mis Pedidos</h1>
                         </div>
-                        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary opacity-60">
+                        <p className="mt-1 text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary opacity-60">
                             Historial con estado de pago y acciones disponibles
                         </p>
                     </div>
@@ -308,7 +308,7 @@ export function Orders() {
                             type="button"
                             onClick={() => setFilter(currentFilter.value)}
                             className={cn(
-                                'flex-shrink-0 rounded-[1.5rem] border px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all duration-500 active:scale-95',
+                                'flex-shrink-0 rounded-[1.5rem] border px-6 py-3 text-2xs font-black uppercase tracking-widest transition-all duration-500 active:scale-95',
                                 filter === currentFilter.value
                                     ? 'border-accent-primary/40 bg-accent-primary/10 text-accent-primary shadow-2xl shadow-accent-primary/20'
                                     : 'border-white/5 bg-white/[0.02] text-theme-tertiary hover:border-white/20 hover:text-white',
@@ -322,29 +322,29 @@ export function Orders() {
 
             <section className="grid gap-4 sm:grid-cols-3">
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
+                    <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
                         Pagos por retomar
                     </p>
                     <p className="mt-3 text-3xl font-black uppercase italic text-yellow-400">{payableCount}</p>
-                    <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/70">
+                    <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/70">
                         Pedidos que siguen pagables en Mercado Pago segun el estado registrado.
                     </p>
                 </div>
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
+                    <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
                         Pagos confirmados
                     </p>
                     <p className="mt-3 text-3xl font-black uppercase italic text-herbal-500">{paidCount}</p>
-                    <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/70">
+                    <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/70">
                         Pedidos con pago confirmado en el estado registrado.
                     </p>
                 </div>
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
+                    <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50">
                         Requieren revision
                     </p>
                     <p className="mt-3 text-3xl font-black uppercase italic text-red-400">{reviewCount}</p>
-                    <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/70">
+                    <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/70">
                         Pedidos que no figuran con pago confirmado o ya no estan pagables.
                     </p>
                 </div>
@@ -354,7 +354,7 @@ export function Orders() {
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center space-y-4 py-32">
                         <Loader2 className="h-10 w-10 animate-spin text-accent-primary opacity-50" />
-                        <p className="animate-pulse text-[10px] font-black uppercase tracking-[0.3em] text-theme-tertiary">
+                        <p className="animate-pulse text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary">
                             Cargando pedidos...
                         </p>
                     </div>
@@ -373,7 +373,7 @@ export function Orders() {
                                 <h2 className="text-2xl font-black uppercase italic text-white">
                                     {filter === 'all' ? 'Sin registros' : 'Sin pedidos en este estado'}
                                 </h2>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed text-theme-tertiary/60">
+                                <p className="text-2xs font-black uppercase tracking-[0.2em] leading-relaxed text-theme-tertiary/60">
                                     {filter === 'all'
                                         ? 'Tu historial de pedidos sigue vacio. Cuando exista una orden registrada, aparecera aqui con su estado de pago.'
                                         : 'No encontramos pedidos persistidos que coincidan con el filtro aplicado.'}

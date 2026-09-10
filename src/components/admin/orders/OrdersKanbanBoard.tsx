@@ -95,7 +95,7 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
                         />
                     ))}
                     {orders.length === 0 && (
-                        <div className="flex items-center justify-center h-20 rounded-xl border border-dashed border-white/[0.06] text-[11px] text-theme-secondary/30 font-medium">
+                        <div className="flex items-center justify-center h-20 rounded-xl border border-dashed border-white/[0.06] text-2xs text-theme-secondary/30 font-medium">
                             Sin pedidos
                         </div>
                     )}

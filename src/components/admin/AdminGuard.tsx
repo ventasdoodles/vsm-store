@@ -78,7 +78,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                         No se pudo verificar tu acceso de administrador. Esto puede ser un problema temporal.
                     </p>
                     <div className="w-full rounded-lg bg-theme-primary p-3 text-left">
-                        <p className="text-[11px] font-mono text-theme-secondary">
+                        <p className="text-2xs font-mono text-theme-secondary">
                             Auth: {authLoading ? 'cargando' : user ? `OK (${user.id.slice(0, 8)}...)` : 'sin sesión'}<br />
                             Admin check: {isAdmin === null ? 'sin respuesta' : isAdmin ? 'sí' : 'no'}<br />
                             Debug: {debugInfo}

@@ -28,7 +28,7 @@ export function IntelligenceToolRenderer({
                     </div>
                     <div>
                         <h4 className="text-lg font-black text-white tracking-tight">Analista Estratégico Pro</h4>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 opacity-80">Motor de Retención Gemini 2.5 Flash Lite</p>
+                        <p className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400 opacity-80">Motor de Retención Gemini 2.5 Flash Lite</p>
                     </div>
                 </div>
 
@@ -36,7 +36,7 @@ export function IntelligenceToolRenderer({
                     <button
                         onClick={() => loadStrategicAI()}
                         disabled={loadingStrategic}
-                        className="px-6 py-3 rounded-2xl bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-indigo-400 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 shadow-lg shadow-indigo-500/40"
+                        className="px-6 py-3 rounded-2xl bg-indigo-500 text-white text-2xs font-black uppercase tracking-widest transition-all hover:bg-indigo-400 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 shadow-lg shadow-indigo-500/40"
                     >
                         {loadingStrategic ? 'Analizando Historial...' : 'Ejecutar Análisis Profundo'}
                     </button>
@@ -54,7 +54,7 @@ export function IntelligenceToolRenderer({
                         {/* Next Steps */}
                         {strategicAnalysis.next_steps && (
                             <div className="space-y-3 mt-6">
-                                <h6 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Pasos Recomendados</h6>
+                                <h6 className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400">Pasos Recomendados</h6>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {strategicAnalysis.next_steps.map((step: string, i: number) => (
                                         <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 group/step hover:bg-white/10 transition-colors">
@@ -84,12 +84,12 @@ export function IntelligenceToolRenderer({
                                 
                                 <div className="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/10">
                                     <div className="text-center px-4">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60 mb-1">Código</p>
+                                        <p className="text-2xs font-black uppercase tracking-widest text-indigo-400/60 mb-1">Código</p>
                                         <p className="text-lg font-black text-white tracking-[0.1em]">{strategicAnalysis.suggested_coupon.code}</p>
                                     </div>
                                     <div className="h-8 w-px bg-white/10" />
                                     <div className="text-center px-4">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60 mb-1">DCTO</p>
+                                        <p className="text-2xs font-black uppercase tracking-widest text-indigo-400/60 mb-1">DCTO</p>
                                         <p className="text-lg font-black text-white">{strategicAnalysis.suggested_coupon.discount}%</p>
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@ export function IntelligenceToolRenderer({
                     {strategicAnalysis.recovery_message && (
                         <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/20 space-y-4">
                             <div className="flex items-center justify-between">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Mensaje de Recuperación Sugerido</h5>
+                                <h5 className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300">Mensaje de Recuperación Sugerido</h5>
                                 <button
                                     onClick={() => {
                                         if (strategicAnalysis.recovery_message) {
@@ -109,7 +109,7 @@ export function IntelligenceToolRenderer({
                                             alert('Mensaje copiado al portapapeles');
                                         }
                                     }}
-                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors"
+                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors"
                                 >
                                     Copiar para WhatsApp
                                     <MessageSquare className="h-3 w-3" />
@@ -123,7 +123,7 @@ export function IntelligenceToolRenderer({
 
                     <button 
                         onClick={() => {/* Strategic Analysis is managed by query cache now, we could invalidate it if needed */}}
-                        className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors mx-auto block"
+                        className="text-2xs font-black uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors mx-auto block"
                     >
                         Resetear Análisis IA
                     </button>

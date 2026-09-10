@@ -31,7 +31,7 @@ export function TagRow({ tag, isDeleting, onEdit, onDelete }: TagRowProps) {
                 </div>
                 <div className="min-w-0">
                     <p className="text-sm font-black text-white truncate">{tag.label}</p>
-                    <p className="text-[10px] font-mono text-theme-secondary/60 truncate sm:hidden">
+                    <p className="text-2xs font-mono text-theme-secondary/60 truncate sm:hidden">
                         {tag.name}
                     </p>
                 </div>

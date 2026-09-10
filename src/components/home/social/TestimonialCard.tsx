@@ -89,7 +89,7 @@ export function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
                 {testimonial.verified_purchase && (
                     <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                         <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                        <span className="text-2xs font-bold uppercase tracking-wider text-emerald-400">
                             Verificada
                         </span>
                     </div>
@@ -127,7 +127,7 @@ export function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
                 <div className="mt-4 pt-3 border-t border-white/[0.06]">
                     <span
                         className={cn(
-                            'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider',
+                            'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-2xs font-bold uppercase tracking-wider',
                             testimonial.section === 'vape'
                                 ? 'bg-vape-500/10 text-vape-400 border border-vape-500/20'
                                 : 'bg-herbal-500/10 text-herbal-400 border border-herbal-500/20',

@@ -62,7 +62,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
 
     return (
         <div className="space-y-4">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-white/40">
+            <label className="text-2xs font-bold uppercase tracking-wider text-white/40">
                 Galeria de Imagenes ({images.length}/{maxImages})
             </label>
 
@@ -78,7 +78,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                             />
                             {/* Portada badge */}
                             {index === 0 && (
-                                <div className="absolute left-2 top-2 rounded-md bg-gradient-to-r from-violet-600 to-indigo-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-violet-500/30 backdrop-blur-sm">
+                                <div className="absolute left-2 top-2 rounded-md bg-gradient-to-r from-violet-600 to-indigo-600 px-2 py-0.5 text-2xs font-black uppercase tracking-wider text-white shadow-lg shadow-violet-500/30 backdrop-blur-sm">
                                     Portada
                                 </div>
                             )}

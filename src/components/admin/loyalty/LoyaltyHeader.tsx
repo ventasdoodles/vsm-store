@@ -17,7 +17,7 @@ export function LoyaltyHeader({ loyaltyConfig, onToggleEnable }: LoyaltyHeaderPr
                     <div className="p-2.5 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-2xl border border-amber-500/20 shadow-inner">
                         <Gift className="h-7 w-7 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
                     </div>
-                     <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-amber-400 ring-1 ring-inset ring-amber-500/30">
+                     <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-amber-400 ring-1 ring-inset ring-amber-500/30">
                         Pro
                     </span>
                 </div>
@@ -29,7 +29,7 @@ export function LoyaltyHeader({ loyaltyConfig, onToggleEnable }: LoyaltyHeaderPr
                 </p>
             </div>
             
-            <div className="relative z-10 w-full md:w-auto bg-[#13141f]/80 p-1.5 rounded-2xl border border-white/5 flex items-center shadow-inner">
+            <div className="relative z-10 w-full md:w-auto bg-surface-base/80 p-1.5 rounded-2xl border border-white/5 flex items-center shadow-inner">
                  <button
                     type="button"
                     onClick={() => onToggleEnable(true)}

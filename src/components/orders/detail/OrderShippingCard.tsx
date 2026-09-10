@@ -30,15 +30,15 @@ export function OrderShippingCard({ trackingTrustView }: OrderShippingCardProps)
                 </div>
                 <div>
                     <h3 className="text-sm font-black text-white uppercase tracking-widest">{trackingTrustView.title}</h3>
-                    <p className="text-[10px] text-theme-tertiary font-bold uppercase opacity-60">{trackingTrustView.subtitle}</p>
+                    <p className="text-2xs text-theme-tertiary font-bold uppercase opacity-60">{trackingTrustView.subtitle}</p>
                 </div>
             </div>
 
             <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                <p className="text-2xs font-black uppercase tracking-[0.2em] text-white">
                     {trackingTrustView.headline}
                 </p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">
+                <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">
                     {trackingTrustView.detail}
                 </p>
             </div>
@@ -46,7 +46,7 @@ export function OrderShippingCard({ trackingTrustView }: OrderShippingCardProps)
             <div className="space-y-4">
                 {trackingTrustView.showTrackingNumber && trackingTrustView.trackingNumber && (
                     <div className="space-y-2">
-                        <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Número de Guía</p>
+                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-widest px-1">Número de Guía</p>
                         <div className="flex items-center justify-between p-4 rounded-xl bg-black border border-white/5 group/copy transition-all hover:border-accent-primary/30">
                             <p className="text-sm font-black text-accent-primary font-mono tracking-tighter uppercase italic">{trackingTrustView.trackingNumber}</p>
                             {trackingTrustView.canCopyTrackingNumber && (
@@ -66,7 +66,7 @@ export function OrderShippingCard({ trackingTrustView }: OrderShippingCardProps)
 
                 {trackingTrustView.showTrackingNotes && trackingTrustView.trackingNotes && (
                     <div className="space-y-2">
-                        <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Notas de Envío</p>
+                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-widest px-1">Notas de Envío</p>
                         <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5">
                             <p className="text-xs text-theme-secondary leading-relaxed">
                                 {trackingTrustView.trackingNotes}

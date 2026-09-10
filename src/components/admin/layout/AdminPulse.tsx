@@ -39,18 +39,18 @@ export const AdminPulse = React.memo(() => {
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1.5 px-1 group">
                             <TrendingUp className="h-3 w-3 text-emerald-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-black text-white/80">${metrics.todaySales.toLocaleString()}</span>
+                            <span className="text-2xs font-black text-white/80">${metrics.todaySales.toLocaleString()}</span>
                         </div>
 
                         <div className="flex items-center gap-1.5 px-1 group">
                             <ShoppingBag className="h-3 w-3 text-indigo-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-black text-white/80">{metrics.activeOrders}</span>
+                            <span className="text-2xs font-black text-white/80">{metrics.activeOrders}</span>
                         </div>
 
                         {metrics.inventoryAlerts > 0 && (
                             <div className="flex items-center gap-1.5 px-1 group animate-pulse">
                                 <Zap className="h-3 w-3 text-rose-400 group-hover:scale-110 transition-transform" />
-                                <span className="text-[10px] font-black text-rose-400">{metrics.inventoryAlerts}</span>
+                                <span className="text-2xs font-black text-rose-400">{metrics.inventoryAlerts}</span>
                             </div>
                         )}
                     </div>

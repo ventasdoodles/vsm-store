@@ -205,7 +205,7 @@ export function Contact() {
                                         errors.name ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
                                     )}
                                 />
-                                {errors.name && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.name.message}</p>}
+                                {errors.name && <p className="text-2xs font-bold text-red-500 uppercase tracking-widest ml-1">{errors.name.message}</p>}
                             </div>
 
                             <div className="grid sm:grid-cols-2 gap-6">
@@ -224,7 +224,7 @@ export function Contact() {
                                             errors.email ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
                                         )}
                                     />
-                                    {errors.email && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.email.message}</p>}
+                                    {errors.email && <p className="text-2xs font-bold text-red-500 uppercase tracking-widest ml-1">{errors.email.message}</p>}
                                 </div>
 
                                 {/* Input: Teléfono */}
@@ -242,7 +242,7 @@ export function Contact() {
                                             errors.phone ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
                                         )}
                                     />
-                                    {errors.phone && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.phone.message}</p>}
+                                    {errors.phone && <p className="text-2xs font-bold text-red-500 uppercase tracking-widest ml-1">{errors.phone.message}</p>}
                                 </div>
                             </div>
 
@@ -261,7 +261,7 @@ export function Contact() {
                                         errors.message ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
                                     )}
                                 />
-                                {errors.message && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.message.message}</p>}
+                                {errors.message && <p className="text-2xs font-bold text-red-500 uppercase tracking-widest ml-1">{errors.message.message}</p>}
                             </div>
 
                             {/* Botón Submit */}

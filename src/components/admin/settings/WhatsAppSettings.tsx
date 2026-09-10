@@ -48,7 +48,7 @@ export function WhatsAppSettings({ formData, handleChange }: WhatsAppSettingsPro
                         placeholder="Ej: 5212281234567"
                         className={INPUT_CLASS}
                     />
-                    <p className="mt-1.5 text-[11px] text-theme-secondary/60">A este número llegarán los pedidos.</p>
+                    <p className="mt-1.5 text-2xs text-theme-secondary/60">A este número llegarán los pedidos.</p>
                 </div>
 
                 <div>

@@ -304,7 +304,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <div className="absolute top-2 right-2 flex flex-col gap-2 translate-x-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 hidden md:flex z-10">
                                     <button
                                         onClick={handleQuickView}
-                                        className="flex-1 h-12 bg-white text-slate-900 font-black rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-all text-[10px] tracking-widest shadow-xl active:scale-95"
+                                        className="flex-1 h-12 bg-white text-slate-900 font-black rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-all text-2xs tracking-widest shadow-xl active:scale-95"
                                     >
                                         <Eye className="w-4 h-4" />
                                     </button>
@@ -320,8 +320,8 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                         {isEmergency ? (
                                             <MessageCircle className="w-5 h-5 text-white" />
                                         ) : (
-                                            requiresOptionSelection ? <span className="text-[10px] font-black tracking-widest uppercase">VER OPCIONES</span> : (
-                                                !purchaseability.canAddToCart ? <span className="text-[10px] font-black tracking-widest uppercase">{purchaseability.ctaLabel}</span> : (
+                                            requiresOptionSelection ? <span className="text-2xs font-black tracking-widest uppercase">VER OPCIONES</span> : (
+                                                !purchaseability.canAddToCart ? <span className="text-2xs font-black tracking-widest uppercase">{purchaseability.ctaLabel}</span> : (
                                                     isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
                                                 )
                                             )
@@ -339,13 +339,13 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <div className="mb-2">
                                     {config && productSurfaceConfig ? (
                                         <span className={cn(
-                                            'text-[10px] font-black uppercase tracking-widest',
+                                            'text-2xs font-black uppercase tracking-widest',
                                             productSurfaceConfig.productChipClassName,
                                         )}>
                                             {productSurfaceConfig.isVape ? 'Vape' : '420'}
                                         </span>
                                     ) : (
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                                        <span className="text-2xs font-black uppercase tracking-widest text-theme-tertiary">
                                             {' '}
                                         </span>
                                     )}
