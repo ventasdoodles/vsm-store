@@ -291,7 +291,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             setTimeout(() => {
                 clearCart();
                 closeCart();
-                if (dbOrderId) navigate({ to: `/payment/success?order_id=${dbOrderId}` as any });
+                if (dbOrderId) navigate({ to: '/payment/success', search: { order_id: dbOrderId } });
                 onSuccess();
                 setSending(false);
             }, 2000);

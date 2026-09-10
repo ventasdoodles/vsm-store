@@ -90,7 +90,7 @@ const TONE_UI: Record<
 };
 
 export function PaymentSuccess() {
-    const search: any = useSearch({ strict: false });
+    const search = useSearch({ from: '/storefront/payment/success' });
     const orderId = search.order_id;
     const clearCart = useCartStore((s) => s.clearCart);
     const processed = useRef(false);

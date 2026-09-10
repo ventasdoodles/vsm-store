@@ -122,9 +122,30 @@ const termsRoute = createRoute({ getParentRoute: () => appRoute, path: '/legal/t
 const privacyLegalRoute = createRoute({ getParentRoute: () => appRoute, path: '/legal/privacy', component: Privacy });
 const privacyRoute = createRoute({ getParentRoute: () => appRoute, path: '/privacy', component: Privacy });
 const contactRoute = createRoute({ getParentRoute: () => appRoute, path: '/contact', component: Contact });
-const paySuccessRoute = createRoute({ getParentRoute: () => appRoute, path: '/payment/success', component: PaymentSuccess });
-const payFailRoute = createRoute({ getParentRoute: () => appRoute, path: '/payment/failure', component: PaymentFailure });
-const payPendingRoute = createRoute({ getParentRoute: () => appRoute, path: '/payment/pending', component: PaymentPending });
+const paySuccessRoute = createRoute({
+    getParentRoute: () => appRoute,
+    path: '/payment/success',
+    validateSearch: (search: Record<string, unknown>): { order_id?: string } => ({
+        order_id: typeof search.order_id === 'string' ? search.order_id : undefined,
+    }),
+    component: PaymentSuccess
+});
+const payFailRoute = createRoute({
+    getParentRoute: () => appRoute,
+    path: '/payment/failure',
+    validateSearch: (search: Record<string, unknown>): { order_id?: string } => ({
+        order_id: typeof search.order_id === 'string' ? search.order_id : undefined,
+    }),
+    component: PaymentFailure
+});
+const payPendingRoute = createRoute({
+    getParentRoute: () => appRoute,
+    path: '/payment/pending',
+    validateSearch: (search: Record<string, unknown>): { order_id?: string } => ({
+        order_id: typeof search.order_id === 'string' ? search.order_id : undefined,
+    }),
+    component: PaymentPending
+});
 const notifRoute = createRoute({ getParentRoute: () => appRoute, path: '/notifications', component: () => <ProtectedRoute><Notifications /></ProtectedRoute> });
 const checkoutRoute = createRoute({ getParentRoute: () => appRoute, path: '/checkout', component: Checkout });
 const trackRoute = createRoute({ getParentRoute: () => appRoute, path: '/rastreo', component: TrackOrder });

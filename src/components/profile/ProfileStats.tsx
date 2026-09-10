@@ -98,7 +98,7 @@ export function ProfileStats() {
                 label="Nivel"
                 value={tierLabel}
                 gradient="from-violet-500 to-purple-400"
-                to={"/loyalty" as any}
+                to="/loyalty"
                 isLoading={isLoading}
             />
         </section>

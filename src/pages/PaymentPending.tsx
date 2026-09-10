@@ -46,7 +46,7 @@ const TONE_UI: Record<
 };
 
 export function PaymentPending() {
-    const search: any = useSearch({ strict: false });
+    const search = useSearch({ from: '/storefront/payment/pending' });
     const orderId = search.order_id;
     const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
     const { data: order, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId ?? undefined);
