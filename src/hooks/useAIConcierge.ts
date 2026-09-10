@@ -442,8 +442,6 @@ export function useAIConcierge() {
                 triggerHaptic(80);
 
                 const errorMsg = error instanceof Error ? error.message : String(error);
-                console.error('[AIConcierge Diag] CATCH BLOCK - raw error:', error);
-                console.error('[AIConcierge Diag] CATCH BLOCK - errorMsg:', errorMsg);
                 const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota');
                 const isTimeout = errorMsg === 'REQUEST_TIMEOUT';
                 const noWriteSmokeMetadata = smokeAudit ? extractNoWriteSmokeMetadata(error) : null;

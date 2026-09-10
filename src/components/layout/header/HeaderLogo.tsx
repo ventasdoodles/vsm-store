@@ -9,7 +9,7 @@ import { Link } from '@tanstack/react-router';
 
 export function HeaderLogo() {
     return (
-        <Link to={"/" as any} className="flex items-center group flex-shrink-0 relative z-10 transition-transform duration-300">
+        <Link to="/" className="flex items-center group flex-shrink-0 relative z-10 transition-transform duration-300">
             {/* Spotlight Glow de fondo */}
             <div className="absolute inset-0 bg-accent-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-150 transition-all duration-700 pointer-events-none" />
             

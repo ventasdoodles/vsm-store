@@ -73,7 +73,7 @@ export async function probeCesarinTrace(): Promise<void> {
             .single();
         if (error) {
             console.error('operator_actions INSERT:', error.code, '—', error.message);
-        } else {
+        } else if (import.meta.env?.DEV) {
             // Probe row intentionally kept — it proves the write path works
             // and appears in the shared activity log as evidence.
             console.info('operator_actions INSERT: OK — id', data?.id);
@@ -92,7 +92,7 @@ export async function probeCesarinTrace(): Promise<void> {
             .single();
         if (error) {
             console.error('signal_states UPSERT:', error.code, '—', error.message);
-        } else {
+        } else if (import.meta.env?.DEV) {
             // Probe row intentionally kept — proves the write path works.
             console.info('signal_states UPSERT: OK — analytics_id', data?.analytics_id);
         }

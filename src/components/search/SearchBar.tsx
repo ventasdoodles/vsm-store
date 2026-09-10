@@ -111,7 +111,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const handleSubmitForm = (searchQuery: string) => {
         if (searchQuery.trim()) {
             saveRecentSearch(searchQuery);
-            navigate({ to: `/buscar?q=${encodeURIComponent(searchQuery)}` as any });
+            navigate({ to: '/buscar', search: { q: searchQuery } });
             setIsOpen(false);
             setQuery('');
             inputRef.current?.blur();
@@ -174,7 +174,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     const product = products[selectedIndex];
                     if (product) {
                         saveRecentSearch(query);
-                        navigate({ to: `/${product.section}/${product.slug}` as any });
+                        navigate({ to: '/$section/$slug', params: { section: product.section, slug: product.slug } });
                     }
                     setIsOpen(false);
                     setQuery('');
@@ -361,7 +361,8 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                         {categories.map((cat) => (
                                             <Link
                                                 key={cat.id}
-                                                to={`/${cat.section}/${cat.slug}` as any}
+                                                to="/$section/$slug"
+                                                params={{ section: cat.section, slug: cat.slug }}
                                                 className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-vape-500 hover:text-slate-950 hover:border-vape-400 transition-all duration-300"
                                             >
                                                 {highlightText(cat.name, query)}
@@ -381,7 +382,8 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                         {products.map((product, idx) => (
                                             <Link
                                                 key={product.id}
-                                                to={`/${product.section}/${product.slug}` as any}
+                                                to="/$section/$slug"
+                                                params={{ section: product.section, slug: product.slug }}
                                                 onClick={() => {
                                                     saveRecentSearch(query);
                                                     setIsOpen(false);
@@ -443,7 +445,12 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* AI Search Insights CTA */}
                             {showAIInsight && (
                                 <Link
-                                    to={`/chat?q=${encodeURIComponent(query)}` as any}
+                                    to="/buscar"
+                                    search={{ q: query }}
+                                    onClick={() => {
+                                        saveRecentSearch(query);
+                                        setIsOpen(false);
+                                    }}
                                     className="block m-2 p-4 rounded-xl bg-gradient-to-br from-accent-primary/10 to-blue-600/10 border border-accent-primary/20 hover:border-accent-primary/40 transition-all group overflow-hidden relative"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-glint" />
@@ -479,7 +486,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             </p>
                             
                             <button
-                                onClick={() => navigate({ to: `/chat?q=${encodeURIComponent(query)}` as any })}
+                                onClick={() => handleSubmitForm(query)}
                                 className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-2xs font-black uppercase tracking-widest text-white hover:bg-vape-500 hover:text-slate-950 transition-all"
                             >
                                 Consultar con VSM AI

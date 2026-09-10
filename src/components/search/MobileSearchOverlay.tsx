@@ -37,14 +37,14 @@ export function MobileSearchOverlay() {
     const handleResultClick = (product: Product) => {
         trigger('light');
         triggerSensory('nav-click');
-        navigate({ to: `/${product.section}/${product.slug}` as any });
+        navigate({ to: '/$section/$slug', params: { section: product.section, slug: product.slug } });
         close();
     };
 
     const handleSubmitForm = (searchQuery: string) => {
         if (!searchQuery.trim()) return;
         trigger('medium');
-        navigate({ to: `/buscar?q=${encodeURIComponent(searchQuery)}` as any });
+        navigate({ to: '/buscar', search: { q: searchQuery } });
         close();
     };
 
