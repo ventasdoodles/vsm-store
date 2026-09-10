@@ -10,9 +10,10 @@ export type ButtonVariant =
     | 'ghost'
     | 'danger'
     | 'vape'
-    | 'herbal';
+    | 'herbal'
+    | 'unstyled';
 
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
+export type ButtonSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 export type ButtonRadius = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -41,9 +42,11 @@ const variants: Record<ButtonVariant, string> = {
     danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40',
     vape: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:to-blue-600 shadow-blue-500/20 shadow-lg border border-blue-400/20 btn-shine',
     herbal: 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:to-emerald-600 shadow-emerald-500/20 shadow-lg border border-emerald-400/20 btn-shine',
+    unstyled: '',
 };
 
 const sizes: Record<ButtonSize, string> = {
+    none: '',
     xs: 'h-7 px-2.5 text-xs gap-1.5',
     sm: 'h-8 px-3 text-xs gap-1.5',
     md: 'h-10 px-4 text-sm gap-2',
@@ -54,6 +57,7 @@ const sizes: Record<ButtonSize, string> = {
 };
 
 const spinnerSizes: Record<ButtonSize, string> = {
+    none: 'h-4 w-4',
     xs: 'h-3.5 w-3.5',
     sm: 'h-4 w-4',
     md: 'h-4 w-4',

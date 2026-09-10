@@ -50,7 +50,7 @@ const FormCard = ({ children, title, icon: Icon }: { children: React.ReactNode, 
         {title && (
             <div className="flex items-center gap-3 border-b border-white/5 bg-white/[0.02] px-6 py-4">
                 {Icon && <Icon className="h-4 w-4 text-vape-400" />}
-                <Heading as="h4" className="text-sm font-bold tracking-tight text-white">{title}</Heading>
+                <Heading as="h4" size="none" variant="none" className="text-sm font-bold tracking-tight text-white">{title}</Heading>
             </div>
         )}
         <div className="p-6">{children}</div>
@@ -257,7 +257,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                 >
                     <CheckCircle className="h-10 w-10 text-slate-900" strokeWidth={3} />
                 </m.div>
-                <Heading as="h3" className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</Heading>
+                <Heading as="h3" size="none" variant="none" className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</Heading>
                 {handoffOnly ? (
                     <p className="text-theme-secondary">Tu solicitud fue enviada por WhatsApp. No se registro un pedido en el sistema.</p>
                 ) : (
@@ -313,6 +313,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                         <FormCard title="Tipo de Entrega" icon={Truck}>
                             <div className="grid grid-cols-2 gap-4">
                                 <Button
+                                    variant="unstyled" size="none" radius="none"
                                     onClick={() => setFormData({ ...formData, deliveryType: 'pickup' })}
                                     className={cn(
                                         "group flex flex-col items-center gap-3 rounded-2xl border p-5 transition-all text-center",
@@ -325,6 +326,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                                     <span className="text-xs font-bold uppercase tracking-widest">Recoger</span>
                                 </Button>
                                 <Button
+                                    variant="unstyled" size="none" radius="none"
                                     onClick={() => setFormData({ ...formData, deliveryType: 'delivery' })}
                                     className={cn(
                                         "group flex flex-col items-center gap-3 rounded-2xl border p-5 transition-all text-center",
@@ -449,6 +451,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
             <div className="mt-10 flex gap-4">
                 {currentStep > 1 && (
                     <Button
+                        variant="unstyled" size="none" radius="none"
                         onClick={prevStep}
                         className="flex h-16 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-theme-secondary hover:bg-white/10 transition-all active:scale-95"
                     >
@@ -457,6 +460,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                 )}
                 {currentStep < 3 ? (
                     <Button
+                        variant="unstyled" size="none" radius="none"
                         onClick={nextStep}
                         className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-vape-500 shadow-xl shadow-vape-500/20 transition-all hover:bg-vape-400 active:scale-95"
                     >
@@ -465,6 +469,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                     </Button>
                 ) : (
                     <Button
+                        variant="unstyled" size="none" radius="none"
                         onClick={onSubmit}
                         disabled={sending || isValidating || !canSubmitCheckout}
                         className={cn(

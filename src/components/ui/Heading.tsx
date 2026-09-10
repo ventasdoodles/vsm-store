@@ -15,8 +15,8 @@ export type HeadingTag =
     | 'label'
     | 'legend'
     | 'a';
-export type HeadingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
-export type HeadingVariant = 'default' | 'muted' | 'accent' | 'gradient';
+export type HeadingSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
+export type HeadingVariant = 'none' | 'default' | 'muted' | 'accent' | 'gradient';
 export type HeadingTracking = 'tighter' | 'tight' | 'normal' | 'wide' | 'wider';
 
 export interface HeadingBaseProps {
@@ -59,6 +59,7 @@ const defaultSizes: Record<HeadingLevel, HeadingSize> = {
 };
 
 const sizeStyles: Record<HeadingSize, string> = {
+    'none': '',
     '5xl': 'text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter leading-none',
     '4xl': 'text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight',
     '3xl': 'text-2xl sm:text-3xl font-black tracking-tight leading-tight',
@@ -71,6 +72,7 @@ const sizeStyles: Record<HeadingSize, string> = {
 };
 
 const variantStyles: Record<HeadingVariant, string> = {
+    'none': '',
     default: 'text-white',
     muted: 'text-theme-secondary',
     accent: 'text-accent-primary',

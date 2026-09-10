@@ -207,7 +207,7 @@ export function CartSidebar() {
 
                     {/* Header del sidebar */}
                     <div className="flex items-center justify-between px-6 py-6 bg-gradient-to-b from-white/5 to-transparent border-b border-white/5">
-                        <Heading as="h2" id="cart-title" className="text-2xl font-black text-white flex items-center gap-3 tracking-tight drop-shadow-md">
+                        <Heading as="h2" id="cart-title" size="none" variant="none" className="text-2xl font-black text-white flex items-center gap-3 tracking-tight drop-shadow-md">
                             Carrito
                             {itemCount > 0 && (
                                 <m.span
