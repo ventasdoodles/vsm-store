@@ -87,7 +87,7 @@ export const getSubtleBadgeClasses = (colorOrToken: string | undefined): string 
     case '#94a3b8':
       return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     default:
-      return 'bg-theme-secondary/50 text-theme-secondary border-border-primary/10';
+      return 'bg-theme-secondary/50 text-theme-secondary border-theme';
   }
 };
 

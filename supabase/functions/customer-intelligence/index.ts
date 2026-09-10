@@ -63,7 +63,7 @@ serve(async (req) => {
             context: 'customer-intelligence',
             gemini_key_present: !!_GEMINI_API_KEY,
             ...buildCustomerIntelligenceNoWriteSmokeErrorFields(noWriteSmokeForError),
-            ...(noWriteSmokeForError ? {} : { full_error: errorObj.stack }),
+            
         };
         return new Response(JSON.stringify(errorPayload), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

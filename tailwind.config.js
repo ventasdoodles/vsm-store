@@ -6,6 +6,9 @@ export default {
     ],
     theme: {
         extend: {
+            accentColor: {
+                'accent-primary': 'rgb(var(--accent-primary) / <alpha-value>)',
+            },
             borderRadius: {
                 /* ── VSM Radius Scale ──────────────────────────
                  *  Escala conservadora y uniforme.
@@ -152,7 +155,7 @@ export default {
             },
             borderColor: {
                 theme: {
-                    DEFAULT: 'rgb(var(--border-primary) / 0.10)',
+                    DEFAULT: 'rgb(var(--border-primary) / <alpha-value>)',
                     subtle: 'rgb(var(--border-primary) / 0.06)',
                     strong: 'rgb(var(--border-primary) / 0.15)',
                 },

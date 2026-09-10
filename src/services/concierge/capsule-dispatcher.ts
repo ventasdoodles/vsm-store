@@ -78,6 +78,7 @@ export async function dispatchClientCapsule({
     invokeStart,
     effectiveTelemetrySessionId,
 }: DispatchClientCapsuleParams): Promise<ClientCapsuleDispatchResult | null> {
+    const noWriteSmokeActive = isCustomerIntelligenceNoWriteSmokeActive(data.no_write_smoke);
                 if (data.capsule_name === 'product_search_integrity') {
                     const capsuleContract = await executeProductSearchCapsule(data.tool_args, {
                         customerId: customerProfile?.id ?? null,
@@ -175,7 +176,7 @@ export async function dispatchClientCapsule({
                     (capsuleContract as Record<string, any>).turn_analysis = commercialTurnAnalysis;
                     (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -320,7 +321,7 @@ export async function dispatchClientCapsule({
                     (capsuleContract as Record<string, any>).turn_analysis = kitTurnAnalysis;
                     (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -442,7 +443,7 @@ export async function dispatchClientCapsule({
                     (capsuleContract as Record<string, any>).turn_analysis = budgetTurnAnalysis;
                     (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -562,7 +563,7 @@ export async function dispatchClientCapsule({
                     (capsuleContract as Record<string, any>).turn_analysis = compatibilityTurnAnalysis;
                     (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -743,7 +744,7 @@ export async function dispatchClientCapsule({
                     (capsuleContract as Record<string, any>).turn_analysis = inventoryTurnAnalysis;
                     (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
 
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -816,7 +817,7 @@ export async function dispatchClientCapsule({
                         }),
                         3,
                     );
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -877,7 +878,7 @@ export async function dispatchClientCapsule({
                         }),
                         3,
                     );
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -938,7 +939,7 @@ export async function dispatchClientCapsule({
                         }),
                         3,
                     );
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -1006,7 +1007,7 @@ export async function dispatchClientCapsule({
                         }),
                         3,
                     );
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -1067,7 +1068,7 @@ export async function dispatchClientCapsule({
                         }),
                         2,
                     );
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,

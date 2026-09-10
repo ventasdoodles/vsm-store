@@ -48,7 +48,7 @@ export const ProactiveAISuggestions = memo(({
                         transition={{ delay: 0.6 + idx * 0.1 }}
                     >
                         <Link
-                            to={`/product/${config?.id || 'vape'}/${product.slug}` as any}
+                            to="/$section/$slug" params={{ section: product.section || config?.id || 'vape', slug: product.slug }}
                             onClick={closeCart}
                             className="group flex items-center gap-4 rounded-2xl bg-white/[0.03] p-3 pr-4 border border-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all"
                         >

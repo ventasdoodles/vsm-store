@@ -79,37 +79,52 @@ export async function executeConciergeRemoteChat({
 
         if (reader) {
             let buffer = '';
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
+            let currentEventType = '';
 
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    if (line?.startsWith('event: text')) {
-                        const dataLine = lines[i+1];
-                        if (dataLine && dataLine.startsWith('data: ')) {
-                            try {
-                                const newText = JSON.parse(dataLine.slice(6));
-                                options.onChunk(newText);
-                            } catch (_e) {
-                                // ignore parse errors on partial stream chunks
-                            }
+            const processLine = (line: string) => {
+                const trimmed = line.trim();
+                if (!trimmed) {
+                    currentEventType = '';
+                    return;
+                }
+                if (trimmed.startsWith('event: ')) {
+                    currentEventType = trimmed.slice(7).trim();
+                    return;
+                }
+                if (trimmed.startsWith('data: ')) {
+                    const rawData = trimmed.slice(6);
+                    if (currentEventType === 'text') {
+                        try {
+                            const newText = JSON.parse(rawData);
+                            options?.onChunk?.(newText);
+                        } catch {
+                            options?.onChunk?.(rawData);
                         }
-                    } else if (line?.startsWith('event: metadata')) {
-                        const dataLine = lines[i+1];
-                        if (dataLine && dataLine.startsWith('data: ')) {
-                            try {
-                                finalMetadata = JSON.parse(dataLine.slice(6));
-                            } catch (_e) {
-                                // ignore parse errors on partial metadata
-                            }
+                    } else if (currentEventType === 'metadata') {
+                        try {
+                            finalMetadata = JSON.parse(rawData);
+                        } catch {
+                            // ignore parse error on partial metadata
                         }
                     }
                 }
+            };
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() ?? '';
+
+                for (const line of lines) {
+                    processLine(line);
+                }
+            }
+
+            if (buffer.trim()) {
+                processLine(buffer);
             }
         }
         

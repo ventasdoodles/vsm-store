@@ -236,7 +236,7 @@ FORMATO:
             error: errObj.message,
             context: 'product-intelligence',
             gemini_key_present: !!GEMINI_API_KEY,
-            full_error: errObj.stack
+            
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,

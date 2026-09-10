@@ -132,7 +132,7 @@ export async function chat(
             catalogGate.is_open ? 2 : 3,
         );
         // Prefer the explicit edge/client ownership contract when present.
-        if (shouldClientLogAITelemetry(telemetryContract)) void logAITelemetry({
+        if (!options?.noWriteSmoke && shouldClientLogAITelemetry(telemetryContract)) void logAITelemetry({
             session_id: effectiveTelemetrySessionId,
             customer_id: customerProfile?.id ?? null,
             query,

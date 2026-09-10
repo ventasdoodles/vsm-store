@@ -1,20 +1,5 @@
 import { supabase } from '@/lib/supabase';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { ConciergeTurnPriority } from "./types";
 
 export async function logAITelemetry(fields: {

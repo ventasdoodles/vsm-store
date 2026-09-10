@@ -12,8 +12,9 @@ import { useSectionFromPath } from '@/hooks/useSectionFromPath';
  * Primero busca categoría por slug; si existe → CategoryPage, si no → ProductDetail.
  */
 export function SectionSlugResolver() {
-    const { slug } = useParams({ strict: false }) as any;
-    const section = useSectionFromPath();
+    const { slug, section: paramSection } = useParams({ strict: false }) as { slug?: string; section?: string };
+    const pathSection = useSectionFromPath();
+    const section = (paramSection === '420' || paramSection === 'vape') ? paramSection : pathSection;
 
     const {
         data: category,
