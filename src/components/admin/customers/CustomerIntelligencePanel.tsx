@@ -293,7 +293,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                 "col-span-1 md:col-span-2 flex gap-6 p-6 rounded-[2rem] bg-gradient-to-br from-vape-500/5 to-indigo-500/5 border border-vape-500/20 relative group transition-all hover:bg-vape-500/10",
                                 loadingNarrative && "animate-pulse"
                             )}>
-                                <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-indigo-500 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20">
+                                <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-indigo-500 text-2xs font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20">
                                     IA Estratégica
                                 </div>
                                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
@@ -374,17 +374,17 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                             <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</Heading>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Score de Propensión</p>
+                                    <p className="text-2xs font-black uppercase tracking-widest text-white/30 mb-1">Score de Propensión</p>
                                     <p className="text-xl font-black text-white">{Math.round((intelligence.ia_context?.propensity_score || 0) * 100)}%</p>
                                 </div>
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Cluster de Persona</p>
+                                    <p className="text-2xs font-black uppercase tracking-widest text-white/30 mb-1">Cluster de Persona</p>
                                     <p className="text-lg font-black text-white capitalize">{intelligence.ia_context?.persona_cluster || 'Neutral'}</p>
                                 </div>
                             </div>
                             {intelligence.ia_context?.last_intent && (
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
-                                     <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Última Intención Detectada</p>
+                                     <p className="text-2xs font-black uppercase tracking-widest text-white/30 mb-1">Última Intención Detectada</p>
                                      <p className="text-xs font-medium text-white/80 leading-snug">{intelligence.ia_context.last_intent}</p>
                                 </div>
                             )}
@@ -454,29 +454,29 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                             {interest}
                                                         </span>
                                                         {isLeading && (
-                                                            <span className="text-[8px] font-black bg-vape-500/20 text-vape-400 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-vape-500/30">
+                                                            <span className="text-3xs font-black bg-vape-500/20 text-vape-400 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-vape-500/30">
                                                                 Foco Superior
                                                             </span>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-1.5">
-                                                        <span className="text-[8px] font-black uppercase tracking-widest text-white/20">Frecuencia</span>
+                                                        <span className="text-3xs font-black uppercase tracking-widest text-white/20">Frecuencia</span>
                                                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-vape-500/10 border border-vape-500/20">
                                                             <TrendingUp className="h-2.5 w-2.5 text-vape-400" />
-                                                            <span className="text-[9px] font-black text-vape-400">{meta?.hits || 1}</span>
+                                                            <span className="text-2xs font-black text-vape-400">{meta?.hits || 1}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 {daysAgo !== null && (
-                                                    <p className="text-[9px] font-medium text-white/30 group-hover/interest:text-white/50 transition-colors flex items-center gap-1.5 flex-wrap">
-                                                        <span className="uppercase text-[8px] opacity-40 mr-0.5">Recencia:</span>
+                                                    <p className="text-2xs font-medium text-white/30 group-hover/interest:text-white/50 transition-colors flex items-center gap-1.5 flex-wrap">
+                                                        <span className="uppercase text-3xs opacity-40 mr-0.5">Recencia:</span>
                                                         hace {daysAgo === 0 ? 'hoy' : `${daysAgo}d`}
                                                         {/* Soft local qualifier — presentation-layer only, not a product classification */}
                                                         {daysAgo <= 3 && (
-                                                            <span className="italic text-[8px] text-vape-400/50 font-normal">&middot; visto recientemente</span>
+                                                            <span className="italic text-3xs text-vape-400/50 font-normal">&middot; visto recientemente</span>
                                                         )}
                                                         {daysAgo > 21 && (
-                                                            <span className="italic text-[8px] text-white/20 font-normal">&middot; interés más antiguo</span>
+                                                            <span className="italic text-3xs text-white/20 font-normal">&middot; interés más antiguo</span>
                                                         )}
                                                     </p>
                                                 )}
@@ -490,9 +490,9 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Clock className="h-3 w-3 text-white/20" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Última Sincronización</span>
+                                    <span className="text-2xs font-black uppercase tracking-widest text-white/20">Última Sincronización</span>
                                 </div>
-                                <span className="text-[9px] font-bold text-white/40">
+                                <span className="text-2xs font-bold text-white/40">
                                     {customerMemory.last_interaction_at 
                                         ? format(new Date(customerMemory.last_interaction_at), "PPP p", { locale: es })
                                         : 'Nunca'}
@@ -558,7 +558,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                     {/* Order Badges if applicable */}
                                     {event.status && (
                                         <div className="mt-2 flex gap-2">
-                                            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                            <span className="text-2xs font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                                 {event.status}
                                             </span>
                                         </div>

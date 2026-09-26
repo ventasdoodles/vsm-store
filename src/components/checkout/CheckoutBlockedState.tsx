@@ -16,8 +16,8 @@ export function CheckoutBlockedState({ headline, detail, onGoToCatalog }: Checko
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="relative overflow-hidden rounded-[2.5rem] border border-red-500/30 bg-black/40 p-8 sm:p-12 text-center shadow-[0_0_50px_rgba(239,68,68,0.15)] backdrop-blur-3xl"
         >
-            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-red-600/10 blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-600/10 blur-[80px] pointer-events-none" />
+            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-red-600/10 blur-4xl pointer-events-none" />
+            <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-600/10 blur-4xl pointer-events-none" />
             
             <m.div 
                 initial={{ scale: 0 }}

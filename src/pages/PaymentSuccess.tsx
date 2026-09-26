@@ -169,7 +169,7 @@ export function PaymentSuccess() {
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-[-10%] left-[-10%] h-[50%] w-[50%] rounded-full bg-vape-600/20 blur-[120px] animate-pulse-slow" />
                 <div className="absolute bottom-[-10%] right-[-10%] h-[50%] w-[50%] rounded-full bg-herbal-600/10 blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
-                <div className="absolute top-[30%] left-[20%] h-[30%] w-[30%] rounded-full bg-vape-400/10 blur-[100px] animate-pulse-slow" style={{ animationDelay: '4s' }} />
+                <div className="absolute top-[30%] left-[20%] h-[30%] w-[30%] rounded-full bg-vape-400/10 blur-5xl animate-pulse-slow" style={{ animationDelay: '4s' }} />
             </div>
 
             <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-20">

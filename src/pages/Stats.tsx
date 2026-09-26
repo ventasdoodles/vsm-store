@@ -97,7 +97,7 @@ export function Stats() {
                              </div>
                              <div className="h-1.5 w-1.5 rounded-full bg-white opacity-20" />
                         </div>
-                        <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.3em] mb-1.5 opacity-50">{item.label}</p>
+                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.3em] mb-1.5 opacity-50">{item.label}</p>
                         <p className={cn('text-2xl font-black italic tracking-tighter uppercase drop-shadow-sm', item.color)}>{item.value}</p>
                         
                         <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
@@ -108,14 +108,14 @@ export function Stats() {
             <div className="grid lg:grid-cols-2 gap-8">
                 {/* Visualización de Gasto (Barras Cinemáticas) */}
                 <section className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 space-y-10 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary/5 rounded-full blur-5xl pointer-events-none" />
                     
                     <header className="flex justify-between items-center">
                         <div className="space-y-1">
                             <h3 className="text-xl font-black text-white uppercase italic tracking-tight flex items-center gap-3">
                                 <TrendingUp className="h-5 w-5 text-herbal-400" /> Fluctuación Mensual
                             </h3>
-                            <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">Gasto consolidado por periodo</p>
+                            <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">Gasto consolidado por periodo</p>
                         </div>
                     </header>
 
@@ -129,7 +129,7 @@ export function Stats() {
                                             <m.span 
                                                 initial={{ opacity: 0, scale: 0 }}
                                                 animate={{ opacity: 1, scale: 1 }}
-                                                className="text-[8px] font-black text-white opacity-0 group-hover/bar:opacity-100 transition-opacity bg-black border border-white/5 px-2 py-1 rounded-md"
+                                                className="text-3xs font-black text-white opacity-0 group-hover/bar:opacity-100 transition-opacity bg-black border border-white/5 px-2 py-1 rounded-md"
                                             >
                                                 {formatPrice(s.total)}
                                             </m.span>
@@ -155,13 +155,13 @@ export function Stats() {
 
                 {/* Inventario de Top Productos */}
                 <section className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 space-y-10 relative overflow-hidden group">
-                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-vape-500/5 rounded-full blur-[100px] pointer-events-none" />
+                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-vape-500/5 rounded-full blur-5xl pointer-events-none" />
                      
                      <header className="space-y-1">
                         <h3 className="text-xl font-black text-white uppercase italic tracking-tight flex items-center gap-3">
                             <ShoppingBag className="h-5 w-5 text-vape-400" /> Curación de Favoritos
                         </h3>
-                        <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">Artículos con mayor tasa de adquisición</p>
+                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">Artículos con mayor tasa de adquisición</p>
                      </header>
 
                      <div className="space-y-4">
@@ -188,11 +188,11 @@ export function Stats() {
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-black text-white uppercase italic truncate">{p.name}</p>
                                     <div className="flex gap-4 mt-1">
-                                        <p className="text-[9px] font-black text-accent-primary uppercase tracking-[0.1em]">
+                                        <p className="text-2xs font-black text-accent-primary uppercase tracking-[0.1em]">
                                             Frecuencia: {p.timesBought} Unid.
                                         </p>
-                                        <div className="h-3 w-[1px] bg-white/10" />
-                                        <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.1em] opacity-60">
+                                        <div className="h-3 w-px bg-white/10" />
+                                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.1em] opacity-60">
                                             Valor: {formatPrice(p.totalSpent)}
                                         </p>
                                     </div>
@@ -217,7 +217,7 @@ export function Stats() {
                                 {pref.icon}
                             </div>
                             <div>
-                                <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.2em] mb-0.5 opacity-40">{pref.label}</p>
+                                <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] mb-0.5 opacity-40">{pref.label}</p>
                                 <p className="text-xs font-black text-white uppercase italic tracking-tight">{pref.value}</p>
                             </div>
                         </div>

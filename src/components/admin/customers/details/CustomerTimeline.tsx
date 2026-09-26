@@ -71,7 +71,7 @@ export function CustomerTimeline({ customer }: Props) {
     return (
         <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl relative overflow-hidden">
             {/* Ambient Background */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -translate-y-1/2 -translate-x-1/2 opacity-50 pointer-events-none" />
+            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-4xl -translate-y-1/2 -translate-x-1/2 opacity-50 pointer-events-none" />
 
             <div className="relative mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-3">

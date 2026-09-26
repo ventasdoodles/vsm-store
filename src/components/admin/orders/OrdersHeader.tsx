@@ -34,7 +34,7 @@ export function OrdersHeader({
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-theme-primary/10 p-6 sm:p-8 rounded-[2rem] border border-white/5 relative overflow-hidden backdrop-blur-md shadow-2xl">
                 {/* Soft Ambient Glow - Match Loyalty style */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-primary/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-primary/5 rounded-full blur-5xl pointer-events-none" />
                 <div className="relative z-10 w-full md:w-auto">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2.5 bg-gradient-to-br from-accent-primary/20 to-blue-500/10 rounded-2xl border border-accent-primary/20 shadow-inner">

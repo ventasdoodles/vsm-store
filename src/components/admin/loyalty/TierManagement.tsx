@@ -111,7 +111,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                         </div>
                                     ))}
                                     {tier.benefits.length > 3 && (
-                                        <p className="text-[9px] text-indigo-400 font-bold pl-5">+ {tier.benefits.length - 3} beneficios más</p>
+                                        <p className="text-2xs text-indigo-400 font-bold pl-5">+ {tier.benefits.length - 3} beneficios más</p>
                                     )}
                                 </div>
                             </div>

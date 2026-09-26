@@ -154,10 +154,10 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                             { label: 'Ganado', value: stats.pointsEarned, suffix: 'VC', color: 'text-gold-400' }
                         ].map((stat, i) => (
                             <div key={i} className="p-5 rounded-2xl bg-black/40 border border-white/5 text-center space-y-1 hover:border-white/10 transition-colors">
-                                <span className="block text-[9px] font-black text-theme-tertiary uppercase tracking-[0.15em] opacity-40">{stat.label}</span>
+                                <span className="block text-2xs font-black text-theme-tertiary uppercase tracking-[0.15em] opacity-40">{stat.label}</span>
                                 <div className="flex items-center justify-center gap-1">
                                     <span className={cn("text-2xl font-black tracking-tighter italic uppercase", stat.color)}>{stat.value}</span>
-                                    {stat.suffix && <span className="text-[9px] font-black text-gold-500/30 uppercase mt-1">{stat.suffix}</span>}
+                                    {stat.suffix && <span className="text-2xs font-black text-gold-500/30 uppercase mt-1">{stat.suffix}</span>}
                                 </div>
                             </div>
                         ))}

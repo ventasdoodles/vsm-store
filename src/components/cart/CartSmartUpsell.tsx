@@ -47,7 +47,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     </Heading>
                 </div>
                 <div className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
-                    <span className="text-[9px] font-black text-vape-400 uppercase tracking-widest">
+                    <span className="text-2xs font-black text-vape-400 uppercase tracking-widest">
                         Ahorra {discountPercentage}%
                     </span>
                 </div>
@@ -58,7 +58,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                 className="relative overflow-hidden bg-gradient-to-br from-white/[0.05] to-transparent backdrop-blur-3xl rounded-[2rem] p-6 border border-white/10 group"
             >
                 {/* Abyssal Glow Background */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/20 blur-[60px] rounded-full -z-10 group-hover:bg-vape-500/30 transition-colors" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/20 blur-3xl rounded-full -z-10 group-hover:bg-vape-500/30 transition-colors" />
                 
                 <div className="flex gap-5">
                     <div className="relative flex-shrink-0">
@@ -116,7 +116,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                 <div className="absolute inset-0 -translate-x-full group-hover:animate-shimmer-slow bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
             </m.div>
 
-            <p className="mt-4 px-2 text-[9px] font-medium text-white/30 italic text-center">
+            <p className="mt-4 px-2 text-2xs font-medium text-white/30 italic text-center">
                 * Basado en tus gustos y existencias actuales.
             </p>
         </m.div>

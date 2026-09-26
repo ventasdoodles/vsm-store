@@ -21,7 +21,7 @@ export function IntelligenceToolRenderer({
             strategicAnalysis ? "shadow-[0_0_50px_-12px_rgba(99,102,241,0.3)]" : "hover:border-white/20"
         )}>
             {/* Background Glow */}
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-indigo-500/10 blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-indigo-500/10 blur-5xl pointer-events-none" />
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
                 <div className="flex items-center gap-4">

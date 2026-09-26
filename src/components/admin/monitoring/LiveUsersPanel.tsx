@@ -95,7 +95,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                                                 {sessionMinutes < 1 ? '<1' : sessionMinutes} min
                                             </span>
                                         </div>
-                                        <p className="text-[9px] font-mono text-theme-secondary/40 mt-0.5 truncate max-w-[100px]">
+                                        <p className="text-2xs font-mono text-theme-secondary/40 mt-0.5 truncate max-w-[100px]">
                                             {user.id.substring(0, 12)}...
                                         </p>
                                     </div>

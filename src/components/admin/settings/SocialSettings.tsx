@@ -37,8 +37,8 @@ export function SocialSettings({ formData, handleChange }: SocialSettingsProps) 
     return (
         <div className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-blue-500/15 hover:shadow-blue-500/5">
             {/* Orbe ambiental */}
-            <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-blue-500/8 blur-[80px] transition-all group-hover:bg-blue-500/12" />
-            <div className="pointer-events-none absolute bottom-0 right-0 h-32 w-32 rounded-full bg-indigo-500/6 blur-[60px]" />
+            <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-blue-500/8 blur-4xl transition-all group-hover:bg-blue-500/12" />
+            <div className="pointer-events-none absolute bottom-0 right-0 h-32 w-32 rounded-full bg-indigo-500/6 blur-3xl" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center gap-3 mb-5">

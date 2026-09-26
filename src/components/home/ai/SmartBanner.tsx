@@ -38,9 +38,9 @@ export const SmartBanner: React.FC = () => {
                 )}>
                     {/* ── Premium Mesh Gradients ── [Wave 125] */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-                        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-white/20 blur-[100px] animate-pulse" />
+                        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-white/20 blur-5xl animate-pulse" />
                         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-black/30 blur-[120px]" />
-                        <div className="absolute top-1/4 left-1/2 w-48 h-48 bg-theme-tertiary/20 rounded-full blur-[80px]" />
+                        <div className="absolute top-1/4 left-1/2 w-48 h-48 bg-theme-tertiary/20 rounded-full blur-4xl" />
                     </div>
 
                     {/* ── High-Speed Shine Sweep ── */}
@@ -91,7 +91,7 @@ export const SmartBanner: React.FC = () => {
                     {/* AI Identity Token */}
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 flex items-center gap-2 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                         <Sparkles className="w-3 h-3 text-white/60" />
-                        <span className="text-[9px] text-white/60 font-black tracking-[0.2em] uppercase">Hyper-Personalized Content</span>
+                        <span className="text-2xs text-white/60 font-black tracking-[0.2em] uppercase">Hyper-Personalized Content</span>
                     </div>
                 </div>
             </m.div>

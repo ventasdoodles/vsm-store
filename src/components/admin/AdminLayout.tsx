@@ -211,7 +211,7 @@ const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSys
             <span className="relative z-10 truncate tracking-wide">{item.label}</span>
 
             {item.isNew ? (
-                <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+                <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(251,191,36,0.1)]">
                     Pro
                 </span>
             ) : item.isPendingOrders ? (
@@ -339,7 +339,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <nav className="flex-1 space-y-8 overflow-y-auto px-5 py-8 custom-scrollbar">
                         {menuSections.map((section, idx) => (
                             <div key={idx} className="space-y-3 flex flex-col items-stretch">
-                                <Heading as="h3" className="px-4 text-[9px] font-black uppercase tracking-[0.3em] text-theme-secondary/30 select-none">
+                                <Heading as="h3" className="px-4 text-2xs font-black uppercase tracking-[0.3em] text-theme-secondary/30 select-none">
                                     {section.title}
                                 </Heading>
                                 <div className="space-y-1">

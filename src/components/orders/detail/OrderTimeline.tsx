@@ -13,7 +13,7 @@ interface OrderTimelineProps {
 export function OrderTimeline({ statusSteps, currentStepIndex, statusConfigMap, statusIcons }: OrderTimelineProps) {
     return (
         <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent-primary/20 to-transparent" />
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent-primary/20 to-transparent" />
             
             <div className="flex items-center justify-between relative">
                 {statusSteps.map((step, i) => {
@@ -35,7 +35,7 @@ export function OrderTimeline({ statusSteps, currentStepIndex, statusConfigMap, 
                                     <StepIcon size={20} />
                                 </div>
                                 <span className={cn(
-                                    "text-[9px] font-black uppercase tracking-widest transition-colors duration-500 hidden sm:block text-center",
+                                    "text-2xs font-black uppercase tracking-widest transition-colors duration-500 hidden sm:block text-center",
                                     isActive ? "text-white font-bold" : "text-theme-tertiary opacity-40"
                                 )}>
                                     {config?.label ?? step}

@@ -52,7 +52,7 @@ export function CustomerWishlist({ customer }: Props) {
     return (
         <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl">
             {/* Ambient Background */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full blur-4xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 
             <div className="relative mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -102,10 +102,10 @@ export function CustomerWishlist({ customer }: Props) {
                                     <span className="text-2xs text-white/30 line-through">{formatPrice(product.compare_at_price)}</span>
                                 )}
                                 {!product.is_active && (
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">Inactivo</span>
+                                    <span className="text-2xs font-bold uppercase tracking-wider text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">Inactivo</span>
                                 )}
                                 {product.stock === 0 && (
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">Agotado</span>
+                                    <span className="text-2xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">Agotado</span>
                                 )}
                             </div>
                             <p className="text-2xs text-white/25 mt-0.5">

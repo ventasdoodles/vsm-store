@@ -107,7 +107,7 @@ export function CustomerList({ customers }: Props) {
                 return (
                     <div className="flex flex-col items-center gap-1.5">
                         <span className={cn(
-                            "text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border shadow-sm transition-all group-hover:shadow-md",
+                            "text-2xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full border shadow-sm transition-all group-hover:shadow-md",
                             customer.intelligence.segment === 'Campeón' && "bg-amber-400/10 text-amber-400 border-amber-400/20",
                             customer.intelligence.segment === 'Leal' && "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
                             customer.intelligence.segment === 'Nuevo' && "bg-blue-400/10 text-blue-400 border-blue-400/20",
@@ -125,7 +125,7 @@ export function CustomerList({ customers }: Props) {
                                 customer.intelligence.health_status === 'Requiere Atención' && "bg-amber-400",
                                 "bg-slate-400"
                             )} />
-                            <span className="text-[8px] font-bold uppercase tracking-tighter text-theme-secondary">
+                            <span className="text-3xs font-bold uppercase tracking-tighter text-theme-secondary">
                                 {customer.intelligence.health_status}
                             </span>
                         </div>

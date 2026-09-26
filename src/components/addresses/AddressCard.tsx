@@ -78,7 +78,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                     {/* Badge Predeterminada */}
                     {address.is_default && (
                         <div className={cn(
-                            'flex h-fit items-center gap-1.5 rounded-lg px-2.5 py-1 text-[8px] font-black uppercase tracking-widest border animate-pulse-slow',
+                            'flex h-fit items-center gap-1.5 rounded-lg px-2.5 py-1 text-3xs font-black uppercase tracking-widest border animate-pulse-slow',
                             isShipping
                                 ? 'bg-vape-500/10 text-vape-400 border-vape-500/20'
                                 : 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20'

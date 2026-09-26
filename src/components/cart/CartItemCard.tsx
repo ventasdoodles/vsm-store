@@ -87,7 +87,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
                     </div>
                     {item.variant_name && (
                         <div className="inline-block mt-2 px-2 py-0.5 rounded-md bg-white/10 border border-white/5">
-                            <p className="text-[9px] font-black uppercase tracking-widest text-white/70">
+                            <p className="text-2xs font-black uppercase tracking-widest text-white/70">
                                 {item.variant_name}
                             </p>
                         </div>

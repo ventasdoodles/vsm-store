@@ -199,7 +199,7 @@ export function CartSidebar() {
                     aria-modal="true"
                     aria-labelledby="cart-title"
                     style={{ willChange: 'transform' }}
-                    className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col bg-slate-900/60 backdrop-blur-[40px] shadow-[0_0_100px_rgba(0,0,0,0.8)] touch-pan-y border-l border-white/10"
+                    className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col bg-slate-900/60 backdrop-blur-2xl shadow-[0_0_100px_rgba(0,0,0,0.8)] touch-pan-y border-l border-white/10"
                 >
                     {/* Background Glows for Glassmorphism Depth */}
                     <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-vape-500/10 blur-[120px] rounded-full -z-10 pointer-events-none" />
@@ -259,7 +259,7 @@ export function CartSidebar() {
                                     className="absolute -bottom-6 -right-6 w-16 h-16 bg-herbal-500/20 blur-xl rounded-full"
                                 />
 
-                                <div className="absolute inset-0 blur-[60px] bg-gradient-to-tr from-vape-500/30 to-herbal-500/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                                <div className="absolute inset-0 blur-3xl bg-gradient-to-tr from-vape-500/30 to-herbal-500/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                                 
                                 <m.div
                                     whileHover={{ scale: 1.05, rotateY: 10 }}
@@ -345,8 +345,8 @@ export function CartSidebar() {
 
                                     {/* Micro-label for progress */}
                                     <div className="mt-2.5 flex justify-between px-1">
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Carrito</span>
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Confirmacion</span>
+                                        <span className="text-2xs font-black text-white/20 uppercase tracking-widest">Carrito</span>
+                                        <span className="text-2xs font-black text-white/20 uppercase tracking-widest">Confirmacion</span>
                                     </div>
                                 </div>
 

@@ -29,8 +29,8 @@ export function GeneralSettings({ formData, handleChange }: GeneralSettingsProps
     return (
         <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-cyan-500/15 hover:shadow-cyan-500/5">
             {/* Orbes ambientales */}
-            <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-500/8 blur-[100px] transition-all group-hover:bg-cyan-500/12" />
-            <div className="pointer-events-none absolute bottom-0 left-1/4 h-40 w-40 rounded-full bg-teal-500/6 blur-[80px]" />
+            <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-500/8 blur-5xl transition-all group-hover:bg-cyan-500/12" />
+            <div className="pointer-events-none absolute bottom-0 left-1/4 h-40 w-40 rounded-full bg-teal-500/6 blur-4xl" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center gap-3 mb-6">

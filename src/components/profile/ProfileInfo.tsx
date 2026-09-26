@@ -20,7 +20,7 @@ function InfoRow({ icon, label, value }: InfoRowProps) {
                 {icon}
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40 mb-1">{label}</p>
+                <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-40 mb-1">{label}</p>
                 <p className="text-sm font-black text-white truncate tracking-tight uppercase italic">{value}</p>
             </div>
         </div>
@@ -39,7 +39,7 @@ export function ProfileInfo() {
     return (
         <section className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 shadow-2xl overflow-hidden relative group">
             {/* Accent decoration */}
-            <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-accent-primary/5 blur-[80px] transition-transform duration-1000 group-hover:scale-150" />
+            <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-accent-primary/5 blur-4xl transition-transform duration-1000 group-hover:scale-150" />
             
             <header className="flex justify-between items-center mb-8">
                 <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">

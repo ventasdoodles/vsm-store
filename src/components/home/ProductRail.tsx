@@ -132,8 +132,8 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] px-6 py-12 sm:px-12 sm:py-16 backdrop-blur-3xl shadow-2xl"
                 >
-                    <div className={`absolute -top-40 -right-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-[80px] pointer-events-none`} />
-                    <div className={`absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-[80px] pointer-events-none`} />
+                    <div className={`absolute -top-40 -right-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-4xl pointer-events-none`} />
+                    <div className={`absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-4xl pointer-events-none`} />
 
                     <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center text-center">
                         <m.div 

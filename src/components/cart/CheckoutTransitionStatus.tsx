@@ -81,7 +81,7 @@ export function CheckoutTransitionStatus({
                                     onClick={() => onDependencyAction(view.dependencyGuidance!.missingProduct)}
                                     className={cn(
                                         'mt-3 inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-2xs font-black uppercase tracking-widest text-amber-300 transition-colors hover:bg-amber-500/20',
-                                        compact && 'px-2.5 py-1 text-[9px]',
+                                        compact && 'px-2.5 py-1 text-2xs',
                                     )}
                                 >
                                     {view.dependencyGuidance.actionLabel}

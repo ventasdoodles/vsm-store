@@ -282,17 +282,17 @@ export function AdminCommandPalette() {
                     <div className="p-4 bg-white/5 border-t border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-1.5 grayscale opacity-50">
-                                <div className="px-1.5 py-0.5 rounded-md bg-white/10 text-[9px] font-black text-white/60">↑↓</div>
-                                <span className="text-[9px] font-bold text-white/40 uppercase">Navegar</span>
+                                <div className="px-1.5 py-0.5 rounded-md bg-white/10 text-2xs font-black text-white/60">↑↓</div>
+                                <span className="text-2xs font-bold text-white/40 uppercase">Navegar</span>
                             </div>
                             <div className="flex items-center gap-1.5 grayscale opacity-50">
-                                <div className="px-1.5 py-0.5 rounded-md bg-white/10 text-[9px] font-black text-white/60">↵</div>
-                                <span className="text-[9px] font-bold text-white/40 uppercase">Seleccionar</span>
+                                <div className="px-1.5 py-0.5 rounded-md bg-white/10 text-2xs font-black text-white/60">↵</div>
+                                <span className="text-2xs font-bold text-white/40 uppercase">Seleccionar</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
                             <Settings className="h-3 w-3 text-white/20" />
-                            <span className="text-[9px] font-black text-white/20 uppercase tracking-tighter">VSM COMMAND ENGINE v1.0</span>
+                            <span className="text-2xs font-black text-white/20 uppercase tracking-tighter">VSM COMMAND ENGINE v1.0</span>
                         </div>
                     </div>
                 </m.div>

@@ -119,8 +119,8 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
     return (
         <form onSubmit={handleSubmit} className="bg-gradient-to-b from-surface-card to-surface-base border border-fuchsia-500/20 shadow-[0_0_40px_rgba(168,85,247,0.1)] rounded-[2.5rem] p-6 md:p-10 mb-8 relative overflow-hidden group">
             {/* Background Gradients */}
-            <div className="absolute -top-32 -right-32 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute -top-32 -right-32 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-5xl pointer-events-none" />
+            <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/10 rounded-full blur-5xl pointer-events-none" />
 
             <div className="flex items-center justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-4">
@@ -152,7 +152,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                         type="button"
                                         onClick={() => handleSystemGen(goal)}
                                         disabled={isGenerating}
-                                        className="text-[9px] font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-400/10 px-2 py-1 rounded-lg border border-fuchsia-400/20 hover:bg-fuchsia-400/20 transition-all disabled:opacity-50"
+                                        className="text-2xs font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-400/10 px-2 py-1 rounded-lg border border-fuchsia-400/20 hover:bg-fuchsia-400/20 transition-all disabled:opacity-50"
                                     >
                                         {goal === 'conversion' ? '⚡ Sugerencia: Venta' : '💎 Sugerencia: Lealtad'}
                                     </Button>
@@ -238,7 +238,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 type="button"
                                 onClick={handleForecast}
                                 disabled={isForecasting || form.discount_value <= 0}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-all disabled:opacity-50"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500 text-white text-2xs font-black uppercase tracking-widest hover:bg-indigo-400 transition-all disabled:opacity-50"
                             >
                                 {isForecasting ? <Loader2 className="h-3 w-3 animate-spin" /> : <TrendingUp className="h-3 w-3" />}
                                 Consultar Sugerencia
@@ -249,11 +249,11 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                             <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="bg-black/40 p-3 rounded-2xl border border-white/5">
-                                        <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest mb-1">Alcance Estimado</p>
+                                        <p className="text-3xs font-bold text-white/30 uppercase tracking-widest mb-1">Alcance Estimado</p>
                                         <p className="text-sm font-black text-white">{forecast.reach} clientes</p>
                                     </div>
                                     <div className="bg-black/40 p-3 rounded-2xl border border-white/5">
-                                        <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest mb-1">Rev. Potencial</p>
+                                        <p className="text-3xs font-bold text-white/30 uppercase tracking-widest mb-1">Rev. Potencial</p>
                                         <p className="text-sm font-black text-emerald-400">${forecast.potential_revenue.toLocaleString()}</p>
                                     </div>
                                 </div>
@@ -304,7 +304,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                     <Button 
                                         type="button" 
                                         onClick={() => clearDate('valid_from')}
-                                        className="text-[9px] font-bold text-red-400/50 hover:text-red-400 uppercase"
+                                        className="text-2xs font-bold text-red-400/50 hover:text-red-400 uppercase"
                                     >
                                         Limpiar
                                     </Button>
@@ -325,21 +325,21 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                         <Button 
                                             type="button" 
                                             onClick={() => addDays(7)} 
-                                            className="text-[8px] font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
+                                            className="text-3xs font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
                                         >
                                             +7d
                                         </Button>
                                         <Button 
                                             type="button" 
                                             onClick={() => addDays(30)} 
-                                            className="text-[8px] font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
+                                            className="text-3xs font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
                                         >
                                             +30d
                                         </Button>
                                         <Button 
                                             type="button" 
                                             onClick={() => clearDate('valid_until')}
-                                            className="text-[9px] font-bold text-red-400/50 hover:text-red-400 uppercase ml-1"
+                                            className="text-2xs font-bold text-red-400/50 hover:text-red-400 uppercase ml-1"
                                         >
                                             X
                                         </Button>

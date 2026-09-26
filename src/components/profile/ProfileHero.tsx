@@ -80,11 +80,11 @@ export function ProfileHero() {
         <section className="relative overflow-hidden rounded-3xl p-8 sm:p-10 glass-premium spotlight-container">
             {/* Background gradient accent - More refined */}
             <div className={cn(
-                'absolute -top-32 -right-32 h-64 w-64 rounded-full blur-[100px] opacity-20 animate-pulse-slow',
+                'absolute -top-32 -right-32 h-64 w-64 rounded-full blur-5xl opacity-20 animate-pulse-slow',
                 `bg-gradient-to-br ${visualConfig.gradient}`
             )} />
             <div className={cn(
-                'absolute -bottom-24 -left-24 h-48 w-48 rounded-full blur-[80px] opacity-10 animate-pulse-slow',
+                'absolute -bottom-24 -left-24 h-48 w-48 rounded-full blur-4xl opacity-10 animate-pulse-slow',
                 `bg-gradient-to-br ${visualConfig.gradient}`
             )} style={{ animationDelay: '2s' }} />
 

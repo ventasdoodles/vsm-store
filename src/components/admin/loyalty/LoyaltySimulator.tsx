@@ -13,7 +13,7 @@ export function LoyaltySimulator({ config }: { config: LoyaltyConfig }) {
     return (
         <div className="bg-gradient-to-br from-theme-primary/10 to-amber-500/5 rounded-3xl p-6 sm:p-8 border border-white/5 shadow-2xl relative overflow-hidden flex flex-col sm:flex-row gap-8 items-center lg:items-start group transition-all hover:bg-theme-primary/20">
             {/* Background elements */}
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-4xl pointer-events-none" />
             <div className="absolute right-4 bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Calculator className="w-40 h-40 text-amber-500" />
             </div>

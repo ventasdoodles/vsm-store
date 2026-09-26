@@ -10,7 +10,7 @@ export function TestimonialsHeader({ onNew }: TestimonialsHeaderProps) {
     return (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-theme-primary/10 p-6 rounded-2xl border border-white/5 relative overflow-hidden backdrop-blur-md shadow-2xl">
             {/* Soft Ambient Glow */}
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-accent-primary/5 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-accent-primary/5 rounded-full blur-5xl pointer-events-none" />
 
             <div className="relative z-10">
                 <Heading as="h1" className="text-3xl font-black text-theme-primary flex items-center gap-3 drop-shadow-sm">

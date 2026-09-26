@@ -79,7 +79,7 @@ export function HealthPulse({ isHealthy, lastCheckTime, uptimeMinutes }: HealthP
                 </p>
 
                 {/* Last check */}
-                <p className="text-[9px] font-mono text-theme-secondary/30 mt-1">
+                <p className="text-2xs font-mono text-theme-secondary/30 mt-1">
                     Ultimo chequeo: {lastCheckTime}
                 </p>
             </div>

@@ -96,8 +96,8 @@ export function AdminDashboard() {
             className="space-y-6 pb-20 relative"
         >
             {/* 💡 Luces de Fondo (Orbes Premium) */}
-            <div className="pointer-events-none absolute -left-10 top-0 h-64 w-64 rounded-full bg-accent-primary/10 blur-[100px]" />
-            <div className="pointer-events-none absolute -right-10 top-40 h-64 w-64 rounded-full bg-blue-500/10 blur-[100px]" />
+            <div className="pointer-events-none absolute -left-10 top-0 h-64 w-64 rounded-full bg-accent-primary/10 blur-5xl" />
+            <div className="pointer-events-none absolute -right-10 top-40 h-64 w-64 rounded-full bg-blue-500/10 blur-5xl" />
 
             {/* Lego: Header con Presets y Exportación */}
             <m.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>

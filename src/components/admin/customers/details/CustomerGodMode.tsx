@@ -63,7 +63,7 @@ export function CustomerGodMode({ customer }: Props) {
     return (
         <div className="relative overflow-hidden rounded-[2rem] border border-red-500/20 bg-gradient-to-b from-rose-950/40 to-surface-base backdrop-blur-xl p-6 shadow-[0_0_40px_rgba(220,38,38,0.05)]">
             
-            <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-4xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 
             <div className="relative mb-6 flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500/20 to-rose-500/5 border border-red-500/30 shadow-[inset_0_0_20px_rgba(220,38,38,0.2)]">

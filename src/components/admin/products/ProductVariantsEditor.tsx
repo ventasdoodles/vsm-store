@@ -296,7 +296,7 @@ export function ProductVariantsEditor({
 
                                     <div className="flex items-center gap-2 flex-1 max-w-[300px]">
                                         <div className="flex-1">
-                                            <label className="text-[9px] font-black uppercase tracking-widest text-white/20 block mb-1">Precio ($)</label>
+                                            <label className="text-2xs font-black uppercase tracking-widest text-white/20 block mb-1">Precio ($)</label>
                                             <input
                                                 type="number"
                                                 className={INPUT_CLS}
@@ -305,7 +305,7 @@ export function ProductVariantsEditor({
                                             />
                                         </div>
                                         <div className="flex-1">
-                                            <label className="text-[9px] font-black uppercase tracking-widest text-white/20 block mb-1">Stock</label>
+                                            <label className="text-2xs font-black uppercase tracking-widest text-white/20 block mb-1">Stock</label>
                                             <input
                                                 type="number"
                                                 className={INPUT_CLS}

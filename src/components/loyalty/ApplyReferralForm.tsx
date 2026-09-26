@@ -85,7 +85,7 @@ export function ApplyReferralForm() {
                             />
                             <label
                                 htmlFor="referral-code"
-                                className="absolute left-5 top-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-[9px] peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
+                                className="absolute left-5 top-2.5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
                             >
                                 Código de Invitación
                             </label>

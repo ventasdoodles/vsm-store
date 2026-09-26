@@ -172,7 +172,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                     {/* Footer Warning */}
                     <div className="p-4 bg-amber-500/5 border-t border-amber-500/10 flex items-center gap-2">
                         <Loader2 className="h-3 w-3 text-amber-500/50" />
-                        <span className="text-[8px] font-bold text-amber-500/40 uppercase tracking-tighter">
+                        <span className="text-3xs font-bold text-amber-500/40 uppercase tracking-tighter">
                             Este mensaje ha sido optimizado por Gemini para maxima tasa de respuesta
                         </span>
                     </div>

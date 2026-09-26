@@ -32,7 +32,7 @@ export function TestimonialsForm({
             onSubmit={onSubmit}
             className="p-8 rounded-3xl bg-surface-base border border-white/[0.08] shadow-2xl relative overflow-hidden"
         >
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-accent-primary/[0.03] rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-accent-primary/[0.03] rounded-full blur-5xl pointer-events-none" />
 
             <div className="flex items-center justify-between shadow-sm border-b border-white/[0.08] pb-6 mb-6">
                 <div>

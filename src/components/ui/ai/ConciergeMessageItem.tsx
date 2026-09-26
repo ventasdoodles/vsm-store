@@ -197,7 +197,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
             <div className="mt-1 flex flex-wrap items-center gap-2">
                 <span
                     className={cn(
-                        'rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-[0.14em]',
+                        'rounded-full border px-2 py-1 text-2xs font-black uppercase tracking-[0.14em]',
                         getVisibleHelpToneClasses(helpSurface.tone),
                     )}
                 >
@@ -261,7 +261,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
         {message.capsule_contract?.capsule_name === 'knowledge_rag_foundation' &&
             message.capsule_contract?.resolved_chunks?.length > 0 && (
             <div className="mt-2 w-full space-y-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
+                <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
                     {message.capsule_contract?.match_strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
                         ? 'Politica Oficial'
                         : message.capsule_contract?.match_strategy === 'MODERATE_CONFIDENCE_MULTI_SOURCE'
@@ -279,7 +279,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-vape-500/50 to-vape-600/10" />
                             <div className="flex items-center justify-between mb-0.5">
                                 <h4 className="text-2xs font-bold text-white tracking-wide">{chunk.title}</h4>
-                                <span className="text-[8px] font-black px-1.5 py-0.5 rounded-md bg-white/5 text-white/50 uppercase tracking-[0.1em]">
+                                <span className="text-3xs font-black px-1.5 py-0.5 rounded-md bg-white/5 text-white/50 uppercase tracking-[0.1em]">
                                     {chunk.category}
                                 </span>
                             </div>
@@ -296,7 +296,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
             <div className="mt-2 w-full space-y-3">
                 {hasSuggestedProducts && (
                     <>
-                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
+                        <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
                             {getSuggestionGroupLabel(message.capsule_contract?.match_strategy)}
                         </p>
                         {showRecoveryHint && recoveryHint && (
@@ -334,13 +334,13 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                                 {getProductPriceLabel(product)}
                                             </p>
                                             {product.status_signal === 'LOW_STOCK' && (
-                                                <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.12em] text-amber-300">
+                                                <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-3xs font-black uppercase tracking-[0.12em] text-amber-300">
                                                     Pocas piezas
                                                 </span>
                                             )}
                                         </div>
                                         {product.ai_sales_note && (
-                                            <p className="text-[9px] text-white/40 truncate mt-0.5 font-medium italic leading-tight">
+                                            <p className="text-2xs text-white/40 truncate mt-0.5 font-medium italic leading-tight">
                                                 {product.ai_sales_note}
                                             </p>
                                         )}
@@ -401,7 +401,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                     Siguiente paso
                                 </p>
                                 {nextStepFamilyLabel && (
-                                    <span className="rounded-full border border-vape-400/20 bg-vape-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-vape-200/80">
+                                    <span className="rounded-full border border-vape-400/20 bg-vape-400/10 px-2 py-1 text-2xs font-black uppercase tracking-[0.12em] text-vape-200/80">
                                         {nextStepFamilyLabel}
                                     </span>
                                 )}

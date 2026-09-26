@@ -21,8 +21,8 @@ export function PromoSection() {
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" style={{ backgroundSize: '100% 100%' }} />
 
                         {/* Background Decoration */}
-                        <div className="absolute top-0 right-0 -mt-24 -mr-24 w-80 h-80 bg-vape-500/20 rounded-full blur-[100px] animate-pulse-slow" />
-                        <div className="absolute bottom-0 left-0 -mb-24 -ml-24 w-80 h-80 bg-herbal-500/20 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+                        <div className="absolute top-0 right-0 -mt-24 -mr-24 w-80 h-80 bg-vape-500/20 rounded-full blur-5xl animate-pulse-slow" />
+                        <div className="absolute bottom-0 left-0 -mb-24 -ml-24 w-80 h-80 bg-herbal-500/20 rounded-full blur-5xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
 
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 relative z-10">
                             {/* Left: Icon + Text */}

@@ -230,7 +230,7 @@ export const Footer = memo(function Footer() {
                                             <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
                                         </button>
                                     </div>
-                                    <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 text-center lg:text-left px-4">
+                                    <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 text-center lg:text-left px-4">
                                         Al unirte aceptas nuestras políticas de privacidad avanzada.
                                     </p>
                                 </div>
@@ -302,7 +302,7 @@ export const Footer = memo(function Footer() {
 
                 {/* Bottom Bar Cinematic */}
                 <div className="pt-12 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-10">
-                    <div className="flex items-center gap-4 text-[9px] font-black text-theme-tertiary uppercase tracking-[0.3em] opacity-40">
+                    <div className="flex items-center gap-4 text-2xs font-black text-theme-tertiary uppercase tracking-[0.3em] opacity-40">
                         <span>© {new Date().getFullYear()} VSM STORE</span>
                         <div className="h-1 w-1 rounded-full bg-theme-tertiary" />
                         <span>TRANSFERENCE PROTOCOL 3.0</span>
@@ -312,7 +312,7 @@ export const Footer = memo(function Footer() {
                         {TRUST_BADGES.map((badge) => (
                             <div key={badge.label} className="flex items-center gap-3 group/trust cursor-help" title={badge.title}>
                                 <badge.icon size={14} className="text-theme-tertiary group-hover:text-accent-primary transition-colors" />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-theme-tertiary group-hover:text-white transition-colors">
+                                <span className="text-2xs font-black uppercase tracking-widest text-theme-tertiary group-hover:text-white transition-colors">
                                     {badge.label}
                                 </span>
                             </div>
@@ -320,8 +320,8 @@ export const Footer = memo(function Footer() {
                     </div>
 
                     <nav className="flex gap-8">
-                        <Link to="/legal/privacy" className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
-                        <Link to="/legal/terms" className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Términos</Link>
+                        <Link to="/legal/privacy" className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
+                        <Link to="/legal/terms" className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Términos</Link>
                     </nav>
                 </div>
             </div>

@@ -70,7 +70,7 @@ export function OrderSummaryCard({
 
                     {/* Items Loop */}
                     <div className="space-y-6 pb-10">
-                        <div className="flex justify-between text-[9px] font-black uppercase tracking-[0.3em] text-theme-tertiary border-b border-white/5 pb-2">
+                        <div className="flex justify-between text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary border-b border-white/5 pb-2">
                             <span>Concepto</span>
                             <span>Total Parcial</span>
                         </div>
@@ -86,7 +86,7 @@ export function OrderSummaryCard({
                                     </div>
                                     <div className="space-y-0.5">
                                         <p className="text-xs font-bold text-white uppercase truncate max-w-[150px]">{item.name}</p>
-                                        <p className="text-[9px] font-black text-accent-primary uppercase tracking-widest">{item.quantity} Uni. × {formatPrice(item.price)}</p>
+                                        <p className="text-2xs font-black text-accent-primary uppercase tracking-widest">{item.quantity} Uni. × {formatPrice(item.price)}</p>
                                     </div>
                                 </div>
                                 <span className="text-xs font-black text-white italic">{formatPrice(item.price * item.quantity)}</span>
@@ -119,7 +119,7 @@ export function OrderSummaryCard({
                     </div>
 
                     <div className="mt-12 text-center opacity-30">
-                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-theme-tertiary">Referencia persistida para seguimiento</p>
+                        <p className="text-2xs font-black uppercase tracking-[0.5em] text-theme-tertiary">Referencia persistida para seguimiento</p>
                     </div>
                 </div>
             </div>

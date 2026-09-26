@@ -68,7 +68,7 @@ export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUplo
                     ) : (
                         <div className="flex flex-col items-center justify-center gap-1 opacity-40">
                             <User className="h-10 w-10 text-theme-tertiary" />
-                            <span className="text-[8px] font-black uppercase tracking-widest text-theme-tertiary">Sin foto</span>
+                            <span className="text-3xs font-black uppercase tracking-widest text-theme-tertiary">Sin foto</span>
                         </div>
                     )}
 
@@ -88,7 +88,7 @@ export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUplo
                         ) : (
                             <>
                                 <Camera className="h-6 w-6 text-white mb-2 transform translate-y-2 group-hover:translate-y-0 transition-transform" />
-                                <span className="text-[8px] font-black uppercase tracking-widest text-white transform translate-y-4 group-hover:translate-y-0 transition-transform">Cambiar</span>
+                                <span className="text-3xs font-black uppercase tracking-widest text-white transform translate-y-4 group-hover:translate-y-0 transition-transform">Cambiar</span>
                             </>
                         )}
                     </button>

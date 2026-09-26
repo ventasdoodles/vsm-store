@@ -26,7 +26,7 @@ export function AIInsights() {
     return (
         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-surface-overlay/50 backdrop-blur-3xl p-8 group">
             {/* Ambient background glow */}
-            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-vape-500/10 blur-[80px] group-hover:bg-vape-500/20 transition-all duration-700" />
+            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-vape-500/10 blur-4xl group-hover:bg-vape-500/20 transition-all duration-700" />
             
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
@@ -73,7 +73,7 @@ export function AIInsights() {
                                         {insight.type === 'warning' && <Zap className="h-4 w-4" />}
                                         {insight.type === 'info' && <Target className="h-4 w-4" />}
                                     </div>
-                                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">VSM CORE</span>
+                                    <span className="text-2xs font-black text-white/10 uppercase tracking-widest">VSM CORE</span>
                                 </div>
 
                                 <Heading as="h3" className="text-sm font-bold text-white mb-2 group-hover/card:text-vape-300 transition-colors">{insight.title}</Heading>

@@ -250,7 +250,7 @@ export function FlashDealsTable({
     if (deals.length === 0) {
         return (
             <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 py-16 backdrop-blur-md">
-                <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/10 blur-[80px]" />
+                <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/10 blur-4xl" />
                 <Zap className="relative z-10 mb-4 h-14 w-14 text-orange-500/20" />
                 <p className="relative z-10 text-sm font-medium text-white/40">No hay ofertas flash creadas</p>
                 <p className="relative z-10 mt-1 text-xs text-white/20">Crea tu primera oferta con el botón "Nueva Oferta"</p>

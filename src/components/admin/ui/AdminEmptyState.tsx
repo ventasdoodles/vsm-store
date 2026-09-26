@@ -27,7 +27,7 @@ export function AdminEmptyState({ icon: Icon, title, description, className }: A
             className
         )}>
             {/* Ambient Glow */}
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/10 blur-[80px]" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/10 blur-4xl" />
 
             {/* Visual Header */}
             <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-inner mb-4">

@@ -69,7 +69,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                             ease: "easeInOut"
                         }}
                         className={cn(
-                            "absolute top-[-15%] right-[-10%] h-[50%] w-[50%] rounded-full blur-[80px] will-change-transform transform-gpu",
+                            "absolute top-[-15%] right-[-10%] h-[50%] w-[50%] rounded-full blur-4xl will-change-transform transform-gpu",
                             colors.primary
                         )}
                     />

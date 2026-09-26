@@ -24,9 +24,9 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
     return (
         <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glows */}
-            <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-violet-500/10 blur-[100px]" />
-            <div className="pointer-events-none absolute right-1/4 top-0 h-56 w-56 rounded-full bg-indigo-500/8 blur-[100px]" />
-            <div className="pointer-events-none absolute -right-10 bottom-0 h-48 w-48 rounded-full bg-fuchsia-500/5 blur-[80px]" />
+            <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-violet-500/10 blur-5xl" />
+            <div className="pointer-events-none absolute right-1/4 top-0 h-56 w-56 rounded-full bg-indigo-500/8 blur-5xl" />
+            <div className="pointer-events-none absolute -right-10 bottom-0 h-48 w-48 rounded-full bg-fuchsia-500/5 blur-4xl" />
 
             <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 {/* Left: Title + Icon */}

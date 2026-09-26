@@ -501,7 +501,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
             {/* Loyalty Info Footer */}
             {isAuthenticated && pointsBalance > 0 && (
                 <div className="mt-10 flex items-center justify-center gap-4 px-6 opacity-60 grayscale hover:grayscale-0 transition-all cursor-default group">
-                    <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-vape-500/30 to-transparent" />
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-vape-500/30 to-transparent" />
                     <div className="flex items-center gap-3">
                         <div className="relative">
                             <Award className="h-5 w-5 text-vape-400" />
@@ -511,7 +511,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                             {pointsBalance} V-Coins disponibles
                         </span>
                     </div>
-                    <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-vape-500/30 to-transparent" />
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-vape-500/30 to-transparent" />
                 </div>
             )}
         </div>

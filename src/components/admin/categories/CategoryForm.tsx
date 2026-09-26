@@ -122,7 +122,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                 {/* ── Header ── */}
                 <div className="relative overflow-hidden border-b border-white/5 px-6 py-5">
                     {/* Mini orbe */}
-                    <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/10 blur-[60px]" />
+                    <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/10 blur-3xl" />
 
                     <div className="relative z-10 flex items-center justify-between">
                         <div>

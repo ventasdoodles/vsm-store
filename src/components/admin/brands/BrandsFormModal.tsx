@@ -41,7 +41,7 @@ export function BrandsFormModal({
             
             {/* Modal */}
             <div className="relative w-full max-w-lg bg-surface-base border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto custom-scrollbar animate-in slide-in-from-bottom-8 duration-300">
-                <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/[0.03] rounded-full blur-5xl pointer-events-none" />
 
                 <div className="flex items-center justify-between shadow-sm border-b border-white/[0.08] pb-6 mb-6">
                     <div>

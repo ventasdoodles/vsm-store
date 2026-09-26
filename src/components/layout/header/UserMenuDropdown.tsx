@@ -68,7 +68,7 @@ export function UserMenuDropdown() {
                             <p className="text-2xs text-white/50 truncate font-medium">{user?.email}</p>
                         </div>
                         <div className="flex flex-col items-end justify-center pl-3 border-l border-white/10 shrink-0">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-vape-400">V-Coins</span>
+                            <span className="text-2xs font-black uppercase tracking-widest text-vape-400">V-Coins</span>
                             <span className="text-sm font-black text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">{points.toLocaleString()}</span>
                         </div>
                     </div>

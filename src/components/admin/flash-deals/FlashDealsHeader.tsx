@@ -30,8 +30,8 @@ export function FlashDealsHeader({ deals, onAdd }: FlashDealsHeaderProps) {
     return (
         <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 p-8 shadow-2xl backdrop-blur-md">
             {/* Orbes ambientales */}
-            <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-orange-500/10 blur-[100px]" />
-            <div className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-red-500/8 blur-[80px]" />
+            <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-orange-500/10 blur-5xl" />
+            <div className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-red-500/8 blur-4xl" />
 
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 {/* Title */}

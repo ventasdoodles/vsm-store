@@ -94,7 +94,7 @@ export function SmartRewardToast() {
                                         {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
                                     </div>
                                 </div>
-                                <p className="text-[9px] text-center mt-2 text-theme-tertiary font-bold uppercase tracking-widest opacity-60">
+                                <p className="text-2xs text-center mt-2 text-theme-tertiary font-bold uppercase tracking-widest opacity-60">
                                     Haz clic para copiar y usar en tu compra
                                 </p>
                             </div>
@@ -102,7 +102,7 @@ export function SmartRewardToast() {
 
                         {/* Footer / Timer */}
                         <div className="px-5 py-2 bg-white/5 border-t border-white/5">
-                            <p className="text-[9px] text-theme-tertiary font-medium">
+                            <p className="text-2xs text-theme-tertiary font-medium">
                                 Esta oferta generada por IA expira en 48 horas.
                             </p>
                         </div>

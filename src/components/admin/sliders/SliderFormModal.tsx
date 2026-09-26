@@ -41,7 +41,7 @@ export function SliderFormModal({
             />
             
             <div className="relative w-full max-w-3xl bg-surface-base border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
-                <div className="absolute top-0 right-1/4 w-96 h-96 bg-pink-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-pink-500/[0.03] rounded-full blur-5xl pointer-events-none" />
 
                 <div className="flex items-center justify-between p-6 sm:p-8 border-b border-white/[0.08] relative z-10 shrink-0">
                     <div>

@@ -115,7 +115,7 @@ export const SmartQuests: React.FC = () => {
                     </h2>
                 </div>
                 <span className={cn(
-                    "text-[9px] font-bold px-2 py-0.5 rounded-full",
+                    "text-2xs font-bold px-2 py-0.5 rounded-full",
                     allDone
                         ? "text-herbal-400 bg-herbal-400/10"
                         : "text-herbal-400 bg-herbal-400/10 animate-pulse-slow"
@@ -191,7 +191,7 @@ export const SmartQuests: React.FC = () => {
                                         style={{ width: `${Math.min((quest.progress / quest.target) * 100, 100)}%` }}
                                     />
                                 </div>
-                                <span className="text-[9px] font-black text-theme-tertiary uppercase">
+                                <span className="text-2xs font-black text-theme-tertiary uppercase">
                                     {quest.target >= 1000
                                         ? `$${quest.progress.toLocaleString('es-MX')}/$${quest.target.toLocaleString('es-MX')}`
                                         : `${quest.progress}/${quest.target}`

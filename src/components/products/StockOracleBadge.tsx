@@ -39,7 +39,7 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
         >
             {/* Ambient Background Glow */}
             <div className={cn(
-                "absolute -right-8 -top-8 w-24 h-24 rounded-full blur-[40px] opacity-40 animate-pulse",
+                "absolute -right-8 -top-8 w-24 h-24 rounded-full blur-2xl opacity-40 animate-pulse",
                 isCritical ? "bg-red-500" : "bg-vape-500"
             )} />
 
@@ -87,7 +87,7 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
             </div>
 
             {/* Subtle bottom glint */}
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </m.div>
     );
 }

@@ -38,7 +38,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                             #{order.id?.slice(-6).toUpperCase()}
                         </span>
                         <span
-                            className="inline-flex items-center rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] backdrop-blur-md shadow-lg transition-transform group-hover:scale-105"
+                            className="inline-flex items-center rounded-lg px-2 py-1 text-2xs font-black uppercase tracking-[0.15em] backdrop-blur-md shadow-lg transition-transform group-hover:scale-105"
                             style={{
                                 backgroundColor: `${statusInfo?.color}22`,
                                 color: statusInfo?.color,

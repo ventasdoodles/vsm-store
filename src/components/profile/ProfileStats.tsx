@@ -27,7 +27,7 @@ function StatCard({ icon, label, value, gradient, to, isLoading }: StatCardProps
         <div className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1 h-full border-white/5 bg-white/[0.02]">
             {/* Background Glow */}
             <div className={cn(
-                "absolute -top-12 -right-12 h-32 w-32 rounded-full blur-[60px] opacity-0 group-hover:opacity-20 transition-all duration-700 bg-gradient-to-br",
+                "absolute -top-12 -right-12 h-32 w-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-all duration-700 bg-gradient-to-br",
                 gradient
             )} />
 

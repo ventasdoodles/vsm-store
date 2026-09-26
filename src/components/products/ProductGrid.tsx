@@ -52,7 +52,7 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                 role="status" 
                 aria-live="polite"
             >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-theme-secondary/20 rounded-full blur-[60px] pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-theme-secondary/20 rounded-full blur-3xl pointer-events-none" />
                 <m.div 
                     initial={{ scale: 0, rotate: -15 }}
                     animate={{ scale: 1, rotate: 0 }}

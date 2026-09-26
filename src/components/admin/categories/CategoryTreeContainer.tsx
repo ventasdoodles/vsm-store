@@ -49,8 +49,8 @@ export function CategoryTreeContainer({
     return (
         <div className="relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-5 shadow-xl backdrop-blur-md">
             {/* Orbes ambientales sutiles */}
-            <div className="pointer-events-none absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-emerald-500/5 blur-[80px]" />
-            <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-lime-500/4 blur-[60px]" />
+            <div className="pointer-events-none absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-emerald-500/5 blur-4xl" />
+            <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-lime-500/4 blur-3xl" />
 
             <div className="relative z-10">
                 {isLoading ? (

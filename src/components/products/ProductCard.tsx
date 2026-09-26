@@ -358,7 +358,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between gap-2">
                                     <span className={cn(
-                                        "text-[9px] font-black uppercase tracking-[0.25em] px-2.5 py-1 rounded-full border",
+                                        "text-2xs font-black uppercase tracking-[0.25em] px-2.5 py-1 rounded-full border",
                                         productSurfaceConfig?.productChipClassName
                                     )}>
                                         {product.section}
@@ -370,7 +370,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                             </span>
-                                            <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">
+                                            <span className="text-2xs font-black text-red-400 uppercase tracking-widest">
                                                 {purchaseability.maxQuantity <= 3
                                                     ? `Stock limitado: ${purchaseability.maxQuantity} unidades`
                                                     : `Disponibilidad limitada: ${purchaseability.maxQuantity} unidades`}

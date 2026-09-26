@@ -120,6 +120,12 @@ export default {
             fontSize: {
                 '3xs': ['0.5rem', { lineHeight: '0.75rem' }],     // 8px / 12px
                 '2xs': ['0.625rem', { lineHeight: '0.875rem' }],   // 10px / 14px
+
+            },
+            blur: {
+                '4xl': '80px',
+                '5xl': '100px',
+                '6xl': '120px',
             },
             backgroundSize: {
                 '200%': '200% auto',

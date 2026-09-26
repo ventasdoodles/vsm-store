@@ -97,7 +97,7 @@ export const BottomNavigation = memo(function BottomNavigation() {
 
                             {/* Badge para carrito */}
                             {item.badge && (
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-theme-primary animate-bounce-in">
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-2xs font-bold text-white shadow-sm ring-2 ring-theme-primary animate-bounce-in">
                                     {item.badge > 9 ? '9+' : item.badge}
                                 </span>
                             )}

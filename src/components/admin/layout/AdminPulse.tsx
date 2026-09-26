@@ -33,7 +33,7 @@ export const AdminPulse = React.memo(() => {
                         )} />
                     </div>
 
-                    <div className="h-4 w-[1px] bg-white/10 mx-1" />
+                    <div className="h-4 w-px bg-white/10 mx-1" />
 
                     {/* Metrics */}
                     <div className="flex items-center gap-4">
@@ -55,11 +55,11 @@ export const AdminPulse = React.memo(() => {
                         )}
                     </div>
 
-                    <div className="h-4 w-[1px] bg-white/10 mx-1" />
+                    <div className="h-4 w-px bg-white/10 mx-1" />
 
                     <div className="flex items-center gap-1 ml-1">
                         <Activity className="h-3 w-3 text-white/20" />
-                        <span className="text-[8px] font-black text-white/10 uppercase tracking-tighter">PULSE ADM</span>
+                        <span className="text-3xs font-black text-white/10 uppercase tracking-tighter">PULSE ADM</span>
                     </div>
                 </m.div>
             )}

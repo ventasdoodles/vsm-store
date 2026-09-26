@@ -301,7 +301,7 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     />
                     <label
                         htmlFor={id}
-                        className="absolute left-14 top-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-[9px] peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
+                        className="absolute left-14 top-2.5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
                     >
                         {label}
                     </label>
@@ -310,7 +310,7 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     <m.p
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="text-[9px] font-black uppercase tracking-widest text-red-400 px-4"
+                        className="text-2xs font-black uppercase tracking-widest text-red-400 px-4"
                     >
                         {error}
                     </m.p>

@@ -49,8 +49,8 @@ export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps
     return (
         <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-amber-500/15 hover:shadow-amber-500/5">
             {/* Orbes ambientales */}
-            <div className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full bg-amber-500/8 blur-[100px] transition-all group-hover:bg-amber-500/12" />
-            <div className="pointer-events-none absolute bottom-0 right-1/4 h-40 w-40 rounded-full bg-orange-500/6 blur-[80px]" />
+            <div className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full bg-amber-500/8 blur-5xl transition-all group-hover:bg-amber-500/12" />
+            <div className="pointer-events-none absolute bottom-0 right-1/4 h-40 w-40 rounded-full bg-orange-500/6 blur-4xl" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center gap-3 mb-6">

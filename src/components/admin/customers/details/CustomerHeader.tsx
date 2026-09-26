@@ -45,7 +45,7 @@ export function CustomerHeader({ customer }: Props) {
     return (
         <div className="relative group overflow-hidden bg-surface-base/80 backdrop-blur-xl border border-white/5 rounded-[2rem] p-6 lg:p-8 hover:border-white/10 transition-colors shadow-2xl">
             {/* Ambient Base Glow */}
-            <div className={`absolute top-0 right-0 w-96 h-96 ${isVIP ? 'bg-yellow-500/5' : 'bg-blue-500/5'} rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 opacity-50 block`} />
+            <div className={`absolute top-0 right-0 w-96 h-96 ${isVIP ? 'bg-yellow-500/5' : 'bg-blue-500/5'} rounded-full blur-5xl -translate-y-1/2 translate-x-1/2 opacity-50 block`} />
             
             <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
                 

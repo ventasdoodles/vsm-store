@@ -149,7 +149,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     transition={{ delay: 0.1 }}
                     className="group relative rounded-2xl bg-white/[0.03] p-5 border border-white/5 overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/10 blur-[40px] rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/10 blur-2xl rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
                     
                     <Link
                         to="/$section"
@@ -196,7 +196,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     transition={{ delay: 0.2 }}
                     className="group relative rounded-2xl bg-white/[0.03] p-5 border border-white/5 overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-2xl rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
 
                     <Link
                         to="/$section"

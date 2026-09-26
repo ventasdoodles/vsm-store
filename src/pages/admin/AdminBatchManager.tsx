@@ -46,7 +46,7 @@ const columns = [
         cell: ({ row }) => (
             <div className="flex flex-col">
                 <span className="text-2xs font-black text-white/60 lowercase">{row.original.id.slice(0, 8)}...</span>
-                <span className="text-[9px] font-bold text-vape-400 uppercase tracking-tighter">{row.original.sku}</span>
+                <span className="text-2xs font-bold text-vape-400 uppercase tracking-tighter">{row.original.sku}</span>
             </div>
         )
     }),

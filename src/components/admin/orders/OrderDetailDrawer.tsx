@@ -122,7 +122,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             <select
                                 value={order.status}
                                 onChange={(e) => handleStatusChange(e.target.value)}
-                                className={cn("w-full appearance-none rounded-xl border border-white/10 bg-surface-card px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20 border-l-[3px]", getBorderHighlightClass(statusInfo?.color))}
+                                className={cn("w-full appearance-none rounded-xl border border-white/10 bg-surface-card px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20 border-l-2", getBorderHighlightClass(statusInfo?.color))}
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.filter(s => s.value !== 'cancelled').map(s => {
                                     const isCurrent = s.value === order.status;

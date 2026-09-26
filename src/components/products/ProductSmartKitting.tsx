@@ -42,7 +42,7 @@ export const ProductSmartKitting = memo(({ product }: ProductSmartKittingProps) 
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 mb-4 p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-vape-500/10 to-transparent border border-vape-500/20 relative overflow-hidden"
         >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-vape-500/10 blur-[80px] rounded-full -z-10" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-vape-500/10 blur-4xl rounded-full -z-10" />
 
             <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-vape-400" />

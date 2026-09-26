@@ -61,7 +61,7 @@ export function ProductEnrichmentReview({
                     Sugerencias de Enriquecimiento
                 </Heading>
                 <span className={cn(
-                    'px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest',
+                    'px-2.5 py-0.5 rounded-full text-2xs font-black uppercase tracking-widest',
                     enrichmentResult.confidence === 'high'
                         ? 'bg-emerald-500/20 text-emerald-400'
                         : enrichmentResult.confidence === 'medium'
@@ -158,7 +158,7 @@ export function ProductEnrichmentReview({
                                 </span>
                             ))}
                         </div>
-                        <p className="text-[9px] text-white/25 mt-1.5 italic">Solo se añaden llaves nuevas — no se sobreescriben specs ya ingresadas.</p>
+                        <p className="text-2xs text-white/25 mt-1.5 italic">Solo se añaden llaves nuevas — no se sobreescriben specs ya ingresadas.</p>
                     </EnrichmentFieldRow>
                 )}
 

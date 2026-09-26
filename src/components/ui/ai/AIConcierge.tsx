@@ -376,7 +376,7 @@ export const AIConcierge: React.FC = () => {
                                                 />
                                             </div>
                                             {isSlowResponse && (
-                                                <p className="text-[9px] font-medium text-white/40 mt-1.5 whitespace-nowrap">
+                                                <p className="text-2xs font-medium text-white/40 mt-1.5 whitespace-nowrap">
                                                     Sigo pensando...
                                                 </p>
                                             )}

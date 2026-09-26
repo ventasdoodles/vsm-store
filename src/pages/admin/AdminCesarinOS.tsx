@@ -68,7 +68,7 @@ export function AdminCesarinOS() {
             {/* Header Lujoso Glassmorphism */}
             <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-surface-overlay p-10 shadow-2xl">
                 <div className="absolute right-0 top-0 -mr-20 -mt-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-[120px]" />
-                <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-[100px]" />
+                <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-5xl" />
 
                 <div className="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
                     <div className="flex items-start gap-6">

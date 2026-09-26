@@ -60,7 +60,7 @@ export function ProfileForm() {
     return (
         <section className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 relative overflow-hidden group">
             {/* Background Decor */}
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-accent-primary/5 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-accent-primary/5 rounded-full blur-4xl pointer-events-none" />
             
             <header className="mb-8">
                 <h2 className="text-sm font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">
@@ -181,7 +181,7 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     />
                     <label
                         htmlFor={id}
-                        className="absolute left-14 top-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-[9px] peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
+                        className="absolute left-14 top-2.5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
                     >
                         {label}
                     </label>
@@ -190,7 +190,7 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     <m.p
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="text-[9px] font-black uppercase tracking-widest text-red-400 px-4"
+                        className="text-2xs font-black uppercase tracking-widest text-red-400 px-4"
                     >
                         {error}
                     </m.p>

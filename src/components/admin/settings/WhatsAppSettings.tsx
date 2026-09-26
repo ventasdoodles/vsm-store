@@ -21,7 +21,7 @@ export function WhatsAppSettings({ formData, handleChange }: WhatsAppSettingsPro
     return (
         <div className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-green-500/15 hover:shadow-green-500/5">
             {/* Orbe ambiental */}
-            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-green-500/8 blur-[80px] transition-all group-hover:bg-green-500/12" />
+            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-green-500/8 blur-4xl transition-all group-hover:bg-green-500/12" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center gap-3 mb-5">

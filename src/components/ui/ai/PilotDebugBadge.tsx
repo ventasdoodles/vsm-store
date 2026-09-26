@@ -84,7 +84,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                 "w-56 p-4 rounded-2xl bg-black/80 border border-white/10 backdrop-blur-xl shadow-2xl transition-all origin-bottom-left",
                 isExpanded ? "scale-100 opacity-100" : "scale-75 opacity-0 hidden"
             )}>
-                <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-3">Runtime Debug Signal</p>
+                <p className="text-2xs font-black text-white/40 uppercase tracking-[0.2em] mb-3">Runtime Debug Signal</p>
                 
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -92,7 +92,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <Search className="h-3 w-3" />
                             <span className="text-2xs font-medium">Param Detected</span>
                         </div>
-                        <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", requested ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
+                        <span className={cn("text-2xs font-bold px-1.5 py-0.5 rounded uppercase", requested ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
                             {requested ? 'YES' : 'NO'}
                         </span>
                     </div>
@@ -102,7 +102,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <Database className="h-3 w-3" />
                             <span className="text-2xs font-medium">Durable Persisted</span>
                         </div>
-                        <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", persisted ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
+                        <span className={cn("text-2xs font-bold px-1.5 py-0.5 rounded uppercase", persisted ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
                             {persisted ? 'YES' : 'NO'}
                         </span>
                     </div>
@@ -112,7 +112,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <Layout className="h-3 w-3" />
                             <span className="text-2xs font-medium">Global Exposure</span>
                         </div>
-                        <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", isGlobalEnabled ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
+                        <span className={cn("text-2xs font-bold px-1.5 py-0.5 rounded uppercase", isGlobalEnabled ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
                             {isGlobalEnabled ? 'OPEN' : 'CLOSED'}
                         </span>
                     </div>
@@ -122,7 +122,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <ShieldCheck className="h-3 w-3 text-emerald-400" />
                             <span className="text-2xs font-black">Exposure Result</span>
                         </div>
-                        <span className={cn("text-[9px] font-black px-1.5 py-0.5 rounded uppercase", exposure.isVisible ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
+                        <span className={cn("text-2xs font-black px-1.5 py-0.5 rounded uppercase", exposure.isVisible ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
                             {exposure.isVisible ? 'VISIBLE' : 'HIDDEN'}
                         </span>
                     </div>
@@ -132,7 +132,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <ShieldCheck className="h-3 w-3" />
                             <span className="text-2xs font-medium">Access Path</span>
                         </div>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
+                        <span className="text-2xs font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
                             {exposureSourceLabel}
                         </span>
                     </div>
@@ -142,7 +142,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <Activity className="h-3 w-3" />
                             <span className="text-2xs font-medium">Shell Freshness</span>
                         </div>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
+                        <span className="text-2xs font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
                             {shellFreshness}
                         </span>
                     </div>
@@ -152,14 +152,14 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <Database className="h-3 w-3" />
                             <span className="text-2xs font-medium">Deployed Build</span>
                         </div>
-                        <span className="max-w-[90px] truncate text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70" title={deployedFingerprint ?? ''}>
+                        <span className="max-w-[90px] truncate text-2xs font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70" title={deployedFingerprint ?? ''}>
                             {deployedFingerprint ?? 'N/A'}
                         </span>
                     </div>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/5">
-                    <p className="text-[8px] leading-relaxed text-white/40 italic">
+                    <p className="text-3xs leading-relaxed text-white/40 italic">
                         Runtime {runtimeBuildInfo.runtimeBuildFingerprint} {exposure.source === 'PilotOverride'
                             ? 'mounted from the durable Pilot override.'
                             : exposure.isVisible

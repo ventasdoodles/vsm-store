@@ -151,7 +151,7 @@ export function PrizeWheel() {
 
             {/* ── Background glow ── */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10">
-                <div className="absolute top-8 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full bg-vape-500/8 blur-[100px]" />
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full bg-vape-500/8 blur-5xl" />
                 <div className="absolute top-16 left-1/3 w-40 h-40 rounded-full bg-yellow-500/6 blur-[70px]" />
                 <div className="absolute top-16 right-1/3 w-40 h-40 rounded-full bg-blue-500/6 blur-[70px]" />
             </div>

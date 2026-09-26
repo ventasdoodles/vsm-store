@@ -139,7 +139,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/60 backdrop-blur-[40px] rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden flex flex-col md:flex-row pointer-events-auto isolation-auto"
+                        className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/60 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden flex flex-col md:flex-row pointer-events-auto isolation-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-vape-500/10 blur-[120px] rounded-full -z-10" />
@@ -292,11 +292,11 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                             {getVariantDisplayName(variant)}
                                                         </span>
                                                         {variant.price && variant.price !== product.price && (
-                                                            <span className="text-[9px] opacity-40 mt-0.5">
+                                                            <span className="text-2xs opacity-40 mt-0.5">
                                                                 Ref: {formatPrice(variant.price)}
                                                             </span>
                                                         )}
-                                                        <span className="text-[9px] opacity-40 mt-1">
+                                                        <span className="text-2xs opacity-40 mt-1">
                                                             {variantUnavailable ? 'No disponible' : `${variant.stock} disponible(s)`}
                                                         </span>
                                                     </button>
@@ -392,7 +392,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 </Link>
                                 <div className="flex items-center gap-2 opacity-30">
                                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-white">Catálogo actual</span>
+                                    <span className="text-2xs font-black uppercase tracking-widest text-white">Catálogo actual</span>
                                 </div>
                             </div>
                         </div>

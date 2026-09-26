@@ -86,7 +86,7 @@ export function Wishlist() {
                         className="flex flex-col items-center justify-center py-32 text-center bg-white/[0.02] rounded-[3rem] border border-dashed border-white/5 relative overflow-hidden group"
                     >
                         {/* Background decorativo */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[100px] group-hover:bg-red-500/10 transition-colors duration-1000" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-5xl group-hover:bg-red-500/10 transition-colors duration-1000" />
                         
                         <div className="relative mb-8">
                              <div className="absolute -inset-4 bg-red-500/20 rounded-full blur-2xl animate-pulse-slow" />

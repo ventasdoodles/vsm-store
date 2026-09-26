@@ -240,7 +240,7 @@ export function Loyalty() {
                                 <div className="flex items-center justify-between">
                                     <TierBadge tier={tierId} size="md" customLabel={tierName} />
                                     {isCurrent && (
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-vape-400 bg-vape-400/10 px-2 py-1 rounded-full">Tu nivel</span>
+                                        <span className="text-3xs font-black uppercase tracking-widest text-vape-400 bg-vape-400/10 px-2 py-1 rounded-full">Tu nivel</span>
                                     )}
                                 </div>
                                 {threshold > 0 && (

@@ -201,7 +201,7 @@ function StatCard({ icon: Icon, value, label, colorCls, bgCls }: StatCardProps) 
         <div className={cn('flex flex-col items-center gap-1 rounded-xl border py-3 px-2', bgCls)}>
             <Icon className={cn('h-4 w-4', colorCls)} />
             <span className={cn('text-2xl font-black tabular-nums', colorCls)}>{value}</span>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-white/25">{label}</span>
+            <span className="text-2xs font-bold uppercase tracking-wider text-white/25">{label}</span>
         </div>
     );
 }

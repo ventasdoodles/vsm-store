@@ -114,7 +114,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                             }`}
                         >
                             {f === 'all' ? 'Todos' : f}
-                            <span className={`ml-1.5 text-[9px] font-mono ${isActive ? 'opacity-80' : 'opacity-40'}`}>
+                            <span className={`ml-1.5 text-2xs font-mono ${isActive ? 'opacity-80' : 'opacity-40'}`}>
                                 ({counts[f]})
                             </span>
                         </Button>
@@ -158,14 +158,14 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                                         <div className={`p-1 rounded-lg bg-white/5`}>
                                             <Icon className={`h-3.5 w-3.5 ${config!.text}`} />
                                         </div>
-                                        <span className={`text-[9px] font-black uppercase tracking-[0.15em] ${config!.text}`}>
+                                        <span className={`text-2xs font-black uppercase tracking-[0.15em] ${config!.text}`}>
                                             {config!.label}
                                         </span>
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-theme-secondary/40 bg-white/5 px-2 py-0.5 rounded-md">
+                                        <span className="text-2xs font-bold uppercase tracking-widest text-theme-secondary/40 bg-white/5 px-2 py-0.5 rounded-md">
                                             {log.category}
                                         </span>
                                     </div>
-                                    <span className="flex items-center gap-1 text-[9px] font-mono text-theme-secondary/40">
+                                    <span className="flex items-center gap-1 text-2xs font-mono text-theme-secondary/40">
                                         <Clock className="h-2.5 w-2.5" />
                                         {formatTimeAgo(log.created_at)}
                                     </span>
@@ -178,7 +178,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
 
                                 {/* URL (if present) */}
                                 {log.url && (
-                                    <p className="mt-2 text-[9px] font-mono text-theme-secondary/30 truncate">
+                                    <p className="mt-2 text-2xs font-mono text-theme-secondary/30 truncate">
                                         {(() => {
                                             try {
                                                 return new URL(log.url, 'https://vsm.store').pathname;
