@@ -78,7 +78,7 @@ function StatCard({ card }: { card: StatCardData }) {
             </div>
 
             {/* Ambient Glow */}
-            <div className={`absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br ${card.gradient} opacity-[0.05] blur-3xl transition-opacity duration-500 group-hover:opacity-20`} />
+            <div className={`absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br ${card.gradient} opacity-5 blur-3xl transition-opacity duration-500 group-hover:opacity-20`} />
 
             {/* Bottom Line Indicator */}
             <div

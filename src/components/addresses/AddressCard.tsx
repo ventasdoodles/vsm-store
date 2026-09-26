@@ -59,7 +59,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                         </div>
 
                         {/* Detalles */}
-                        <div className="space-y-1 pl-[3.25rem]">
+                        <div className="space-y-1 pl-12">
                             {address.full_name && !compact && (
                                 <p className="text-2xs font-bold text-white uppercase tracking-wide">{address.full_name}</p>
                             )}
