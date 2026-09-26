@@ -192,7 +192,7 @@ export function Contact() {
 
                             {/* Input: Nombre */}
                             <div className="space-y-2">
-                                <label htmlFor="contact_name" className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                <label htmlFor="contact_name" className="text-xs font-black uppercase tracking-macro text-theme-tertiary ml-1">
                                     Nombre completo
                                 </label>
                                 <input
@@ -211,7 +211,7 @@ export function Contact() {
                             <div className="grid sm:grid-cols-2 gap-6">
                                 {/* Input: Email */}
                                 <div className="space-y-2">
-                                    <label htmlFor="contact_email" className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                    <label htmlFor="contact_email" className="text-xs font-black uppercase tracking-macro text-theme-tertiary ml-1">
                                         Email
                                     </label>
                                     <input
@@ -229,7 +229,7 @@ export function Contact() {
 
                                 {/* Input: Teléfono */}
                                 <div className="space-y-2">
-                                    <label htmlFor="contact_phone" className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                    <label htmlFor="contact_phone" className="text-xs font-black uppercase tracking-macro text-theme-tertiary ml-1">
                                         Teléfono
                                     </label>
                                     <input
@@ -248,7 +248,7 @@ export function Contact() {
 
                             {/* Input: Mensaje */}
                             <div className="space-y-2">
-                                <label htmlFor="contact_message" className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                <label htmlFor="contact_message" className="text-xs font-black uppercase tracking-macro text-theme-tertiary ml-1">
                                     Tu consulta
                                 </label>
                                 <textarea
@@ -272,7 +272,7 @@ export function Contact() {
                                 className="group relative w-full h-14 rounded-2xl bg-vape-500 shadow-2xl shadow-vape-500/25 transition-all hover:shadow-vape-500/50 hover:-translate-y-1 active:translate-y-0 overflow-hidden mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-vape-600 via-vape-500 to-vape-600 animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
-                                <div className="relative flex items-center justify-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-white">
+                                <div className="relative flex items-center justify-center gap-3 text-sm font-black uppercase tracking-macro text-white">
                                     <Send className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                                     <span>{isSubmitting ? 'Enviando...' : 'Enviar mensaje'}</span>
                                 </div>

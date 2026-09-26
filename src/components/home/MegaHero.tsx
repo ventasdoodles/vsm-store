@@ -186,7 +186,7 @@ export const MegaHero = () => {
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: 0.4 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-xs md:text-sm tracking-[0.2em] uppercase mb-2 shadow-2xl"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-xs md:text-sm tracking-macro uppercase mb-2 shadow-2xl"
                             >
                                 <Sparkles className="w-4 h-4 text-accent-primary animate-pulse" />
                                 {slide.tag}

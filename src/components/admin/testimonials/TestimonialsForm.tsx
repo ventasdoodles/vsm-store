@@ -56,7 +56,7 @@ export function TestimonialsForm({
             {/* Row 1: Name + Location + Rating */}
             <div className="grid md:grid-cols-3 gap-6 mb-6 relative z-10">
                 <div>
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Nombre del cliente *
                     </label>
                     <input
@@ -69,7 +69,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div>
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Ubicación
                     </label>
                     <input
@@ -81,7 +81,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div>
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Calificación
                     </label>
                     <div className="flex items-center gap-1.5 pt-2 bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-3 h-14 shadow-inner">
@@ -112,7 +112,7 @@ export function TestimonialsForm({
             {/* Row 2: Title + Section */}
             <div className="grid md:grid-cols-2 gap-6 mb-6 relative z-10">
                 <div>
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Título de reseña (opcional)
                     </label>
                     <input
@@ -124,7 +124,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div className="relative group">
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Sección (contexto visual)
                     </label>
                     <select
@@ -147,7 +147,7 @@ export function TestimonialsForm({
 
             {/* Row 3: Body */}
             <div className="mb-6 relative z-10">
-                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1 flex justify-between">
+                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1 flex justify-between">
                     <span>Cuerpo de la reseña *</span>
                     <span className="text-theme-secondary/40 font-mono tracking-normal text-2xs">{form.body.length} caracteres</span>
                 </label>
@@ -164,7 +164,7 @@ export function TestimonialsForm({
             {/* Row 4: Toggles + Sort + Date */}
             <div className="grid md:grid-cols-4 gap-6 mb-8 relative z-10">
                 <div>
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Fecha
                     </label>
                     <input
@@ -175,7 +175,7 @@ export function TestimonialsForm({
                     />
                 </div>
                 <div>
-                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                    <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                         Orden (Prioridad)
                     </label>
                     <input
@@ -247,7 +247,7 @@ function ToggleSwitch({
 }) {
     return (
         <label className="flex flex-col items-center gap-2 cursor-pointer select-none group">
-             <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors">{label}</span>
+             <span className="text-2xs uppercase font-black tracking-macro text-theme-secondary group-hover:text-theme-primary transition-colors">{label}</span>
             <Button
                 type="button"
                 onClick={() => onChange(!checked)}

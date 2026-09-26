@@ -74,7 +74,7 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onClearFilter}
-                        className="relative z-10 mt-8 inline-flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-6 py-3 text-xs font-black uppercase tracking-[0.15em] text-white transition-all hover:bg-white/10 hover:shadow-lg"
+                        className="relative z-10 mt-8 inline-flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-6 py-3 text-xs font-black uppercase tracking-micro text-white transition-all hover:bg-white/10 hover:shadow-lg"
                     >
                         <RotateCcw className="h-4 w-4" />
                         Limpiar filtro
@@ -84,7 +84,7 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                         <m.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative z-10 mt-8 overflow-hidden inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-accent-primary/80 to-accent-primary px-6 py-3 text-xs font-black uppercase tracking-[0.15em] text-black shadow-xl transition-all hover:shadow-[0_0_30px_rgba(var(--accent-primary-rgb),0.4)]"
+                            className="relative z-10 mt-8 overflow-hidden inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-accent-primary/80 to-accent-primary px-6 py-3 text-xs font-black uppercase tracking-micro text-black shadow-xl transition-all hover:shadow-[0_0_30px_rgba(var(--accent-primary-rgb),0.4)]"
                         >
                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                             <ShoppingBag className="h-4 w-4 relative z-10" />

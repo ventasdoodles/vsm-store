@@ -300,7 +300,7 @@ export function CartSidebar() {
                                 className="mt-8 group relative"
                             >
                                 <div className="absolute inset-0 bg-vape-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
-                                <div className="relative rounded-2xl px-10 py-4 bg-white text-slate-900 text-xs font-black uppercase tracking-[0.25em] flex items-center justify-center gap-3 shadow-2xl">
+                                <div className="relative rounded-2xl px-10 py-4 bg-white text-slate-900 text-xs font-black uppercase tracking-mega flex items-center justify-center gap-3 shadow-2xl">
                                     Explorar Catálogo
                                     <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                                 </div>
@@ -399,7 +399,7 @@ export function CartSidebar() {
 
                                     <div className="pt-4 border-t border-white/5 flex items-end justify-between">
                                         <div>
-                                            <span className="text-xs font-black text-white/40 uppercase tracking-[0.2em] mb-1 block">Total a Pagar</span>
+                                            <span className="text-xs font-black text-white/40 uppercase tracking-macro mb-1 block">Total a Pagar</span>
                                             <div className="text-xs font-medium text-white/50 flex items-center gap-1.5">
                                                 Impuestos incluidos
                                             </div>
@@ -432,7 +432,7 @@ export function CartSidebar() {
                                     <div className="absolute inset-0 -translate-x-full animate-shimmer-slow bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
                                     <div className="relative z-10 flex items-center justify-center gap-3 w-full h-full text-slate-900 font-black">
-                                        <span className="text-sm uppercase tracking-[0.25em]">
+                                        <span className="text-sm uppercase tracking-mega">
                                             {openOrderRecoveryView?.shouldRecover
                                                 ? openOrderRecoveryView.sidebarActionLabel
                                                 : transitionView.status === 'blocked'

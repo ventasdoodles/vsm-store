@@ -43,7 +43,7 @@ export function OrderStatusBanner({
             <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-2">
                     <StatusIcon className={cn("h-5 w-5", statusConfig.color)} />
-                    <h2 className={cn("text-xs font-black uppercase tracking-[0.2em]", statusConfig.color)}>
+                    <h2 className={cn("text-xs font-black uppercase tracking-macro", statusConfig.color)}>
                         Estado del Pedido: {statusConfig.label}
                     </h2>
                 </div>

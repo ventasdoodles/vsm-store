@@ -34,7 +34,7 @@ export const ProactiveAISuggestions = memo(({
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
                     <Zap className="h-3 w-3 fill-current" />
                 </div>
-                <h4 className="text-2xs font-black uppercase tracking-[0.2em] text-white/90">
+                <h4 className="text-2xs font-black uppercase tracking-macro text-white/90">
                     {title}
                 </h4>
             </div>

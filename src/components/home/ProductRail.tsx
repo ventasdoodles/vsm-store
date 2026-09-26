@@ -155,7 +155,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                             <m.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className={`mt-8 relative overflow-hidden inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r ${theme.gradient} px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:shadow-2xl ${theme.shadow}`}
+                                className={`mt-8 relative overflow-hidden inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r ${theme.gradient} px-8 py-4 text-xs font-black uppercase tracking-macro text-white shadow-xl transition-all hover:shadow-2xl ${theme.shadow}`}
                             >
                                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                                 <span className="relative z-10">{renderabilityConfig.rail.emptyStateCtaLabel}</span>

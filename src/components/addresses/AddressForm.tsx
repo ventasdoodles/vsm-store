@@ -246,14 +246,14 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 py-5 rounded-[2rem] bg-white/5 border border-white/5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:bg-white/10 hover:text-white transition-all duration-500"
+                    className="flex-1 py-5 rounded-[2rem] bg-white/5 border border-white/5 text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:bg-white/10 hover:text-white transition-all duration-500"
                 >
                     Cancelar
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
-                    className="flex-[2] py-5 rounded-[2rem] bg-accent-primary text-white text-2xs font-black uppercase tracking-[0.2em] hover:bg-accent-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3 shadow-2xl shadow-accent-primary/30"
+                    className="flex-[2] py-5 rounded-[2rem] bg-accent-primary text-white text-2xs font-black uppercase tracking-macro hover:bg-accent-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3 shadow-2xl shadow-accent-primary/30"
                 >
                     {loading ? (
                         <>
@@ -301,7 +301,7 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     />
                     <label
                         htmlFor={id}
-                        className="absolute left-14 top-2.5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
+                        className="absolute left-14 top-2.5 text-2xs font-black uppercase tracking-macro text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-macro peer-focus:text-accent-primary"
                     >
                         {label}
                     </label>

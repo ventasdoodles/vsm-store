@@ -105,7 +105,7 @@ export const FlashDeals = () => {
                 >
                     <div className="inline-flex items-center gap-3 px-4 py-2 bg-red-500/10 rounded-full border border-red-500/20">
                         <Zap className="w-4 h-4 text-red-500 fill-current" />
-                        <span className="text-red-500 font-black text-xs uppercase tracking-[0.2em]">Live Now</span>
+                        <span className="text-red-500 font-black text-xs uppercase tracking-macro">Live Now</span>
                     </div>
                     <Heading as="h2" className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
                         Ofertas <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">Relámpago</span>
@@ -196,7 +196,7 @@ export const FlashDeals = () => {
 
                                     {/* Image Section */}
                                     <div className="relative aspect-[4/5] overflow-hidden">
-                                        <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-red-600 text-white text-2xs font-black uppercase tracking-[0.2em] rounded-full shadow-xl flex items-center gap-2">
+                                        <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-red-600 text-white text-2xs font-black uppercase tracking-macro rounded-full shadow-xl flex items-center gap-2">
                                             <Flame className="w-3.5 h-3.5 fill-current" />
                                             -{discountPercent}% OFF
                                         </div>
@@ -230,7 +230,7 @@ export const FlashDeals = () => {
 
                                         {/* Stock Progress with Breathing Animation */}
                                         <div className="space-y-3 mt-auto">
-                                            <div className="flex justify-between text-2xs font-black uppercase tracking-[0.2em]">
+                                            <div className="flex justify-between text-2xs font-black uppercase tracking-macro">
                                                 <span className="text-white/40">Inventario</span>
                                                 <span className={cn(
                                                     "transition-colors",

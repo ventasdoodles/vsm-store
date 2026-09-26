@@ -29,7 +29,7 @@ export function Stats() {
         return (
             <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
                 <Loader2 className="h-10 w-10 animate-spin text-accent-primary" />
-                <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.3em] animate-pulse">Procesando Múltiples KPIs...</p>
+                <p className="text-2xs text-theme-tertiary font-black uppercase tracking-giga animate-pulse">Procesando Múltiples KPIs...</p>
             </div>
         );
     }
@@ -71,7 +71,7 @@ export function Stats() {
                              <Sparkles className="h-4 w-4 text-accent-primary animate-bounce-slow" />
                              <h1 className="text-4xl font-black text-white uppercase italic tracking-tight">Vanguardia Analítica</h1>
                         </div>
-                        <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.3em] opacity-60 mt-1">Trayectoria transaccional y KPIs de consumo</p>
+                        <p className="text-2xs text-theme-tertiary font-black uppercase tracking-giga opacity-60 mt-1">Trayectoria transaccional y KPIs de consumo</p>
                     </div>
                 </div>
             </header>
@@ -97,7 +97,7 @@ export function Stats() {
                              </div>
                              <div className="h-1.5 w-1.5 rounded-full bg-white opacity-20" />
                         </div>
-                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.3em] mb-1.5 opacity-50">{item.label}</p>
+                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-giga mb-1.5 opacity-50">{item.label}</p>
                         <p className={cn('text-2xl font-black italic tracking-tighter uppercase drop-shadow-sm', item.color)}>{item.value}</p>
                         
                         <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
@@ -115,7 +115,7 @@ export function Stats() {
                             <h3 className="text-xl font-black text-white uppercase italic tracking-tight flex items-center gap-3">
                                 <TrendingUp className="h-5 w-5 text-herbal-400" /> Fluctuación Mensual
                             </h3>
-                            <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">Gasto consolidado por periodo</p>
+                            <p className="text-2xs font-black text-theme-tertiary uppercase tracking-macro opacity-40">Gasto consolidado por periodo</p>
                         </div>
                     </header>
 
@@ -161,7 +161,7 @@ export function Stats() {
                         <h3 className="text-xl font-black text-white uppercase italic tracking-tight flex items-center gap-3">
                             <ShoppingBag className="h-5 w-5 text-vape-400" /> Curación de Favoritos
                         </h3>
-                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">Artículos con mayor tasa de adquisición</p>
+                        <p className="text-2xs font-black text-theme-tertiary uppercase tracking-macro opacity-40">Artículos con mayor tasa de adquisición</p>
                      </header>
 
                      <div className="space-y-4">
@@ -205,7 +205,7 @@ export function Stats() {
             
             {/* Preferencias de Dimensión Periférica */}
             <div className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 space-y-8">
-                <h3 className="text-sm font-black text-theme-tertiary uppercase tracking-[0.3em] opacity-40">Parámetros Ambientales</h3>
+                <h3 className="text-sm font-black text-theme-tertiary uppercase tracking-giga opacity-40">Parámetros Ambientales</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {[
                          { icon: stats.favoriteSection === '420' ? <Leaf className="h-5 w-5 text-herbal-400" /> : <Flame className="h-5 w-5 text-vape-400" />, label: 'Ecosistema Favorito', value: stats.favoriteSection === '420' ? 'Herbal 420' : 'Vape' },
@@ -217,7 +217,7 @@ export function Stats() {
                                 {pref.icon}
                             </div>
                             <div>
-                                <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] mb-0.5 opacity-40">{pref.label}</p>
+                                <p className="text-2xs font-black text-theme-tertiary uppercase tracking-macro mb-0.5 opacity-40">{pref.label}</p>
                                 <p className="text-xs font-black text-white uppercase italic tracking-tight">{pref.value}</p>
                             </div>
                         </div>

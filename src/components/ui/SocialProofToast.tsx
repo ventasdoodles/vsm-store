@@ -58,7 +58,7 @@ export const SocialProofToast = () => {
 
                             {/* Text Content */}
                             <div className="flex-1 min-w-0 pr-4">
-                                <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400 mb-0.5">
+                                <p className="text-2xs font-black uppercase tracking-macro text-vape-400 mb-0.5">
                                     ¡Alguien acaba de comprar!
                                 </p>
                                 <p className="text-xs font-bold text-white truncate leading-tight">

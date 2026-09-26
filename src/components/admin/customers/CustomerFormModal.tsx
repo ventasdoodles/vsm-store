@@ -106,7 +106,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                 <form id="customer-form" onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[75vh] md:h-auto overflow-hidden relative z-10">
                     {/* Col 1: Datos Personales */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 border-b md:border-b-0 md:border-r border-white/5 custom-scrollbar">
-                        <Heading as="h3" className="text-2xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <Heading as="h3" className="text-2xs font-black text-blue-400 uppercase tracking-macro mb-4 flex items-center gap-2">
                             <Mail className="h-3 w-3" />
                             Datos de Cuenta
                         </Heading>
@@ -176,7 +176,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                     {/* Col 2: Dirección */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-white/[0.02] custom-scrollbar">
-                        <Heading as="h3" className="text-2xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <Heading as="h3" className="text-2xs font-black text-indigo-400 uppercase tracking-macro mb-4 flex items-center gap-2">
                             <MapPin className="h-3 w-3" />
                             Dirección de Entrega
                         </Heading>

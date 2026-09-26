@@ -81,8 +81,8 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                         <div className="absolute -inset-1 bg-gradient-to-r from-accent-primary via-accent-secondary to-accent-primary rounded-2xl blur-xl opacity-10 group-hover/code:opacity-30 transition duration-1000 animate-pulse-slow" />
                         <div className="relative flex items-center justify-between bg-white/[0.02] border border-white/5 rounded-2xl p-6 overflow-hidden backdrop-blur-xl">
                             <div className="flex flex-col">
-                                <span className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] mb-2 opacity-50">Tu código maestro</span>
-                                <span className="text-3xl font-black text-white tracking-[0.25em] italic uppercase">{referralCode}</span>
+                                <span className="text-2xs font-black text-theme-tertiary uppercase tracking-macro mb-2 opacity-50">Tu código maestro</span>
+                                <span className="text-3xl font-black text-white tracking-mega italic uppercase">{referralCode}</span>
                             </div>
                             <div className="flex gap-3">
                                 <m.button
@@ -154,7 +154,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                             { label: 'Ganado', value: stats.pointsEarned, suffix: 'VC', color: 'text-gold-400' }
                         ].map((stat, i) => (
                             <div key={i} className="p-5 rounded-2xl bg-black/40 border border-white/5 text-center space-y-1 hover:border-white/10 transition-colors">
-                                <span className="block text-2xs font-black text-theme-tertiary uppercase tracking-[0.15em] opacity-40">{stat.label}</span>
+                                <span className="block text-2xs font-black text-theme-tertiary uppercase tracking-micro opacity-40">{stat.label}</span>
                                 <div className="flex items-center justify-center gap-1">
                                     <span className={cn("text-2xl font-black tracking-tighter italic uppercase", stat.color)}>{stat.value}</span>
                                     {stat.suffix && <span className="text-2xs font-black text-gold-500/30 uppercase mt-1">{stat.suffix}</span>}

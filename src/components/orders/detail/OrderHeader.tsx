@@ -25,7 +25,7 @@ export function OrderHeader({ orderNumber, createdAt, statusConfig }: OrderHeade
                         <h1 className="text-2xl font-black text-white uppercase italic tracking-tight">{orderNumber}</h1>
                         <Sparkles className="h-4 w-4 text-accent-primary animate-pulse" />
                     </div>
-                    <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60">
+                    <p className="text-2xs text-theme-tertiary font-black uppercase tracking-macro opacity-60">
                         Registro de compra: {new Date(createdAt).toLocaleDateString('es-MX', {
                             day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                         })}

@@ -105,7 +105,7 @@ function ColumnWithSpotlight({ title, icon: Icon, colorClass, children }: { titl
                     `,
                 }}
             />
-            <h4 className="text-white font-black mb-8 uppercase tracking-[0.2em] text-2xs flex items-center gap-3 relative z-10 opacity-40 group-hover:opacity-100 transition-opacity">
+            <h4 className="text-white font-black mb-8 uppercase tracking-macro text-2xs flex items-center gap-3 relative z-10 opacity-40 group-hover:opacity-100 transition-opacity">
                 <Icon className={cn("w-4 h-4", colorClass)} />
                 {title}
             </h4>
@@ -184,7 +184,7 @@ export const Footer = memo(function Footer() {
                     
                     <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6 text-center lg:text-left">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-2xs font-black uppercase tracking-[0.2em] text-yellow-500 animate-pulse">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-2xs font-black uppercase tracking-macro text-yellow-500 animate-pulse">
                                 <Zap className="h-3 w-3 fill-current" />
                                 Protocolo VIP VSM
                             </div>
@@ -206,7 +206,7 @@ export const Footer = memo(function Footer() {
                                     <div className="h-12 w-12 rounded-full border border-emerald-400 flex items-center justify-center">
                                         <ShieldCheck size={24} />
                                     </div>
-                                    <p className="text-xs font-black uppercase tracking-[0.2em]">Enlace de acceso enviado</p>
+                                    <p className="text-xs font-black uppercase tracking-macro">Enlace de acceso enviado</p>
                                 </m.div>
                             ) : (
                                 <div className="space-y-4">
@@ -230,7 +230,7 @@ export const Footer = memo(function Footer() {
                                             <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
                                         </button>
                                     </div>
-                                    <p className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 text-center lg:text-left px-4">
+                                    <p className="text-2xs font-black text-theme-tertiary uppercase tracking-macro opacity-40 text-center lg:text-left px-4">
                                         Al unirte aceptas nuestras políticas de privacidad avanzada.
                                     </p>
                                 </div>
@@ -250,13 +250,13 @@ export const Footer = memo(function Footer() {
                             Redefiniendo el lujo en <span className="text-white">Vape & 420 Culture</span>. Calidad suprema, discreción absoluta y curaduría de marcas globales para cada entrega.
                         </p>
                         <div className="space-y-4">
-                            <a href="mailto:hq@vsmstore.com" className="flex items-center gap-5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-accent-primary transition-all group">
+                            <a href="mailto:hq@vsmstore.com" className="flex items-center gap-5 text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:text-accent-primary transition-all group">
                                 <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-accent-primary/10 group-hover:border-accent-primary/30 group-hover:scale-110 transition-all duration-500">
                                     <Mail size={16} />
                                 </div>
                                 hq@vsmstore.com
                             </a>
-                            <a href="tel:+528100000000" className="flex items-center gap-5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-emerald-400 transition-all group">
+                            <a href="tel:+528100000000" className="flex items-center gap-5 text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:text-emerald-400 transition-all group">
                                 <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-emerald-400/10 group-hover:border-emerald-400/30 group-hover:scale-110 transition-all duration-500">
                                     <Phone size={16} />
                                 </div>
@@ -302,7 +302,7 @@ export const Footer = memo(function Footer() {
 
                 {/* Bottom Bar Cinematic */}
                 <div className="pt-12 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-10">
-                    <div className="flex items-center gap-4 text-2xs font-black text-theme-tertiary uppercase tracking-[0.3em] opacity-40">
+                    <div className="flex items-center gap-4 text-2xs font-black text-theme-tertiary uppercase tracking-giga opacity-40">
                         <span>© {new Date().getFullYear()} VSM STORE</span>
                         <div className="h-1 w-1 rounded-full bg-theme-tertiary" />
                         <span>TRANSFERENCE PROTOCOL 3.0</span>
@@ -320,8 +320,8 @@ export const Footer = memo(function Footer() {
                     </div>
 
                     <nav className="flex gap-8">
-                        <Link to="/legal/privacy" className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
-                        <Link to="/legal/terms" className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Términos</Link>
+                        <Link to="/legal/privacy" className="text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
+                        <Link to="/legal/terms" className="text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:text-white transition-all">Términos</Link>
                     </nav>
                 </div>
             </div>

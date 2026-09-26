@@ -358,7 +358,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between gap-2">
                                     <span className={cn(
-                                        "text-2xs font-black uppercase tracking-[0.25em] px-2.5 py-1 rounded-full border",
+                                        "text-2xs font-black uppercase tracking-mega px-2.5 py-1 rounded-full border",
                                         productSurfaceConfig?.productChipClassName
                                     )}>
                                         {product.section}

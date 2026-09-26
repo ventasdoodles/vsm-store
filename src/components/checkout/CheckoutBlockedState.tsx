@@ -39,7 +39,7 @@ export function CheckoutBlockedState({ headline, detail, onGoToCatalog }: Checko
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onGoToCatalog}
-                className="relative z-10 mt-10 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-red-500 to-orange-600 px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-[0_10px_30px_-10px_rgba(239,68,68,0.5)] transition-all hover:shadow-[0_15px_40px_-10px_rgba(239,68,68,0.7)]"
+                className="relative z-10 mt-10 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-red-500 to-orange-600 px-8 py-4 text-xs font-black uppercase tracking-macro text-white shadow-[0_10px_30px_-10px_rgba(239,68,68,0.5)] transition-all hover:shadow-[0_15px_40px_-10px_rgba(239,68,68,0.7)]"
             >
                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 skew-x-12 rounded-2xl" />
                 Volver al catálogo

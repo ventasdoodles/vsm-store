@@ -12,7 +12,7 @@ export function ProductSurfaceFixture() {
         <main className="min-h-screen bg-theme-primary px-4 py-10 text-white sm:px-6 lg:px-10">
             <section className="mx-auto flex max-w-5xl flex-col gap-8">
                 <div className="space-y-2">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-vape-300">
+                    <p className="text-xs font-bold uppercase tracking-macro text-vape-300">
                         Local QA fixture
                     </p>
                     <h1 className="text-3xl font-black leading-tight md:text-4xl">

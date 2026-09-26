@@ -49,7 +49,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                                 <MapPin size={20} />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <span className="block text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary mb-0.5 opacity-50">
+                                <span className="block text-2xs font-black uppercase tracking-macro text-theme-tertiary mb-0.5 opacity-50">
                                     {isShipping ? 'Dirección de Envío' : 'Dirección de Facturación'}
                                 </span>
                                 <h3 className="text-sm font-black text-white uppercase tracking-tight truncate">

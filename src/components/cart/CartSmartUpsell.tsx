@@ -42,7 +42,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
                         <Zap className="h-3.5 w-3.5 fill-current" />
                     </div>
-                    <Heading as="h3" className="text-2xs font-black uppercase tracking-[0.2em] text-white/90">
+                    <Heading as="h3" className="text-2xs font-black uppercase tracking-macro text-white/90">
                         IA Suggestion
                     </Heading>
                 </div>
@@ -76,7 +76,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
                     </div>
 
                     <div className="flex flex-col justify-center flex-1">
-                        <Heading as="h4" className="text-2xs font-black text-white/40 uppercase tracking-[0.2em] mb-1">
+                        <Heading as="h4" className="text-2xs font-black text-white/40 uppercase tracking-macro mb-1">
                             {bundleName}
                         </Heading>
                         <Heading as="h3" className="text-sm font-bold text-white mb-3 line-clamp-1">

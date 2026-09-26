@@ -260,7 +260,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
 
                                 {hasVariations && (
                                     <div className="space-y-3">
-                                        <label className="text-2xs font-black uppercase tracking-[0.2em] text-white/40">
+                                        <label className="text-2xs font-black uppercase tracking-macro text-white/40">
                                             Selecciona una opción
                                         </label>
                                         <div className="grid grid-cols-2 gap-2">
@@ -369,7 +369,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             ) : (
                                                 <PackageX className="w-6 h-6 text-slate-900" />
                                             )}
-                                            <span className="text-slate-900 font-black uppercase tracking-[0.2em] text-sm">
+                                            <span className="text-slate-900 font-black uppercase tracking-macro text-sm">
                                                 {purchaseability.canAddToCart ? 'Añadir al Carrito' : purchaseability.ctaLabel}
                                             </span>
                                         </div>
@@ -385,7 +385,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                     to="/$section/$slug"
                                     params={{ section: product.section, slug: product.slug }}
                                     onClick={onClose}
-                                    className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-2xs uppercase tracking-[0.2em] transition-colors"
+                                    className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-2xs uppercase tracking-macro transition-colors"
                                 >
                                     Ver detalles completos
                                     <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

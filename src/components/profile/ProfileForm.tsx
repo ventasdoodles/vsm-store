@@ -63,7 +63,7 @@ export function ProfileForm() {
             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-accent-primary/5 rounded-full blur-4xl pointer-events-none" />
             
             <header className="mb-8">
-                <h2 className="text-sm font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40">
+                <h2 className="text-sm font-black text-theme-tertiary uppercase tracking-macro opacity-40">
                     Editar Información
                 </h2>
                 <p className="text-2xs text-theme-tertiary font-bold uppercase tracking-widest opacity-60 mt-1">
@@ -128,7 +128,7 @@ export function ProfileForm() {
                         type="submit"
                         disabled={!isDirty || isSubmitting}
                         className={cn(
-                            "group relative flex w-full items-center justify-center gap-3 rounded-[2rem] py-5 text-2xs font-black uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden shadow-2xl active:scale-95",
+                            "group relative flex w-full items-center justify-center gap-3 rounded-[2rem] py-5 text-2xs font-black uppercase tracking-macro transition-all duration-500 overflow-hidden shadow-2xl active:scale-95",
                             isDirty && !isSubmitting
                                 ? "bg-accent-primary text-white shadow-accent-primary/30 hover:bg-accent-secondary"
                                 : "bg-white/5 border border-white/5 text-theme-tertiary cursor-not-allowed opacity-50"
@@ -181,7 +181,7 @@ const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
                     />
                     <label
                         htmlFor={id}
-                        className="absolute left-14 top-2.5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
+                        className="absolute left-14 top-2.5 text-2xs font-black uppercase tracking-macro text-theme-tertiary transition-all duration-500 pointer-events-none peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-macro peer-focus:text-accent-primary"
                     >
                         {label}
                     </label>

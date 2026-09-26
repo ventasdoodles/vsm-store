@@ -75,7 +75,7 @@ export function CheckoutDesktopSummary({
 
                         <div className="pt-4 border-t border-white/5 flex justify-between items-end">
                             <div>
-                                <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total estimado</p>
+                                <p className="text-2xs font-black uppercase tracking-macro text-vape-400 mb-1">Total estimado</p>
                                 <p className="text-3xl font-black text-white tracking-tighter">{formatPrice(displaySubtotal)}</p>
                             </div>
                             {canContinueCheckout && (

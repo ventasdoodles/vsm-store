@@ -46,7 +46,7 @@ export function ApplyReferralForm() {
                 <CheckCircle className="h-6 w-6 text-herbal-400" />
             </div>
             <div>
-                <p className="text-xs font-black text-herbal-400 uppercase tracking-[0.15em]">¡Código Maestro Activado!</p>
+                <p className="text-xs font-black text-herbal-400 uppercase tracking-micro">¡Código Maestro Activado!</p>
                 <p className="text-2xs text-herbal-400/60 font-medium">Has desbloqueado tus recompensas de bienvenida.</p>
             </div>
         </div>
@@ -79,13 +79,13 @@ export function ApplyReferralForm() {
                                 placeholder=" "
                                 disabled={applyMutation.isPending || status === 'success'}
                                 className={cn(
-                                    "peer w-full rounded-2xl border border-white/5 bg-white/[0.02] px-5 pt-7 pb-3 text-sm font-black text-white tracking-[0.2em] uppercase placeholder-transparent focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all backdrop-blur-xl",
+                                    "peer w-full rounded-2xl border border-white/5 bg-white/[0.02] px-5 pt-7 pb-3 text-sm font-black text-white tracking-macro uppercase placeholder-transparent focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all backdrop-blur-xl",
                                     status === 'error' && "border-red-500/30 text-red-400"
                                 )}
                             />
                             <label
                                 htmlFor="referral-code"
-                                className="absolute left-5 top-2.5 text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-[0.2em] peer-focus:text-accent-primary"
+                                className="absolute left-5 top-2.5 text-2xs font-black uppercase tracking-macro text-theme-tertiary transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-xs peer-placeholder-shown:font-bold peer-placeholder-shown:tracking-normal peer-focus:top-2.5 peer-focus:text-2xs peer-focus:font-black peer-focus:tracking-macro peer-focus:text-accent-primary"
                             >
                                 Código de Invitación
                             </label>

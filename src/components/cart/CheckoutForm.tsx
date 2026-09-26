@@ -462,7 +462,7 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                         onClick={nextStep}
                         className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-vape-500 shadow-xl shadow-vape-500/20 transition-all hover:bg-vape-400 active:scale-95"
                     >
-                        <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Continuar</span>
+                        <span className="text-sm font-black uppercase tracking-macro text-slate-900">Continuar</span>
                         <ChevronRight className="h-5 w-5 text-slate-900 transition-transform group-hover:translate-x-1" />
                     </Button>
                 ) : (
@@ -479,12 +479,12 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                             {sending ? (
                                 <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
                                     <Loader2 className="h-5 w-5 animate-spin" />
-                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Procesando</span>
+                                    <span className="text-sm font-black uppercase tracking-macro text-slate-900">Procesando</span>
                                 </m.div>
                             ) : (
                                 <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
                                     <Send className="h-5 w-5 text-slate-900" />
-                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">
+                                    <span className="text-sm font-black uppercase tracking-macro text-slate-900">
                                         {hasOpenRecoverableOrder
                                             ? 'Ya existe una orden pendiente'
                                             : formData.paymentMethod === 'mercadopago'

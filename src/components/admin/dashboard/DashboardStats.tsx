@@ -64,7 +64,7 @@ function StatCard({ card }: { card: StatCardData }) {
             <div className="flex items-start justify-between relative z-10">
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                        <p className="text-2xs font-black text-theme-secondary/60 uppercase tracking-[0.25em]">
+                        <p className="text-2xs font-black text-theme-secondary/60 uppercase tracking-mega">
                             {card.label}
                         </p>
                     </div>

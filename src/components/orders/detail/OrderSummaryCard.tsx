@@ -61,16 +61,16 @@ export function OrderSummaryCard({
                             <ShoppingBag className="h-10 w-10 text-theme-tertiary opacity-20 transition-opacity group-hover:opacity-40" />
                             <div className="absolute -inset-2 bg-accent-primary/5 rounded-full blur-xl animate-pulse" />
                         </div>
-                        <h2 className="text-2xl font-black text-white uppercase italic tracking-[0.2em]">Resumen del pedido</h2>
+                        <h2 className="text-2xl font-black text-white uppercase italic tracking-macro">Resumen del pedido</h2>
                         <div className="flex flex-col items-center gap-1 opacity-60">
-                            <p className="text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary">Cod. Reg: {orderNumber}</p>
-                            <p className="text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary">Estado persistido del pedido</p>
+                            <p className="text-2xs font-black uppercase tracking-giga text-theme-tertiary">Cod. Reg: {orderNumber}</p>
+                            <p className="text-2xs font-black uppercase tracking-giga text-theme-tertiary">Estado persistido del pedido</p>
                         </div>
                     </div>
 
                     {/* Items Loop */}
                     <div className="space-y-6 pb-10">
-                        <div className="flex justify-between text-2xs font-black uppercase tracking-[0.3em] text-theme-tertiary border-b border-white/5 pb-2">
+                        <div className="flex justify-between text-2xs font-black uppercase tracking-giga text-theme-tertiary border-b border-white/5 pb-2">
                             <span>Concepto</span>
                             <span>Total Parcial</span>
                         </div>
@@ -113,7 +113,7 @@ export function OrderSummaryCard({
                             </div>
                         )}
                         <div className="flex justify-between items-center pt-6 border-t border-white/5">
-                            <span className="text-sm font-black text-white uppercase italic tracking-[0.2em]">Total registrado</span>
+                            <span className="text-sm font-black text-white uppercase italic tracking-macro">Total registrado</span>
                             <span className="text-2xl font-black text-accent-primary italic drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">{formatPrice(total)}</span>
                         </div>
                     </div>
@@ -162,7 +162,7 @@ export function OrderSummaryCard({
                     </div>
 
                     <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
-                        <p className="text-2xs font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-60">
+                        <p className="text-2xs font-black uppercase tracking-macro text-theme-tertiary opacity-60">
                             Siguiente paso real
                         </p>
                         <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">

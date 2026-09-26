@@ -305,7 +305,7 @@ export function AdminAttributes() {
                                 <div className="mt-8 border-t border-white/5 pt-6">
                                     <div className="flex items-center gap-2 mb-4">
                                         <FolderTree className="h-4 w-4 text-violet-400" />
-                                        <Heading as="h4" className="text-2xs font-black uppercase tracking-[0.2em] text-white/40">Restringir a Categorías Específicas</Heading>
+                                        <Heading as="h4" className="text-2xs font-black uppercase tracking-macro text-white/40">Restringir a Categorías Específicas</Heading>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {(categories || []).length === 0 && <p className="text-2xs text-white/20 italic">No hay categorías cargadas.</p>}

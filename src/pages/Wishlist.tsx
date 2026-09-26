@@ -50,7 +50,7 @@ export function Wishlist() {
                             <Sparkles className="h-4 w-4 text-accent-primary animate-bounce-slow" />
                             <h1 className="text-4xl font-black text-white uppercase tracking-tight italic">Mis Favoritos</h1>
                         </div>
-                        <p className="text-2xs text-theme-tertiary font-black uppercase tracking-[0.2em] opacity-60 mt-1">
+                        <p className="text-2xs text-theme-tertiary font-black uppercase tracking-macro opacity-60 mt-1">
                             {items.length} {items.length === 1 ? 'objeto de deseo' : 'objetos de deseo'} guardados
                         </p>
                     </div>

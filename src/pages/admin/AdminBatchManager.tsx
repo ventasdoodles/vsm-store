@@ -54,7 +54,7 @@ const columns = [
         header: ({ column }) => (
             <Button
                 onClick={column.getToggleSortingHandler()}
-                className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                className="flex items-center gap-1 uppercase tracking-macro hover:text-white transition-colors"
             >
                 Nombre del Producto
                 {{
@@ -76,7 +76,7 @@ const columns = [
         header: ({ column }) => (
             <Button
                 onClick={column.getToggleSortingHandler()}
-                className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                className="flex items-center gap-1 uppercase tracking-macro hover:text-white transition-colors"
             >
                 Precio ($)
                 {{
@@ -106,7 +106,7 @@ const columns = [
         header: ({ column }) => (
             <Button
                 onClick={column.getToggleSortingHandler()}
-                className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                className="flex items-center gap-1 uppercase tracking-macro hover:text-white transition-colors"
             >
                 Stock
                 {{
@@ -300,7 +300,7 @@ export function AdminBatchManager() {
                                     <th 
                                         key={header.id} 
                                         className={cn(
-                                            "px-8 py-5 text-2xs font-black uppercase tracking-[0.2em] text-white/30",
+                                            "px-8 py-5 text-2xs font-black uppercase tracking-macro text-white/30",
                                             header.column.id === 'is_active' && "text-center"
                                         )}
                                     >

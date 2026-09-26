@@ -97,7 +97,7 @@ export function AdminCesarinOS() {
                             )}
                         >
                             <div className="flex-1">
-                                <div className="text-2xs font-black uppercase tracking-[0.25em] text-white/40">
+                                <div className="text-2xs font-black uppercase tracking-mega text-white/40">
                                     Visibilidad
                                 </div>
                                 <div className="mt-1 flex items-center gap-2">

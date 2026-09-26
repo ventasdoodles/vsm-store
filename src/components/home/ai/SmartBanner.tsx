@@ -91,7 +91,7 @@ export const SmartBanner: React.FC = () => {
                     {/* AI Identity Token */}
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 flex items-center gap-2 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                         <Sparkles className="w-3 h-3 text-white/60" />
-                        <span className="text-2xs text-white/60 font-black tracking-[0.2em] uppercase">Hyper-Personalized Content</span>
+                        <span className="text-2xs text-white/60 font-black tracking-macro uppercase">Hyper-Personalized Content</span>
                     </div>
                 </div>
             </m.div>

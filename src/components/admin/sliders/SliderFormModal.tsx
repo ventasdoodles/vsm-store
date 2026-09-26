@@ -67,7 +67,7 @@ export function SliderFormModal({
                         
                         {/* 1. Visual Theme Selection */}
                         <div className="space-y-4">
-                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] flex items-center gap-2">
+                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro flex items-center gap-2">
                                 <Zap className="w-3.5 h-3.5 text-pink-500" /> Tema Visual Premium
                             </label>
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -106,7 +106,7 @@ export function SliderFormModal({
 
                         {/* 2. Image Upload */}
                         <div className="space-y-4">
-                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] flex items-center gap-2">
+                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro flex items-center gap-2">
                                 <ImageIcon className="w-3.5 h-3.5 text-pink-500" /> Imagen del Producto / Modelo
                             </label>
                             <div className="bg-theme-primary/[0.02] border border-white/10 rounded-3xl p-6 shadow-inner">
@@ -135,7 +135,7 @@ export function SliderFormModal({
                         {/* 3. Text Content */}
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
-                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                     Etiqueta (Badge)
                                 </label>
                                 <select
@@ -150,7 +150,7 @@ export function SliderFormModal({
                             </div>
                             
                             <div>
-                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                     Título Principal *
                                 </label>
                                 <input
@@ -164,7 +164,7 @@ export function SliderFormModal({
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                     Subtítulo Resaltado *
                                 </label>
                                 <input
@@ -178,7 +178,7 @@ export function SliderFormModal({
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                     Descripción (Opcional)
                                 </label>
                                 <textarea
@@ -196,7 +196,7 @@ export function SliderFormModal({
                         {/* 4. CTA */}
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
-                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                     Texto del Botón *
                                 </label>
                                 <input
@@ -209,7 +209,7 @@ export function SliderFormModal({
                                 />
                             </div>
                             <div>
-                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                                <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                     Link / URL del Botón *
                                 </label>
                                 <input
@@ -279,7 +279,7 @@ function ToggleSwitch({
 }) {
     return (
         <label className="flex flex-col items-center justify-center gap-3 cursor-pointer select-none w-full h-full group">
-             <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
+             <span className="text-2xs uppercase font-black tracking-macro text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
             <Button
                 type="button"
                 onClick={() => onChange(!checked)}

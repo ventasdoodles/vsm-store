@@ -261,7 +261,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
         {message.capsule_contract?.capsule_name === 'knowledge_rag_foundation' &&
             message.capsule_contract?.resolved_chunks?.length > 0 && (
             <div className="mt-2 w-full space-y-3">
-                <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
+                <p className="text-2xs font-black uppercase tracking-macro text-vape-400/60 mb-1">
                     {message.capsule_contract?.match_strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
                         ? 'Politica Oficial'
                         : message.capsule_contract?.match_strategy === 'MODERATE_CONFIDENCE_MULTI_SOURCE'
@@ -296,7 +296,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
             <div className="mt-2 w-full space-y-3">
                 {hasSuggestedProducts && (
                     <>
-                        <p className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
+                        <p className="text-2xs font-black uppercase tracking-macro text-vape-400/60 mb-1">
                             {getSuggestionGroupLabel(message.capsule_contract?.match_strategy)}
                         </p>
                         {showRecoveryHint && recoveryHint && (

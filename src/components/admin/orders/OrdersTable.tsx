@@ -78,7 +78,7 @@ const columns = [
         header: ({ column }) => (
             <Button
                 onClick={column.getToggleSortingHandler()}
-                className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                className="flex items-center gap-1 uppercase tracking-macro hover:text-white transition-colors"
             >
                 Cliente
                 {{
@@ -117,7 +117,7 @@ const columns = [
         header: ({ column }) => (
             <Button
                 onClick={column.getToggleSortingHandler()}
-                className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                className="flex items-center gap-1 uppercase tracking-macro hover:text-white transition-colors"
             >
                 Total
                 {{
@@ -179,7 +179,7 @@ const columns = [
         header: ({ column }) => (
             <Button
                 onClick={column.getToggleSortingHandler()}
-                className="flex items-center gap-1 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                className="flex items-center gap-1 uppercase tracking-macro hover:text-white transition-colors"
             >
                 Fecha
                 {{

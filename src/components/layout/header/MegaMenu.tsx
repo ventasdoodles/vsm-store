@@ -112,7 +112,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                             {/* COL 1: Main Categories */}
                             <div className="w-1/3 border-r border-white/5 bg-white/[0.02] p-4">
                                 <div className="mb-4 px-4 pt-2">
-                                    <span className="text-2xs font-black uppercase tracking-[0.2em] text-white/30">Explorar {label}</span>
+                                    <span className="text-2xs font-black uppercase tracking-macro text-white/30">Explorar {label}</span>
                                 </div>
                                 <div className="space-y-1">
                                     {categories.map((cat) => (
@@ -226,7 +226,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                         <TrendingUp className="h-4 w-4 text-herbal-400" />
                                     </div>
                                 </div>
-                                <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-2 italic">Destacado</h4>
+                                <h4 className="text-xs font-black uppercase tracking-macro text-white/50 mb-2 italic">Destacado</h4>
                                 <p className="text-xs font-bold text-white leading-relaxed px-4">Selección destacada de productos de {activeCategory?.name}.</p>
                             </div>
 

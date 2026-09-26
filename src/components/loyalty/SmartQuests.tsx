@@ -110,7 +110,7 @@ export const SmartQuests: React.FC = () => {
             <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                     <Target className="h-4 w-4 text-vape-400" />
-                    <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-80">
+                    <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-macro opacity-80">
                         Smart Quests
                     </h2>
                 </div>

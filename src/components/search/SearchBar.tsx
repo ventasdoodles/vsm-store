@@ -321,7 +321,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     {(showRecent || showAIHints) && (
                         <div className="p-2">
                             <div className="flex items-center justify-between px-3 py-2 mb-1">
-                                <div className="flex items-center gap-2 text-xs font-black text-theme-secondary uppercase tracking-[0.2em]">
+                                <div className="flex items-center gap-2 text-xs font-black text-theme-secondary uppercase tracking-macro">
                                     {showRecent ? <History className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5 text-accent-primary" />}
                                     {showRecent ? 'Historial Reciente' : 'Sugerencias VSM AI'}
                                 </div>
@@ -355,7 +355,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* Categories Suggestion (Omni-Pulse Power) */}
                             {categories.length > 0 && (
                                 <div className="px-1">
-                                    <div className="flex items-center gap-2 px-3 py-2 text-2xs font-black text-theme-secondary uppercase tracking-[0.2em]">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-2xs font-black text-theme-secondary uppercase tracking-macro">
                                         Categorías
                                     </div>
                                     <div className="flex flex-wrap gap-2 px-2">
@@ -376,7 +376,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* Products */}
                             {products.length > 0 && (
                                 <div className="px-1">
-                                    <div className="flex items-center gap-2 px-3 py-2 text-2xs font-black text-theme-secondary uppercase tracking-[0.2em]">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-2xs font-black text-theme-secondary uppercase tracking-macro">
                                         Productos
                                     </div>
                                     <div className="space-y-1">
@@ -438,7 +438,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             {/* View All CTA */}
                             <button
                                 onClick={() => handleSubmit()}
-                                className="w-full p-4 text-center text-2xs font-black uppercase tracking-[0.3em] text-white/40 hover:text-vape-400 hover:bg-vape-500/5 transition-all border-t border-white/5"
+                                className="w-full p-4 text-center text-2xs font-black uppercase tracking-giga text-white/40 hover:text-vape-400 hover:bg-vape-500/5 transition-all border-t border-white/5"
                             >
                                 Ver todos los resultados
                             </button>

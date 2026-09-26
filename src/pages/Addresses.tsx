@@ -48,7 +48,7 @@ export function Addresses() {
             {/* Layout de Direcciones */}
             <div className="grid gap-8">
                 <div className="space-y-4">
-                    <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 px-1">
+                    <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-macro opacity-40 px-1">
                         Libreta de direcciones
                     </h2>
                     <AddressList customerId={user.id} />

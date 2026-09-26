@@ -109,7 +109,7 @@ export const TrustBadges = () => {
                             <Heading as="h3" className="font-black text-white/90 uppercase tracking-wider text-2xs sm:text-xs leading-none">
                                 {badge.title}
                             </Heading>
-                            <p className="text-2xs sm:text-2xs text-white/40 font-bold uppercase tracking-[0.2em] leading-tight px-2">
+                            <p className="text-2xs sm:text-2xs text-white/40 font-bold uppercase tracking-macro leading-tight px-2">
                                 {badge.description}
                             </p>
                         </div>

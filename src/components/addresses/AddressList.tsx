@@ -131,7 +131,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                         <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:bg-accent-primary/10 group-hover:border-accent-primary/20 transition-all duration-500">
                              <Plus className="h-6 w-6 text-theme-tertiary group-hover:text-accent-primary transition-colors" />
                         </div>
-                        <span className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] group-hover:text-white transition-colors">Añadir Nueva Dirección</span>
+                        <span className="text-2xs font-black text-theme-tertiary uppercase tracking-macro group-hover:text-white transition-colors">Añadir Nueva Dirección</span>
                     </button>
                 </div>
             )}

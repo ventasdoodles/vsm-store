@@ -190,7 +190,7 @@ export function PaymentSuccess() {
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-white uppercase italic">
                             {headline}
                         </h1>
-                        <p className={`text-lg font-bold uppercase tracking-[0.2em] ${ui.eyebrow}`}>
+                        <p className={`text-lg font-bold uppercase tracking-macro ${ui.eyebrow}`}>
                             {eyebrow}
                         </p>
                     </m.div>
@@ -200,7 +200,7 @@ export function PaymentSuccess() {
                         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-8 text-left backdrop-blur-2xl">
                             <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-white/5 pb-6 sm:flex-row sm:items-center">
                                 <div className="space-y-1">
-                                    <span className="text-2xs font-black uppercase tracking-[0.3em] text-white/30">Numero de pedido</span>
+                                    <span className="text-2xs font-black uppercase tracking-giga text-white/30">Numero de pedido</span>
                                     <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">
                                         {order?.order_number || 'Consultando...'}
                                     </h3>

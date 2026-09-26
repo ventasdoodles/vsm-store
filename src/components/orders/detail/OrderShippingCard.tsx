@@ -35,7 +35,7 @@ export function OrderShippingCard({ trackingTrustView }: OrderShippingCardProps)
             </div>
 
             <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
-                <p className="text-2xs font-black uppercase tracking-[0.2em] text-white">
+                <p className="text-2xs font-black uppercase tracking-macro text-white">
                     {trackingTrustView.headline}
                 </p>
                 <p className="mt-2 text-2xs font-bold uppercase tracking-wider text-theme-secondary/80 leading-relaxed">

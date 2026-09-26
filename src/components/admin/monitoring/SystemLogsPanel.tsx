@@ -158,7 +158,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
                                         <div className={`p-1 rounded-lg bg-white/5`}>
                                             <Icon className={`h-3.5 w-3.5 ${config!.text}`} />
                                         </div>
-                                        <span className={`text-2xs font-black uppercase tracking-[0.15em] ${config!.text}`}>
+                                        <span className={`text-2xs font-black uppercase tracking-micro ${config!.text}`}>
                                             {config!.label}
                                         </span>
                                         <span className="text-2xs font-bold uppercase tracking-widest text-theme-secondary/40 bg-white/5 px-2 py-0.5 rounded-md">

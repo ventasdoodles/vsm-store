@@ -67,7 +67,7 @@ export function HealthPulse({ isHealthy, lastCheckTime, uptimeMinutes }: HealthP
                 </div>
 
                 {/* Status Text */}
-                <p className={`text-sm font-black uppercase tracking-[0.2em] ${
+                <p className={`text-sm font-black uppercase tracking-macro ${
                     isHealthy ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
                     {isHealthy ? 'Sistema Operativo' : 'Errores Detectados'}

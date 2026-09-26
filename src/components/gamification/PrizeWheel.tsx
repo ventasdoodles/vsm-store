@@ -164,7 +164,7 @@ export function PrizeWheel() {
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-vape-600/30 to-orange-500/20 border border-vape-500/30"
                 >
                     <Zap className="w-3 h-3 text-vape-400 fill-current" />
-                    <span className="text-2xs font-black text-vape-300 uppercase tracking-[0.2em]">Giro Diario Gratis</span>
+                    <span className="text-2xs font-black text-vape-300 uppercase tracking-macro">Giro Diario Gratis</span>
                 </m.div>
 
                 <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
@@ -387,7 +387,7 @@ export function PrizeWheel() {
                             onClick={() => spin(prizes)}
                             disabled={isSpinning}
                             className={cn(
-                                'relative w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-white overflow-hidden transition-all',
+                                'relative w-full py-5 rounded-[2rem] font-black uppercase tracking-macro text-white overflow-hidden transition-all',
                                 isSpinning
                                     ? 'bg-white/5 border border-white/10 cursor-not-allowed'
                                     : 'border border-orange-400/30 shadow-[0_8px_32px_rgba(234,88,12,0.4)] hover:shadow-[0_12px_40px_rgba(234,88,12,0.65)]',

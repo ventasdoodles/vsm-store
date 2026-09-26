@@ -146,7 +146,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
 
     const PremiumInput = ({ label, value, onChange, icon: Icon, placeholder, mono = false }: PremiumInputProps) => (
         <div className="relative group">
-            <label className="text-2xs font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
+            <label className="text-2xs font-black text-white/50 uppercase tracking-macro mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
                 {Icon && <Icon className="w-3 h-3" />}
                 {label}
             </label>
@@ -172,7 +172,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
 
     const PremiumTextarea = ({ label, value, onChange, rows = 3, placeholder }: PremiumTextareaProps) => (
         <div className="relative group">
-            <label className="text-2xs font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
+            <label className="text-2xs font-black text-white/50 uppercase tracking-macro mb-2 flex items-center gap-1.5 ml-1 transition-colors group-focus-within:text-violet-400">
                 {label}
             </label>
             <textarea

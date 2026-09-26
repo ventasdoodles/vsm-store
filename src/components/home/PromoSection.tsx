@@ -34,7 +34,7 @@ export function PromoSection() {
                                     <Heading as="h3" className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
                                         Envíos por DHL <br className="hidden md:block" /> con cobertura por confirmar
                                     </Heading>
-                                    <p className="text-theme-tertiary font-bold uppercase tracking-[0.2em] text-xs md:text-sm opacity-60">
+                                    <p className="text-theme-tertiary font-bold uppercase tracking-macro text-xs md:text-sm opacity-60">
                                         Productos importados de <span className="text-vape-400 font-black">China y USA</span>
                                     </p>
                                 </div>

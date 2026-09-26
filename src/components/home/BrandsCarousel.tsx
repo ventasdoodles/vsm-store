@@ -41,7 +41,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
                                             {brand.name[0]?.toUpperCase()}
                                         </span>
                                     </div>
-                                    <span className="text-2xs sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
+                                    <span className="text-2xs sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-giga text-center w-full px-2 truncate transition-colors">
                                         {brand.name}
                                     </span>
                                 </div>
@@ -54,7 +54,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
                                     {brand.name[0]?.toUpperCase()}
                                 </span>
                             </div>
-                            <span className="text-2xs sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
+                            <span className="text-2xs sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-giga text-center w-full px-2 truncate transition-colors">
                                 {brand.name}
                             </span>
                         </div>

@@ -36,7 +36,7 @@ export function AIInsights() {
                         </div>
                         <div>
                             <Heading as="h2" className="text-lg font-black text-white tracking-tight">AI Insights</Heading>
-                            <p className="text-2xs font-bold text-white/20 uppercase tracking-[0.2em]">Optimización: VSM Intelligent Core</p>
+                            <p className="text-2xs font-bold text-white/20 uppercase tracking-macro">Optimización: VSM Intelligent Core</p>
                         </div>
                     </div>
                     

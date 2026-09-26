@@ -217,7 +217,7 @@ export function Loyalty() {
 
             {/* ─── SECCIÓN 3: Beneficios por tier ─── */}
             <div className="space-y-4">
-                <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-60 px-1">
+                <h2 className="text-2xs font-black text-theme-tertiary uppercase tracking-macro opacity-60 px-1">
                     Niveles del programa
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2">

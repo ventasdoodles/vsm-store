@@ -117,6 +117,12 @@ export default {
                     '100%': { 'offset-distance': '100%' },
                 },
             },
+            letterSpacing: {
+                'micro': '0.15em',
+                'macro': '0.2em',
+                'mega': '0.25em',
+                'giga': '0.3em',
+            },
             fontSize: {
                 '3xs': ['0.5rem', { lineHeight: '0.75rem' }],     // 8px / 12px
                 '2xs': ['0.625rem', { lineHeight: '0.875rem' }],   // 10px / 14px

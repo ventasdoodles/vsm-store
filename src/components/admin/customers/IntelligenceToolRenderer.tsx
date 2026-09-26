@@ -30,7 +30,7 @@ export function IntelligenceToolRenderer({
                     </div>
                     <div>
                         <Heading as="h4" className="text-lg font-black text-white tracking-tight">Analista Estratégico Pro</Heading>
-                        <p className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400 opacity-80">Motor de Retención Gemini 2.5 Flash Lite</p>
+                        <p className="text-2xs font-black uppercase tracking-macro text-indigo-400 opacity-80">Motor de Retención Gemini 2.5 Flash Lite</p>
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@ export function IntelligenceToolRenderer({
                         {/* Next Steps */}
                         {strategicAnalysis.next_steps && (
                             <div className="space-y-3 mt-6">
-                                <Heading as="h6" className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-400">Pasos Recomendados</Heading>
+                                <Heading as="h6" className="text-2xs font-black uppercase tracking-macro text-indigo-400">Pasos Recomendados</Heading>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {strategicAnalysis.next_steps.map((step: string, i: number) => (
                                         <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 group/step hover:bg-white/10 transition-colors">
@@ -103,7 +103,7 @@ export function IntelligenceToolRenderer({
                     {strategicAnalysis.recovery_message && (
                         <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/20 space-y-4">
                             <div className="flex items-center justify-between">
-                                <Heading as="h5" className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300">Mensaje de Recuperación Sugerido</Heading>
+                                <Heading as="h5" className="text-2xs font-black uppercase tracking-macro text-indigo-300">Mensaje de Recuperación Sugerido</Heading>
                                 <Button
                                     onClick={() => {
                                         if (strategicAnalysis.recovery_message) {

@@ -28,7 +28,7 @@ export function PostPurchaseReceiptCard({
         <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 text-left shadow-2xl backdrop-blur-xl">
             <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-black uppercase tracking-[0.2em] text-white/60">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-black uppercase tracking-macro text-white/60">
                         <ReceiptText className="h-3.5 w-3.5" />
                         Resumen persistido
                     </div>

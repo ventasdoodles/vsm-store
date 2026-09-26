@@ -322,7 +322,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                 <span className="text-sm font-black tracking-tight text-white uppercase italic">VSM Admin</span>
                                 <div className="flex items-center gap-1.5">
                                     <span className="h-1.5 w-1.5 rounded-full bg-vape-400 animate-pulse" />
-                                    <span className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/80">
+                                    <span className="text-2xs font-black uppercase tracking-macro text-vape-400/80">
                                         Control
                                     </span>
                                 </div>
@@ -339,7 +339,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <nav className="flex-1 space-y-8 overflow-y-auto px-5 py-8 custom-scrollbar">
                         {menuSections.map((section, idx) => (
                             <div key={idx} className="space-y-3 flex flex-col items-stretch">
-                                <Heading as="h3" className="px-4 text-2xs font-black uppercase tracking-[0.3em] text-theme-secondary/30 select-none">
+                                <Heading as="h3" className="px-4 text-2xs font-black uppercase tracking-giga text-theme-secondary/30 select-none">
                                     {section.title}
                                 </Heading>
                                 <div className="space-y-1">

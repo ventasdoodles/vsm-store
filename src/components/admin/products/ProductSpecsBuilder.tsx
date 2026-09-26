@@ -33,7 +33,7 @@ export function ProductSpecsBuilder({
                 {/* Sugerencias Guardrails */}
                 {specSuggestions.length > 0 && (
                     <div className="space-y-2">
-                        <label className="flex items-center gap-1.5 text-2xs font-black uppercase tracking-[0.15em] text-white/20">
+                        <label className="flex items-center gap-1.5 text-2xs font-black uppercase tracking-micro text-white/20">
                             <Sparkles className="h-3 w-3 text-violet-400" />
                             Sugerencias para {categoryName || 'esta sección'}
                         </label>

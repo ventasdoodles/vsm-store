@@ -303,7 +303,7 @@ export const AIConcierge: React.FC = () => {
                                         <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full border-2 border-[var(--concierge-bg-border)] bg-emerald-400 ring-2 ring-emerald-400/20 animate-pulse" />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-black uppercase tracking-[0.15em] italic bg-clip-text text-transparent bg-gradient-to-r from-white via-vape-200 to-white bg-[length:200%_100%] animate-[gradient-x_3s_linear_infinite]">
+                                        <h3 className="text-sm font-black uppercase tracking-micro italic bg-clip-text text-transparent bg-gradient-to-r from-white via-vape-200 to-white bg-[length:200%_100%] animate-[gradient-x_3s_linear_infinite]">
                                             CESAR
                                         </h3>
                                         <div className="flex items-center gap-1.5">

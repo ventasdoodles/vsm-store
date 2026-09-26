@@ -64,7 +64,7 @@ export function StockOracleBadge({ prediction, isLoading }: StockOracleBadgeProp
                 <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                         <span className={cn(
-                            "text-2xs font-black uppercase tracking-[0.2em]",
+                            "text-2xs font-black uppercase tracking-macro",
                             isCritical ? "text-red-400" : "text-vape-400"
                         )}>
                             Profecía de Stock VSM IA

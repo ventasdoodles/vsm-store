@@ -241,7 +241,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     <div className="relative p-6 px-8">
                         <div className="flex items-center gap-2 mb-4">
                             <Sparkles className="h-4 w-4 text-vape-400 animate-pulse" />
-                            <span className="text-2xs font-black uppercase tracking-[0.2em] text-vape-400/80">Recomendaciones del Sistema</span>
+                            <span className="text-2xs font-black uppercase tracking-macro text-vape-400/80">Recomendaciones del Sistema</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -300,7 +300,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                     <Sparkles className={cn("h-7 w-7", loadingNarrative && "animate-spin-slow")} />
                                 </div>
                                 <div className="flex flex-col justify-center w-full">
-                                    <Heading as="h5" className="text-2xs font-black uppercase tracking-[0.2em] text-indigo-300/80 mb-2">Análisis de Comportamiento</Heading>
+                                    <Heading as="h5" className="text-2xs font-black uppercase tracking-macro text-indigo-300/80 mb-2">Análisis de Comportamiento</Heading>
                                     {loadingNarrative ? (
                                         <div className="space-y-2">
                                             <div className="h-2 w-3/4 bg-white/10 rounded-full" />

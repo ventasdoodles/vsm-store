@@ -84,7 +84,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                 "w-56 p-4 rounded-2xl bg-black/80 border border-white/10 backdrop-blur-xl shadow-2xl transition-all origin-bottom-left",
                 isExpanded ? "scale-100 opacity-100" : "scale-75 opacity-0 hidden"
             )}>
-                <p className="text-2xs font-black text-white/40 uppercase tracking-[0.2em] mb-3">Runtime Debug Signal</p>
+                <p className="text-2xs font-black text-white/40 uppercase tracking-macro mb-3">Runtime Debug Signal</p>
                 
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">

@@ -66,7 +66,7 @@ export function BrandsFormModal({
                     
                     {/* Name */}
                     <div>
-                        <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                        <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                             Nombre de la Marca *
                         </label>
                         <input
@@ -81,7 +81,7 @@ export function BrandsFormModal({
 
                     {/* Logo */}
                     <div>
-                        <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                        <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                             Logo de la Marca
                         </label>
                         <div className="bg-theme-primary/[0.03] border border-white/10 rounded-2xl p-5 shadow-inner">
@@ -101,7 +101,7 @@ export function BrandsFormModal({
                     {/* Sort Order & Active */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
+                            <label className="text-2xs font-black text-theme-secondary uppercase tracking-macro mb-2 block ml-1">
                                 Orden
                             </label>
                             <input
@@ -163,7 +163,7 @@ function ToggleSwitch({
 }) {
     return (
         <label className="flex flex-col items-center justify-center gap-2 cursor-pointer select-none w-full h-full group">
-             <span className="text-2xs uppercase font-black tracking-[0.2em] text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
+             <span className="text-2xs uppercase font-black tracking-macro text-theme-secondary group-hover:text-theme-primary transition-colors text-center">{label}</span>
             <Button
                 type="button"
                 onClick={() => onChange(!checked)}

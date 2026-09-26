@@ -59,7 +59,7 @@ export function SecondVerticalProofFixture() {
         <main className="min-h-screen bg-theme-primary px-4 py-10 text-white sm:px-6 lg:px-10">
             <section className="mx-auto flex max-w-6xl flex-col gap-8">
                 <header className="space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-300">
+                    <p className="text-xs font-bold uppercase tracking-macro text-cyan-300">
                         Local QA fixture
                     </p>
                     <div className="max-w-3xl space-y-2">
