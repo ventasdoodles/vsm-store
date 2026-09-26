@@ -43,7 +43,7 @@ function StatCard({ card }: { card: StatCardData }) {
 
     return (
         <div
-            className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/40 backdrop-blur-2xl p-6 transition-all duration-500 hover:border-white/20 hover:bg-surface-base/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+            className="group relative overflow-hidden rounded-4xl border border-white/5 bg-surface-base/40 backdrop-blur-2xl p-6 transition-all duration-500 hover:border-white/20 hover:bg-surface-base/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
             onMouseMove={handleMouseMove}
             title={card.tooltip}
         >

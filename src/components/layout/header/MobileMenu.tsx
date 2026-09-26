@@ -90,7 +90,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         >
             <nav className="p-4 space-y-2">
                 {/* SearchBar en móvil (Alto z-index local) */}
-                <div className="sm:hidden pb-4 relative z-[60]">
+                <div className="sm:hidden pb-4 relative z-60">
                     <SearchBar />
                 </div>
 

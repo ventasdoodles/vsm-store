@@ -121,7 +121,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const modalContent = (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-none">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-none">
                     <m.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -139,7 +139,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/60 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden flex flex-col md:flex-row pointer-events-auto isolation-auto"
+                        className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/60 backdrop-blur-2xl rounded-5xl shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden flex flex-col md:flex-row pointer-events-auto isolation-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="absolute top-[-10%] right-[-10%] w-72 h-72 bg-vape-500/10 blur-6xl rounded-full -z-10" />
@@ -156,7 +156,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         </m.button>
 
                         <div className="w-full md:w-[55%] p-6 md:p-10 flex flex-col gap-6">
-                            <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-black/40 border border-white/5 group shadow-inner">
+                            <div className="relative aspect-square rounded-4xl overflow-hidden bg-black/40 border border-white/5 group shadow-inner">
                                 <AnimatePresence mode="wait">
                                     <m.div
                                         key={selectedImage}

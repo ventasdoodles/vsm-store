@@ -8,7 +8,7 @@ export function LoyaltyStats() {
 
     if (isLoading) {
         return (
-            <div className="bg-surface-base/50 border border-white/5 rounded-[2.5rem] p-8 flex items-center justify-center min-h-48">
+            <div className="bg-surface-base/50 border border-white/5 rounded-5xl p-8 flex items-center justify-center min-h-48">
                 <Loader2 className="w-8 h-8 animate-spin text-amber-500/50" />
             </div>
         );

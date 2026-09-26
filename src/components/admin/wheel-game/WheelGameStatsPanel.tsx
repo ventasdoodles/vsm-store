@@ -26,7 +26,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, icon: Icon, color, bg, border, isLoading }: StatCardProps) {
     return (
-        <div className={`rounded-[1.5rem] border ${border} bg-gradient-to-br ${bg} p-5 backdrop-blur-sm`}>
+        <div className={`rounded-3xl border ${border} bg-gradient-to-br ${bg} p-5 backdrop-blur-sm`}>
             <div className="flex items-start justify-between mb-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white/5`}>
                     <Icon className={`h-5 w-5 ${color}`} />
@@ -84,7 +84,7 @@ export function WheelGameStatsPanel({ stats, isLoading }: WheelGameStatsPanelPro
     ] as const;
 
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-theme-primary/5 p-6 backdrop-blur-sm">
+        <div className="rounded-3xl border border-white/5 bg-theme-primary/5 p-6 backdrop-blur-sm">
             <Heading as="h2" className="text-sm font-black uppercase tracking-widest text-white/40 mb-4">
                 Estadísticas de Participación
             </Heading>

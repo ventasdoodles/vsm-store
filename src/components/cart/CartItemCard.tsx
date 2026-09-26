@@ -48,7 +48,7 @@ export const CartItemCard = memo(({ item, isVape, onUpdateQuantity, onRemove }: 
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, x: -20 }}
-            className="group relative flex gap-4 rounded-[1.5rem] border border-white/5 bg-white/[0.04] p-4 shadow-xl backdrop-blur-xl transition-all hover:bg-white/[0.08] hover:border-white/20 hover:shadow-black/60 overflow-hidden"
+            className="group relative flex gap-4 rounded-3xl border border-white/5 bg-white/[0.04] p-4 shadow-xl backdrop-blur-xl transition-all hover:bg-white/[0.08] hover:border-white/20 hover:shadow-black/60 overflow-hidden"
         >
             {/* Spotlight Reveal */}
             <m.div

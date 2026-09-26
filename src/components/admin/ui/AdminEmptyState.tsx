@@ -22,7 +22,7 @@ interface AdminEmptyStateProps {
 export function AdminEmptyState({ icon: Icon, title, description, className }: AdminEmptyStateProps) {
     return (
         <div className={cn(
-            "relative flex flex-col items-center justify-center overflow-hidden rounded-[2rem]",
+            "relative flex flex-col items-center justify-center overflow-hidden rounded-4xl",
             "border border-white/5 bg-theme-primary/10 py-16 px-4 text-center backdrop-blur-md",
             className
         )}>

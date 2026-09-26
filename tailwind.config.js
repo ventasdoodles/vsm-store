@@ -29,6 +29,19 @@ export default {
                 '2xl': '14px',
                 '3xl': '16px',
             },
+            borderRadius: {
+                '4xl': '2rem',
+                '5xl': '2.5rem',
+                '6xl': '3rem',
+                '7xl': '4rem',
+            },
+            zIndex: {
+                '60': '60',
+                '100': '100',
+                '101': '101',
+                '110': '110',
+                '150': '150',
+            },
             colors: {
                 // Colores primarios VSM (base slate)
                 // Colores primarios VSM (base slate) - REMOVED (Use theme properties below)

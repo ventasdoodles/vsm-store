@@ -85,7 +85,7 @@ function CategoryCard({ category, priority }: { category: FeaturedCategory, prio
             <Link
                 to="/$section/$slug"
                 params={{ section: category.section, slug: category.slug }}
-                className="group relative block h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] vsm-border bg-slate-900/40 backdrop-blur-3xl spotlight-container"
+                className="group relative block h-80 rounded-5xl overflow-hidden transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] vsm-border bg-slate-900/40 backdrop-blur-3xl spotlight-container"
             >
                 {/* Spotlight Reveal */}
                 <m.div

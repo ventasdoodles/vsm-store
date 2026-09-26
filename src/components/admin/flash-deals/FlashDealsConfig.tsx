@@ -75,7 +75,7 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
     const isUrgent = timeLeft && timeLeft.total < 3_600_000; // < 1h
 
     return (
-        <div className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-orange-500/10 h-full">
+        <div className="group relative overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-orange-500/10 h-full">
             {/* Orbe */}
             <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-orange-500/8 blur-[70px]" />
 
@@ -134,7 +134,7 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
             <div className="relative z-10">
                 {nextExpiring && timeLeft ? (
                     <div className={cn(
-                        'rounded-[1rem] border p-4 transition-all',
+                        'rounded-2xl border p-4 transition-all',
                         isUrgent
                             ? 'border-red-500/30 bg-red-500/5'
                             : 'border-orange-500/15 bg-orange-500/5'
@@ -171,12 +171,12 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
                         </div>
                     </div>
                 ) : deals.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 rounded-[1rem] border border-dashed border-white/10 p-6 text-center">
+                    <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-white/10 p-6 text-center">
                         <Zap className="h-8 w-8 text-orange-500/20" />
                         <p className="text-xs text-white/30">Crea tu primera oferta flash para comenzar</p>
                     </div>
                 ) : (
-                    <div className="flex items-center gap-2 rounded-[1rem] border border-amber-500/15 bg-amber-500/5 p-4">
+                    <div className="flex items-center gap-2 rounded-2xl border border-amber-500/15 bg-amber-500/5 p-4">
                         <AlertTriangle className="h-4 w-4 text-amber-400/60 flex-shrink-0" />
                         <p className="text-xs text-amber-400/60">
                             Ninguna oferta activa. La sección no aparecerá en el storefront.

@@ -244,7 +244,7 @@ export function AdminBatchManager() {
     return (
         <div className="space-y-8 pb-20">
             {/* Toolbar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/5 backdrop-blur-xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-5xl bg-white/[0.03] border border-white/5 backdrop-blur-xl">
                 <div>
                     <Heading as="h1" className="text-2xl font-black text-white tracking-tight">Batch Manager</Heading>
                     <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Edición de alta densidad</p>
@@ -291,7 +291,7 @@ export function AdminBatchManager() {
             </div>
 
             {/* Grid */}
-            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] overflow-hidden backdrop-blur-xl">
+            <div className="rounded-5xl border border-white/5 bg-white/[0.02] overflow-hidden backdrop-blur-xl">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         {table.getHeaderGroups().map(headerGroup => (
@@ -347,7 +347,7 @@ export function AdminBatchManager() {
             </div>
 
             {/* AI Warning Footer */}
-            <div className="flex items-center gap-4 p-6 rounded-[2rem] bg-amber-500/5 border border-amber-500/20">
+            <div className="flex items-center gap-4 p-6 rounded-4xl bg-amber-500/5 border border-amber-500/20">
                 <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
                 <p className="text-xs text-amber-500/80 font-medium">
                     <span className="font-bold">Nota de Seguridad:</span> Los cambios aplicados aquí impactarán directamente en el inventario real. El sistema asegura la integridad de las transacciones atómicas.

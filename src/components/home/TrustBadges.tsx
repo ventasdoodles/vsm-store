@@ -57,7 +57,7 @@ const BADGES: Badge[] = [
 
 export const TrustBadges = () => {
     return (
-        <section className="py-20 bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+        <section className="py-20 bg-slate-900/40 backdrop-blur-3xl rounded-6xl border border-white/5 shadow-2xl relative overflow-hidden group">
             {/* Ambient Background Glows */}
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-primary/[0.05] rounded-full blur-6xl pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-vape-500/[0.05] rounded-full blur-6xl pointer-events-none" />
@@ -84,7 +84,7 @@ export const TrustBadges = () => {
                             className="relative mb-6"
                         >
                             <div
-                                className="w-20 h-20 rounded-[2rem] flex items-center justify-center transition-all duration-700 bg-white/[0.02] border border-white/[0.08] shadow-2xl relative overflow-hidden group-hover/badge:scale-110 group-hover/badge:bg-white/[0.05] group-hover/badge:border-white/20"
+                                className="w-20 h-20 rounded-4xl flex items-center justify-center transition-all duration-700 bg-white/[0.02] border border-white/[0.08] shadow-2xl relative overflow-hidden group-hover/badge:scale-110 group-hover/badge:bg-white/[0.05] group-hover/badge:border-white/20"
                                 style={{
                                     boxShadow: `0 10px 30px -10px ${badge.color}20`
                                 }}

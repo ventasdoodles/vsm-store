@@ -26,7 +26,7 @@ interface CategoryCascaderProps {
 }
 
 /** Glassmorphism select style */
-const SELECT_CLS = 'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20';
+const SELECT_CLS = 'w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20';
 
 /** Level labels for visual context */
 const LEVEL_LABELS = ['Categoria', 'Subcategoria', 'Sub-subcategoria', 'Nivel 4', 'Nivel 5'] as const;

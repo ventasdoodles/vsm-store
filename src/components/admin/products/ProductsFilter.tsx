@@ -59,20 +59,20 @@ export function ProductsFilter({
                     placeholder="Buscar por nombre o SKU..."
                     value={search}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full rounded-[1rem] border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder-white/30 backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder-white/30 backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
                 />
             </div>
 
             {/* Section + Inactive */}
             <div className="flex items-center gap-2">
                 {/* Section tabs */}
-                <div className="flex gap-1 rounded-[1rem] border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
+                <div className="flex gap-1 rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
                     {SECTION_TABS.map(tab => (
                         <Button
                             key={tab.value}
                             onClick={() => onSectionChange(tab.value)}
                             className={cn(
-                                'rounded-[0.75rem] px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all',
+                                'rounded-xl px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all',
                                 sectionFilter === tab.value
                                     ? 'bg-white/10 text-white shadow-lg shadow-white/5 ring-1 ring-white/10'
                                     : 'text-white/40 hover:text-white/70'
@@ -87,7 +87,7 @@ export function ProductsFilter({
                 <Button
                     onClick={onToggleInactive}
                     className={cn(
-                        'inline-flex items-center gap-1.5 rounded-[1rem] border px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm',
+                        'inline-flex items-center gap-1.5 rounded-2xl border px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-sm',
                         showInactive
                             ? 'border-amber-500/30 bg-amber-500/10 text-amber-400 ring-1 ring-inset ring-amber-500/20'
                             : 'border-white/10 bg-white/5 text-white/40 hover:text-white/70'

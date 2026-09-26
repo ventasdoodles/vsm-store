@@ -184,7 +184,7 @@ export function CategoryPage() {
 
             {/* Category Banner/Header */}
             {category?.image_url && (
-                <div className="mb-10 relative h-48 sm:h-64 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl group">
+                <div className="mb-10 relative h-48 sm:h-64 rounded-5xl overflow-hidden border border-white/5 shadow-2xl group">
                     <OptimizedImage
                         src={category.image_url}
                         alt={category.name}

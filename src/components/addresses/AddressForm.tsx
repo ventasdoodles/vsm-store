@@ -75,7 +75,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
 
             <div className="grid gap-6">
                 {/* Selector de Tipo (Shipping/Billing) */}
-                <div className="grid grid-cols-2 gap-4 p-1.5 rounded-[2rem] bg-black/40 border border-white/5 relative overflow-hidden">
+                <div className="grid grid-cols-2 gap-4 p-1.5 rounded-4xl bg-black/40 border border-white/5 relative overflow-hidden">
                     <button
                         type="button"
                         onClick={() => setValue('type', 'shipping')}
@@ -215,7 +215,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                 </div>
 
                 {/* Switch Predeterminada */}
-                <label className="group flex items-center justify-between p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.04] transition-all duration-500">
+                <label className="group flex items-center justify-between p-6 rounded-4xl bg-white/[0.02] border border-white/5 cursor-pointer hover:bg-white/[0.04] transition-all duration-500">
                     <div className="flex items-center gap-4">
                         <div className={cn(
                             "h-12 w-12 rounded-xl flex items-center justify-center border transition-all duration-500",
@@ -246,14 +246,14 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 py-5 rounded-[2rem] bg-white/5 border border-white/5 text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:bg-white/10 hover:text-white transition-all duration-500"
+                    className="flex-1 py-5 rounded-4xl bg-white/5 border border-white/5 text-2xs font-black uppercase tracking-macro text-theme-tertiary hover:bg-white/10 hover:text-white transition-all duration-500"
                 >
                     Cancelar
                 </button>
                 <button
                     type="submit"
                     disabled={loading}
-                    className="flex-[2] py-5 rounded-[2rem] bg-accent-primary text-white text-2xs font-black uppercase tracking-macro hover:bg-accent-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3 shadow-2xl shadow-accent-primary/30"
+                    className="flex-[2] py-5 rounded-4xl bg-accent-primary text-white text-2xs font-black uppercase tracking-macro hover:bg-accent-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 flex items-center justify-center gap-3 shadow-2xl shadow-accent-primary/30"
                 >
                     {loading ? (
                         <>

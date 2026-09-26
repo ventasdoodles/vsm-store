@@ -37,7 +37,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
 
             {/* Users List */}
             {users.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 rounded-[1.5rem] border border-white/5 bg-surface-base/40 backdrop-blur-md">
+                <div className="flex flex-col items-center justify-center py-16 rounded-3xl border border-white/5 bg-surface-base/40 backdrop-blur-md">
                     <div className="relative mb-4">
                         <Wifi className="h-12 w-12 text-theme-secondary/20" />
                         <div className="absolute inset-0 animate-ping">
@@ -60,7 +60,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                         return (
                             <div
                                 key={user.id}
-                                className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-surface-base/40 hover:bg-surface-base/70 backdrop-blur-md p-5 transition-all duration-500 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/5"
+                                className="group relative overflow-hidden rounded-3xl border border-white/5 bg-surface-base/40 hover:bg-surface-base/70 backdrop-blur-md p-5 transition-all duration-500 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/5"
                             >
                                 {/* Ambient Glow */}
                                 <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-emerald-500/5 blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />

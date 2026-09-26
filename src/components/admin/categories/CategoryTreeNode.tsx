@@ -73,7 +73,7 @@ export function CategoryTreeNode({
             {/* Row */}
             <div
                 className={cn(
-                    'group flex items-center gap-2.5 rounded-[1rem] border px-3.5 py-2.5 transition-all duration-200',
+                    'group flex items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 transition-all duration-200',
                     category.is_active
                         ? 'border-white/5 hover:border-white/10 hover:bg-white/[0.04] hover:shadow-lg'
                         : 'border-dashed border-white/5 opacity-40 hover:opacity-60',

@@ -82,7 +82,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
             onMouseMove={handleMouseMove}
             className="group relative"
         >
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-3xl transition-all duration-700 hover:border-white/20 hover:bg-white/[0.04] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-3xl transition-all duration-700 hover:border-white/20 hover:bg-white/[0.04] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                 <m.div
                     className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     style={{
@@ -309,7 +309,7 @@ export function Orders() {
                             type="button"
                             onClick={() => setFilter(currentFilter.value)}
                             className={cn(
-                                'flex-shrink-0 rounded-[1.5rem] border px-6 py-3 text-2xs font-black uppercase tracking-widest transition-all duration-500 active:scale-95',
+                                'flex-shrink-0 rounded-3xl border px-6 py-3 text-2xs font-black uppercase tracking-widest transition-all duration-500 active:scale-95',
                                 filter === currentFilter.value
                                     ? 'border-accent-primary/40 bg-accent-primary/10 text-accent-primary shadow-2xl shadow-accent-primary/20'
                                     : 'border-white/5 bg-white/[0.02] text-theme-tertiary hover:border-white/20 hover:text-white',
@@ -322,7 +322,7 @@ export function Orders() {
             </header>
 
             <section className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
+                <div className="rounded-4xl border border-white/5 bg-white/[0.02] p-6">
                     <p className="text-2xs font-black uppercase tracking-macro text-theme-tertiary opacity-50">
                         Pagos por retomar
                     </p>
@@ -331,7 +331,7 @@ export function Orders() {
                         Pedidos que siguen pagables en Mercado Pago segun el estado registrado.
                     </p>
                 </div>
-                <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
+                <div className="rounded-4xl border border-white/5 bg-white/[0.02] p-6">
                     <p className="text-2xs font-black uppercase tracking-macro text-theme-tertiary opacity-50">
                         Pagos confirmados
                     </p>
@@ -340,7 +340,7 @@ export function Orders() {
                         Pedidos con pago confirmado en el estado registrado.
                     </p>
                 </div>
-                <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
+                <div className="rounded-4xl border border-white/5 bg-white/[0.02] p-6">
                     <p className="text-2xs font-black uppercase tracking-macro text-theme-tertiary opacity-50">
                         Requieren revision
                     </p>
@@ -364,10 +364,10 @@ export function Orders() {
                         <m.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="relative space-y-8 overflow-hidden rounded-[3rem] border border-dashed border-white/5 bg-white/[0.01] py-32 text-center"
+                            className="relative space-y-8 overflow-hidden rounded-6xl border border-dashed border-white/5 bg-white/[0.01] py-32 text-center"
                         >
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-primary/[0.02] to-transparent" />
-                            <div className="relative mx-auto flex h-24 w-24 items-center justify-center rounded-[2.5rem] border border-white/5 bg-black/40 shadow-2xl">
+                            <div className="relative mx-auto flex h-24 w-24 items-center justify-center rounded-5xl border border-white/5 bg-black/40 shadow-2xl">
                                 <Package className="h-10 w-10 text-theme-tertiary opacity-10" />
                             </div>
                             <div className="relative mx-auto max-w-sm space-y-4 px-6">

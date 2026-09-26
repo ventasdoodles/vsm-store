@@ -22,7 +22,7 @@ export function OrderShippingCard({ trackingTrustView }: OrderShippingCardProps)
     if (!trackingTrustView.showPanel) return null;
 
     return (
-        <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 space-y-6 group/tracking overflow-hidden relative">
+        <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 space-y-6 group/tracking overflow-hidden relative">
             <div className="absolute -right-8 -top-8 w-24 h-24 bg-accent-primary/5 rounded-full blur-2xl transition-all duration-700 group-hover/tracking:scale-150" />
             <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-2xl bg-accent-primary/10 border border-accent-primary/20 flex items-center justify-center text-accent-primary shadow-xl">

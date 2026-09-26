@@ -66,14 +66,14 @@ export function AdminCesarinOS() {
     return (
         <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
             {/* Header Lujoso Glassmorphism */}
-            <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-surface-overlay p-10 shadow-2xl">
+            <div className="relative overflow-hidden rounded-6xl border border-white/5 bg-surface-overlay p-10 shadow-2xl">
                 <div className="absolute right-0 top-0 -mr-20 -mt-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-6xl" />
                 <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-5xl" />
 
                 <div className="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
                     <div className="flex items-start gap-6">
                         <div className="relative shrink-0">
-                            <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-[0_20px_50px_rgba(99,102,241,0.35)]">
+                            <div className="flex h-20 w-20 items-center justify-center rounded-4xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-[0_20px_50px_rgba(99,102,241,0.35)]">
                                 <Bot className="h-10 w-10" />
                             </div>
                             <div className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full border-4 border-[#0a0a0f] bg-emerald-500" />
@@ -142,7 +142,7 @@ export function AdminCesarinOS() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={cn(
-                                'relative flex items-start gap-4 rounded-[2rem] border p-6 transition-all text-left overflow-hidden group',
+                                'relative flex items-start gap-4 rounded-4xl border p-6 transition-all text-left overflow-hidden group',
                                 isActive
                                     ? 'border-indigo-500/50 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.15)]'
                                     : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.06]'
@@ -172,7 +172,7 @@ export function AdminCesarinOS() {
             </nav>
 
             {/* Contenido Principal */}
-            <div className="rounded-[3rem] border border-white/5 bg-surface-overlay p-10 min-h-[500px]">
+            <div className="rounded-6xl border border-white/5 bg-surface-overlay p-10 min-h-[500px]">
                 <AnimatePresence mode="wait">
                     {renderActiveTab()}
                 </AnimatePresence>

@@ -17,7 +17,7 @@ export function IntelligenceToolRenderer({
 }: IntelligenceToolRendererProps) {
     return (
         <div className={cn(
-            "col-span-1 md:col-span-2 flex flex-col gap-6 p-8 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/10 via-vape-500/5 to-transparent border border-white/10 relative overflow-hidden transition-all duration-700",
+            "col-span-1 md:col-span-2 flex flex-col gap-6 p-8 rounded-5xl bg-gradient-to-br from-indigo-500/10 via-vape-500/5 to-transparent border border-white/10 relative overflow-hidden transition-all duration-700",
             strategicAnalysis ? "shadow-[0_0_50px_-12px_rgba(99,102,241,0.3)]" : "hover:border-white/20"
         )}>
             {/* Background Glow */}
@@ -71,7 +71,7 @@ export function IntelligenceToolRenderer({
 
                     {/* Suggested Coupon */}
                     {strategicAnalysis.suggested_coupon && (
-                        <div className="group relative p-6 rounded-[2rem] bg-indigo-500/10 border border-indigo-500/20 overflow-hidden">
+                        <div className="group relative p-6 rounded-4xl bg-indigo-500/10 border border-indigo-500/20 overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-4">
@@ -101,7 +101,7 @@ export function IntelligenceToolRenderer({
 
                     {/* Recovery Message Copy Section */}
                     {strategicAnalysis.recovery_message && (
-                        <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/20 space-y-4">
+                        <div className="p-6 rounded-4xl bg-indigo-500/5 border border-indigo-500/20 space-y-4">
                             <div className="flex items-center justify-between">
                                 <Heading as="h5" className="text-2xs font-black uppercase tracking-macro text-indigo-300">Mensaje de Recuperación Sugerido</Heading>
                                 <Button

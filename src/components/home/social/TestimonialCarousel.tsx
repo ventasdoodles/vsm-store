@@ -89,10 +89,10 @@ export function TestimonialCarousel({ items }: TestimonialCarouselProps) {
 
             {/* Edge Fade Gradients */}
             {canScrollLeft && (
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-theme-primary to-transparent z-[1] pointer-events-none" />
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-theme-primary to-transparent z-10 pointer-events-none" />
             )}
             {canScrollRight && (
-                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-theme-primary to-transparent z-[1] pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-theme-primary to-transparent z-10 pointer-events-none" />
             )}
 
             {/* Scrollable Cards */}

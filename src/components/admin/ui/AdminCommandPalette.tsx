@@ -159,7 +159,7 @@ export function AdminCommandPalette() {
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4">
+            <div className="fixed inset-0 z-100 flex items-start justify-center pt-[15vh] px-4">
                 {/* Backdrop */}
                 <m.div 
                     initial={{ opacity: 0 }}
@@ -175,7 +175,7 @@ export function AdminCommandPalette() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -20 }}
                     onKeyDown={onKeyDown}
-                    className="relative z-[101] w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-white/10 bg-surface-overlay/90 backdrop-blur-2xl shadow-2xl"
+                    className="relative z-101 w-full max-w-2xl overflow-hidden rounded-5xl border border-white/10 bg-surface-overlay/90 backdrop-blur-2xl shadow-2xl"
                 >
                     {/* Search Input Section */}
                     <div className="relative flex items-center p-6 border-b border-white/5">

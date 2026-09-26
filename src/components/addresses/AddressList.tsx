@@ -87,7 +87,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
         <div className="space-y-4">
             {filtered.length === 0 ? (
                 <div className="vsm-surface glass-premium p-12 text-center space-y-6">
-                    <div className="mx-auto h-20 w-20 rounded-[2.5rem] bg-white/[0.02] border border-dashed border-white/10 flex items-center justify-center">
+                    <div className="mx-auto h-20 w-20 rounded-5xl bg-white/[0.02] border border-dashed border-white/10 flex items-center justify-center">
                         <MapPin className="h-10 w-10 text-theme-tertiary opacity-30" />
                     </div>
                     <div className="space-y-2">
@@ -126,7 +126,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                     
                     <button
                         onClick={() => setShowForm(true)}
-                        className="group w-full py-8 border-2 border-dashed border-white/5 rounded-[2.5rem] hover:border-accent-primary/20 hover:bg-accent-primary/5 transition-all duration-500 flex flex-col items-center justify-center gap-3"
+                        className="group w-full py-8 border-2 border-dashed border-white/5 rounded-5xl hover:border-accent-primary/20 hover:bg-accent-primary/5 transition-all duration-500 flex flex-col items-center justify-center gap-3"
                     >
                         <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:bg-accent-primary/10 group-hover:border-accent-primary/20 transition-all duration-500">
                              <Plus className="h-6 w-6 text-theme-tertiary group-hover:text-accent-primary transition-colors" />

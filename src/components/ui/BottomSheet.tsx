@@ -100,7 +100,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
             {/* Overlay */}
             <div
                 className={cn(
-                    'fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm transition-opacity duration-300',
+                    'fixed inset-0 z-100 bg-black/60 backdrop-blur-sm transition-opacity duration-300',
                     isOpen ? 'opacity-100' : 'opacity-0'
                 )}
                 onClick={onClose}
@@ -111,7 +111,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
             <div
                 ref={sheetRef}
                 className={cn(
-                    'fixed inset-x-0 bottom-0 z-[101] flex max-h-[90vh] flex-col rounded-t-3xl bg-theme-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]',
+                    'fixed inset-x-0 bottom-0 z-101 flex max-h-[90vh] flex-col rounded-t-3xl bg-theme-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]',
                     isOpen ? 'translate-y-0' : 'translate-y-full'
                 )}
                 role="dialog"

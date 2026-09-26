@@ -387,7 +387,7 @@ export function PrizeWheel() {
                             onClick={() => spin(prizes)}
                             disabled={isSpinning}
                             className={cn(
-                                'relative w-full py-5 rounded-[2rem] font-black uppercase tracking-macro text-white overflow-hidden transition-all',
+                                'relative w-full py-5 rounded-4xl font-black uppercase tracking-macro text-white overflow-hidden transition-all',
                                 isSpinning
                                     ? 'bg-white/5 border border-white/10 cursor-not-allowed'
                                     : 'border border-orange-400/30 shadow-[0_8px_32px_rgba(234,88,12,0.4)] hover:shadow-[0_12px_40px_rgba(234,88,12,0.65)]',

@@ -19,7 +19,7 @@ export function SettingsSaveBar({ isPending }: SettingsSaveBarProps) {
                 type="submit"
                 disabled={isPending}
                 className="
-                    group relative flex items-center gap-2.5 rounded-[1rem] px-8 py-3.5
+                    group relative flex items-center gap-2.5 rounded-2xl px-8 py-3.5
                     font-bold text-white shadow-xl
                     bg-gradient-to-r from-violet-600 to-fuchsia-600
                     transition-all duration-300
@@ -29,7 +29,7 @@ export function SettingsSaveBar({ isPending }: SettingsSaveBarProps) {
                 "
             >
                 {/* Glow behind button */}
-                <div className="pointer-events-none absolute inset-0 rounded-[1rem] bg-gradient-to-r from-violet-500 to-fuchsia-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
 
                 <span className="relative z-10 flex items-center gap-2.5">
                     {isPending ? (

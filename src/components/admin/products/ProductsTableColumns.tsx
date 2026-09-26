@@ -49,7 +49,7 @@ export const columns = [
 
             return (
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-[0.75rem] border border-white/10 bg-white/5 shadow-inner">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-inner">
                         <OptimizedImage
                             src={product.images?.[0] || product.cover_image || ''}
                             alt={product.name}
@@ -89,7 +89,7 @@ export const columns = [
                         type="number"
                         value={editForm.price}
                         onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
-                        className="w-20 rounded-[0.75rem] border border-violet-500/30 bg-violet-500/5 px-2 py-1 text-xs text-white backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-violet-500/30"
+                        className="w-20 rounded-xl border border-violet-500/30 bg-violet-500/5 px-2 py-1 text-xs text-white backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                         min="0"
                     />
                 );
@@ -117,7 +117,7 @@ export const columns = [
                         type="number"
                         value={editForm.stock}
                         onChange={(e) => setEditForm({ ...editForm, stock: Number(e.target.value) })}
-                        className="w-16 rounded-[0.75rem] border border-violet-500/30 bg-violet-500/5 px-2 py-1 text-xs text-center text-white backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-violet-500/30"
+                        className="w-16 rounded-xl border border-violet-500/30 bg-violet-500/5 px-2 py-1 text-xs text-center text-white backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                         min="0"
                     />
                 );

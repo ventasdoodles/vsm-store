@@ -17,7 +17,7 @@ interface Props {
 
 export function CustomerAddress({ customer }: Props) {
     if (!customer?.addresses || customer.addresses.length === 0) return (
-        <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col items-center justify-center min-h-36">
+        <div className="rounded-4xl border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col items-center justify-center min-h-36">
             <Map className="w-8 h-8 text-theme-secondary/30 mb-2" />
             <p className="text-sm font-medium text-white mb-1">Sin direcciones</p>
             <p className="text-xs text-theme-secondary">El usuario no ha registrado un domicilio de entrega.</p>
@@ -28,7 +28,7 @@ export function CustomerAddress({ customer }: Props) {
     if (!mainAddress) return null;
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl group transition-all hover:border-white/10">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl group transition-all hover:border-white/10">
             {/* Ambient Background */}
             <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 

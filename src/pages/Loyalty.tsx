@@ -102,7 +102,7 @@ export function Loyalty() {
             <SmartQuests />
 
             {/* 🎡 RUCOLA DE PREMIOS (WAVE 22) */}
-            <div className="rounded-[2.5rem] border border-vape-500/20 bg-gradient-to-b from-vape-500/5 to-transparent overflow-hidden">
+            <div className="rounded-5xl border border-vape-500/20 bg-gradient-to-b from-vape-500/5 to-transparent overflow-hidden">
                 <PrizeWheel />
             </div>
 

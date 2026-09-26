@@ -80,7 +80,7 @@ export function ProfileQuickLinks() {
                     <Link
                         key={link.to}
                         to={link.to}
-                        className="group flex items-center gap-5 rounded-[2rem] border border-white/5 bg-white/[0.02] backdrop-blur-3xl px-6 py-5 transition-all duration-500 hover:bg-white/[0.04] hover:border-white/10 hover:shadow-2xl hover:-translate-y-1"
+                        className="group flex items-center gap-5 rounded-4xl border border-white/5 bg-white/[0.02] backdrop-blur-3xl px-6 py-5 transition-all duration-500 hover:bg-white/[0.04] hover:border-white/10 hover:shadow-2xl hover:-translate-y-1"
                     >
                         {/* Gradient icon */}
                         <div className={cn(

@@ -60,15 +60,15 @@ export function Wishlist() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={handleAddAllToCart}
-                            className="group relative flex items-center gap-3 rounded-[2rem] bg-accent-primary px-8 py-4 text-2xs font-black uppercase tracking-widest text-white shadow-2xl shadow-accent-primary/30 transition-all hover:bg-accent-secondary hover:-translate-y-1 active:scale-95"
+                            className="group relative flex items-center gap-3 rounded-4xl bg-accent-primary px-8 py-4 text-2xs font-black uppercase tracking-widest text-white shadow-2xl shadow-accent-primary/30 transition-all hover:bg-accent-secondary hover:-translate-y-1 active:scale-95"
                         >
                             <ShoppingCart className="h-4 w-4 group-hover:rotate-12 transition-transform" />
                             Llevar Todo al Carrito
-                            <div className="absolute inset-0 rounded-[2rem] bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-0 group-hover:opacity-10" />
+                            <div className="absolute inset-0 rounded-4xl bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-0 group-hover:opacity-10" />
                         </button>
                         <button
                             onClick={clearWishlist}
-                            className="flex h-14 w-14 items-center justify-center rounded-[2rem] bg-white/5 border border-white/5 text-theme-secondary hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all duration-500 shadow-xl"
+                            className="flex h-14 w-14 items-center justify-center rounded-4xl bg-white/5 border border-white/5 text-theme-secondary hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all duration-500 shadow-xl"
                             title="Limpiar Favoritos"
                         >
                             <Trash2 size={20} />
@@ -83,14 +83,14 @@ export function Wishlist() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex flex-col items-center justify-center py-32 text-center bg-white/[0.02] rounded-[3rem] border border-dashed border-white/5 relative overflow-hidden group"
+                        className="flex flex-col items-center justify-center py-32 text-center bg-white/[0.02] rounded-6xl border border-dashed border-white/5 relative overflow-hidden group"
                     >
                         {/* Background decorativo */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-5xl group-hover:bg-red-500/10 transition-colors duration-1000" />
                         
                         <div className="relative mb-8">
                              <div className="absolute -inset-4 bg-red-500/20 rounded-full blur-2xl animate-pulse-slow" />
-                             <div className="relative rounded-[2.5rem] bg-black/40 p-10 border border-white/10 shadow-2xl">
+                             <div className="relative rounded-5xl bg-black/40 p-10 border border-white/10 shadow-2xl">
                                 <Heart className="h-20 w-20 text-theme-tertiary opacity-20" />
                              </div>
                         </div>

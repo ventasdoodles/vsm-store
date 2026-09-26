@@ -37,7 +37,7 @@ export function ProfileInfo() {
     });
 
     return (
-        <section className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 shadow-2xl overflow-hidden relative group">
+        <section className="rounded-5xl border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 shadow-2xl overflow-hidden relative group">
             {/* Accent decoration */}
             <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-accent-primary/5 blur-4xl transition-transform duration-1000 group-hover:scale-150" />
             

@@ -105,7 +105,7 @@ export function CustomerNotes({ customer }: Props) {
     }, [debouncedNotes]);
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col">
             
             <div className="relative mb-6 flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-blue-500/5 border border-indigo-500/20 shadow-inner">

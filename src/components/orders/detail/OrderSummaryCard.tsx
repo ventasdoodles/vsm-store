@@ -52,12 +52,12 @@ export function OrderSummaryCard({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* RECIBO CINEMÁTICO */}
             <div className="lg:col-span-2 relative group/receipt">
-                <div className="absolute -inset-1 bg-gradient-to-b from-accent-primary/20 via-transparent to-accent-primary/10 rounded-[3rem] blur-xl opacity-40 group-hover/receipt:opacity-70 transition-opacity duration-1000" />
+                <div className="absolute -inset-1 bg-gradient-to-b from-accent-primary/20 via-transparent to-accent-primary/10 rounded-6xl blur-xl opacity-40 group-hover/receipt:opacity-70 transition-opacity duration-1000" />
 
-                <div className="relative rounded-[2.5rem] border border-white/10 bg-zinc-950 p-8 sm:p-10 space-y-8 backdrop-blur-3xl shadow-2xl overflow-hidden">
+                <div className="relative rounded-5xl border border-white/10 bg-zinc-950 p-8 sm:p-10 space-y-8 backdrop-blur-3xl shadow-2xl overflow-hidden">
                     {/* Header Recibo */}
                     <div className="text-center space-y-4 mb-10">
-                        <div className="mx-auto w-24 h-24 rounded-[2rem] bg-black border border-white/5 flex items-center justify-center shadow-inner relative group">
+                        <div className="mx-auto w-24 h-24 rounded-4xl bg-black border border-white/5 flex items-center justify-center shadow-inner relative group">
                             <ShoppingBag className="h-10 w-10 text-theme-tertiary opacity-20 transition-opacity group-hover:opacity-40" />
                             <div className="absolute -inset-2 bg-accent-primary/5 rounded-full blur-xl animate-pulse" />
                         </div>
@@ -126,7 +126,7 @@ export function OrderSummaryCard({
 
             {/* PANEL DE ACCIONES */}
             <div className="space-y-8">
-                <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 space-y-6">
+                <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 space-y-6">
                     <div className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-theme-secondary shadow-xl">
                             <CreditCard size={24} />

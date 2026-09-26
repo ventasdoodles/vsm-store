@@ -158,7 +158,7 @@ export function AdminHomeSliders() {
                 activeCount={sliders.filter(s => s.active).length}
             />
 
-            <div className="bg-surface-base rounded-[2.5rem] p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+            <div className="bg-surface-base rounded-5xl p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-500/5 rounded-full blur-6xl pointer-events-none" />
 
                 <SlidersList

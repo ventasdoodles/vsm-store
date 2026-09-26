@@ -25,7 +25,7 @@ export function PostPurchaseReceiptCard({
     const previewItems = (Array.isArray(order.items) ? order.items : []).slice(0, 3);
 
     return (
-        <section className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 text-left shadow-2xl backdrop-blur-xl">
+        <section className="rounded-4xl border border-white/10 bg-white/[0.04] p-6 text-left shadow-2xl backdrop-blur-xl">
             <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-2xs font-black uppercase tracking-macro text-white/60">
@@ -69,7 +69,7 @@ export function PostPurchaseReceiptCard({
             </div>
 
             {previewItems.length > 0 && (
-                <div className="mt-5 rounded-[1.5rem] border border-white/5 bg-black/20 p-4">
+                <div className="mt-5 rounded-3xl border border-white/5 bg-black/20 p-4">
                     <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Lo que ya quedo registrado</p>
                     <div className="mt-3 space-y-2">
                         {previewItems.map((item, index) => (
@@ -95,7 +95,7 @@ export function PostPurchaseReceiptCard({
                 </div>
             )}
 
-            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+            <div className="mt-5 rounded-3xl border border-white/10 bg-white/[0.03] p-4">
                 <p className="text-2xs font-black uppercase tracking-[0.18em] text-white/35">Que sigue ahora</p>
                 <p className="mt-2 text-sm font-black uppercase tracking-[0.16em] text-white">
                     {confidenceView.receiptTitle}

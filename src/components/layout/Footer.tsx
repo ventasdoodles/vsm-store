@@ -91,10 +91,10 @@ function ColumnWithSpotlight({ title, icon: Icon, colorClass, children }: { titl
     return (
         <div 
             onMouseMove={handleMouseMove}
-            className="group relative p-8 rounded-[2rem] border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-700 overflow-hidden"
+            className="group relative p-8 rounded-4xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-700 overflow-hidden"
         >
             <m.div
-                className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 transition duration-700 group-hover:opacity-100"
+                className="pointer-events-none absolute -inset-px rounded-4xl opacity-0 transition duration-700 group-hover:opacity-100"
                 style={{
                     background: useMotionTemplate`
                         radial-gradient(
@@ -178,7 +178,7 @@ export const Footer = memo(function Footer() {
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="relative p-10 sm:p-16 rounded-[3rem] border border-white/5 bg-white/[0.01] backdrop-blur-3xl shadow-2xl mb-24 group overflow-hidden"
+                    className="relative p-10 sm:p-16 rounded-6xl border border-white/5 bg-white/[0.01] backdrop-blur-3xl shadow-2xl mb-24 group overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/[0.03] via-transparent to-vape-500/[0.03]" />
                     
@@ -220,7 +220,7 @@ export const Footer = memo(function Footer() {
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Introduce tu dirección de email..."
                                             required
-                                            className="w-full h-16 sm:h-20 pl-16 pr-32 bg-black border border-white/5 rounded-[1.5rem] text-sm font-black uppercase tracking-widest placeholder:text-theme-tertiary/40 focus:outline-none focus:border-accent-primary/50 transition-all italic text-white"
+                                            className="w-full h-16 sm:h-20 pl-16 pr-32 bg-black border border-white/5 rounded-3xl text-sm font-black uppercase tracking-widest placeholder:text-theme-tertiary/40 focus:outline-none focus:border-accent-primary/50 transition-all italic text-white"
                                         />
                                         <button
                                             type="submit"

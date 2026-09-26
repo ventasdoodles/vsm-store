@@ -55,7 +55,7 @@ export const CartSmartUpsell = memo(({ product }: { product: Product }) => {
 
             <m.div
                 whileHover={{ y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-white/[0.05] to-transparent backdrop-blur-3xl rounded-[2rem] p-6 border border-white/10 group"
+                className="relative overflow-hidden bg-gradient-to-br from-white/[0.05] to-transparent backdrop-blur-3xl rounded-4xl p-6 border border-white/10 group"
             >
                 {/* Abyssal Glow Background */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/20 blur-3xl rounded-full -z-10 group-hover:bg-vape-500/30 transition-colors" />

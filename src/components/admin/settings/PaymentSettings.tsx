@@ -43,11 +43,11 @@ const PAYMENT_METHODS = [
 ] as const;
 
 const TEXTAREA_CLASS =
-    'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none backdrop-blur-sm transition-colors focus:border-amber-500/50 focus:bg-white/[0.07] font-mono resize-none';
+    'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none backdrop-blur-sm transition-colors focus:border-amber-500/50 focus:bg-white/[0.07] font-mono resize-none';
 
 export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps) {
     return (
-        <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-amber-500/15 hover:shadow-amber-500/5">
+        <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-amber-500/15 hover:shadow-amber-500/5">
             {/* Orbes ambientales */}
             <div className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full bg-amber-500/8 blur-5xl transition-all group-hover:bg-amber-500/12" />
             <div className="pointer-events-none absolute bottom-0 right-1/4 h-40 w-40 rounded-full bg-orange-500/6 blur-4xl" />
@@ -73,7 +73,7 @@ export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps
                         <label
                             key={method.name}
                             className={`
-                                relative flex items-start gap-3 p-4 rounded-[1rem] border cursor-pointer
+                                relative flex items-start gap-3 p-4 rounded-2xl border cursor-pointer
                                 transition-all duration-200
                                 ${isActive
                                     ? 'border-amber-500/30 bg-amber-500/5 shadow-lg shadow-amber-500/5'
@@ -118,7 +118,7 @@ export function PaymentSettings({ formData, handleChange }: PaymentSettingsProps
 
             {/* Bank info (conditional) */}
             {formData.payment_methods.transfer && (
-                <div className="relative z-10 mt-5 rounded-[1rem] border border-amber-500/15 bg-amber-500/5 p-5 backdrop-blur-sm">
+                <div className="relative z-10 mt-5 rounded-2xl border border-amber-500/15 bg-amber-500/5 p-5 backdrop-blur-sm">
                     <label className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400/80">
                         <Landmark className="h-3.5 w-3.5" />
                         Datos Bancarios (para Transferencias)

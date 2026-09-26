@@ -60,7 +60,7 @@ const columns = [
             const product = getValue();
             return (
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-[0.75rem] border border-white/10 bg-white/5 shadow-inner">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-inner">
                         {product?.images?.[0] ? (
                             <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
                         ) : (
@@ -249,7 +249,7 @@ export function FlashDealsTable({
     /* ── Empty ── */
     if (deals.length === 0) {
         return (
-            <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 py-16 backdrop-blur-md">
+            <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-4xl border border-white/5 bg-theme-primary/10 py-16 backdrop-blur-md">
                 <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/10 blur-4xl" />
                 <Zap className="relative z-10 mb-4 h-14 w-14 text-orange-500/20" />
                 <p className="relative z-10 text-sm font-medium text-white/40">No hay ofertas flash creadas</p>
@@ -260,7 +260,7 @@ export function FlashDealsTable({
 
     /* ── Table ── */
     return (
-        <div className="overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 backdrop-blur-md shadow-xl">
+        <div className="overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 backdrop-blur-md shadow-xl">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead>

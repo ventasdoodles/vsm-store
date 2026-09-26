@@ -24,7 +24,7 @@ export function HealthPulse({ isHealthy, lastCheckTime, uptimeMinutes }: HealthP
     };
 
     return (
-        <div className={`relative overflow-hidden rounded-[1.5rem] border p-5 backdrop-blur-md transition-all duration-700 ${
+        <div className={`relative overflow-hidden rounded-3xl border p-5 backdrop-blur-md transition-all duration-700 ${
             isHealthy
                 ? 'border-emerald-500/15 bg-emerald-500/[0.03]'
                 : 'border-rose-500/20 bg-rose-500/5'

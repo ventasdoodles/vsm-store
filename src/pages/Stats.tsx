@@ -37,7 +37,7 @@ export function Stats() {
     if (!stats || stats.totalOrders === 0) {
         return (
             <div className="container-vsm py-32 text-center max-w-lg">
-                <div className="mx-auto w-24 h-24 rounded-[2.5rem] bg-accent-primary/5 border border-white/5 flex items-center justify-center mb-10 shadow-inner">
+                <div className="mx-auto w-24 h-24 rounded-5xl bg-accent-primary/5 border border-white/5 flex items-center justify-center mb-10 shadow-inner">
                     <BarChart3 size={40} className="text-theme-tertiary opacity-20" />
                 </div>
                 <h2 className="text-3xl font-black text-white uppercase italic tracking-tight mb-4">Universo Paralelo de Datos</h2>
@@ -61,8 +61,8 @@ export function Stats() {
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div className="flex items-center gap-6">
                     <div className="relative">
-                        <div className="absolute -inset-1 bg-accent-primary/20 rounded-[2rem] blur-xl animate-pulse" />
-                        <div className="relative flex h-16 w-16 items-center justify-center rounded-[2rem] bg-black border border-white/5 text-accent-primary shadow-2xl">
+                        <div className="absolute -inset-1 bg-accent-primary/20 rounded-4xl blur-xl animate-pulse" />
+                        <div className="relative flex h-16 w-16 items-center justify-center rounded-4xl bg-black border border-white/5 text-accent-primary shadow-2xl">
                             <BarChart3 className="h-8 w-8" />
                         </div>
                     </div>
@@ -89,7 +89,7 @@ export function Stats() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         key={item.label} 
-                        className={cn("relative overflow-hidden group rounded-[2.5rem] border p-8 backdrop-blur-3xl shadow-2xl transition-all duration-700 hover:scale-105", item.gradient)}
+                        className={cn("relative overflow-hidden group rounded-5xl border p-8 backdrop-blur-3xl shadow-2xl transition-all duration-700 hover:scale-105", item.gradient)}
                     >
                         <div className="flex justify-between items-start mb-6">
                              <div className={cn("p-3 rounded-2xl bg-black border border-white/5 shadow-inner", item.color)}>
@@ -107,7 +107,7 @@ export function Stats() {
 
             <div className="grid lg:grid-cols-2 gap-8">
                 {/* Visualización de Gasto (Barras Cinemáticas) */}
-                <section className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 space-y-10 relative overflow-hidden group">
+                <section className="rounded-6xl border border-white/5 bg-white/[0.02] p-10 space-y-10 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary/5 rounded-full blur-5xl pointer-events-none" />
                     
                     <header className="flex justify-between items-center">
@@ -140,7 +140,7 @@ export function Stats() {
                                         animate={{ height: `${height}%` }}
                                         transition={{ duration: 1, delay: i * 0.1 }}
                                         className={cn(
-                                            'w-full rounded-[1.5rem] transition-all duration-700 relative shadow-2xl overflow-hidden',
+                                            'w-full rounded-3xl transition-all duration-700 relative shadow-2xl overflow-hidden',
                                             s.total > 0 ? 'bg-gradient-to-t from-accent-primary to-accent-secondary' : 'bg-white/5'
                                         )}
                                     >
@@ -154,7 +154,7 @@ export function Stats() {
                 </section>
 
                 {/* Inventario de Top Productos */}
-                <section className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 space-y-10 relative overflow-hidden group">
+                <section className="rounded-6xl border border-white/5 bg-white/[0.02] p-10 space-y-10 relative overflow-hidden group">
                      <div className="absolute bottom-0 left-0 w-64 h-64 bg-vape-500/5 rounded-full blur-5xl pointer-events-none" />
                      
                      <header className="space-y-1">
@@ -171,7 +171,7 @@ export function Stats() {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.1 }}
                                 key={p.product_id} 
-                                className="flex items-center gap-6 p-4 rounded-[2rem] bg-white/[0.01] border border-white/5 transition-all duration-500 hover:bg-white/[0.03] group/item"
+                                className="flex items-center gap-6 p-4 rounded-4xl bg-white/[0.01] border border-white/5 transition-all duration-500 hover:bg-white/[0.03] group/item"
                             >
                                 <div className="relative">
                                      <span className="absolute -top-3 -left-3 flex h-8 w-8 items-center justify-center rounded-full bg-black border border-white/10 text-2xs font-black text-white italic z-20 shadow-2xl">
@@ -204,7 +204,7 @@ export function Stats() {
             </div>
             
             {/* Preferencias de Dimensión Periférica */}
-            <div className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 space-y-8">
+            <div className="rounded-6xl border border-white/5 bg-white/[0.02] p-10 space-y-8">
                 <h3 className="text-sm font-black text-theme-tertiary uppercase tracking-giga opacity-40">Parámetros Ambientales</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {[
@@ -212,7 +212,7 @@ export function Stats() {
                          { icon: <CreditCard className="h-5 w-5 text-accent-primary" />, label: 'Método Digital Preferente', value: stats.preferredPayment === 'cash' ? 'Efectivo' : stats.preferredPayment === 'transfer' ? 'Transferencia' : stats.preferredPayment ?? 'WhatsApp' },
                          { icon: <Package className="h-5 w-5 text-white/40" />, label: 'Volumen Acumulado', value: `${stats.totalOrders} Adquisiciones` },
                     ].map((pref, i) => (
-                        <div key={i} className="flex items-center gap-6 rounded-[2rem] bg-black/40 border border-white/5 p-6 shadow-inner hover:border-white/10 transition-colors">
+                        <div key={i} className="flex items-center gap-6 rounded-4xl bg-black/40 border border-white/5 p-6 shadow-inner hover:border-white/10 transition-colors">
                             <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl">
                                 {pref.icon}
                             </div>

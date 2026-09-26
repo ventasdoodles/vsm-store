@@ -263,12 +263,12 @@ export function CartSidebar() {
                                 
                                 <m.div
                                     whileHover={{ scale: 1.05, rotateY: 10 }}
-                                    className="relative rounded-[2.5rem] bg-white/[0.03] p-10 border border-white/10 backdrop-blur-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5)] preserve-3d"
+                                    className="relative rounded-5xl bg-white/[0.03] p-10 border border-white/10 backdrop-blur-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5)] preserve-3d"
                                 >
                                     <ShoppingBag className="h-24 w-24 text-white/10 drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]" strokeWidth={1} />
                                     
                                     {/* Liquid Glow Ring */}
-                                    <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                                    <div className="absolute inset-0 rounded-5xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
                                 </m.div>
                             </div>
 
@@ -314,7 +314,7 @@ export function CartSidebar() {
                             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
 
                                 {/* Shipping expectation */}
-                                <div className="relative overflow-hidden rounded-[1.5rem] bg-white/[0.03] border border-white/10 p-5 mb-4 shadow-2xl group/progress">
+                                <div className="relative overflow-hidden rounded-3xl bg-white/[0.03] border border-white/10 p-5 mb-4 shadow-2xl group/progress">
                                     {/* Animated background glow rotation */}
                                     <div className="absolute inset-0 opacity-20 pointer-events-none">
                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent,rgba(16,185,129,0.3),transparent)] animate-[spin_8s_linear_infinite]" />

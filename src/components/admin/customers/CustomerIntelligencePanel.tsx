@@ -140,7 +140,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* 0. Customer Header Info [Wave 120] */}
             {intelligence && (
-                <div className="flex items-center gap-4 p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+                <div className="flex items-center gap-4 p-6 rounded-5xl bg-white/[0.02] border border-white/5 backdrop-blur-xl">
                     <div className="h-16 w-16 rounded-2xl border-2 border-white/10 overflow-hidden bg-white/5 shrink-0 shadow-xl">
                         {intelligence.avatar_url ? (
                             <img src={intelligence.avatar_url || undefined} alt={intelligence.full_name || 'Customer'} className="h-full w-full object-cover" />
@@ -160,7 +160,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             {/* 1. Header de Inteligencia (RFM Cards) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Recency Card */}
-                <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:border-white/10">
+                <div className="group relative overflow-hidden rounded-4xl border border-white/5 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:border-white/10">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                             <Calendar className="h-5 w-5" />
@@ -174,7 +174,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 </div>
 
                 {/* Frequency Card */}
-                <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:border-white/10">
+                <div className="group relative overflow-hidden rounded-4xl border border-white/5 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:border-white/10">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                             <TrendingUp className="h-5 w-5" />
@@ -188,7 +188,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 </div>
 
                 {/* Monetary Card */}
-                <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:border-white/10">
+                <div className="group relative overflow-hidden rounded-4xl border border-white/5 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:border-white/10">
                     <div className="flex items-center gap-3 mb-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
                             <CreditCard className="h-5 w-5" />
@@ -203,7 +203,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                 {/* Segment Card */}
                 <div className={cn(
-                    "group relative overflow-hidden rounded-[2rem] border p-5 backdrop-blur-md transition-all",
+                    "group relative overflow-hidden rounded-4xl border p-5 backdrop-blur-md transition-all",
                     getSegmentColor(intelligence?.segment || '')
                 )}>
                     <div className="flex items-center justify-between mb-3">
@@ -236,7 +236,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
             {/* 1.5. Sección de Insights Inteligentes (Fase A) */}
             {insights.length > 0 && (
-                <div className="relative overflow-hidden rounded-[2.5rem] border border-vape-500/20 bg-gradient-to-br from-vape-950/40 to-black/40 p-1 backdrop-blur-2xl">
+                <div className="relative overflow-hidden rounded-5xl border border-vape-500/20 bg-gradient-to-br from-vape-950/40 to-black/40 p-1 backdrop-blur-2xl">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.1),transparent_50%)]" />
                     <div className="relative p-6 px-8">
                         <div className="flex items-center gap-2 mb-4">
@@ -290,7 +290,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                             {/* AI Narrative Section */}
                             <div className={cn(
-                                "col-span-1 md:col-span-2 flex gap-6 p-6 rounded-[2rem] bg-gradient-to-br from-vape-500/5 to-indigo-500/5 border border-vape-500/20 relative group transition-all hover:bg-vape-500/10",
+                                "col-span-1 md:col-span-2 flex gap-6 p-6 rounded-4xl bg-gradient-to-br from-vape-500/5 to-indigo-500/5 border border-vape-500/20 relative group transition-all hover:bg-vape-500/10",
                                 loadingNarrative && "animate-pulse"
                             )}>
                                 <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-indigo-500 text-2xs font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20">
@@ -336,7 +336,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
             {/* 1.8 Neural Identity Section [Wave 120] */}
             {intelligence && (intelligence.ai_preferences || intelligence.ia_context) && (
-                <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
+                <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                         <Sparkles className="h-32 w-32 text-indigo-500" />
                     </div>
@@ -394,7 +394,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             )}
 
             {/* 1.9 Cesarin Memory Section — Conversational Learning */}
-            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
+            <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                     <Activity className="h-32 w-32 text-vape-500" />
                 </div>
@@ -405,7 +405,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 </Heading>
 
                 {!customerMemory || customerMemory.detected_interests.length === 0 ? (
-                    <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 text-center relative z-10">
+                    <div className="p-6 rounded-4xl bg-white/5 border border-white/5 text-center relative z-10">
                         <p className="text-xs text-white/40 font-medium leading-relaxed">Aún no se han detectado intereses recurrentes para este cliente. Los intereses aparecerán aquí a medida que interactúe con el asistente.</p>
                     </div>
                 ) : (
@@ -511,7 +511,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             </div>
 
             {/* 2. Timeline Unificada */}
-            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl">
+            <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl">
                 <Heading as="h4" className="flex items-center gap-3 text-sm font-bold text-white mb-8">
                     <Activity className="h-5 w-5 text-vape-400" />
                     Línea de Tiempo 360

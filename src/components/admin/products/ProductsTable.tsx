@@ -123,7 +123,7 @@ export function ProductsTable({
     /* ── Empty State ── */
     if (products.length === 0) {
         return (
-            <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 py-20 backdrop-blur-md">
+            <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-4xl border border-white/5 bg-theme-primary/10 py-20 backdrop-blur-md">
                 <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/10 blur-4xl" />
                 <Package className="relative z-10 mb-4 h-14 w-14 text-white/10" />
                 <p className="relative z-10 text-sm font-medium text-white/40">No se encontraron productos</p>
@@ -134,7 +134,7 @@ export function ProductsTable({
     /* ── Table ── */
     return (
         <>
-            <div className="overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 backdrop-blur-md shadow-xl">
+            <div className="overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 backdrop-blur-md shadow-xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>

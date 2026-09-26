@@ -14,7 +14,7 @@ interface TagsHeaderProps {
 
 export function TagsHeader({ onNew }: TagsHeaderProps) {
     return (
-        <div className="relative overflow-hidden mb-8 rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <div className="relative overflow-hidden mb-8 rounded-4xl border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glows Premium */}
             <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-accent-primary/10 blur-5xl" />
             <div className="pointer-events-none absolute right-1/4 top-0 h-64 w-64 rounded-full bg-pink-500/10 blur-5xl" />
@@ -22,7 +22,7 @@ export function TagsHeader({ onNew }: TagsHeaderProps) {
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2.5 bg-gradient-to-br from-accent-primary/20 to-pink-500/10 rounded-[1rem] border border-accent-primary/20 shadow-inner">
+                        <div className="p-2.5 bg-gradient-to-br from-accent-primary/20 to-pink-500/10 rounded-2xl border border-accent-primary/20 shadow-inner">
                             <Tags className="h-7 w-7 text-accent-primary drop-shadow-[0_0_8px_rgba(var(--color-accent-primary),0.3)]" />
                         </div>
                         <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-accent-primary/20 to-pink-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-accent-primary ring-1 ring-inset ring-accent-primary/30">

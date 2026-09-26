@@ -32,7 +32,7 @@ export const SmartBanner: React.FC = () => {
                 className="relative w-full py-2 px-4 md:px-0"
             >
                 <div className={cn(
-                    "relative overflow-hidden rounded-[2rem] p-6 md:p-8 shadow-2xl border border-white/20",
+                    "relative overflow-hidden rounded-4xl p-6 md:p-8 shadow-2xl border border-white/20",
                     "bg-gradient-to-br",
                     banner.bgClass
                 )}>

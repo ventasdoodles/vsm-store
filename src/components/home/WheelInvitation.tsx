@@ -22,7 +22,7 @@ export function WheelInvitation() {
     return (
         <Link
             to={isAuthenticated ? '/loyalty' : '/login'}
-            className="block relative overflow-hidden rounded-[3rem] border border-white/10 bg-surface-overlay/80 backdrop-blur-3xl group transition-all duration-700 hover:border-vape-500/50 hover:scale-[1.02] active:scale-[0.99] shadow-2xl"
+            className="block relative overflow-hidden rounded-6xl border border-white/10 bg-surface-overlay/80 backdrop-blur-3xl group transition-all duration-700 hover:border-vape-500/50 hover:scale-[1.02] active:scale-[0.99] shadow-2xl"
         >
             {/* ── Background: Cinematic Auras ── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">

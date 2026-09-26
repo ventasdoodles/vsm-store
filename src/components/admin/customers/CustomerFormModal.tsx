@@ -82,7 +82,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xl animate-in fade-in duration-300">
-            <div className="w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-surface-base shadow-2xl relative">
+            <div className="w-full max-w-4xl overflow-hidden rounded-4xl border border-white/10 bg-surface-base shadow-2xl relative">
                 {/* Glow ambiental */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-5xl pointer-events-none" />
 

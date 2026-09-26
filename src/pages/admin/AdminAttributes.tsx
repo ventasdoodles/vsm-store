@@ -245,7 +245,7 @@ export function AdminAttributes() {
                     </Heading>
 
                     {selectedAttribute ? (
-                        <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl animate-in fade-in duration-500">
+                        <div className="rounded-4xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl animate-in fade-in duration-500">
                             <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-6">
                                 <div>
                                     <Heading as="h3" className="text-2xl font-black text-white">{selectedAttribute.name}</Heading>
@@ -404,7 +404,7 @@ export function AdminAttributes() {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex h-[400px] flex-col items-center justify-center rounded-[2rem] border border-dashed border-white/10 bg-white/[0.01]">
+                        <div className="flex h-[400px] flex-col items-center justify-center rounded-4xl border border-dashed border-white/10 bg-white/[0.01]">
                             <div className="rounded-full bg-white/5 p-4 mb-4">
                                 <Settings2 className="h-8 w-8 text-white/20" />
                             </div>

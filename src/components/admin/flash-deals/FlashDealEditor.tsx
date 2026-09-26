@@ -29,7 +29,7 @@ interface FlashDealEditorProps {
     products: Product[];
 }
 
-const INPUT_CLS = 'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white backdrop-blur-sm transition-all focus:border-orange-500/40 focus:outline-none focus:ring-1 focus:ring-orange-500/20 placeholder:text-white/20';
+const INPUT_CLS = 'w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white backdrop-blur-sm transition-all focus:border-orange-500/40 focus:outline-none focus:ring-1 focus:ring-orange-500/20 placeholder:text-white/20';
 
 /** Duration preset definition */
 interface DurationPreset {
@@ -257,7 +257,7 @@ export function FlashDealEditor({
                         <SectionHeader icon={Package} label="Producto" color="orange" />
                         <div className="space-y-3 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                             {selectedProduct ? (
-                                <div className="flex items-center gap-3 rounded-[0.75rem] border border-orange-500/20 bg-orange-500/5 p-3">
+                                <div className="flex items-center gap-3 rounded-xl border border-orange-500/20 bg-orange-500/5 p-3">
                                     <ProductThumb product={selectedProduct} size="lg" />
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold text-white truncate">{selectedProduct.name}</p>
@@ -280,7 +280,7 @@ export function FlashDealEditor({
                                 <Button
                                     type="button"
                                     onClick={() => setShowProductPicker(true)}
-                                    className="w-full rounded-[0.75rem] border border-dashed border-white/15 bg-white/[0.02] p-6 text-center text-sm text-white/30 hover:border-orange-500/30 hover:text-orange-400/60 transition-all"
+                                    className="w-full rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center text-sm text-white/30 hover:border-orange-500/30 hover:text-orange-400/60 transition-all"
                                 >
                                     Click para seleccionar producto
                                 </Button>
@@ -299,7 +299,7 @@ export function FlashDealEditor({
                                             autoFocus
                                         />
                                     </div>
-                                    <div className="max-h-48 overflow-y-auto rounded-[0.75rem] border border-white/5 bg-surface-card divide-y divide-white/5">
+                                    <div className="max-h-48 overflow-y-auto rounded-xl border border-white/5 bg-surface-card divide-y divide-white/5">
                                         {filteredProducts.length === 0 ? (
                                             <p className="p-3 text-xs text-white/30 text-center">Sin resultados</p>
                                         ) : (
@@ -367,7 +367,7 @@ export function FlashDealEditor({
                             </div>
 
                             {selectedProduct && formData.flash_price > 0 && (
-                                <div className="flex items-center justify-between rounded-[0.75rem] border border-orange-500/15 bg-orange-500/5 px-4 py-3">
+                                <div className="flex items-center justify-between rounded-xl border border-orange-500/15 bg-orange-500/5 px-4 py-3">
                                     <div className="flex items-center gap-2">
                                         <Zap className="h-4 w-4 text-orange-400" />
                                         <span className="text-sm text-white/60">Descuento:</span>

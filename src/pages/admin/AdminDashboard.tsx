@@ -70,14 +70,14 @@ export function AdminDashboard() {
             <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="h-28 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
+                        <div key={i} className="h-28 animate-pulse rounded-3xl bg-theme-primary/10 backdrop-blur-md border border-white/5" />
                     ))}
                 </div>
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    <div className="h-72 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
-                    <div className="h-72 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
+                    <div className="h-72 animate-pulse rounded-3xl bg-theme-primary/10 backdrop-blur-md border border-white/5" />
+                    <div className="h-72 animate-pulse rounded-3xl bg-theme-primary/10 backdrop-blur-md border border-white/5" />
                 </div>
-                <div className="h-72 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
+                <div className="h-72 animate-pulse rounded-3xl bg-theme-primary/10 backdrop-blur-md border border-white/5" />
             </div>
         );
     }

@@ -193,7 +193,7 @@ export function ProductVariantsEditor({
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* 1. Selector de Configuracion */}
-            <div className="rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-md">
+            <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-md">
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <Heading as="h4" className="flex items-center gap-2 text-sm font-bold text-white">

@@ -22,7 +22,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
     const lowStock = products.filter(p => p.is_active && p.stock < 5).length;
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glows */}
             <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-violet-500/10 blur-5xl" />
             <div className="pointer-events-none absolute right-1/4 top-0 h-56 w-56 rounded-full bg-indigo-500/8 blur-5xl" />
@@ -32,7 +32,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
                 {/* Left: Title + Icon */}
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2.5 bg-gradient-to-br from-violet-500/20 to-indigo-500/10 rounded-[1rem] border border-violet-500/20 shadow-inner">
+                        <div className="p-2.5 bg-gradient-to-br from-violet-500/20 to-indigo-500/10 rounded-2xl border border-violet-500/20 shadow-inner">
                             <Package className="h-7 w-7 text-violet-400 drop-shadow-[0_0_8px_rgba(139,92,246,0.4)]" />
                         </div>
                         <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-violet-500/20 to-indigo-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-violet-400 ring-1 ring-inset ring-violet-500/30">
@@ -60,7 +60,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
                     <div className="flex items-center gap-2">
                         <Button
                             onClick={onExportCSV}
-                            className="inline-flex items-center gap-2 rounded-[1rem] border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
+                            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
                             title="Exportar lista filtrada a CSV"
                         >
                             <Download className="h-4 w-4" />
@@ -69,7 +69,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
                         <Button
                             onClick={onAddProduct}
                             className="
-                                group relative inline-flex items-center gap-2 rounded-[1rem] px-5 py-2.5
+                                group relative inline-flex items-center gap-2 rounded-2xl px-5 py-2.5
                                 font-bold text-white text-sm
                                 bg-gradient-to-r from-violet-600 to-indigo-600
                                 shadow-lg shadow-violet-500/20
@@ -78,7 +78,7 @@ export function ProductsHeader({ products, onExportCSV, onAddProduct }: Products
                                 active:scale-[0.98]
                             "
                         >
-                            <div className="pointer-events-none absolute inset-0 rounded-[1rem] bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
+                            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
                             <Plus className="relative z-10 h-4 w-4" />
                             <span className="relative z-10">Nuevo</span>
                         </Button>

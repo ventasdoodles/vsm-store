@@ -37,7 +37,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
     };
 
     return (
-        <div className="relative overflow-hidden mb-8 rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <div className="relative overflow-hidden mb-8 rounded-4xl border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glow */}
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -66,7 +66,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     {/* Presets */}
-                    <div className="flex items-center gap-1 rounded-[1.5rem] border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
+                    <div className="flex items-center gap-1 rounded-3xl border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
                         {PRESETS.map(({ label, days }) => (
                             <Button
                                 key={days}
@@ -84,7 +84,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     </div>
 
                     {/* Date Picker */}
-                    <div className="flex items-center gap-2 rounded-[1.5rem] border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 rounded-3xl border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
                         <div className="flex items-center gap-3 px-3 py-1.5">
                             <Calendar className="h-4 w-4 text-theme-secondary" />
                             <input

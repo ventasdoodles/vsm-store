@@ -106,7 +106,7 @@ export function AdminLoyalty() {
                 <LoyaltyStats />
 
                 {/* Form Matrix (REGLAS GLOBALES - MOVIDO ARRIBA) */}
-                <div className="bg-surface-base rounded-[2.5rem] p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+                <div className="bg-surface-base rounded-5xl p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="h-4 w-1.5 rounded-full bg-amber-500" />
                         <Heading as="h2" className="text-xl font-black text-theme-primary tracking-tight uppercase">Reglas del Programa V-Coins</Heading>

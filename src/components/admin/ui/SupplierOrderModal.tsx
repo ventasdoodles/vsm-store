@@ -67,7 +67,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-150 flex items-center justify-center p-4">
                 <m.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -80,7 +80,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-white/10 bg-surface-overlay shadow-2xl"
+                    className="relative w-full max-w-lg overflow-hidden rounded-5xl border border-white/10 bg-surface-overlay shadow-2xl"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between p-8 border-b border-white/5 bg-white/[0.02]">
@@ -136,7 +136,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     rows={4}
-                                    className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 text-sm text-white/80 leading-relaxed focus:border-vape-500/50 outline-none transition-all resize-none"
+                                    className="w-full bg-white/5 border border-white/10 rounded-4xl p-6 text-sm text-white/80 leading-relaxed focus:border-vape-500/50 outline-none transition-all resize-none"
                                 />
                                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
                                     <Button 

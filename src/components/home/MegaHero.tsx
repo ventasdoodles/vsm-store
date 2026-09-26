@@ -128,7 +128,7 @@ export const MegaHero = () => {
 
     const slide = activeSlides[currentIndex];
 
-    if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-[3rem]" />;
+    if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-6xl" />;
 
     return (
         <section

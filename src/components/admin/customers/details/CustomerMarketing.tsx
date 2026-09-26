@@ -80,7 +80,7 @@ export function CustomerMarketing({ customer }: Props) {
     };
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl">
             {/* Ambient Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 rounded-full blur-4xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 

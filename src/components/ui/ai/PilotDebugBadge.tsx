@@ -58,7 +58,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
     if (!isAuthorized && !requested) return null;
 
     return (
-        <div className="fixed bottom-24 left-6 z-[60] flex flex-col items-start gap-2 pointer-events-none">
+        <div className="fixed bottom-24 left-6 z-60 flex flex-col items-start gap-2 pointer-events-none">
             {/* Main Toggle Badge */}
             <button 
                 onClick={() => setIsExpanded(!isExpanded)}

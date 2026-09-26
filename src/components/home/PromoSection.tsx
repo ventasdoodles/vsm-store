@@ -14,7 +14,7 @@ export function PromoSection() {
     return (
         <section className="my-20 relative overflow-hidden">
             <div className="container-vsm relative z-10">
-                <div className="relative group overflow-hidden rounded-[2.5rem] p-1 bg-gradient-to-r from-vape-500 to-herbal-500 shadow-2xl shadow-vape-500/10">
+                <div className="relative group overflow-hidden rounded-5xl p-1 bg-gradient-to-r from-vape-500 to-herbal-500 shadow-2xl shadow-vape-500/10">
                     <div className="relative bg-black/60 backdrop-blur-3xl rounded-[2.3rem] p-10 md:p-16 border border-white/10 overflow-hidden">
 
                         {/* Shimmer Effect */}

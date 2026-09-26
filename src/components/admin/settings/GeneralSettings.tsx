@@ -15,7 +15,7 @@ interface GeneralSettingsProps {
 }
 
 const INPUT_CLASS =
-    'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none backdrop-blur-sm transition-colors focus:border-cyan-500/50 focus:bg-white/[0.07]';
+    'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none backdrop-blur-sm transition-colors focus:border-cyan-500/50 focus:bg-white/[0.07]';
 
 /** Campos del formulario con metadata para renderizado */
 const FIELDS = [
@@ -27,7 +27,7 @@ const FIELDS = [
 
 export function GeneralSettings({ formData, handleChange }: GeneralSettingsProps) {
     return (
-        <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-cyan-500/15 hover:shadow-cyan-500/5">
+        <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-cyan-500/15 hover:shadow-cyan-500/5">
             {/* Orbes ambientales */}
             <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-500/8 blur-5xl transition-all group-hover:bg-cyan-500/12" />
             <div className="pointer-events-none absolute bottom-0 left-1/4 h-40 w-40 rounded-full bg-teal-500/6 blur-4xl" />

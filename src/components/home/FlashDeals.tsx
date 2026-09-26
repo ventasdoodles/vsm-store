@@ -116,7 +116,7 @@ export const FlashDeals = () => {
                     <m.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-4 bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-6 rounded-[2rem] shadow-2xl relative overflow-hidden group"
+                        className="flex items-center gap-4 bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-6 rounded-4xl shadow-2xl relative overflow-hidden group"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Clock className="w-8 h-8 text-red-500 animate-pulse hidden sm:block" />
@@ -190,7 +190,7 @@ export const FlashDeals = () => {
                             className="flex-shrink-0 w-72 md:w-80 group/card relative"
                         >
                             <Link to="/$section/$slug" params={{ section: product.section, slug: product.slug }} className="block h-full cursor-none lg:cursor-default">
-                                <div className="relative h-full bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(239,68,68,0.3)] flex flex-col group/inner spotlight-container">
+                                <div className="relative h-full bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-5xl overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(239,68,68,0.3)] flex flex-col group/inner spotlight-container">
                                     {/* Spotlight logic - managed by global class if available, else local CSS is enough */}
                                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--x,50%)_var(--y,50%),rgba(239,68,68,0.15)_0%,transparent_50%)] opacity-0 group-hover/card:opacity-100 transition-opacity pointer-events-none" />
 

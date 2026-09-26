@@ -22,7 +22,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
             whileHover={{ y: -8, scale: 1.05 }}
             className="flex-shrink-0 group cursor-pointer"
         >
-            <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-[2.5rem] bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl flex items-center justify-center p-8 transition-all duration-700 hover:bg-white/[0.04] hover:border-white/[0.15] spotlight-container overflow-hidden group">
+            <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-5xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl flex items-center justify-center p-8 transition-all duration-700 hover:bg-white/[0.04] hover:border-white/[0.15] spotlight-container overflow-hidden group">
                 {/* ── Spotlight Glow ── */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-[radial-gradient(circle_at_var(--x,50%)_var(--y,50%),rgba(255,255,255,0.08)_0%,transparent_70%)] pointer-events-none" />
                 

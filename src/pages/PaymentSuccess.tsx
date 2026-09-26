@@ -180,10 +180,10 @@ export function PaymentSuccess() {
                     className="w-full max-w-2xl text-center space-y-8"
                 >
                     <m.div variants={item} className="relative inline-block">
-                        <div className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br ${ui.iconWrap}`}>
+                        <div className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-4xl bg-gradient-to-br ${ui.iconWrap}`}>
                             <StatusIcon className="h-12 w-12 text-white" />
                         </div>
-                        <div className={`absolute -inset-4 z-0 rounded-[2.5rem] blur-xl animate-pulse ${ui.iconGlow}`} />
+                        <div className={`absolute -inset-4 z-0 rounded-5xl blur-xl animate-pulse ${ui.iconGlow}`} />
                     </m.div>
 
                     <m.div variants={item} className="space-y-3">
@@ -196,8 +196,8 @@ export function PaymentSuccess() {
                     </m.div>
 
                     <m.div variants={item} className="relative group">
-                        <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-r from-vape-500/20 to-herbal-500/20 opacity-50 blur transition duration-1000 group-hover:opacity-100" />
-                        <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-8 text-left backdrop-blur-2xl">
+                        <div className="absolute -inset-1 rounded-5xl bg-gradient-to-r from-vape-500/20 to-herbal-500/20 opacity-50 blur transition duration-1000 group-hover:opacity-100" />
+                        <div className="relative overflow-hidden rounded-5xl border border-white/5 bg-white/[0.03] p-8 text-left backdrop-blur-2xl">
                             <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-white/5 pb-6 sm:flex-row sm:items-center">
                                 <div className="space-y-1">
                                     <span className="text-2xs font-black uppercase tracking-giga text-white/30">Numero de pedido</span>

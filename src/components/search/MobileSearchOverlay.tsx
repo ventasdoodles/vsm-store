@@ -56,7 +56,7 @@ export function MobileSearchOverlay() {
     if (!isOpen) return null;
 
     return (
-        <div role="dialog" aria-modal="true" aria-label="Buscar productos" className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-3xl animate-in fade-in duration-300">
+        <div role="dialog" aria-modal="true" aria-label="Buscar productos" className="fixed inset-0 z-60 flex flex-col bg-theme-primary/95 backdrop-blur-3xl animate-in fade-in duration-300">
             {/* Header Search */}
             <div className="flex items-center gap-3 border-b border-white/5 p-4">
                 <form onSubmit={handleSubmit} className="relative flex-1">

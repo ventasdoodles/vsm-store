@@ -58,7 +58,7 @@ export function ProfileForm() {
     if (!user) return null;
 
     return (
-        <section className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 relative overflow-hidden group">
+        <section className="rounded-5xl border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 relative overflow-hidden group">
             {/* Background Decor */}
             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-accent-primary/5 rounded-full blur-4xl pointer-events-none" />
             
@@ -128,7 +128,7 @@ export function ProfileForm() {
                         type="submit"
                         disabled={!isDirty || isSubmitting}
                         className={cn(
-                            "group relative flex w-full items-center justify-center gap-3 rounded-[2rem] py-5 text-2xs font-black uppercase tracking-macro transition-all duration-500 overflow-hidden shadow-2xl active:scale-95",
+                            "group relative flex w-full items-center justify-center gap-3 rounded-4xl py-5 text-2xs font-black uppercase tracking-macro transition-all duration-500 overflow-hidden shadow-2xl active:scale-95",
                             isDirty && !isSubmitting
                                 ? "bg-accent-primary text-white shadow-accent-primary/30 hover:bg-accent-secondary"
                                 : "bg-white/5 border border-white/5 text-theme-tertiary cursor-not-allowed opacity-50"

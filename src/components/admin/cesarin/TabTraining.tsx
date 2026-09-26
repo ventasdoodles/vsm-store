@@ -26,7 +26,7 @@ export function TabTraining() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 {/* Upload Section */}
                 <div 
-                    className={`p-10 rounded-[2rem] border-2 border-dashed transition-all ${
+                    className={`p-10 rounded-4xl border-2 border-dashed transition-all ${
                         dragActive ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.04]'
                     } flex flex-col items-center justify-center text-center`}
                     onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
@@ -47,7 +47,7 @@ export function TabTraining() {
 
                 {/* Settings & Links Section */}
                 <div className="space-y-6">
-                    <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02]">
+                    <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02]">
                         <div className="flex items-center gap-3 mb-4">
                             <Link2 className="h-6 w-6 text-vape-400" />
                             <Heading as="h3" className="text-lg font-bold text-white">Aprender de Enlace Web</Heading>
@@ -67,7 +67,7 @@ export function TabTraining() {
                         </div>
                     </div>
 
-                    <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02]">
+                    <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02]">
                         <div className="flex items-center gap-3 mb-4">
                             <Settings2 className="h-6 w-6 text-indigo-400" />
                             <Heading as="h3" className="text-lg font-bold text-white">Personalidad Básica</Heading>

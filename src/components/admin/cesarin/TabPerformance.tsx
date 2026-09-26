@@ -20,7 +20,7 @@ export function TabPerformance() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] flex flex-col gap-4">
+                <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02] flex flex-col gap-4">
                     <div className="h-12 w-12 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center">
                         <MessageSquare className="h-6 w-6" />
                     </div>
@@ -30,7 +30,7 @@ export function TabPerformance() {
                     </div>
                 </div>
 
-                <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] flex flex-col gap-4">
+                <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02] flex flex-col gap-4">
                     <div className="h-12 w-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center">
                         <ThumbsUp className="h-6 w-6" />
                     </div>
@@ -40,7 +40,7 @@ export function TabPerformance() {
                     </div>
                 </div>
 
-                <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] flex flex-col gap-4">
+                <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02] flex flex-col gap-4">
                     <div className="h-12 w-12 bg-vape-500/20 text-vape-400 rounded-2xl flex items-center justify-center">
                         <Users className="h-6 w-6" />
                     </div>
@@ -51,7 +51,7 @@ export function TabPerformance() {
                 </div>
             </div>
 
-            <div className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] h-64 flex items-center justify-center">
+            <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02] h-64 flex items-center justify-center">
                 <p className="text-white/30 font-semibold">Aquí iría un gráfico de líneas súper limpio de los últimos 7 días</p>
             </div>
         </m.div>

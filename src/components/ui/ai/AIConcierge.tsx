@@ -285,10 +285,10 @@ export const AIConcierge: React.FC = () => {
                             exit={{ opacity: 0, scale: 0.8, y: 20, x: -20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                             style={{ willChange: 'transform, opacity' }}
-                            className="pointer-events-auto mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[580px] max-h-[75vh] rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] border border-white/10 flex flex-col isolation-auto bg-surface-overlay/60 backdrop-blur-3xl relative"
+                            className="pointer-events-auto mb-4 w-[calc(100vw-3rem)] sm:w-[400px] h-[580px] max-h-[75vh] rounded-5xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] border border-white/10 flex flex-col isolation-auto bg-surface-overlay/60 backdrop-blur-3xl relative"
                         >
                             {/* Inner border glow / highlight */}
-                            <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none" style={{ maskImage: 'linear-gradient(to bottom, white, transparent)' }} />
+                            <div className="absolute inset-0 rounded-5xl border border-white/5 pointer-events-none" style={{ maskImage: 'linear-gradient(to bottom, white, transparent)' }} />
                             
                             <div className="absolute inset-x-0 -top-20 -z-10 flex justify-center">
                                 <div className="h-40 w-full blur-[64px] rounded-full bg-vape-500/30 animate-pulse-slow" />
@@ -477,7 +477,7 @@ export const AIConcierge: React.FC = () => {
                     />
                     <div
                         className={cn(
-                            'relative h-full w-full rounded-[1.5rem] flex items-center justify-center shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500 border border-white/10',
+                            'relative h-full w-full rounded-3xl flex items-center justify-center shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500 border border-white/10',
                             isOpen ? 'bg-white text-slate-900 rotate-90' : 'bg-gradient-to-br from-vape-500 via-vape-600 to-vape-800 text-white',
                         )}
                         style={{ willChange: 'transform' }}

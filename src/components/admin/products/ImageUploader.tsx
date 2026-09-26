@@ -71,7 +71,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
             {images.length > 0 && (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {images.map((url, index) => (
-                        <div key={url} className="group relative aspect-square overflow-hidden rounded-[1rem] border border-white/10 bg-white/5 shadow-inner">
+                        <div key={url} className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-inner">
                             <OptimizedImage
                                 src={url}
                                 alt={`Product image ${index + 1}`}
@@ -95,7 +95,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
 
                     {/* Placeholder slots */}
                     {Array.from({ length: Math.max(0, maxImages - Math.max(images.length, 1)) }).map((_, i) => (
-                        <div key={`placeholder-${i}`} className="flex aspect-square items-center justify-center rounded-[1rem] border border-dashed border-white/10 bg-white/[0.02]">
+                        <div key={`placeholder-${i}`} className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02]">
                             <ImageIcon className="h-8 w-8 text-white/10" />
                         </div>
                     ))}
@@ -121,7 +121,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                         </>
                     ) : (
                         <>
-                            <div className="mb-4 rounded-[1rem] bg-gradient-to-br from-violet-500/10 to-indigo-500/5 p-4 border border-violet-500/10">
+                            <div className="mb-4 rounded-2xl bg-gradient-to-br from-violet-500/10 to-indigo-500/5 p-4 border border-violet-500/10">
                                 <UploadCloud className="h-8 w-8 text-violet-400/60" />
                             </div>
                             <p className="text-sm font-semibold text-white/60">

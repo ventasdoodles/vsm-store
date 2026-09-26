@@ -83,7 +83,7 @@ export function ConfirmDialog() {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-0">
                     {/* Backdrop */}
                     <m.div
                         initial={{ opacity: 0 }}

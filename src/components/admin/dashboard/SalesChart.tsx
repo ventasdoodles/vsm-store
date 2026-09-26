@@ -26,10 +26,10 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
     };
 
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-surface-base/70 backdrop-blur-md p-6 shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5 h-full flex flex-col">
+        <div className="rounded-3xl border border-white/5 bg-surface-base/70 backdrop-blur-md p-6 shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5 h-full flex flex-col">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-[0.75rem] bg-accent-primary/10">
+                    <div className="p-2 rounded-xl bg-accent-primary/10">
                         <BarChart3 className="h-5 w-5 text-accent-primary" />
                     </div>
                     <div>
@@ -56,7 +56,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                     return (
                         <div key={day.date} className="flex-1 flex flex-col items-center gap-2 group relative h-full justify-end">
                             {/* Tooltip on hover */}
-                            <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 bg-white/10 backdrop-blur-lg border border-white/10 text-white text-2xs font-bold px-3 py-1.5 rounded-[0.5rem] pointer-events-none whitespace-nowrap z-20 shadow-xl">
+                            <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:-translate-y-1 bg-white/10 backdrop-blur-lg border border-white/10 text-white text-2xs font-bold px-3 py-1.5 rounded-lg pointer-events-none whitespace-nowrap z-20 shadow-xl">
                                 {day.count} pedidos
                             </div>
                             <span className="text-2xs text-theme-secondary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
@@ -64,7 +64,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                             </span>
                             <div className="w-full flex items-end relative h-28">
                                 <div
-                                    className={`w-full rounded-[0.5rem] transition-all duration-500 relative overflow-hidden ${isToday
+                                    className={`w-full rounded-lg transition-all duration-500 relative overflow-hidden ${isToday
                                             ? 'bg-gradient-to-t from-accent-primary/80 to-accent-primary shadow-lg shadow-accent-primary/20'
                                             : 'bg-gradient-to-t from-white/5 to-white/10 hover:from-white/10 hover:to-white/20'
                                         }`}

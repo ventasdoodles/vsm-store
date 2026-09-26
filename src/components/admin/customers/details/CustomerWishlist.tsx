@@ -28,7 +28,7 @@ export function CustomerWishlist({ customer }: Props) {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-[2rem] min-h-36">
+            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-4xl min-h-36">
                 <Loader2 className="w-6 h-6 animate-spin text-rose-500 mb-2" />
                 <p className="text-xs text-theme-secondary">Cargando favoritos...</p>
             </div>
@@ -37,7 +37,7 @@ export function CustomerWishlist({ customer }: Props) {
 
     if (items.length === 0) {
         return (
-            <div className="rounded-[2rem] border border-white/5 bg-surface-base/50 p-6 flex items-center justify-center min-h-28 shadow-inner">
+            <div className="rounded-4xl border border-white/5 bg-surface-base/50 p-6 flex items-center justify-center min-h-28 shadow-inner">
                 <div className="text-center">
                     <Heart className="w-6 h-6 text-theme-secondary/30 mx-auto mb-2" />
                     <p className="text-sm font-medium text-white mb-0.5">Sin favoritos registrados</p>
@@ -50,7 +50,7 @@ export function CustomerWishlist({ customer }: Props) {
     }
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl">
             {/* Ambient Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full blur-4xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
 

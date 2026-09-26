@@ -8,7 +8,7 @@ interface CouponHeaderProps {
 
 export function CouponHeader({ onNewCoupon }: CouponHeaderProps) {
     return (
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-theme-primary/10 p-6 sm:p-8 rounded-[2rem] border border-white/5 relative overflow-hidden backdrop-blur-md shadow-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-theme-primary/10 p-6 sm:p-8 rounded-4xl border border-white/5 relative overflow-hidden backdrop-blur-md shadow-2xl">
             {/* Soft Ambient Glow */}
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-5xl pointer-events-none" />
 

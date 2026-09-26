@@ -32,7 +32,7 @@ export function OrdersHeader({
 }: OrdersHeaderProps) {
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-theme-primary/10 p-6 sm:p-8 rounded-[2rem] border border-white/5 relative overflow-hidden backdrop-blur-md shadow-2xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-theme-primary/10 p-6 sm:p-8 rounded-4xl border border-white/5 relative overflow-hidden backdrop-blur-md shadow-2xl">
                 {/* Soft Ambient Glow - Match Loyalty style */}
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-primary/5 rounded-full blur-5xl pointer-events-none" />
                 <div className="relative z-10 w-full md:w-auto">

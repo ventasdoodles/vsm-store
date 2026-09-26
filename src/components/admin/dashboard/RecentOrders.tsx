@@ -116,7 +116,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                 </div>
                 <Link
                     to="/admin/orders"
-                    className="group flex items-center gap-2 text-xs font-bold text-accent-primary hover:text-white transition-colors bg-accent-primary/10 hover:bg-accent-primary/20 px-4 py-2 rounded-[1rem] hover:shadow-lg hover:shadow-accent-primary/5"
+                    className="group flex items-center gap-2 text-xs font-bold text-accent-primary hover:text-white transition-colors bg-accent-primary/10 hover:bg-accent-primary/20 px-4 py-2 rounded-2xl hover:shadow-lg hover:shadow-accent-primary/5"
                 >
                     Ver todos
                     <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
@@ -125,7 +125,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
 
             {/* Listado de Pedidos en Formato Tarjeta usando TanStack Table */}
             {table.getRowModel().rows.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center rounded-[1.5rem] border border-white/5 bg-surface-base/70 backdrop-blur-md">
+                <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl border border-white/5 bg-surface-base/70 backdrop-blur-md">
                     <Package className="h-12 w-12 text-theme-secondary/30 mb-4" />
                     <p className="text-sm font-medium text-theme-secondary">No hay pedidos recientes aun</p>
                 </div>
@@ -137,7 +137,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                             <div
                                 key={row.id}
                                 onClick={() => navigate({ to: `/admin/orders?id=${order.id}` as any })}
-                                className="group flex w-full items-center gap-4 px-6 py-5 text-left transition-all duration-300 rounded-[1.5rem] border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-0.5"
+                                className="group flex w-full items-center gap-4 px-6 py-5 text-left transition-all duration-300 rounded-3xl border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-0.5"
                             >
                                 <div className="flex-1 min-w-0">
                                     {flexRender(

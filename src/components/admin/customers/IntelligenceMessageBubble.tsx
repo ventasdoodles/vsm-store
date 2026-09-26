@@ -15,7 +15,7 @@ export function IntelligenceMessageBubble({
     setGeneratedWhatsApp
 }: IntelligenceMessageBubbleProps) {
     return (
-        <div className="mt-8 p-6 rounded-[2.5rem] bg-emerald-500/10 border border-emerald-500/20 animate-in zoom-in-95 duration-500">
+        <div className="mt-8 p-6 rounded-5xl bg-emerald-500/10 border border-emerald-500/20 animate-in zoom-in-95 duration-500">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">

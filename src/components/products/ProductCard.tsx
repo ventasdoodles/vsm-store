@@ -220,7 +220,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                     onMouseLeave={spotlightEnabled ? handleSpotlightLeave : undefined}
                 >
                     <div
-                        className="relative glass-premium rounded-[2rem] overflow-hidden transition-shadow duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] h-full flex flex-col isolation-auto border border-white/5"
+                        className="relative glass-premium rounded-4xl overflow-hidden transition-shadow duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] h-full flex flex-col isolation-auto border border-white/5"
                     >
                         {/* Spotlight Effect Layer */}
                         {spotlightEnabled && (

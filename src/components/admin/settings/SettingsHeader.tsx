@@ -10,7 +10,7 @@ import { Settings2 } from 'lucide-react';
 
 export function SettingsHeader() {
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glows */}
             <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-violet-500/10 blur-5xl" />
             <div className="pointer-events-none absolute right-1/4 top-0 h-56 w-56 rounded-full bg-fuchsia-500/8 blur-5xl" />
@@ -19,7 +19,7 @@ export function SettingsHeader() {
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2.5 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/10 rounded-[1rem] border border-violet-500/20 shadow-inner">
+                        <div className="p-2.5 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/10 rounded-2xl border border-violet-500/20 shadow-inner">
                             <Settings2 className="h-7 w-7 text-violet-400 drop-shadow-[0_0_8px_rgba(139,92,246,0.4)]" />
                         </div>
                         <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-violet-400 ring-1 ring-inset ring-violet-500/30">

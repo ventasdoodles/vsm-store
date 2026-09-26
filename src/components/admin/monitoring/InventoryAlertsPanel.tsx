@@ -20,7 +20,7 @@ export function InventoryAlertsPanel() {
                 </Heading>
             </div>
             
-            <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl overflow-hidden p-5 shadow-2xl">
+            <div className="rounded-4xl border border-white/5 bg-surface-base/80 backdrop-blur-xl overflow-hidden p-5 shadow-2xl">
                 {isLoading ? (
                     <div className="h-32 flex items-center justify-center text-theme-secondary">
                         <span className="animate-pulse">Cargando alertas...</span>

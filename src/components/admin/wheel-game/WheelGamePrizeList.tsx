@@ -220,7 +220,7 @@ export function WheelGamePrizeList({
     });
 
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-theme-primary/5 overflow-hidden backdrop-blur-sm">
+        <div className="rounded-3xl border border-white/5 bg-theme-primary/5 overflow-hidden backdrop-blur-sm">
             {/* Table */}
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">

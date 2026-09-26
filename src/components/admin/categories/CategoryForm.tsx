@@ -48,10 +48,10 @@ const EMPTY: CategoryFormData = {
 
 /** Clase compartida para inputs glassmorphism */
 const INPUT_CLASS =
-    'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder-white/25 outline-none backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:bg-white/[0.07]';
+    'w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder-white/25 outline-none backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:bg-white/[0.07]';
 
 const SELECT_CLASS =
-    'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:bg-white/[0.07] [&>option]:bg-gray-900 [&>option]:text-white';
+    'w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none backdrop-blur-sm transition-colors focus:border-emerald-500/50 focus:bg-white/[0.07] [&>option]:bg-gray-900 [&>option]:text-white';
 
 export function CategoryForm({ open, editing, parentCategory, allCategories, isSaving, onSave, onClose }: CategoryFormProps) {
     const { config } = useActiveVerticalPack();
@@ -248,7 +248,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             className={INPUT_CLASS}
                         />
                         {form.image_url && (
-                            <div className="mt-2.5 overflow-hidden rounded-[1rem] border border-white/10 shadow-lg">
+                            <div className="mt-2.5 overflow-hidden rounded-2xl border border-white/10 shadow-lg">
                                 <img
                                     src={form.image_url}
                                     alt="preview"
@@ -261,7 +261,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                     </div>
 
                     {/* Toggles Card */}
-                    <div className="space-y-3 rounded-[1rem] border border-white/5 bg-white/[0.02] p-4">
+                    <div className="space-y-3 rounded-2xl border border-white/5 bg-white/[0.02] p-4">
 
                         {/* Popular */}
                         <div className="flex items-center justify-between">
@@ -303,7 +303,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                                 min={0}
                                 value={form.order_index ?? 0}
                                 onChange={e => set('order_index', Number(e.target.value))}
-                                className="w-16 rounded-[0.75rem] border border-white/10 bg-white/5 px-2.5 py-1.5 text-center text-sm text-white outline-none focus:border-emerald-500/50"
+                                className="w-16 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-center text-sm text-white outline-none focus:border-emerald-500/50"
                             />
                         </div>
                     </div>
@@ -313,7 +313,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                 <div className="flex items-center justify-end gap-3 border-t border-white/5 px-6 py-4">
                     <Button
                         onClick={onClose}
-                        className="rounded-[0.75rem] border border-white/10 px-4 py-2.5 text-sm font-medium text-white/50 transition-all hover:bg-white/5 hover:text-white/70"
+                        className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-white/50 transition-all hover:bg-white/5 hover:text-white/70"
                     >
                         Cancelar
                     </Button>
@@ -321,7 +321,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         onClick={handleSubmit}
                         disabled={isSaving || !form.name.trim() || !form.slug.trim()}
                         className="
-                            group relative inline-flex items-center gap-2 rounded-[0.75rem] px-6 py-2.5
+                            group relative inline-flex items-center gap-2 rounded-xl px-6 py-2.5
                             text-sm font-bold text-white
                             bg-gradient-to-r from-emerald-600 to-lime-600
                             shadow-lg shadow-emerald-500/20
@@ -331,7 +331,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             active:scale-[0.98]
                         "
                     >
-                        <div className="pointer-events-none absolute inset-0 rounded-[0.75rem] bg-gradient-to-r from-emerald-500 to-lime-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
+                        <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500 to-lime-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
                         <span className="relative z-10 flex items-center gap-2">
                             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                             {editing ? 'Guardar cambios' : 'Crear categoría'}

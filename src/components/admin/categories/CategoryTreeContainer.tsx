@@ -47,7 +47,7 @@ export function CategoryTreeContainer({
         sectionFilter === 'all' ? null : (config ? getAdminSectionCatalogEntry(sectionFilter, config)?.shortLabel : sectionFilter) ?? sectionFilter;
 
     return (
-        <div className="relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-5 shadow-xl backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 p-5 shadow-xl backdrop-blur-md">
             {/* Orbes ambientales sutiles */}
             <div className="pointer-events-none absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-emerald-500/5 blur-4xl" />
             <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-lime-500/4 blur-3xl" />
@@ -58,7 +58,7 @@ export function CategoryTreeContainer({
                         {Array.from({ length: SKELETON_COUNT }, (_, i) => (
                             <div
                                 key={i}
-                                className="h-12 animate-pulse rounded-[1rem] bg-white/5"
+                                className="h-12 animate-pulse rounded-2xl bg-white/5"
                                 style={{ width: `${100 - i * 8}%` }}
                             />
                         ))}

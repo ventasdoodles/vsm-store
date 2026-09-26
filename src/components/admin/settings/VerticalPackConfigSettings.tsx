@@ -191,7 +191,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-violet-600/20 blur-[128px] rounded-full pointer-events-none mix-blend-screen" />
             <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-600/10 blur-[128px] rounded-full pointer-events-none mix-blend-screen" />
 
-            <div className="rounded-[2rem] bg-surface-overlay/80 backdrop-blur-3xl border border-white/10 overflow-hidden relative shadow-[0_0_80px_rgba(0,0,0,0.8)] focus-within:border-violet-500/30 transition-all duration-500 flex flex-col lg:flex-row min-h-[700px]">
+            <div className="rounded-4xl bg-surface-overlay/80 backdrop-blur-3xl border border-white/10 overflow-hidden relative shadow-[0_0_80px_rgba(0,0,0,0.8)] focus-within:border-violet-500/30 transition-all duration-500 flex flex-col lg:flex-row min-h-[700px]">
                 
                 {/* Left Sidebar Navigator */}
                 <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/5 bg-white/[0.01] flex flex-col relative z-10">

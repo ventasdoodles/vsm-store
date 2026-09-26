@@ -47,7 +47,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
     };
 
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 transition-all duration-300 overflow-hidden group">
+        <div className="rounded-3xl border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 transition-all duration-300 overflow-hidden group">
             {/* Header Row */}
             <div className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors">
                 {/* Selection Checkbox */}

@@ -2,7 +2,7 @@
  * Z-index scale constants — VSM Store
  *
  * Centralised reference for the z-index layers used across the app.
- * Components currently use Tailwind utility classes (z-40, z-50, z-[100]).
+ * Components currently use Tailwind utility classes (z-40, z-50, z-100).
  * This file documents the intended scale so future developers keep it consistent.
  *
  * Layer hierarchy (low → high):

@@ -122,7 +122,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
 
             {/* Editor Modal Overlay */}
             {editingTier && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
                     <div className="bg-surface-base border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
                         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                             <Heading as="h3" className="text-lg font-black text-theme-primary tracking-tight">EDITAR NIVEL {editingTier.name.toUpperCase()}</Heading>

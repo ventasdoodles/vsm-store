@@ -33,7 +33,7 @@ export function OrderStatusBanner({
 
     return (
         <div className={cn(
-            "rounded-[2.5rem] border p-8 space-y-4 mb-8 relative overflow-hidden group/banner",
+            "rounded-5xl border p-8 space-y-4 mb-8 relative overflow-hidden group/banner",
             statusConfig.bg, statusConfig.border
         )}>
             <div className="absolute top-0 right-0 p-8 opacity-10 scale-150 rotate-12 transition-transform duration-1000 group-hover/banner:scale-110 group-hover/banner:rotate-0">

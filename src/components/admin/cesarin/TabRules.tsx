@@ -46,7 +46,7 @@ export function TabRules() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Panel de Creación */}
                 <div className="xl:col-span-1 space-y-6">
-                    <form onSubmit={handleAddRule} className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] space-y-6">
+                    <form onSubmit={handleAddRule} className="p-8 rounded-4xl border border-white/5 bg-white/[0.02] space-y-6">
                         <div>
                             <label className="block text-xs font-bold text-white/50 uppercase mb-4">Nueva Directriz</label>
                             <div className="flex gap-4 mb-4">
@@ -94,7 +94,7 @@ export function TabRules() {
                         </Button>
                     </form>
 
-                    <div className="p-6 rounded-[2rem] bg-amber-500/10 border border-amber-500/20 text-amber-200/80 text-sm flex items-start gap-3">
+                    <div className="p-6 rounded-4xl bg-amber-500/10 border border-amber-500/20 text-amber-200/80 text-sm flex items-start gap-3">
                         <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                         <p>
                             Las reglas muy estrictas pueden hacer que Cesarin suene menos natural. Utilízalas solo para proteger la política de la tienda o corregir errores frecuentes.
@@ -107,7 +107,7 @@ export function TabRules() {
                     {isLoading ? (
                         <div className="text-white/40 text-center py-20">Cargando reglas...</div>
                     ) : rules.length === 0 ? (
-                        <div className="border border-dashed border-white/10 rounded-[2rem] p-20 flex flex-col items-center justify-center text-center">
+                        <div className="border border-dashed border-white/10 rounded-4xl p-20 flex flex-col items-center justify-center text-center">
                             <ShieldCheck className="w-16 h-16 text-white/10 mb-4" />
                             <Heading as="h3" className="text-xl font-bold text-white mb-2">No hay reglas activas</Heading>
                             <p className="text-white/40 text-sm max-w-sm">
@@ -124,7 +124,7 @@ export function TabRules() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     className={cn(
-                                        "flex items-center gap-4 p-5 rounded-[1.5rem] border backdrop-blur-md transition-colors",
+                                        "flex items-center gap-4 p-5 rounded-3xl border backdrop-blur-md transition-colors",
                                         rule.is_active 
                                             ? rule.type === 'MUST_DO' ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'
                                             : 'bg-white/5 border-white/5 opacity-50'

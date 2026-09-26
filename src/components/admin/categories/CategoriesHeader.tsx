@@ -40,7 +40,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
     ];
 
     return (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glows */}
             <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-5xl" />
             <div className="pointer-events-none absolute right-1/4 top-0 h-56 w-56 rounded-full bg-lime-500/8 blur-5xl" />
@@ -50,7 +50,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                 {/* Left: Title + Icon */}
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2.5 bg-gradient-to-br from-emerald-500/20 to-lime-500/10 rounded-[1rem] border border-emerald-500/20 shadow-inner">
+                        <div className="p-2.5 bg-gradient-to-br from-emerald-500/20 to-lime-500/10 rounded-2xl border border-emerald-500/20 shadow-inner">
                             <FolderTree className="h-7 w-7 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
                         </div>
                         <span className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-emerald-500/20 to-lime-500/20 px-2.5 py-1 text-2xs font-black uppercase tracking-wider text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
@@ -77,12 +77,12 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                     </div>
 
                     {/* Section Filter Tabs */}
-                    <div className="flex gap-1 rounded-[1rem] border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
+                    <div className="flex gap-1 rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
                         {sectionTabs.map(tab => (
                             <Button
                                 key={tab.value}
                                 onClick={() => onSectionChange(tab.value)}
-                                className={`rounded-[0.75rem] px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${
+                                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all ${
                                     tab.value === 'all'
                                         ? sectionFilter === tab.value
                                             ? 'bg-white/10 text-white shadow-lg shadow-white/5 ring-1 ring-white/10'
@@ -101,7 +101,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                     <Button
                         onClick={onNew}
                         className="
-                            group relative inline-flex items-center gap-2 rounded-[1rem] px-5 py-2.5
+                            group relative inline-flex items-center gap-2 rounded-2xl px-5 py-2.5
                             font-bold text-white text-sm
                             bg-gradient-to-r from-emerald-600 to-lime-600
                             shadow-lg shadow-emerald-500/20
@@ -110,7 +110,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                             active:scale-[0.98]
                         "
                     >
-                        <div className="pointer-events-none absolute inset-0 rounded-[1rem] bg-gradient-to-r from-emerald-500 to-lime-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
+                        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500 to-lime-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
                         <Plus className="relative z-10 h-4 w-4" />
                         <span className="relative z-10">Nueva</span>
                     </Button>

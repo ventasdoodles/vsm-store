@@ -71,14 +71,14 @@ export function MonitoringStatsGrid({
                 return (
                     <div
                         key={card.label}
-                        className={`group relative overflow-hidden rounded-[1.5rem] border p-5 backdrop-blur-md transition-all duration-500 hover:shadow-xl hover:-translate-y-0.5 ${card.accentColor}`}
+                        className={`group relative overflow-hidden rounded-3xl border p-5 backdrop-blur-md transition-all duration-500 hover:shadow-xl hover:-translate-y-0.5 ${card.accentColor}`}
                     >
                         {/* Ambient glow on hover */}
                         <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full ${card.glowColor} blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
 
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-3">
-                                <div className={`p-2 rounded-[0.75rem] bg-white/5 group-hover:bg-white/10 transition-colors`}>
+                                <div className={`p-2 rounded-xl bg-white/5 group-hover:bg-white/10 transition-colors`}>
                                     <Icon className={`h-5 w-5 ${card.textColor}`} />
                                 </div>
                                 {/* Live pulse for online users */}
