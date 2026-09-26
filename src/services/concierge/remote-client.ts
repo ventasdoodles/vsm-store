@@ -75,64 +75,165 @@ export async function executeConciergeRemoteChat({
     if (options?.onChunk && res.headers.get('Content-Type')?.includes('text/event-stream')) {
         const reader = res.body?.getReader();
         const decoder = new TextDecoder();
-        let finalMetadata = null;
+        let finalMetadata: Record<string, any> | null = null;
+        let receivedText = false;
 
         if (reader) {
             let buffer = '';
-            let currentEventType = '';
 
-            const processLine = (line: string) => {
-                const trimmed = line.trim();
-                if (!trimmed) {
-                    currentEventType = '';
+            // === SSE State Machine (WHATWG Server-Sent Events spec) ===
+            // Per-event buffers: `data` lines accumulate until a pure blank line
+            // terminates the event; the event type resets after each dispatch.
+            let dataLines: string[] = [];
+            let eventType = '';
+
+            const dispatchEvent = () => {
+                if (dataLines.length === 0) {
+                    eventType = '';
                     return;
                 }
-                if (trimmed.startsWith('event: ')) {
-                    currentEventType = trimmed.slice(7).trim();
-                    return;
-                }
-                if (trimmed.startsWith('data: ')) {
-                    const rawData = trimmed.slice(6);
-                    if (currentEventType === 'text') {
-                        try {
-                            const newText = JSON.parse(rawData);
-                            options?.onChunk?.(newText);
-                        } catch {
-                            options?.onChunk?.(rawData);
+                // Multiple `data:` lines of the same event are joined with '\n'.
+                const payload = dataLines.join('\n');
+                dataLines = [];
+
+                if (eventType === 'text') {
+                    // The backend serializes text chunks as JSON strings. Accept the
+                    // parsed value ONLY when it is a real string; otherwise emit the
+                    // raw payload untouched, so JSON primitives like `1` or `true`
+                    // are never mutated into numbers/booleans.
+                    let chunk = payload;
+                    try {
+                        const parsed = JSON.parse(payload);
+                        if (typeof parsed === 'string') {
+                            chunk = parsed;
                         }
-                    } else if (currentEventType === 'metadata') {
-                        try {
-                            finalMetadata = JSON.parse(rawData);
-                        } catch {
-                            // ignore parse error on partial metadata
-                        }
+                    } catch {
+                        // Raw text payload: emit as-is.
+                    }
+                    options?.onChunk?.(chunk);
+                    receivedText = true;
+                } else if (eventType === 'metadata') {
+                    try {
+                        finalMetadata = JSON.parse(payload);
+                    } catch {
+                        // Malformed metadata: ignore.
                     }
                 }
+                eventType = '';
             };
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+            const processLine = (line: string) => {
+                // Pure blank line: end of event -> dispatch.
+                if (line.length === 0) {
+                    dispatchEvent();
+                    return;
+                }
+                // Comment line (starts with ':'): ignore.
+                if (line.startsWith(':')) {
+                    return;
+                }
+                // Field parsing: "field: value" / "field:value". Exactly one leading
+                // space after the colon is removed; every other whitespace byte in
+                // the value is preserved verbatim (no .trim() anywhere, so Markdown
+                // indentation and bullet formatting inside `data:` survive intact).
+                const colonIndex = line.indexOf(':');
+                const field = colonIndex === -1 ? line : line.slice(0, colonIndex);
+                let value = colonIndex === -1 ? '' : line.slice(colonIndex + 1);
+                if (value.startsWith(' ')) {
+                    value = value.slice(1);
+                }
 
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() ?? '';
+                if (field === 'event') {
+                    eventType = value;
+                } else if (field === 'data') {
+                    dataLines.push(value);
+                }
+                // 'id', 'retry' and unknown fields are ignored.
+            };
 
-                for (const line of lines) {
+            // Extracts every complete line from `buffer` (LF, CR or CRLF
+            // terminated), leaving any incomplete tail in `buffer`.
+            const consumeCompleteLines = (): string[] => {
+                const lines: string[] = [];
+                let start = 0;
+
+                for (;;) {
+                    const lfIndex = buffer.indexOf('\n', start);
+                    const crIndex = buffer.indexOf('\r', start);
+
+                    if (lfIndex === -1 && crIndex === -1) break;
+
+                    let end: number;
+                    let next: number;
+
+                    if (crIndex !== -1 && (lfIndex === -1 || crIndex < lfIndex)) {
+                        if (crIndex === buffer.length - 1) {
+                            // Ambiguous trailing CR: it may be the first half of a
+                            // CRLF pair split across chunks. Wait for more bytes.
+                            break;
+                        }
+                        if (buffer.charCodeAt(crIndex + 1) === 10) {
+                            end = crIndex;
+                            next = crIndex + 2;
+                        } else {
+                            end = crIndex;
+                            next = crIndex + 1;
+                        }
+                    } else {
+                        end = lfIndex;
+                        next = lfIndex + 1;
+                    }
+
+                    lines.push(buffer.slice(start, end));
+                    start = next;
+                }
+
+                if (start > 0) {
+                    buffer = buffer.slice(start);
+                }
+                return lines;
+            };
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+
+                    for (const line of consumeCompleteLines()) {
+                        processLine(line);
+                    }
+                }
+
+                // Flush any pending multi-byte sequence held by the decoder.
+                buffer += decoder.decode();
+                for (const line of consumeCompleteLines()) {
                     processLine(line);
                 }
+            } catch (err) {
+                // If a TCP reset or network error occurs during streaming,
+                // we break the loop and rely on the graceful degradation
+                // block below to return partial metadata.
             }
 
-            if (buffer.trim()) {
-                processLine(buffer);
-            }
+            // EOF: per WHATWG spec, if the stream ends in the middle of an
+            // event (no final empty line), the pending event MUST be discarded.
+            // We do not dispatch the incomplete event.
         }
         
         if (finalMetadata) {
             return finalMetadata;
-        } else {
-            throw new Error('Stream finished without metadata');
         }
+
+        if (receivedText) {
+            // The stream ended before the metadata event arrived (e.g. network
+            // cut). Never discard the text the user already read: return partial
+            // metadata so the UI keeps the message on screen.
+            return { partial: true };
+        }
+
+        throw new Error('Stream finished without metadata');
     } else {
         return await res.json();
     }
