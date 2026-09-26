@@ -70,7 +70,7 @@ const columns = [
                         )}
                     </div>
                     <div className="min-w-0">
-                        <p className="truncate font-semibold text-white max-w-[180px]">{product?.name ?? '—'}</p>
+                        <p className="truncate font-semibold text-white max-w-44">{product?.name ?? '—'}</p>
                         <p className="text-xs text-white/30">{product?.section?.toUpperCase()}</p>
                     </div>
                 </div>

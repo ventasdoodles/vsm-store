@@ -85,7 +85,7 @@ export function OrderSummaryCard({
                                         )}
                                     </div>
                                     <div className="space-y-0.5">
-                                        <p className="text-xs font-bold text-white uppercase truncate max-w-[150px]">{item.name}</p>
+                                        <p className="text-xs font-bold text-white uppercase truncate max-w-36">{item.name}</p>
                                         <p className="text-2xs font-black text-accent-primary uppercase tracking-widest">{item.quantity} Uni. × {formatPrice(item.price)}</p>
                                     </div>
                                 </div>

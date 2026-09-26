@@ -138,7 +138,7 @@ export function CustomerNotes({ customer }: Props) {
                             setIsDirty(true);
                         }}
                         placeholder="Clic aquí para agregar notas de seguimiento libres. Modificaciones se guardan solas..."
-                        className="w-full min-h-[120px] bg-transparent border border-transparent hover:border-white/5 focus:border-white/10 rounded-xl p-3 text-sm text-theme-secondary resize-none transition-colors outline-none focus:bg-white/[0.02]"
+                        className="w-full min-h-28 bg-transparent border border-transparent hover:border-white/5 focus:border-white/10 rounded-xl p-3 text-sm text-theme-secondary resize-none transition-colors outline-none focus:bg-white/[0.02]"
                     />
                 </div>
 
@@ -149,7 +149,7 @@ export function CustomerNotes({ customer }: Props) {
                     <label className="text-xs font-bold text-theme-secondary/80 flex items-center gap-1.5 mb-3 uppercase tracking-wider">
                         <Tag className="h-3.5 w-3.5" /> Etiquetas Globales
                     </label>
-                    <div className="flex flex-wrap gap-2 mb-3 min-h-[28px]">
+                    <div className="flex flex-wrap gap-2 mb-3 min-h-7">
                         {customer.admin_notes?.tags?.map(tag => (
                             <span key={tag} className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-card border border-white/5 text-xs font-medium text-theme-secondary hover:text-white hover:border-white/20 transition-colors shadow-sm">
                                 {tag}

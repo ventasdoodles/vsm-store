@@ -61,7 +61,7 @@ export function CustomerEvidence({ customer }: Props) {
 
             <div className="relative z-10 space-y-4">
                 {/* Upload Zone */}
-                <label className={`relative flex flex-col items-center justify-center w-full min-h-[120px] rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden group
+                <label className={`relative flex flex-col items-center justify-center w-full min-h-28 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer overflow-hidden group
                     ${uploadMutation.isPending ? 'border-cyan-500/50 bg-surface-card' : 'border-white/10 hover:border-cyan-500/30 hover:bg-cyan-500/5 bg-surface-card/50'}
                 `}>
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />

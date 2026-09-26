@@ -27,7 +27,7 @@ export function CustomerPreferences({ customer }: Props) {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-[2rem] min-h-[150px]">
+            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-[2rem] min-h-36">
                 <Loader2 className="w-6 h-6 animate-spin text-purple-500 mb-2" />
                 <p className="text-xs text-theme-secondary">Mapeando preferencias de consumo...</p>
             </div>
@@ -36,7 +36,7 @@ export function CustomerPreferences({ customer }: Props) {
 
     if (!data || (data.topProducts.length === 0 && data.topCategories.length === 0)) {
         return (
-            <div className="rounded-[2rem] border border-white/5 bg-surface-base/50 p-6 flex items-center justify-center min-h-[120px] shadow-inner">
+            <div className="rounded-[2rem] border border-white/5 bg-surface-base/50 p-6 flex items-center justify-center min-h-28 shadow-inner">
                  <div className="text-center">
                     <Target className="w-6 h-6 text-theme-secondary/30 mx-auto mb-2" />
                     <p className="text-sm font-medium text-white mb-0.5">Sin huella de consumo</p>

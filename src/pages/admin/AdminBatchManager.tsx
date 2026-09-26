@@ -68,7 +68,7 @@ const columns = [
                 {row.original.cover_image && (
                     <img src={row.original.cover_image} alt="" className="h-8 w-8 rounded-lg object-cover bg-white/5 border border-white/10" />
                 )}
-                <span className="text-sm font-bold text-white truncate max-w-[200px]">{getValue()}</span>
+                <span className="text-sm font-bold text-white truncate max-w-48">{getValue()}</span>
             </div>
         )
     }),

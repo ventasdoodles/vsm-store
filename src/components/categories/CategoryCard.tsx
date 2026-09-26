@@ -56,7 +56,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
                 </h3>
 
                 {category.description && (
-                    <p className="text-xs uppercase tracking-widest text-theme-tertiary leading-relaxed line-clamp-2 max-w-[240px] opacity-60 font-bold">
+                    <p className="text-xs uppercase tracking-widest text-theme-tertiary leading-relaxed line-clamp-2 max-w-60 opacity-60 font-bold">
                         {category.description}
                     </p>
                 )}

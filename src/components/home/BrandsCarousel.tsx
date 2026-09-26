@@ -80,7 +80,7 @@ export const BrandsCarousel = () => {
         <section className="relative py-24 sm:py-32 overflow-hidden bg-theme-primary">
             {/* Background elements */}
             <div className="absolute top-0 left-1/4 w-[1000px] h-full bg-vape-500/[0.05] -skew-x-12 blur-[150px] pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-[800px] h-full bg-theme-tertiary/[0.03] skew-x-12 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-[800px] h-full bg-theme-tertiary/[0.03] skew-x-12 blur-6xl pointer-events-none" />
 
             {/* Header Premium */}
             <div className="container-vsm relative z-10 text-center mb-16">

@@ -202,7 +202,7 @@ const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSys
             )}>
                 <item.icon
                     className={cn(
-                        'h-[18px] w-[18px] transition-all duration-500',
+                        'h-4 w-4 transition-all duration-500',
                         active ? 'scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]' : 'group-hover:scale-110'
                     )}
                 />

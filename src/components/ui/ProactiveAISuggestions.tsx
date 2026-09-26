@@ -11,7 +11,7 @@ import { useCartStore } from '@/stores/cart.store';
 export const ProactiveAISuggestions = memo(({ 
     title = "Sugerencias Inteligentes",
     limit = 2,
-    className = "mt-8 w-full max-w-[280px]"
+    className = "mt-8 w-full max-w-72"
 }: { 
     title?: string, 
     limit?: number,

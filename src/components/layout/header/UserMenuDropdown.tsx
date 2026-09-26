@@ -55,13 +55,13 @@ export function UserMenuDropdown() {
                     )}
                 </div>
 
-                <span className="hidden sm:inline max-w-[100px] truncate">{firstName}</span>
+                <span className="hidden sm:inline max-w-24 truncate">{firstName}</span>
                 <ChevronDown className={cn('h-3 w-3 transition-transform duration-200 opacity-70', open && 'rotate-180')} />
             </button>
 
 
             {open && (
-                <div className="absolute right-0 top-full z-50 mt-2 min-w-[240px] overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/80 backdrop-blur-2xl animate-scale-in">
+                <div className="absolute right-0 top-full z-50 mt-2 min-w-60 overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/80 backdrop-blur-2xl animate-scale-in">
                     <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex items-center justify-between">
                         <div className="flex-1 min-w-0 pr-2">
                             <p className="text-sm font-bold text-white truncate">{profile?.full_name ?? 'Mi cuenta'}</p>

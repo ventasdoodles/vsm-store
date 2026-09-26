@@ -269,7 +269,7 @@ export function AdminAttributes() {
                                                     { is_variant_capable: e.target.checked },
                                                 ))}
                                             />
-                                            <div className="h-5 w-9 rounded-full bg-white/10 transition-colors peer-checked:bg-violet-500/50 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
+                                            <div className="h-5 w-9 rounded-full bg-white/10 transition-colors peer-checked:bg-violet-500/50 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
                                         </label>
                                     </div>
                                     {/* Applicability Toggles (Sections) */}

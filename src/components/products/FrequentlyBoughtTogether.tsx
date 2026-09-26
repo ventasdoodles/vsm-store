@@ -100,7 +100,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
                         </div>
 
                         {/* Resumen y CTA */}
-                        <div className="flex flex-col items-center lg:items-end min-w-[200px] bg-theme-primary/40 p-6 rounded-2xl vsm-border-subtle">
+                        <div className="flex flex-col items-center lg:items-end min-w-48 bg-theme-primary/40 p-6 rounded-2xl vsm-border-subtle">
                             <div className="text-sm text-theme-secondary mb-1">Precio del paquete:</div>
                             <div className="flex items-baseline gap-2 mb-4">
                                 <span className="text-2xl font-black text-theme-primary">

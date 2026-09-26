@@ -39,7 +39,7 @@ export function TagRow({ tag, isDeleting, onEdit, onDelete }: TagRowProps) {
             </div>
 
             {/* Slug (desktop) */}
-            <div className="hidden sm:flex items-center gap-1.5 shrink-0 min-w-0 max-w-[180px]">
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0 min-w-0 max-w-44">
                 <span className="text-xs font-mono text-theme-secondary/60 truncate">
                     {tag.name}
                 </span>

@@ -76,7 +76,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg, co
 
             {/* Dropdown */}
             {open && rootCategories.length > 0 && (
-                <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl vsm-border-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
+                <div className="absolute left-0 top-full z-50 mt-2 min-w-48 overflow-hidden rounded-xl vsm-border-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
                     {/* Link a la sección */}
                     <Link
                         to="/$section"

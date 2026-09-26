@@ -84,7 +84,7 @@ export function TestimonialsForm({
                     <label className="text-2xs font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
                         Calificación
                     </label>
-                    <div className="flex items-center gap-1.5 pt-2 bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-3 h-[58px] shadow-inner">
+                    <div className="flex items-center gap-1.5 pt-2 bg-theme-primary/[0.03] border border-white/10 rounded-2xl px-5 py-3 h-14 shadow-inner">
                         {[1, 2, 3, 4, 5].map((n) => (
                             <Button
                                 key={n}
@@ -258,7 +258,7 @@ function ToggleSwitch({
             >
                 <span
                     className={cn(
-                        'absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.3)]',
+                        'absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.3)]',
                         checked ? 'translate-x-6 scale-100' : 'translate-x-0 scale-90 opacity-80',
                     )}
                 />

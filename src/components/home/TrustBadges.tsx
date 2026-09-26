@@ -59,8 +59,8 @@ export const TrustBadges = () => {
     return (
         <section className="py-20 bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] border border-white/5 shadow-2xl relative overflow-hidden group">
             {/* Ambient Background Glows */}
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-primary/[0.05] rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-vape-500/[0.05] rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-primary/[0.05] rounded-full blur-6xl pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-vape-500/[0.05] rounded-full blur-6xl pointer-events-none" />
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-12 gap-x-8 container-vsm relative z-10">
                 {BADGES.map((badge, index) => (

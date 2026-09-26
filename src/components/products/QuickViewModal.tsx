@@ -142,8 +142,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/60 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden flex flex-col md:flex-row pointer-events-auto isolation-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-vape-500/10 blur-[120px] rounded-full -z-10" />
-                        <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-herbal-500/10 blur-[120px] rounded-full -z-10" />
+                        <div className="absolute top-[-10%] right-[-10%] w-72 h-72 bg-vape-500/10 blur-6xl rounded-full -z-10" />
+                        <div className="absolute bottom-[-10%] left-[-10%] w-72 h-72 bg-herbal-500/10 blur-6xl rounded-full -z-10" />
 
                         <m.button
                             whileHover={{ scale: 1.1, rotate: 90 }}

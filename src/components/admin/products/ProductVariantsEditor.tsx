@@ -275,7 +275,7 @@ export function ProductVariantsEditor({
                                 className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10"
                             >
                                 <div className="flex flex-wrap items-center justify-between gap-4">
-                                    <div className="flex items-center gap-3 min-w-[150px]">
+                                    <div className="flex items-center gap-3 min-w-36">
                                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/5 text-white/20">
                                             <PackageCheck className="h-5 w-5" />
                                         </div>
@@ -294,7 +294,7 @@ export function ProductVariantsEditor({
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 flex-1 max-w-[300px]">
+                                    <div className="flex items-center gap-2 flex-1 max-w-72">
                                         <div className="flex-1">
                                             <label className="text-2xs font-black uppercase tracking-widest text-white/20 block mb-1">Precio ($)</label>
                                             <input

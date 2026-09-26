@@ -5,7 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 
 const PROMOS = [
     { 
-        content: <><span className="font-bold tracking-widest uppercase text-xs">🚀 ENVÍOS DHL</span> <span className="font-light opacity-90 mx-1.5 text-xs">cotización</span> <span className="font-semibold border-b border-white/30 pb-[1px] text-xs">antes de confirmar</span></>,
+        content: <><span className="font-bold tracking-widest uppercase text-xs">🚀 ENVÍOS DHL</span> <span className="font-light opacity-90 mx-1.5 text-xs">cotización</span> <span className="font-semibold border-b border-white/30 pb-0 text-xs">antes de confirmar</span></>,
         link: '/vape',
         urgency: false
     },

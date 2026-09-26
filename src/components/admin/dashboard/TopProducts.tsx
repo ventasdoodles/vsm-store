@@ -45,7 +45,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                                         }`}>
                                             {i + 1}
                                         </span>
-                                        <span className="text-xs font-semibold text-white truncate max-w-[160px] group-hover:text-accent-primary transition-colors" title={product.name}>
+                                        <span className="text-xs font-semibold text-white truncate max-w-40 group-hover:text-accent-primary transition-colors" title={product.name}>
                                             {product.name}
                                         </span>
                                     </div>

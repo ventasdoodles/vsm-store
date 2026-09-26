@@ -49,7 +49,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                 </div>
             </div>
             
-            <div className="flex items-end gap-2 sm:gap-3 flex-1 min-h-[160px] pb-2">
+            <div className="flex items-end gap-2 sm:gap-3 flex-1 min-h-40 pb-2">
                 {chartData.map((day) => {
                     const height = maxSales > 0 ? Math.max((day.total / maxSales) * 100, 4) : 4;
                     const isToday = day.date === new Date().toISOString().slice(0, 10);
@@ -62,7 +62,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                             <span className="text-2xs text-theme-secondary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                                 {day.total > 0 ? formatPrice(day.total) : ''}
                             </span>
-                            <div className="w-full flex items-end relative h-[120px]">
+                            <div className="w-full flex items-end relative h-28">
                                 <div
                                     className={`w-full rounded-[0.5rem] transition-all duration-500 relative overflow-hidden ${isToday
                                             ? 'bg-gradient-to-t from-accent-primary/80 to-accent-primary shadow-lg shadow-accent-primary/20'

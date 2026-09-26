@@ -40,7 +40,7 @@ export function TestimonialCard({ testimonial, index }: TestimonialCardProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: Math.min(index * 0.08, 0.4) }}
             className={cn(
-                'flex-shrink-0 w-[85vw] sm:w-[340px] md:w-[360px] snap-start',
+                'flex-shrink-0 w-[85vw] sm:w-80 md:w-96 snap-start',
                 'relative p-6 rounded-2xl',
                 'bg-theme-secondary/40 backdrop-blur-md',
                 'border border-white/[0.08]',

@@ -31,7 +31,7 @@ export const SocialProofToast = () => {
                     initial={{ opacity: 0, x: -100, scale: 0.8 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-                    className="fixed bottom-6 left-6 z-[100] max-w-sm w-full sm:w-[320px]"
+                    className="fixed bottom-6 left-6 z-[100] max-w-sm w-full sm:w-80"
                 >
                     <div className="relative group overflow-hidden rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-3xl p-4 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] spotlight-container">
                         {/* Interactive Spotlight Effect */}

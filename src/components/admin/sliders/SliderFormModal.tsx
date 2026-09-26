@@ -290,7 +290,7 @@ function ToggleSwitch({
             >
                 <span
                     className={cn(
-                        'absolute top-[3px] left-[3px] w-6 h-6 bg-white rounded-full transition-transform duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.3)]',
+                        'absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full transition-transform duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.3)]',
                         checked ? 'translate-x-8 scale-100' : 'translate-x-0 scale-90 opacity-80',
                     )}
                 />

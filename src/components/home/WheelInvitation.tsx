@@ -26,7 +26,7 @@ export function WheelInvitation() {
         >
             {/* ── Background: Cinematic Auras ── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] rounded-full bg-vape-500/20 blur-[120px] group-hover:bg-vape-500/30 transition-all duration-1000" />
+                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] rounded-full bg-vape-500/20 blur-6xl group-hover:bg-vape-500/30 transition-all duration-1000" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-theme-tertiary/10 blur-5xl animate-pulse" />
                 
                 {/* ── Cinematic Particles [Wave 125] ── */}

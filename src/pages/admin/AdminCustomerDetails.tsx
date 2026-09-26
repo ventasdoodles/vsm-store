@@ -87,7 +87,7 @@ export function AdminCustomerDetails() {
                 </div>
 
                 {/* Right Column (CRM, Retention, Actions) */}
-                <div className="space-y-6 flex flex-col xl:sticky xl:top-[120px] min-w-0">
+                <div className="space-y-6 flex flex-col xl:sticky xl:top-28 min-w-0">
 
                     {/* Retention & Marketing Machine */}
                     <CustomerMarketing customer={customer} />

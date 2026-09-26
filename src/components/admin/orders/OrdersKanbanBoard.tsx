@@ -86,7 +86,7 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
 
             {/* Sortable area */}
             <SortableContext id={status.value} items={orderIds} strategy={verticalListSortingStrategy}>
-                <div className="flex-1 space-y-2 p-3 overflow-y-auto min-h-[150px] scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <div className="flex-1 space-y-2 p-3 overflow-y-auto min-h-36 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {orders.map(order => (
                         <SortableOrderCard
                             key={order.id}

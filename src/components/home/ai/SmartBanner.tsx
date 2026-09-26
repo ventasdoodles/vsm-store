@@ -39,7 +39,7 @@ export const SmartBanner: React.FC = () => {
                     {/* ── Premium Mesh Gradients ── [Wave 125] */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
                         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-white/20 blur-5xl animate-pulse" />
-                        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-black/30 blur-[120px]" />
+                        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-black/30 blur-6xl" />
                         <div className="absolute top-1/4 left-1/2 w-48 h-48 bg-theme-tertiary/20 rounded-full blur-4xl" />
                     </div>
 

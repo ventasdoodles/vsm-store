@@ -59,7 +59,7 @@ export function SocialProof({
         <section className="relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-primary/5 rounded-full blur-[120px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-primary/5 rounded-full blur-6xl" />
             </div>
 
             <div className="relative space-y-8">

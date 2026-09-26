@@ -86,7 +86,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 </div>
                 <div className="flex gap-4 overflow-hidden px-4 sm:px-0">
                     {Array.from({ length: renderabilityConfig?.rail.loadingSkeletonCount ?? 4 }).map((_, i) => (
-                        <div key={i} className="min-w-[200px] h-72 sm:min-w-[240px] rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/5 overflow-hidden flex flex-col skeleton-shimmer">
+                        <div key={i} className="min-w-48 h-72 sm:min-w-60 rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/5 overflow-hidden flex flex-col skeleton-shimmer">
                             <div className="aspect-square bg-white/5 w-full" />
                             <div className="p-6 flex-1 flex flex-col justify-end gap-3 bg-gradient-to-b from-transparent to-black/30">
                                 <div className="w-12 h-3 bg-white/10 rounded-full" />
@@ -228,14 +228,14 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                         <m.div
                             key={product.id}
                             variants={itemVariants}
-                            className="min-w-[200px] max-w-[200px] sm:min-w-[240px] sm:max-w-[240px] snap-start"
+                            className="min-w-48 max-w-48 sm:min-w-60 sm:max-w-60 snap-start"
                         >
                             <ProductCard product={product} compact priority={index < 2} />
                         </m.div>
                     ))}
 
                     {/* Botón ver más dinámico (Mobile) */}
-                    <div className="sm:hidden min-w-[150px] flex items-center justify-center snap-start pr-4">
+                    <div className="sm:hidden min-w-36 flex items-center justify-center snap-start pr-4">
                         <Link
                             to={renderabilityConfig.rail.emptyStateCtaHref}
                             className={renderabilityConfig.rail.emptyStateMobileActionClassName}

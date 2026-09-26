@@ -216,7 +216,7 @@ export function AdminProductForm() {
                                         type="button"
                                         onClick={() => set(key, !form[key])}
                                         className={cn(
-                                            'rounded-xl border px-4 py-2 text-sm font-medium transition-colors min-w-[140px]',
+                                            'rounded-xl border px-4 py-2 text-sm font-medium transition-colors min-w-36',
                                             form[key] ? active : 'border-theme bg-theme-primary/60 text-theme-secondary'
                                         )}
                                     >

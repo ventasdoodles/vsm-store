@@ -40,7 +40,7 @@ export function CustomerTimeline({ customer }: Props) {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-3xl min-h-[200px]">
+            <div className="flex flex-col items-center justify-center p-8 bg-surface-base/50 border border-white/5 rounded-3xl min-h-48">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-3" />
                 <p className="text-sm text-theme-secondary">Analizando historial de pedidos...</p>
             </div>
@@ -97,10 +97,10 @@ export function CustomerTimeline({ customer }: Props) {
                         <Clock className="w-6 h-6 text-theme-secondary/50" />
                     </div>
                     <p className="text-sm font-medium text-white mb-1">Sin movimientos</p>
-                    <p className="text-xs text-theme-secondary text-center max-w-[250px]">El cliente aún no ha registrado transacciones en la plataforma.</p>
+                    <p className="text-xs text-theme-secondary text-center max-w-64">El cliente aún no ha registrado transacciones en la plataforma.</p>
                 </div>
             ) : (
-                <div className="relative pl-6 sm:pl-8 py-4 z-10 before:absolute before:inset-0 before:left-[17px] sm:before:left-[25px] before:h-full before:w-0.5 before:bg-gradient-to-b before:from-white/20 before:via-white/5 before:to-transparent before:rounded-full">
+                <div className="relative pl-6 sm:pl-8 py-4 z-10 before:absolute before:inset-0 before:left-4 sm:before:left-6 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-white/20 before:via-white/5 before:to-transparent before:rounded-full">
                     <div className="space-y-8">
                         {orders.map((order) => {
                             const config = getStatusConfig(order.status);

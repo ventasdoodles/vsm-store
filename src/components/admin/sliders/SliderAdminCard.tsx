@@ -44,7 +44,7 @@ export function SliderAdminCard({
         )}>
             
             {/* Visual Preview Area (Left side) */}
-            <div className={`relative w-full md:w-2/5 min-h-[220px] bg-gradient-to-r ${currentPreset.bg} flex items-center justify-center p-6 overflow-hidden`}>
+            <div className={`relative w-full md:w-2/5 min-h-56 bg-gradient-to-r ${currentPreset.bg} flex items-center justify-center p-6 overflow-hidden`}>
                 <div className="absolute inset-0 bg-black/20" /> {/* Overlay for better image contrast */}
                 
                 {slider.image ? (
@@ -101,7 +101,7 @@ export function SliderAdminCard({
                             {slider.ctaText || 'Sin CTA'}
                         </div>
                         {slider.ctaLink && (
-                            <span className="text-2xs font-mono text-theme-secondary/50 truncate max-w-[150px]">
+                            <span className="text-2xs font-mono text-theme-secondary/50 truncate max-w-36">
                                 {slider.ctaLink}
                             </span>
                         )}

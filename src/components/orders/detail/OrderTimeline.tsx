@@ -43,7 +43,7 @@ export function OrderTimeline({ statusSteps, currentStepIndex, statusConfigMap, 
                             </div>
                             
                             {i < statusSteps.length - 1 && (
-                                <div className="h-[2px] flex-1 bg-white/5 mx-[-12px] relative overflow-hidden">
+                                <div className="h-0.5 flex-1 bg-white/5 mx-[-12px] relative overflow-hidden">
                                     {i < currentStepIndex && (
                                         <m.div 
                                             initial={{ width: 0 }}

@@ -225,7 +225,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                     )}
                 </div>
 
-                <div className="absolute inset-x-0 bottom-0 h-[2px] w-full scale-x-0 bg-gradient-to-r from-transparent via-accent-primary to-transparent transition-transform duration-1000 group-hover:scale-x-100" />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 w-full scale-x-0 bg-gradient-to-r from-transparent via-accent-primary to-transparent transition-transform duration-1000 group-hover:scale-x-100" />
             </div>
         </m.div>
     );

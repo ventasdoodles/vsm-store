@@ -35,7 +35,7 @@ export function Header() {
                     className={cn(
                         'mx-auto relative overflow-visible transition-all duration-500 container-vsm',
                         scrolled
-                            ? 'h-[64px] flex items-center justify-between gap-3 bg-slate-900/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
+                            ? 'h-16 flex items-center justify-between gap-3 bg-slate-900/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
                             : 'h-auto px-0 flex flex-col gap-4 bg-transparent border-transparent'
                     )}
                 >
@@ -83,7 +83,7 @@ export function Header() {
                             className={cn(
                                 "hidden md:flex transition-all duration-300 group justify-center",
                                 scrolled
-                                    ? "w-[220px] lg:w-[280px] xl:w-[340px] mx-auto"
+                                    ? "w-56 lg:w-72 xl:w-80 mx-auto"
                                     : "flex-1 max-w-4xl mx-auto"
                             )}
                         >
@@ -92,7 +92,7 @@ export function Header() {
                                 fallback={
                                     <div className={cn(
                                         "w-full rounded-full h-10 px-4 flex items-center gap-3 bg-white/5 border border-white/10",
-                                        scrolled ? "max-w-[280px]" : "max-w-4xl"
+                                        scrolled ? "max-w-72" : "max-w-4xl"
                                     )}>
                                         <Search className="w-4 h-4 text-white/30" />
                                         <span className="text-sm text-white/20 italic">Buscador temporalmente limitado</span>

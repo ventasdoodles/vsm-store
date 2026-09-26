@@ -82,7 +82,7 @@ function StatCard({ card }: { card: StatCardData }) {
 
             {/* Bottom Line Indicator */}
             <div
-                className={`absolute bottom-0 left-0 h-[4px] w-full bg-gradient-to-r ${card.gradient} opacity-20 group-hover:opacity-100 transition-opacity duration-700 ease-out shadow-[0_-2px_10px_rgba(255,255,255,0.1)]`}
+                className={`absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r ${card.gradient} opacity-20 group-hover:opacity-100 transition-opacity duration-700 ease-out shadow-[0_-2px_10px_rgba(255,255,255,0.1)]`}
             />
         </div>
     );

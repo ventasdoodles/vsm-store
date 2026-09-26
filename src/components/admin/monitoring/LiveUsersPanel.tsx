@@ -82,7 +82,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                                         <div className="flex items-center gap-3 mt-1">
                                             <span className="flex items-center gap-1 text-2xs text-theme-secondary/60">
                                                 <MapPin className="h-3 w-3" />
-                                                <span className="font-mono truncate max-w-[180px]">{user.path}</span>
+                                                <span className="font-mono truncate max-w-44">{user.path}</span>
                                             </span>
                                         </div>
                                     </div>
@@ -95,7 +95,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                                                 {sessionMinutes < 1 ? '<1' : sessionMinutes} min
                                             </span>
                                         </div>
-                                        <p className="text-2xs font-mono text-theme-secondary/40 mt-0.5 truncate max-w-[100px]">
+                                        <p className="text-2xs font-mono text-theme-secondary/40 mt-0.5 truncate max-w-24">
                                             {user.id.substring(0, 12)}...
                                         </p>
                                     </div>

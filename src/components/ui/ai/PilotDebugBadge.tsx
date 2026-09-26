@@ -152,7 +152,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             <Database className="h-3 w-3" />
                             <span className="text-2xs font-medium">Deployed Build</span>
                         </div>
-                        <span className="max-w-[90px] truncate text-2xs font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70" title={deployedFingerprint ?? ''}>
+                        <span className="max-w-24 truncate text-2xs font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70" title={deployedFingerprint ?? ''}>
                             {deployedFingerprint ?? 'N/A'}
                         </span>
                     </div>

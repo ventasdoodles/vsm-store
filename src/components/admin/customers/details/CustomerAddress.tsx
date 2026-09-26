@@ -17,7 +17,7 @@ interface Props {
 
 export function CustomerAddress({ customer }: Props) {
     if (!customer?.addresses || customer.addresses.length === 0) return (
-        <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col items-center justify-center min-h-[150px]">
+        <div className="rounded-[2rem] border border-white/5 bg-surface-base/80 backdrop-blur-xl p-6 shadow-2xl flex flex-col items-center justify-center min-h-36">
             <Map className="w-8 h-8 text-theme-secondary/30 mb-2" />
             <p className="text-sm font-medium text-white mb-1">Sin direcciones</p>
             <p className="text-xs text-theme-secondary">El usuario no ha registrado un domicilio de entrega.</p>

@@ -14,7 +14,7 @@ export const TypewriterBubble: React.FC<{ text: string; isLatest: boolean; onTic
         <>
             {displayedText}
             {isTyping && (
-                <span className="inline-block w-[3px] h-[1em] ml-0.5 bg-vape-400/70 animate-pulse align-text-bottom" />
+                <span className="inline-block w-0.5 h-[1em] ml-0.5 bg-vape-400/70 animate-pulse align-text-bottom" />
             )}
         </>
     );

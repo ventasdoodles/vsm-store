@@ -209,7 +209,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                             </div>
 
                             {/* COL 3: Visual/Highlight */}
-                            <div className="w-[240px] border-l border-white/5 p-6 bg-black/20 flex flex-col items-center justify-center text-center">
+                            <div className="w-60 border-l border-white/5 p-6 bg-black/20 flex flex-col items-center justify-center text-center">
                                 <div className="relative mb-6 h-32 w-32 group">
                                     <div className="absolute inset-0 rounded-3xl bg-vape-500/20 blur-2xl transition-all group-hover:blur-3xl group-hover:bg-vape-500/40" />
                                     <div className="relative h-full w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">

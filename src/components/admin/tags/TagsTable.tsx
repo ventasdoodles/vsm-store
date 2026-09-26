@@ -37,7 +37,7 @@ export function TagsTable({ tags, deletingName, onEdit, onDelete }: TagsTablePro
             {/* Header row (desktop) */}
             <div className="hidden sm:flex items-center gap-4 px-4 py-2 text-2xs font-black uppercase tracking-wider text-theme-secondary/40">
                 <div className="flex-1">Etiqueta</div>
-                <div className="min-w-0 max-w-[180px]">Slug</div>
+                <div className="min-w-0 max-w-44">Slug</div>
                 <div className="w-16 text-center">Productos</div>
                 <div className="w-20" />
             </div>

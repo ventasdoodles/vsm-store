@@ -67,7 +67,7 @@ export function AdminCesarinOS() {
         <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
             {/* Header Lujoso Glassmorphism */}
             <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-surface-overlay p-10 shadow-2xl">
-                <div className="absolute right-0 top-0 -mr-20 -mt-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-[120px]" />
+                <div className="absolute right-0 top-0 -mr-20 -mt-20 h-72 w-72 rounded-full bg-emerald-500/10 blur-6xl" />
                 <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-5xl" />
 
                 <div className="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
@@ -87,7 +87,7 @@ export function AdminCesarinOS() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-stretch xl:min-w-[320px]">
+                    <div className="flex flex-col items-stretch xl:min-w-80">
                         <div
                             className={cn(
                                 'flex items-center gap-4 rounded-[1.8rem] border px-5 py-4 backdrop-blur-md transition-all duration-500',

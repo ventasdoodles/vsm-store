@@ -236,7 +236,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                             {...register('is_default')}
                             className="sr-only peer"
                         />
-                        <div className="w-14 h-8 bg-white/5 border border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-white after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent-primary peer-checked:border-accent-primary shadow-inner" />
+                        <div className="w-14 h-8 bg-white/5 border border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:border-white after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent-primary peer-checked:border-accent-primary shadow-inner" />
                     </div>
                 </label>
             </div>

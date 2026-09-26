@@ -187,7 +187,7 @@ export const FlashDeals = () => {
                         <m.div
                             key={product.id}
                             variants={itemVariants}
-                            className="flex-shrink-0 w-[300px] md:w-[340px] group/card relative"
+                            className="flex-shrink-0 w-72 md:w-80 group/card relative"
                         >
                             <Link to="/$section/$slug" params={{ section: product.section, slug: product.slug }} className="block h-full cursor-none lg:cursor-default">
                                 <div className="relative h-full bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(239,68,68,0.3)] flex flex-col group/inner spotlight-container">

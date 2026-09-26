@@ -364,7 +364,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                                     value={cancelReason}
                                                     onChange={e => setCancelReason(e.target.value)}
                                                     placeholder="Razón obligatoria..."
-                                                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-theme-primary focus:outline-none focus:border-red-500/50 min-h-[80px]"
+                                                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-theme-primary focus:outline-none focus:border-red-500/50 min-h-20"
                                                     disabled={isCancelling}
                                                 />
                                             </div>

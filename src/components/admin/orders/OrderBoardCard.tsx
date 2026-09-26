@@ -45,7 +45,7 @@ export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoard
                     value={order.status}
                     onChange={(e) => onStatusChange(order.id, e.target.value as AdminOrderStatus)}
                     onClick={(e) => e.stopPropagation()}
-                    className="max-w-[110px] rounded-lg border border-white/10 bg-surface-card px-1.5 py-1 text-2xs font-medium text-theme-secondary hover:border-white/20 focus:outline-none cursor-pointer transition-colors"
+                    className="max-w-28 rounded-lg border border-white/10 bg-surface-card px-1.5 py-1 text-2xs font-medium text-theme-secondary hover:border-white/20 focus:outline-none cursor-pointer transition-colors"
                 >
                     {ADMIN_ORDER_STATUSES_LIST.map(s => (
                         <option

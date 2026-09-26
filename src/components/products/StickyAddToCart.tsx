@@ -128,7 +128,7 @@ export function StickyAddToCart({
                     onClick={handleAddToCart}
                     disabled={!purchaseability.canAddToCart}
                     className={cn(
-                        'flex h-10 min-w-[40px] items-center justify-center rounded-xl border transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed',
+                        'flex h-10 min-w-10 items-center justify-center rounded-xl border transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed',
                         purchaseability.canAddToCart
                             ? cn(
                                 'bg-gradient-to-r text-white shadow-lg',

@@ -199,11 +199,11 @@ export function CartSidebar() {
                     aria-modal="true"
                     aria-labelledby="cart-title"
                     style={{ willChange: 'transform' }}
-                    className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col bg-slate-900/60 backdrop-blur-2xl shadow-[0_0_100px_rgba(0,0,0,0.8)] touch-pan-y border-l border-white/10"
+                    className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-lg flex-col bg-slate-900/60 backdrop-blur-2xl shadow-[0_0_100px_rgba(0,0,0,0.8)] touch-pan-y border-l border-white/10"
                 >
                     {/* Background Glows for Glassmorphism Depth */}
-                    <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-vape-500/10 blur-[120px] rounded-full -z-10 pointer-events-none" />
-                    <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-herbal-500/10 blur-[120px] rounded-full -z-10 pointer-events-none" />
+                    <div className="absolute top-[-10%] right-[-10%] w-72 h-72 bg-vape-500/10 blur-6xl rounded-full -z-10 pointer-events-none" />
+                    <div className="absolute bottom-[-10%] left-[-10%] w-72 h-72 bg-herbal-500/10 blur-6xl rounded-full -z-10 pointer-events-none" />
 
                     {/* Header del sidebar */}
                     <div className="flex items-center justify-between px-6 py-6 bg-gradient-to-b from-white/5 to-transparent border-b border-white/5">
@@ -213,7 +213,7 @@ export function CartSidebar() {
                                 <m.span
                                     initial={{ scale: 0 }} animate={{ scale: 1 }}
                                     key={`badge-${itemCount}`}
-                                    className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-vape-500 text-sm font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.5)]"
+                                    className="flex h-7 min-w-7 items-center justify-center rounded-full bg-vape-500 text-sm font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.5)]"
                                 >
                                     {itemCount}
                                 </m.span>
@@ -285,7 +285,7 @@ export function CartSidebar() {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.3 }}
-                                className="mt-4 text-sm text-gray-400 font-medium leading-relaxed max-w-[280px]"
+                                className="mt-4 text-sm text-gray-400 font-medium leading-relaxed max-w-72"
                             >
                                 Tu selección premium aguarda. Inicia tu viaje visual explorando nuestra curaduría exclusiva.
                             </m.p>

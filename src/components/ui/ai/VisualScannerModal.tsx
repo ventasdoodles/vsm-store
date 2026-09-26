@@ -92,7 +92,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                         <Camera className="w-8 h-8" />
                                     </div>
                                     <p className="text-sm font-bold text-white mb-1">Toma una foto o sube una imagen</p>
-                                    <p className="text-xs text-theme-tertiary text-center max-w-[250px]">
+                                    <p className="text-xs text-theme-tertiary text-center max-w-64">
                                         Escanea tu equipo, resistencia o pod para encontrar repuestos compatibles exactos.
                                     </p>
                                 </div>
@@ -117,7 +117,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                         <AlertTriangle className="w-8 h-8" />
                                     </div>
                                     <p className="text-sm font-bold text-white mb-2">No pudimos identificar el equipo</p>
-                                    <p className="text-xs text-red-400/80 mb-6 max-w-[280px]">{error}</p>
+                                    <p className="text-xs text-red-400/80 mb-6 max-w-72">{error}</p>
                                     <button 
                                         onClick={resetScanner}
                                         className="px-6 py-2 text-xs font-bold text-white rounded-full bg-white/10 hover:bg-white/20"

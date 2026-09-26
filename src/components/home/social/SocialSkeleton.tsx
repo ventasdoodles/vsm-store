@@ -9,7 +9,7 @@ export function SocialSkeleton() {
             {[...Array(3)].map((_, i) => (
                 <div
                     key={i}
-                    className="flex-shrink-0 w-[85vw] sm:w-[340px] md:w-[360px] p-6 rounded-2xl bg-theme-secondary/30 animate-pulse"
+                    className="flex-shrink-0 w-[85vw] sm:w-80 md:w-96 p-6 rounded-2xl bg-theme-secondary/30 animate-pulse"
                 >
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-11 h-11 rounded-full bg-white/10" />

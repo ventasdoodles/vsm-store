@@ -90,7 +90,7 @@ export function Home() {
             case 'smart-banner':
                 return (
                     <SectionErrorBoundary key={id} name="SmartBanner">
-                        <Suspense fallback={<div className="h-[60px] skeleton-shimmer rounded-xl" />}>
+                        <Suspense fallback={<div className="h-14 skeleton-shimmer rounded-xl" />}>
                             <SmartBanner />
                         </Suspense>
                     </SectionErrorBoundary>
@@ -98,7 +98,7 @@ export function Home() {
             case 'categories':
                 return (
                     <SectionErrorBoundary key={id} name="CategoryShowcase">
-                        <Suspense fallback={<div className="h-[200px] skeleton-shimmer rounded-2xl" />}>
+                        <Suspense fallback={<div className="h-48 skeleton-shimmer rounded-2xl" />}>
                             <CategoryShowcase />
                         </Suspense>
                     </SectionErrorBoundary>
@@ -107,7 +107,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="160px">
                         <SectionErrorBoundary name="BrandsCarousel">
-                            <Suspense fallback={<div className="h-[160px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-40 skeleton-shimmer rounded-2xl" />}>
                                 <BrandsCarousel />
                             </Suspense>
                         </SectionErrorBoundary>
@@ -116,7 +116,7 @@ export function Home() {
             case 'wheel':
                 return (
                     <SectionErrorBoundary key={id} name="WheelInvitation">
-                        <Suspense fallback={<div className="h-[300px] skeleton-shimmer rounded-2xl" />}>
+                        <Suspense fallback={<div className="h-72 skeleton-shimmer rounded-2xl" />}>
                             <WheelInvitation />
                         </Suspense>
                     </SectionErrorBoundary>
@@ -125,7 +125,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="300px">
                         <SectionErrorBoundary name="FlashDeals">
-                            <Suspense fallback={<div className="h-[300px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-72 skeleton-shimmer rounded-2xl" />}>
                                 <FlashDeals />
                             </Suspense>
                         </SectionErrorBoundary>
@@ -135,7 +135,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="320px">
                         <SectionErrorBoundary name="ProductRail:bestseller">
-                            <Suspense fallback={<div className="h-[320px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-80 skeleton-shimmer rounded-2xl" />}>
                                 <ProductRail type="bestseller" title="Los Más Vendidos" />
                             </Suspense>
                         </SectionErrorBoundary>
@@ -145,7 +145,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="200px">
                         <SectionErrorBoundary name="PromoSection">
-                            <Suspense fallback={<div className="h-[200px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-48 skeleton-shimmer rounded-2xl" />}>
                                 <PromoSection />
                             </Suspense>
                         </SectionErrorBoundary>
@@ -155,7 +155,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="320px">
                         <SectionErrorBoundary name="ProductRail:new">
-                            <Suspense fallback={<div className="h-[320px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-80 skeleton-shimmer rounded-2xl" />}>
                                 <ProductRail type="new" title="Nuevos Lanzamientos" />
                             </Suspense>
                         </SectionErrorBoundary>
@@ -175,7 +175,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="120px">
                         <SectionErrorBoundary name="TrustBadges">
-                            <Suspense fallback={<div className="h-[120px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-28 skeleton-shimmer rounded-2xl" />}>
                                 <TrustBadges />
                             </Suspense>
                         </SectionErrorBoundary>

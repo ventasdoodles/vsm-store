@@ -89,7 +89,7 @@ const columns = [
         ),
         cell: ({ row }) => (
             <div>
-                <p className="font-bold text-theme-primary text-xs truncate max-w-[140px]">
+                <p className="font-bold text-theme-primary text-xs truncate max-w-36">
                     {row.original.customer_name || 'Sin nombre'}
                 </p>
                 {row.original.customer_phone && (
