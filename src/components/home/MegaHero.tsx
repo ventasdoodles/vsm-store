@@ -192,7 +192,7 @@ export const MegaHero = () => {
                                 {slide.tag}
                             </m.div>
 
-                            <Heading as="h1" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] md:leading-[1.05] tracking-tight drop-shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
+                            <Heading as="h1" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-hero-loose md:leading-hero-relaxed tracking-tight drop-shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
                                 {slide.title}
                                 <br />
                                 <m.span

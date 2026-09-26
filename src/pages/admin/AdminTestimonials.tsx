@@ -221,7 +221,7 @@ export function AdminTestimonials() {
                 </div>
             )}
 
-            <div className="bg-[#181825]/50 rounded-3xl p-6 border border-white/5 space-y-6">
+            <div className="bg-theme-secondary/50 rounded-3xl p-6 border border-white/5 space-y-6">
                 <TestimonialsFilters
                     search={search}
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}

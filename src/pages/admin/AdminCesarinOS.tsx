@@ -76,7 +76,7 @@ export function AdminCesarinOS() {
                             <div className="flex h-20 w-20 items-center justify-center rounded-4xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-[0_20px_50px_rgba(99,102,241,0.35)]">
                                 <Bot className="h-10 w-10" />
                             </div>
-                            <div className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full border-4 border-[#0a0a0f] bg-emerald-500" />
+                            <div className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full border-4 border-theme-primary bg-emerald-500" />
                         </div>
 
                         <div className="space-y-3">

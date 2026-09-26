@@ -98,10 +98,10 @@ export const BrandsCarousel = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <Heading as="h2" className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-theme-primary">
+                        <Heading as="h2" className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-hero-tight text-theme-primary">
                             Trusted by the
                         </Heading>
-                        <Heading as="h2" className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+                        <Heading as="h2" className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-hero-tight text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
                             Industry Leaders
                         </Heading>
                     </div>

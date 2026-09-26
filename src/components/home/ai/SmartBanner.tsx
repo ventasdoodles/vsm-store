@@ -66,7 +66,7 @@ export const SmartBanner: React.FC = () => {
                                 <m.h3 
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className="text-2xl md:text-4xl font-black text-white tracking-tighter uppercase italic leading-[0.9]"
+                                    className="text-2xl md:text-4xl font-black text-white tracking-tighter uppercase italic leading-hero-snug"
                                 >
                                     {banner.title}
                                 </m.h3>

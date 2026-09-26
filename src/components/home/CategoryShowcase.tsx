@@ -130,7 +130,7 @@ function CategoryCard({ category, priority }: { category: FeaturedCategory, prio
                     </m.div>
 
                     <div className="space-y-2">
-                        <Heading as="h3" className="text-2xl sm:text-3xl font-black text-white tracking-tighter uppercase italic line-clamp-2 leading-[0.9] pb-1 pt-1 group-hover:text-vape-400 transition-colors">
+                        <Heading as="h3" className="text-2xl sm:text-3xl font-black text-white tracking-tighter uppercase italic line-clamp-2 leading-hero-snug pb-1 pt-1 group-hover:text-vape-400 transition-colors">
                             {category.name}
                         </Heading>
                         <div className="flex items-center gap-2">

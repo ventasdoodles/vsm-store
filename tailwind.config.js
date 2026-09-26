@@ -136,6 +136,12 @@ export default {
                 'mega': '0.25em',
                 'giga': '0.3em',
             },
+            lineHeight: {
+                'hero-tight': '0.85',
+                'hero-snug': '0.9',
+                'hero-relaxed': '1.05',
+                'hero-loose': '1.1',
+            },
             fontSize: {
                 '3xs': ['0.5rem', { lineHeight: '0.75rem' }],     // 8px / 12px
                 '2xs': ['0.625rem', { lineHeight: '0.875rem' }],   // 10px / 14px

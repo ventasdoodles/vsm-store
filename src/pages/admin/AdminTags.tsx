@@ -214,7 +214,7 @@ export function AdminTags() {
         mostUsedTag={stats.mostUsedTag}
       />
 
-      <div className="bg-[#181825]/50 rounded-3xl p-4 sm:p-6 border border-white/5 space-y-4">
+      <div className="bg-theme-secondary/50 rounded-3xl p-4 sm:p-6 border border-white/5 space-y-4">
         <TagsFilters
           search={search}
           onSearchChange={(val) => {
