@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const MODELS = {
-  'glm-flash': { id: 'z-ai/glm-5.3-flash', name: 'GLM 5.3 Flash', role: 'Implementador' },
+  'glm-flash': { id: 'z-ai/glm-5.3-flashx', name: 'GLM 5.3 FlashX', role: 'Implementador' },
   'luna-pro':  { id: 'openai/gpt-6-luna-pro', name: 'Luna Pro (GPT-6)', role: 'Auditor de Aceptación' },
 };
 
