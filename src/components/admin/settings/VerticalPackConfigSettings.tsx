@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from 'react';
@@ -386,7 +387,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                             {idx + 1}
                                                         </div>
                                                         <div>
-                                                            <input 
+                                                            <Input variant="admin" 
                                                                 type="text" 
                                                                 value={section.label || ''} 
                                                                 onChange={(e) => updateSection(idx, 'label', e.target.value)} 
@@ -395,7 +396,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                             />
                                                             <div className="flex items-center gap-2 mt-1">
                                                                 <span className="text-2xs uppercase tracking-widest text-emerald-400/80 font-mono bg-emerald-400/10 px-2 py-0.5 rounded">SLUG</span>
-                                                                <input 
+                                                                <Input variant="admin" 
                                                                     type="text" 
                                                                     value={section.slug || ''} 
                                                                     onChange={(e) => updateSection(idx, 'slug', e.target.value)} 
@@ -410,11 +411,11 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Etiqueta Corta</label>
-                                                                <input type="text" value={section.shortLabel || ''} onChange={(e) => updateSection(idx, 'shortLabel', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                                <Input variant="admin" type="text" value={section.shortLabel || ''} onChange={(e) => updateSection(idx, 'shortLabel', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                             <div>
                                                                 <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Ruta Base</label>
-                                                                <input type="text" value={section.routePrefix || ''} onChange={(e) => updateSection(idx, 'routePrefix', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 font-mono text-blue-300 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                                <Input variant="admin" type="text" value={section.routePrefix || ''} onChange={(e) => updateSection(idx, 'routePrefix', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 font-mono text-blue-300 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                         </div>
                                                         <div>
@@ -428,7 +429,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                             </div>
                                                             <div>
                                                                 <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Token de Tema</label>
-                                                                <input type="text" value={section.themeToken || ''} onChange={(e) => updateSection(idx, 'themeToken', e.target.value)} placeholder="ej. blue, violet" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                                <Input variant="admin" type="text" value={section.themeToken || ''} onChange={(e) => updateSection(idx, 'themeToken', e.target.value)} placeholder="ej. blue, violet" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                         </div>
                                                     </div>

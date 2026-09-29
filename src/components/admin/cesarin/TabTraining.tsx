@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import { m } from 'framer-motion';
@@ -56,10 +57,11 @@ export function TabTraining() {
                             Pega la URL de una página web, manual online o FAQ para que Cesarin la analice.
                         </p>
                         <div className="flex gap-3">
-                            <input 
+                            <Input 
+                                variant="admin"
                                 type="url" 
                                 placeholder="https://..."
-                                className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-vape-500 outline-none"
+                                className="flex-1"
                             />
                             <Button className="px-6 py-3 bg-vape-500 text-white rounded-xl hover:bg-vape-400 transition-colors font-semibold">
                                 Ingerir
@@ -73,22 +75,22 @@ export function TabTraining() {
                             <Heading as="h3" className="text-lg font-bold text-white">Personalidad Básica</Heading>
                         </div>
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-white/50 uppercase mb-2">Nombre del Asistente</label>
-                                <input 
+                            <Input 
+                                    variant="admin"
+                                    labelClassName="block text-xs font-bold text-white/50 uppercase mb-2"
+                                    label="Nombre del Asistente"
                                     type="text" 
                                     defaultValue="Cesarin"
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none"
+                                    className="w-full"
                                 />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-white/50 uppercase mb-2">Comportamiento (1 línea)</label>
-                                <input 
+                            <Input 
+                                    variant="admin"
+                                    labelClassName="block text-xs font-bold text-white/50 uppercase mb-2"
+                                    label="Comportamiento (1 línea)"
                                     type="text" 
                                     defaultValue="Eres un vendedor experto, amable y muy servicial."
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none"
+                                    className="w-full"
                                 />
-                            </div>
                             <Button className="w-full px-6 py-3 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors font-semibold">
                                 Guardar Personalidad
                             </Button>

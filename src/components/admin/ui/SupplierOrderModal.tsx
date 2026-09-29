@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import { useCallback, useState, useEffect } from 'react';
@@ -114,7 +115,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                         {/* Phone Input */}
                         <div className="space-y-2">
                             <label className="text-2xs font-black text-white/40 uppercase tracking-widest ml-1">Teléfono del Proveedor</label>
-                            <input 
+                            <Input variant="admin" 
                                 type="text"
                                 placeholder="Ej: 5212281234567"
                                 value={phone}

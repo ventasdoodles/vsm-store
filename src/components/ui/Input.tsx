@@ -8,8 +8,9 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
     inputSize?: 'sm' | 'md' | 'lg';
-    variant?: 'default' | 'surface' | 'ghost';
+    variant?: 'default' | 'surface' | 'ghost' | 'admin';
     containerClassName?: string;
+    labelClassName?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -17,6 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {
             className,
             containerClassName,
+            labelClassName,
             label,
             error,
             helperText,
@@ -71,6 +73,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             default: 'bg-white/5 border-surface text-white placeholder:text-white/30 backdrop-blur-sm focus:border-vape-500/50 focus:ring-vape-500/20',
             surface: 'bg-surface-card border-surface text-white placeholder:text-white/30 focus:border-vape-500/50 focus:ring-vape-500/20',
             ghost: 'bg-transparent border-transparent hover:bg-white/5 text-white placeholder:text-white/30 focus:bg-white/5 focus:border-surface focus:ring-white/10',
+            admin: 'bg-white/5 border-white/10 text-white placeholder-white/25 backdrop-blur-sm focus:border-violet-500/40 focus:ring-violet-500/20',
         };
 
         return (
@@ -78,7 +81,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 {label && (
                     <label
                         htmlFor={inputId}
-                        className="mb-1.5 block text-xs font-medium text-theme-secondary cursor-pointer"
+                        className={cn("mb-1.5 block text-xs font-medium text-theme-secondary cursor-pointer", labelClassName)}
                     >
                         {label}
                     </label>

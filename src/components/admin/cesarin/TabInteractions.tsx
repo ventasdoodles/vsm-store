@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import { m } from 'framer-motion';
@@ -60,10 +61,11 @@ export function TabInteractions({ interactions = [], onAddNote }: TabInteraction
                                 </div>
                                 
                                 <div className="flex items-center gap-3 w-1/2">
-                                    <input 
+                                    <Input 
+                                        variant="admin"
                                         type="text" 
                                         placeholder="Ej: Recuerda ofrecer color azul..."
-                                        className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-indigo-500 outline-none"
+                                        className="flex-1"
                                         value={activeInteractionId === interaction.id ? note : ''}
                                         onChange={(e) => {
                                             setActiveInteractionId(interaction.id);

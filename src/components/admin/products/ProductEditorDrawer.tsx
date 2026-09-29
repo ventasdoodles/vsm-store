@@ -1,7 +1,8 @@
-import { Heading } from "@/components/ui/Heading";
+﻿import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 /**
- * // ─── COMPONENTE: ProductEditorDrawer ───
+ * // â”€â”€â”€ COMPONENTE: ProductEditorDrawer â”€â”€â”€
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Panel lateral glassmorphism para crear/editar productos.
  *    Secciones: Imagenes, Info Basica, Catalogo (seccion + categoria + tags),
@@ -74,15 +75,15 @@ const getProductEditorSchema = (SECTION_LABELS: string[]) => z.object({
     name: z.string().min(1, 'El nombre del paquete o producto es obligatorio.'),
     price: z.coerce.number().min(0.01, 'El precio debe ser mayor a $0.'),
     stock: z.coerce.number().min(0, 'El stock no puede ser un valor negativo.'),
-    category_id: z.string().min(1, 'Debes seleccionar una categoría.'),
-    section: z.string().min(1, `Debes seleccionar una sección (${SECTION_LABELS.join(' o ')}).`),
+    category_id: z.string().min(1, 'Debes seleccionar una categorÃ­a.'),
+    section: z.string().min(1, `Debes seleccionar una secciÃ³n (${SECTION_LABELS.join(' o ')}).`),
 });
 
 /** Glassmorphism input style constant */
 const INPUT_CLS = 'w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-white/25 backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20';
 
 import { ProductEnrichmentReview } from './ProductEnrichmentReview';
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function ProductEditorDrawer({
     product,
@@ -110,7 +111,7 @@ export function ProductEditorDrawer({
 
     const { data: fullProduct } = useAdminProductDetail(isOpen && product?.id ? product.id : null);
 
-    // Sugerencias de Specs basadas en categoría
+    // Sugerencias de Specs basadas en categorÃ­a
     const currentCategory = useMemo(() => {
         return categories.find(c => c.id === formData.category_id);
     }, [categories, formData.category_id]);
@@ -190,8 +191,8 @@ export function ProductEditorDrawer({
 
         if (isTechnicalTag(t)) {
             notify.warning(
-                'Propiedad Técnica Detectada', 
-                `"${t}" parece ser una especificación. Es mejor añadirla en la pestaña 'Configuración > Specs' para mantener el catálogo limpio.`
+                'Propiedad TÃ©cnica Detectada', 
+                `"${t}" parece ser una especificaciÃ³n. Es mejor aÃ±adirla en la pestaÃ±a 'ConfiguraciÃ³n > Specs' para mantener el catÃ¡logo limpio.`
             );
         }
 
@@ -211,7 +212,7 @@ export function ProductEditorDrawer({
         const result = ProductEditorSchema.safeParse(formData);
         if (!formData.section) {
             const label = SECTION_CATALOG?.sections.map((section) => section.shortLabel).join(' o ');
-            notify.warning('Revisar datos requeridos', `Debes seleccionar una sección (${label}).`);
+            notify.warning('Revisar datos requeridos', `Debes seleccionar una secciÃ³n (${label}).`);
             return;
         }
         if (!result.success) {
@@ -272,7 +273,7 @@ export function ProductEditorDrawer({
                 updated.ai_sales_note = enrichmentResult.ai_sales_note;
             }
             if (approvedFields.has('specs') && enrichmentResult.specs) {
-                // Additive merge only — never overwrite human-entered specs
+                // Additive merge only â€” never overwrite human-entered specs
                 const merged = { ...(prev.specs || {}) };
                 for (const [k, v] of Object.entries(enrichmentResult.specs)) {
                     if (!merged[k]) merged[k] = v;
@@ -301,11 +302,11 @@ export function ProductEditorDrawer({
             width="max-w-3xl w-full"
         >
             <div className="flex flex-col h-full bg-theme-primary/50">
-                {/* ─── TAB NAVIGATION ─── */}
+                {/* â”€â”€â”€ TAB NAVIGATION â”€â”€â”€ */}
                 <ProductEditorTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
                 <div className="space-y-8 pb-32 overflow-y-auto px-1">
-                    {/* ─── TAB: COMERCIAL ─── */}
+                    {/* â”€â”€â”€ TAB: COMERCIAL â”€â”€â”€ */}
                     {activeTab === 'comercial' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             {/* 1. Imagenes */}
@@ -332,24 +333,19 @@ export function ProductEditorDrawer({
                                 </Heading>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <div className="md:col-span-2">
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Nombre del Producto *</label>
-                                        <input type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Ej: Vaporesso XROS 3" className={INPUT_CLS} />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Nombre del Producto *" type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Ej: Vaporesso XROS 3"  />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">SKU (Interno)</label>
-                                        <input type="text" name="sku" value={formData.sku || ''} onChange={handleChange} className={INPUT_CLS} />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="SKU (Interno)" type="text" name="sku" value={formData.sku || ''} onChange={handleChange}  />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Stock Disponible *</label>
-                                        <input type="number" name="stock" value={formData.stock || 0} onChange={handleChange} className={INPUT_CLS} />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Stock Disponible *" type="number" name="stock" value={formData.stock || 0} onChange={handleChange}  />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Precio de Venta ($) *</label>
-                                        <input type="number" name="price" value={formData.price || 0} onChange={handleChange} className={`${INPUT_CLS} text-lg font-black text-emerald-400`} />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio de Venta ($) *" type="number" name="price" value={formData.price || 0} onChange={handleChange} className="text-lg font-black text-emerald-400" />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Precio Comparación</label>
-                                        <input type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange} className={INPUT_CLS} />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio ComparaciÃ³n" type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange}  />
                                     </div>
                                 </div>
                             </section>
@@ -357,7 +353,7 @@ export function ProductEditorDrawer({
                             <section className="space-y-3">
                                 <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <LayoutDashboard className="h-4 w-4 text-amber-400" />
-                                    Descripción Corta
+                                    DescripciÃ³n Corta
                                 </Heading>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <textarea name="short_description" value={formData.short_description || ''} onChange={handleChange} rows={2} className={INPUT_CLS} placeholder="Resumen breve visible en tarjetas..." />
@@ -366,18 +362,18 @@ export function ProductEditorDrawer({
                         </div>
                     )}
 
-                    {/* ─── TAB: CLASIFICACION ─── */}
+                    {/* â”€â”€â”€ TAB: CLASIFICACION â”€â”€â”€ */}
                     {activeTab === 'clasificacion' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             <section className="space-y-3">
                                 <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <FolderTree className="h-4 w-4 text-cyan-400" />
-                                    Ontología del Catálogo
+                                    OntologÃ­a del CatÃ¡logo
                                 </Heading>
                                 <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     {/* Seccion */}
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">SecciÃ³n Exclusiva</label>
                                         <select name="section" value={formData.section || DEFAULT_SECTION} onChange={handleChange} className={INPUT_CLS}>
                                             {SECTION_CATALOG?.sections.map((section) => (
                                                 <option key={section.slug} value={section.slug}>
@@ -388,7 +384,7 @@ export function ProductEditorDrawer({
                                     </div>
                                     {/* Estado */}
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Estado de Publicación</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Estado de PublicaciÃ³n</label>
                                         <select name="status" value={formData.status || 'draft'} onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as ProductStatus }))} className={INPUT_CLS}>
                                             <option value="active">Activo (Visible en tienda)</option>
                                             <option value="draft">Borrador (Interno)</option>
@@ -406,7 +402,7 @@ export function ProductEditorDrawer({
                                     <div>
                                         <label className="mt-3 flex cursor-pointer items-center gap-3">
                                             <div className="relative">
-                                                <input
+                                                <Input variant="admin"
                                                     type="checkbox"
                                                     className="sr-only peer"
                                                     checked={formData.is_active}
@@ -424,7 +420,7 @@ export function ProductEditorDrawer({
                         </div>
                     )}
 
-                    {/* ─── TAB: CONFIGURACION ─── */}
+                    {/* â”€â”€â”€ TAB: CONFIGURACION â”€â”€â”€ */}
                     {activeTab === 'configuracion' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                              {/* Fixed Specs JSON Editor */}
@@ -465,7 +461,7 @@ export function ProductEditorDrawer({
                         </div>
                     )}
 
-                    {/* ─── TAB: INTELIGENCIA ─── */}
+                    {/* â”€â”€â”€ TAB: INTELIGENCIA â”€â”€â”€ */}
                     {activeTab === 'inteligencia' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             {/* AI Marketing Copy */}
@@ -487,8 +483,8 @@ export function ProductEditorDrawer({
                                 </div>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Descripción Completa</label>
-                                        <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={6} className={INPUT_CLS} placeholder="Larga extensión con detalles para SEO..." />
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">DescripciÃ³n Completa</label>
+                                        <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={6} className={INPUT_CLS} placeholder="Larga extensiÃ³n con detalles para SEO..." />
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Nota de Venta sugerida por IA</label>
@@ -541,9 +537,9 @@ export function ProductEditorDrawer({
 
                                     {/* Semantic Tags */}
                                     <div>
-                                        <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Etiquetas Semánticas</label>
+                                        <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Etiquetas SemÃ¡nticas</label>
                                         <div className="relative flex gap-2">
-                                            <input
+                                            <Input variant="admin"
                                                 type="text"
                                                 value={tagInput}
                                                 onChange={(e) => { setTagInput(e.target.value); setShowTagDropdown(true); }}
@@ -551,7 +547,7 @@ export function ProductEditorDrawer({
                                                 onBlur={() => setTimeout(() => setShowTagDropdown(false), 150)}
                                                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                                                 className={cn(INPUT_CLS, 'flex-1')}
-                                                placeholder="Sabor, Perfil, Ocasión..."
+                                                placeholder="Sabor, Perfil, OcasiÃ³n..."
                                             />
                                             <Button type="button" onClick={() => addTag()} className="px-3 bg-white/5 rounded-xl border border-white/10"><Plus className="h-4 w-4 text-white/40" /></Button>
                                             {showTagDropdown && tagSuggestions.length > 0 && (
@@ -574,7 +570,7 @@ export function ProductEditorDrawer({
                                 </div>
                             </section>
 
-                        {/* ─── ENRICHMENT REVIEW PANEL ─── */}
+                        {/* â”€â”€â”€ ENRICHMENT REVIEW PANEL â”€â”€â”€ */}
                         {enrichmentResult && (
                             <ProductEnrichmentReview
                                 enrichmentResult={enrichmentResult}
@@ -607,3 +603,4 @@ export function ProductEditorDrawer({
         </SideDrawer>
     );
 }
+

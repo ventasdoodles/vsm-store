@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import React, { useState, useMemo } from 'react';
@@ -89,7 +90,7 @@ const columns = [
             const meta = table.options.meta as TableMetaType;
             return (
                 <div className="relative w-28 group">
-                    <input 
+                    <Input variant="admin" 
                         type="number"
                         value={getValue() ?? 0}
                         onChange={(e) => meta.handleUpdateLocal(row.original.id, 'price', e.target.value)}
@@ -120,7 +121,7 @@ const columns = [
             const stock = getValue() ?? 0;
             return (
                 <div className="relative w-24 group">
-                    <input 
+                    <Input variant="admin" 
                         type="number"
                         value={stock}
                         onChange={(e) => meta.handleUpdateLocal(row.original.id, 'stock', e.target.value)}
@@ -253,7 +254,7 @@ export function AdminBatchManager() {
                 <div className="flex items-center gap-4">
                     <div className="relative group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-vape-400 transition-colors" />
-                        <input 
+                        <Input variant="admin" 
                             placeholder="Filtrar por nombre o SKU..."
                             className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-6 text-sm text-white placeholder:text-white/10 focus:outline-none focus:ring-1 focus:ring-vape-500/30 transition-all w-64"
                             value={search}

@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
@@ -180,7 +181,7 @@ export function AdminCommandPalette() {
                     {/* Search Input Section */}
                     <div className="relative flex items-center p-6 border-b border-white/5">
                         <Search className="h-6 w-6 text-white/20 mr-4" />
-                        <input 
+                        <Input variant="admin" 
                             autoFocus
                             placeholder={isRecording ? "Escuchando..." : "Busca o di un comando..."}
                             className={cn(

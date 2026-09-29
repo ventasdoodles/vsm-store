@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import { ShieldCheck, Sparkles, CheckCircle2, X } from 'lucide-react';
@@ -65,13 +66,13 @@ export function ProductSpecsBuilder({
                 <div className="grid grid-cols-2 gap-3 mb-2">
                     {Object.entries(specs).map(([key, val], idx) => (
                         <div key={idx} className="flex gap-2">
-                            <input 
+                            <Input variant="admin" 
                                 type="text" 
                                 value={key} 
                                 readOnly 
                                 className={cn(INPUT_CLS, "flex-1 opacity-50 cursor-not-allowed")} 
                             />
-                            <input 
+                            <Input variant="admin" 
                                 type="text" 
                                 value={val} 
                                 onChange={(e) => onUpdateSpec(key, e.target.value)}
@@ -87,7 +88,7 @@ export function ProductSpecsBuilder({
                     ))}
                 </div>
                 <div className="flex gap-2 border-t border-white/5 pt-4">
-                    <input 
+                    <Input variant="admin" 
                         id="new-spec-key" 
                         type="text" 
                         placeholder="Nueva Propiedad (ej: Watts)" 
