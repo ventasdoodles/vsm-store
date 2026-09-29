@@ -160,7 +160,7 @@ export function AdminProductForm() {
                         <div><Input variant="admin" label="Precio *" type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} /></div>
                         <div><Input variant="admin" label="Precio anterior" type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} /></div>
                         <div><Input variant="admin" label="Stock *" type="number" required min={0} value={form.stock || ''} onChange={(e) => set('stock', parseInt(e.target.value) || 0)} /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value as ProductStatus)} ><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value as ProductStatus)} className={inputCls}><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
                     </div>
                 </section>
 

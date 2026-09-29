@@ -75,8 +75,8 @@ const getProductEditorSchema = (SECTION_LABELS: string[]) => z.object({
     name: z.string().min(1, 'El nombre del paquete o producto es obligatorio.'),
     price: z.coerce.number().min(0.01, 'El precio debe ser mayor a $0.'),
     stock: z.coerce.number().min(0, 'El stock no puede ser un valor negativo.'),
-    category_id: z.string().min(1, 'Debes seleccionar una categorÃ­a.'),
-    section: z.string().min(1, `Debes seleccionar una secciÃ³n (${SECTION_LABELS.join(' o ')}).`),
+    category_id: z.string().min(1, 'Debes seleccionar una categoría.'),
+    section: z.string().min(1, `Debes seleccionar una sección (${SECTION_LABELS.join(' o ')}).`),
 });
 
 /** Glassmorphism input style constant */
@@ -111,7 +111,7 @@ export function ProductEditorDrawer({
 
     const { data: fullProduct } = useAdminProductDetail(isOpen && product?.id ? product.id : null);
 
-    // Sugerencias de Specs basadas en categorÃ­a
+    // Sugerencias de Specs basadas en categoría
     const currentCategory = useMemo(() => {
         return categories.find(c => c.id === formData.category_id);
     }, [categories, formData.category_id]);
@@ -191,8 +191,8 @@ export function ProductEditorDrawer({
 
         if (isTechnicalTag(t)) {
             notify.warning(
-                'Propiedad TÃ©cnica Detectada', 
-                `"${t}" parece ser una especificaciÃ³n. Es mejor aÃ±adirla en la pestaÃ±a 'ConfiguraciÃ³n > Specs' para mantener el catÃ¡logo limpio.`
+                'Propiedad Técnica Detectada', 
+                `"${t}" parece ser una especificaciÃ³n. Es mejor añadirla en la pestaña 'ConfiguraciÃ³n > Specs' para mantener el catÃ¡logo limpio.`
             );
         }
 
@@ -212,7 +212,7 @@ export function ProductEditorDrawer({
         const result = ProductEditorSchema.safeParse(formData);
         if (!formData.section) {
             const label = SECTION_CATALOG?.sections.map((section) => section.shortLabel).join(' o ');
-            notify.warning('Revisar datos requeridos', `Debes seleccionar una secciÃ³n (${label}).`);
+            notify.warning('Revisar datos requeridos', `Debes seleccionar una sección (${label}).`);
             return;
         }
         if (!result.success) {
@@ -345,7 +345,7 @@ export function ProductEditorDrawer({
                                         <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio de Venta ($) *" type="number" name="price" value={formData.price || 0} onChange={handleChange} className=" text-lg font-black text-emerald-400" />
                                     </div>
                                     <div>
-                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio ComparaciÃ³n" type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange}  />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio Comparación" type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange}  />
                                     </div>
                                 </div>
                             </section>
@@ -353,7 +353,7 @@ export function ProductEditorDrawer({
                             <section className="space-y-3">
                                 <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <LayoutDashboard className="h-4 w-4 text-amber-400" />
-                                    DescripciÃ³n Corta
+                                    Descripción Corta
                                 </Heading>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     <textarea name="short_description" value={formData.short_description || ''} onChange={handleChange} rows={2} className={INPUT_CLS} placeholder="Resumen breve visible en tarjetas..." />
@@ -368,12 +368,12 @@ export function ProductEditorDrawer({
                             <section className="space-y-3">
                                 <Heading as="h3" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <FolderTree className="h-4 w-4 text-cyan-400" />
-                                    OntologÃ­a del CatÃ¡logo
+                                    Ontología del Catálogo
                                 </Heading>
                                 <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                                     {/* Seccion */}
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">SecciÃ³n Exclusiva</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
                                         <select name="section" value={formData.section || DEFAULT_SECTION} onChange={handleChange} className={INPUT_CLS}>
                                             {SECTION_CATALOG?.sections.map((section) => (
                                                 <option key={section.slug} value={section.slug}>
@@ -384,7 +384,7 @@ export function ProductEditorDrawer({
                                     </div>
                                     {/* Estado */}
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Estado de PublicaciÃ³n</label>
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Estado de Publicación</label>
                                         <select name="status" value={formData.status || 'draft'} onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as ProductStatus }))} className={INPUT_CLS}>
                                             <option value="active">Activo (Visible en tienda)</option>
                                             <option value="draft">Borrador (Interno)</option>
@@ -483,8 +483,8 @@ export function ProductEditorDrawer({
                                 </div>
                                 <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
                                     <div>
-                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">DescripciÃ³n Completa</label>
-                                        <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={6} className={INPUT_CLS} placeholder="Larga extensiÃ³n con detalles para SEO..." />
+                                        <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Descripción Completa</label>
+                                        <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={6} className={INPUT_CLS} placeholder="Larga extensión con detalles para SEO..." />
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-2xs font-bold uppercase tracking-wider text-white/40">Nota de Venta sugerida por IA</label>
@@ -537,7 +537,7 @@ export function ProductEditorDrawer({
 
                                     {/* Semantic Tags */}
                                     <div>
-                                        <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Etiquetas SemÃ¡nticas</label>
+                                        <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Etiquetas Semánticas</label>
                                         <div className="relative flex gap-2">
                                             <input
                                                 type="text"
@@ -547,7 +547,7 @@ export function ProductEditorDrawer({
                                                 onBlur={() => setTimeout(() => setShowTagDropdown(false), 150)}
                                                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                                                 className={cn(INPUT_CLS, 'flex-1')}
-                                                placeholder="Sabor, Perfil, OcasiÃ³n..."
+                                                placeholder="Sabor, Perfil, Ocasión..."
                                             />
                                             <Button type="button" onClick={() => addTag()} className="px-3 bg-white/5 rounded-xl border border-white/10"><Plus className="h-4 w-4 text-white/40" /></Button>
                                             {showTagDropdown && tagSuggestions.length > 0 && (
