@@ -1,4 +1,4 @@
-﻿import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/Input";
 import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import React, { useState, useMemo } from 'react';
@@ -190,7 +190,7 @@ export function AdminBatchManager() {
         mutationFn: (updates: { id: string; updates: Partial<ProductFormData> }[]) => bulkUpdateProducts(updates),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-            success('Ã‰xito', 'Cambios aplicados masivamente');
+            success('Éxito', 'Cambios aplicados masivamente');
             setIsDirty(false);
         },
         onError: () => {
@@ -247,7 +247,7 @@ export function AdminBatchManager() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-5xl bg-white/[0.03] border border-white/5 backdrop-blur-xl">
                 <div>
                     <Heading as="h1" className="text-2xl font-black text-white tracking-tight">Batch Manager</Heading>
-                    <p className="text-xs text-white/40 font-medium uppercase tracking-wider">EdiciÃ³n de alta densidad</p>
+                    <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Edición de alta densidad</p>
                 </div>
 
                 <div className="flex items-center gap-4">

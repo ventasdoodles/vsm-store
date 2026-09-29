@@ -1,4 +1,4 @@
-﻿import { Heading } from "@/components/ui/Heading";
+import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 /**
@@ -192,7 +192,7 @@ export function ProductEditorDrawer({
         if (isTechnicalTag(t)) {
             notify.warning(
                 'Propiedad Técnica Detectada', 
-                `"${t}" parece ser una especificaciÃ³n. Es mejor añadirla en la pestaña 'ConfiguraciÃ³n > Specs' para mantener el catÃ¡logo limpio.`
+                `"${t}" parece ser una especificación. Es mejor añadirla en la pestaña 'Configuración > Specs' para mantener el catálogo limpio.`
             );
         }
 

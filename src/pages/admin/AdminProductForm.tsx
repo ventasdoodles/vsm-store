@@ -188,7 +188,7 @@ export function AdminProductForm() {
                             </div>
                         </div>
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Categoría *</label>
-                            <select required value={form.category_id} onChange={(e) => set('category_id', e.target.value)} >
+                            <select required value={form.category_id} onChange={(e) => set('category_id', e.target.value)} className={inputCls}>
                                 <option value="">Selecciona categoría</option>
                                 {filteredCats.map((c: Category) => (<option key={c.id} value={c.id}>{c.parent_id ? '  └ ' : ''}{c.name}</option>))}
                             </select>
