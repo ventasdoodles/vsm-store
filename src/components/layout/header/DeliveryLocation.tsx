@@ -6,6 +6,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MapPin, LocateFixed, Loader2, X, Check } from 'lucide-react';
 import { safeLocalStorage } from '@/lib/safe-storage';
+import { Button } from '@/components/ui/Button';
 
 // ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm_delivery_cp';
@@ -120,9 +121,9 @@ export function DeliveryLocation() {
                 <div className="absolute top-full left-0 mt-2 w-64 rounded-xl bg-slate-900/95 border border-white/15 shadow-2xl shadow-black/60 backdrop-blur-xl z-50 p-4 animate-fadeIn">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-semibold text-white">Código postal</span>
-                        <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white transition-colors">
+                        <Button variant="unstyled" onClick={() => setOpen(false)} className="text-white/40 hover:text-white transition-colors">
                             <X className="h-4 w-4" />
-                        </button>
+                        </Button>
                     </div>
 
                     <div className="flex gap-2">

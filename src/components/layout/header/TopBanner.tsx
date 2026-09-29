@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronRight, X, Flame } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { m, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/Button';
 
 const PROMOS = [
     { 
@@ -71,12 +72,12 @@ export function TopBanner() {
                     </AnimatePresence>
                 </div>
 
-                <button 
+                <Button variant="unstyled"
                     onClick={() => setIsVisible(false)}
                     className="absolute right-3 sm:right-6 z-10 p-1 rounded-full hover:bg-white/20 transition-colors bg-black/10"
                 >
                     <X className="w-3.5 h-3.5" />
-                </button>
+                </Button>
             </div>
         </m.div>
     );

@@ -6,6 +6,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { Link } from '@tanstack/react-router';
+import { Button } from '@/components/ui/Button';
 
 interface VisualScannerModalProps {
     isOpen: boolean;
@@ -118,12 +119,12 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                     </div>
                                     <p className="text-sm font-bold text-white mb-2">No pudimos identificar el equipo</p>
                                     <p className="text-xs text-red-400/80 mb-6 max-w-72">{error}</p>
-                                    <button 
+                                    <Button variant="unstyled"
                                         onClick={resetScanner}
                                         className="px-6 py-2 text-xs font-bold text-white rounded-full bg-white/10 hover:bg-white/20"
                                     >
                                         Intentar de nuevo
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
 
@@ -163,7 +164,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                                         </Link>
                                                         <div className="mt-auto pt-2 flex items-center justify-between">
                                                             <span className="text-sm font-black text-white">{formatPrice(product.price || 0)}</span>
-                                                            <button 
+                                                            <Button variant="unstyled"
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
                                                                     addItem(product as import('@/types/product').Product);
@@ -172,7 +173,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                                                 className="w-6 h-6 rounded-full bg-vape-500 text-white flex items-center justify-center hover:bg-vape-400 transition-colors"
                                                             >
                                                                 <Plus className="w-3 h-3" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -185,12 +186,12 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                     )}
 
                                     <div className="flex justify-center pt-2">
-                                        <button 
+                                        <Button variant="unstyled"
                                             onClick={resetScanner}
                                             className="text-xs font-bold text-theme-tertiary hover:text-white"
                                         >
                                             Escanear otra imagen
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             )}

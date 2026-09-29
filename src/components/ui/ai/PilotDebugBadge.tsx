@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Database, Layout, Search, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { isPilotActive, PILOT_ACTIVATION_EVENT, resolveStorefrontAIExposure } from '@/lib/pilot-activation';
 import { readServiceWorkerDiagnostics, runtimeBuildInfo } from '@/lib/runtime-build';
 
@@ -60,7 +61,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
     return (
         <div className="fixed bottom-24 left-6 z-60 flex flex-col items-start gap-2 pointer-events-none">
             {/* Main Toggle Badge */}
-            <button 
+            <Button variant="unstyled"
                 onClick={() => setIsExpanded(!isExpanded)}
                 className={cn(
                     "pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-2xl transition-all backdrop-blur-md",
@@ -77,7 +78,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     PILOT: {isAuthorized ? 'ACTIVE' : 'REQUESTED'}
                 </span>
                 <Activity className="h-3 w-3" />
-            </button>
+            </Button>
 
             {/* Debug Details Panel */}
             <div className={cn(

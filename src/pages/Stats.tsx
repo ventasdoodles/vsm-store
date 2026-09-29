@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { BarChart3, Loader2, ShoppingBag, TrendingUp, Flame, Leaf, Sparkles, Target, Zap, CreditCard, Package } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCustomerStats, useTopProducts, useSpendingHistory } from '@/hooks/useStats';
 import { SEO } from '@/components/seo/SEO';
@@ -45,7 +46,7 @@ export function Stats() {
                     Tu dimensión analítica está virgen. Inicia tu primera transacción para comenzar a trazar tu trayectoria de consumo.
                 </p>
                 <div className="pt-10">
-                    <button className="vsm-button-primary px-10" onClick={() => window.location.href = '/'}>Poblar Estadísticas</button>
+                    <Button variant="primary" className="px-10" onClick={() => window.location.href = '/'}>Poblar Estadísticas</Button>
                 </div>
             </div>
         );

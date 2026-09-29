@@ -14,6 +14,7 @@ import {
     Share2,
     ArrowRight
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { useNotification } from '@/hooks/useNotification';
 import { cn } from '@/lib/utils';
 import { REWARD_POINTS_REFERRER, REWARD_POINTS_REFERRED } from '@/lib/domain/loyalty';
@@ -167,9 +168,9 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                 {/* Footer interactivo */}
                 <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex items-center justify-between">
                     <span className="text-2xs font-bold text-theme-tertiary uppercase">¿Cómo funciona?</span>
-                    <button className="flex items-center gap-1.5 text-xs font-bold text-accent-primary hover:gap-2 transition-all duration-300">
+                    <Button variant="unstyled" className="flex items-center gap-1.5 text-xs font-bold text-accent-primary hover:gap-2 transition-all duration-300">
                         Ver términos <ArrowRight className="h-3 w-3" />
-                    </button>
+                    </Button>
                 </div>
             </div>
         </section>
