@@ -1,5 +1,6 @@
 ﻿import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 /**
  * // â”€â”€â”€ COMPONENTE: ProductEditorDrawer â”€â”€â”€
  * // Arquitectura: Dumb Component (Visual)
@@ -602,4 +603,5 @@ export function ProductEditorDrawer({
         </SideDrawer>
     );
 }
+
 
