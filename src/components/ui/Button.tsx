@@ -10,7 +10,10 @@ export type ButtonVariant =
     | 'ghost'
     | 'danger'
     | 'vape'
+    | 'vape-solid'
     | 'herbal'
+    | 'link'
+    | 'icon-glass'
     | 'unstyled';
 
 export type ButtonSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
@@ -41,7 +44,10 @@ const variants: Record<ButtonVariant, string> = {
     ghost: 'bg-transparent text-theme-secondary hover:text-white hover:bg-white/5',
     danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40',
     vape: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:to-blue-600 shadow-blue-500/20 shadow-lg border border-blue-400/20 btn-shine',
+    'vape-solid': 'bg-vape-500 text-white hover:bg-vape-400 transition-colors',
     herbal: 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:to-emerald-600 shadow-emerald-500/20 shadow-lg border border-emerald-400/20 btn-shine',
+    link: 'bg-transparent text-white/40 hover:text-white/60 underline p-0 h-auto',
+    'icon-glass': 'bg-black/10 hover:bg-white/20 text-white/40 hover:text-white transition-colors rounded-full',
     unstyled: '',
 };
 

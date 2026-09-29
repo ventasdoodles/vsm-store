@@ -354,7 +354,7 @@ export function PrizeWheel() {
                             className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-center space-y-2"
                         >
                             <p className="text-red-400 text-sm font-bold">{error}</p>
-                            <Button variant="unstyled" onClick={reset} className="text-2xs text-white/40 hover:text-white/60 underline">Cerrar</Button>
+                            <Button variant="link" onClick={reset} className="text-2xs">Cerrar</Button>
                         </m.div>
                     ) : result ? (
                         <m.div
@@ -378,7 +378,7 @@ export function PrizeWheel() {
                                 <div className="text-lg font-black mt-0.5" style={{ color: result.color }}>{formatPrizeValue(result)}</div>
                             </div>
                             <div className="text-2xs text-white/25 font-medium">Tu premio ha sido aplicado a tu perfil.</div>
-                            <Button variant="unstyled" onClick={reset} className="text-2xs text-white/30 hover:text-white/60 underline">Volver</Button>
+                            <Button variant="link" onClick={reset} className="text-2xs">Volver</Button>
                         </m.div>
                     ) : (
                         <m.button

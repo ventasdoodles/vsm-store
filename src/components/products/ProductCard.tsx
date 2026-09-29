@@ -13,6 +13,7 @@ import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle, PackageX
 import { m } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
+import { Card } from '@/components/ui/Card';
 import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
@@ -219,8 +220,10 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                     onMouseMove={spotlightEnabled ? handleSpotlightMove : undefined}
                     onMouseLeave={spotlightEnabled ? handleSpotlightLeave : undefined}
                 >
-                    <div
-                        className="card-premium hover-lift h-full isolation-auto"
+                    <Card
+                        premium
+                        interactive
+                        className="h-full isolation-auto"
                     >
                         {/* Spotlight Effect Layer */}
                         {spotlightEnabled && (
@@ -438,7 +441,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </m.button>
                             </div>
                         </div>
-                    </div>
+                    </Card>
                 </Link>
             </m.div>
 

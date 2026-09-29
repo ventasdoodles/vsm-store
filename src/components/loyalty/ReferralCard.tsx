@@ -168,7 +168,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                 {/* Footer interactivo */}
                 <div className="px-6 py-4 bg-white/5 border-t border-white/5 flex items-center justify-between">
                     <span className="text-2xs font-bold text-theme-tertiary uppercase">¿Cómo funciona?</span>
-                    <Button variant="unstyled" className="flex items-center gap-1.5 text-xs font-bold text-accent-primary hover:gap-2 transition-all duration-300">
+                    <Button variant="link" className="flex items-center gap-1.5 text-xs font-bold text-accent-primary hover:gap-2 transition-all duration-300">
                         Ver términos <ArrowRight className="h-3 w-3" />
                     </Button>
                 </div>

@@ -119,9 +119,9 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                     </div>
                                     <p className="text-sm font-bold text-white mb-2">No pudimos identificar el equipo</p>
                                     <p className="text-xs text-red-400/80 mb-6 max-w-72">{error}</p>
-                                    <Button variant="unstyled"
+                                    <Button variant="secondary" size="sm"
                                         onClick={resetScanner}
-                                        className="px-6 py-2 text-xs font-bold text-white rounded-full bg-white/10 hover:bg-white/20"
+                                        className="rounded-full"
                                     >
                                         Intentar de nuevo
                                     </Button>
@@ -164,13 +164,13 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                                         </Link>
                                                         <div className="mt-auto pt-2 flex items-center justify-between">
                                                             <span className="text-sm font-black text-white">{formatPrice(product.price || 0)}</span>
-                                                            <Button variant="unstyled"
+                                                            <Button variant="vape-solid" size="icon-sm"
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
                                                                     addItem(product as import('@/types/product').Product);
                                                                     onClose();
                                                                 }}
-                                                                className="w-6 h-6 rounded-full bg-vape-500 text-white flex items-center justify-center hover:bg-vape-400 transition-colors"
+                                                                className="rounded-full"
                                                             >
                                                                 <Plus className="w-3 h-3" />
                                                             </Button>
@@ -186,7 +186,7 @@ export function VisualScannerModal({ isOpen, onClose }: VisualScannerModalProps)
                                     )}
 
                                     <div className="flex justify-center pt-2">
-                                        <Button variant="unstyled"
+                                        <Button variant="link"
                                             onClick={resetScanner}
                                             className="text-xs font-bold text-theme-tertiary hover:text-white"
                                         >

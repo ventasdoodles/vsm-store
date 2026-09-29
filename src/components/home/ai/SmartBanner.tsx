@@ -78,10 +78,10 @@ export const SmartBanner: React.FC = () => {
 
                         <Link
                             to={banner.link}
-                            className="group relative flex items-center gap-3 px-10 py-4 bg-[rgb(var(--border-primary))] rounded-full font-black text-sm uppercase tracking-widest hover:scale-105 transition-all duration-300 shadow-[0_20px_40px_rgba(255,255,255,0.15)] text-[rgb(var(--bg-primary))]"
+                            className="group relative flex items-center gap-3 px-10 py-4 bg-theme-border-primary rounded-full font-black text-sm uppercase tracking-widest hover:scale-105 transition-all duration-300 shadow-[0_20px_40px_rgba(255,255,255,0.15)] text-theme-bg-primary"
                         >
                             <span className="relative z-10">{banner.cta}</span>
-                            <div className="relative z-10 p-1 bg-[rgb(var(--bg-primary))] rounded-full group-hover:bg-theme-secondary transition-colors">
+                            <div className="relative z-10 p-1 bg-theme-bg-primary rounded-full group-hover:bg-theme-secondary transition-colors">
                                 <ArrowRight className="w-3.5 h-3.5 text-theme-primary" />
                             </div>
                         </Link>

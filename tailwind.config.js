@@ -43,6 +43,10 @@ export default {
                 '150': '150',
             },
             colors: {
+                theme: {
+                    'bg-primary': 'rgb(var(--bg-primary) / <alpha-value>)',
+                    'border-primary': 'rgb(var(--border-primary) / <alpha-value>)',
+                },
                 // Colores primarios VSM (base slate)
                 // Colores primarios VSM (base slate) - REMOVED (Use theme properties below)
 

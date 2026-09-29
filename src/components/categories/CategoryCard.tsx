@@ -7,6 +7,7 @@ import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
+import { Card } from '@/components/ui/Card';
 
 interface CategoryCardProps {
     category: Category;
@@ -21,11 +22,12 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
     if (!productSurfaceConfig) return null;
 
     return (
-        <Link
+        <Card premium interactive spotlight className={cn('group cursor-pointer p-0', productSurfaceConfig.categoryHoverShadowClassName, className)}>
+            <Link
             to="/$section/$slug"
             params={{ section, slug: category.slug }}
             className={cn(
-                'group items-center justify-center gap-5 p-10 text-center card-premium hover-lift spotlight-container cursor-pointer',
+                'flex flex-col items-center justify-center gap-5 p-10 text-center w-full h-full relative',
                 productSurfaceConfig.categoryHoverShadowClassName,
                 className
             )}
@@ -66,5 +68,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
                 productSurfaceConfig.categoryDotClassName
             )} />
         </Link>
+        </Card>
     );
 }
+
