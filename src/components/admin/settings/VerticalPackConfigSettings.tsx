@@ -410,12 +410,10 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                     <div className="space-y-5">
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Etiqueta Corta</label>
-                                                                <Input variant="admin" type="text" value={section.shortLabel || ''} onChange={(e) => updateSection(idx, 'shortLabel', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                                <Input labelClassName="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1" label="Etiqueta Corta" variant="admin" type="text" value={section.shortLabel || ''} onChange={(e) => updateSection(idx, 'shortLabel', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                             <div>
-                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Ruta Base</label>
-                                                                <Input variant="admin" type="text" value={section.routePrefix || ''} onChange={(e) => updateSection(idx, 'routePrefix', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 font-mono text-blue-300 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                                <Input labelClassName="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1" label="Ruta Base" variant="admin" type="text" value={section.routePrefix || ''} onChange={(e) => updateSection(idx, 'routePrefix', e.target.value)} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 font-mono text-blue-300 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                         </div>
                                                         <div>
@@ -428,8 +426,7 @@ export function VerticalPackConfigSettings({ formData, handleChange }: Props) {
                                                                 <textarea value={section.seoDescription || ''} onChange={(e) => updateSection(idx, 'seoDescription', e.target.value)} rows={2} className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white/70 text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all resize-none" />
                                                             </div>
                                                             <div>
-                                                                <label className="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1">Token de Tema</label>
-                                                                <Input variant="admin" type="text" value={section.themeToken || ''} onChange={(e) => updateSection(idx, 'themeToken', e.target.value)} placeholder="ej. blue, violet" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
+                                                                <Input labelClassName="text-2xs font-bold text-white/40 uppercase tracking-widest block mb-1.5 ml-1" label="Token de Tema" variant="admin" type="text" value={section.themeToken || ''} onChange={(e) => updateSection(idx, 'themeToken', e.target.value)} placeholder="ej. blue, violet" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-white text-sm focus:border-violet-500/50 outline-none focus:bg-violet-500/5 transition-all" />
                                                             </div>
                                                         </div>
                                                     </div>

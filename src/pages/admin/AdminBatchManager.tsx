@@ -94,8 +94,7 @@ const columns = [
                         type="number"
                         value={getValue() ?? 0}
                         onChange={(e) => meta.handleUpdateLocal(row.original.id, 'price', e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-theme-primary focus:border-vape-500/50 outline-none transition-all"
-                    />
+                        />
                     <div className="absolute top-1/2 -translate-y-1/2 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                         <Edit3 className="h-3 w-3 text-white/20" />
                     </div>
@@ -252,15 +251,7 @@ export function AdminBatchManager() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-vape-400 transition-colors" />
-                        <Input variant="admin" 
-                            placeholder="Filtrar por nombre o SKU..."
-                            className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-6 text-sm text-white placeholder:text-white/10 focus:outline-none focus:ring-1 focus:ring-vape-500/30 transition-all w-64"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
+                    <Input variant="admin" placeholder="Filtrar por nombre o SKU..." value={search} onChange={(e) => setSearch(e.target.value)} containerClassName="w-64" leftIcon={<Search className="h-4 w-4 text-white/20 group-focus-within:text-vape-400 transition-colors" />} />
 
                     <AnimatePresence>
                         {isDirty && (

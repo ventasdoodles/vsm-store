@@ -1,6 +1,5 @@
 ﻿import { Heading } from "@/components/ui/Heading";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 /**
  * // â”€â”€â”€ COMPONENTE: ProductEditorDrawer â”€â”€â”€
  * // Arquitectura: Dumb Component (Visual)
@@ -342,7 +341,7 @@ export function ProductEditorDrawer({
                                         <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Stock Disponible *" type="number" name="stock" value={formData.stock || 0} onChange={handleChange}  />
                                     </div>
                                     <div>
-                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio de Venta ($) *" type="number" name="price" value={formData.price || 0} onChange={handleChange} className="text-lg font-black text-emerald-400" />
+                                        <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio de Venta ($) *" type="number" name="price" value={formData.price || 0} onChange={handleChange} className=" text-lg font-black text-emerald-400" />
                                     </div>
                                     <div>
                                         <Input variant="admin" labelClassName="text-2xs font-bold uppercase tracking-wider text-white/40" label="Precio ComparaciÃ³n" type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange}  />
@@ -402,7 +401,7 @@ export function ProductEditorDrawer({
                                     <div>
                                         <label className="mt-3 flex cursor-pointer items-center gap-3">
                                             <div className="relative">
-                                                <Input variant="admin"
+                                                <input
                                                     type="checkbox"
                                                     className="sr-only peer"
                                                     checked={formData.is_active}
@@ -539,7 +538,7 @@ export function ProductEditorDrawer({
                                     <div>
                                         <label className="mb-2 block text-2xs font-bold uppercase tracking-wider text-white/40">Etiquetas SemÃ¡nticas</label>
                                         <div className="relative flex gap-2">
-                                            <Input variant="admin"
+                                            <input
                                                 type="text"
                                                 value={tagInput}
                                                 onChange={(e) => { setTagInput(e.target.value); setShowTagDropdown(true); }}

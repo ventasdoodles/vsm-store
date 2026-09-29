@@ -141,14 +141,14 @@ export function AdminProductForm() {
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
                     <Heading as="h2" className="flex items-center gap-2 text-sm font-semibold text-theme-secondary"><Package className="h-4 w-4 text-vape-400" />Información básica</Heading>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="sm:col-span-2"><Input variant="admin" label="Nombre *" labelClassName="mb-1 block text-xs font-medium text-theme-secondary"  type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} placeholder="Nombre del producto"  /></div>
+                        <div className="sm:col-span-2"><Input variant="admin" label="Nombre *" type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Nombre del producto"  /></div>
                         <div>
-                            <Input variant="admin" label="Slug" labelClassName="text-xs font-medium text-theme-secondary"  type="text" value={form.slug} onChange={(e) => set('slug', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="auto-generado" />
+                            <Input variant="admin" label="Slug" type="text" value={form.slug} onChange={(e) => set('slug', e.target.value)} className="font-mono" placeholder="auto-generado" />
                         </div>
                         <div>
-                            <Input variant="admin" label="SKU" labelClassName="text-xs font-medium text-theme-secondary"  type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="VSM-XXX-001" />
+                            <Input variant="admin" label="SKU" type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} className="font-mono" placeholder="VSM-XXX-001" />
                         </div>
-                        <div className="sm:col-span-2"><Input variant="admin" label="Descripción corta" labelClassName="mb-1 block text-xs font-medium text-theme-secondary"  type="text" value={form.short_description} onChange={(e) => set('short_description', e.target.value)} className={inputCls} placeholder="Resumen breve"  /></div>
+                        <div className="sm:col-span-2"><Input variant="admin" label="Descripción corta" type="text" value={form.short_description} onChange={(e) => set('short_description', e.target.value)} placeholder="Resumen breve"  /></div>
                         <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-theme-secondary">Descripción completa</label><textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} className={cn(inputCls, 'resize-none')} placeholder="Descripción detallada..." /></div>
                     </div>
                 </section>
@@ -157,10 +157,10 @@ export function AdminProductForm() {
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
                     <Heading as="h2" className="text-sm font-semibold text-theme-secondary">💰 Precio e Inventario</Heading>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                        <div><Input variant="admin" label="Precio *" labelClassName="mb-1 block text-xs font-medium text-theme-secondary"  type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} className={inputCls}  /></div>
-                        <div><Input variant="admin" label="Precio anterior" labelClassName="mb-1 block text-xs font-medium text-theme-secondary"  type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} className={inputCls}  /></div>
-                        <div><Input variant="admin" label="Stock *" labelClassName="mb-1 block text-xs font-medium text-theme-secondary"  type="number" required min={0} value={form.stock || ''} onChange={(e) => set('stock', parseInt(e.target.value) || 0)} className={inputCls}  /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value as ProductStatus)} className={inputCls}><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
+                        <div><Input variant="admin" label="Precio *" type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} /></div>
+                        <div><Input variant="admin" label="Precio anterior" type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} /></div>
+                        <div><Input variant="admin" label="Stock *" type="number" required min={0} value={form.stock || ''} onChange={(e) => set('stock', parseInt(e.target.value) || 0)} /></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value as ProductStatus)} ><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
                     </div>
                 </section>
 
@@ -188,7 +188,7 @@ export function AdminProductForm() {
                             </div>
                         </div>
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Categoría *</label>
-                            <select required value={form.category_id} onChange={(e) => set('category_id', e.target.value)} className={inputCls}>
+                            <select required value={form.category_id} onChange={(e) => set('category_id', e.target.value)} >
                                 <option value="">Selecciona categoría</option>
                                 {filteredCats.map((c: Category) => (<option key={c.id} value={c.id}>{c.parent_id ? '  └ ' : ''}{c.name}</option>))}
                             </select>

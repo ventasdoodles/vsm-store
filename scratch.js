@@ -1,0 +1,4 @@
+const fs = require('fs');
+let content = fs.readFileSync('src/components/categories/CategoryCard.tsx', 'utf8');
+content = content.replace(/<Link\s+to="/\/\"\s+params=\{\{ section, slug: category\.slug \}\}\s+className=\{cn\(\s+'group items-center justify-center gap-5 p-10 text-center card-premium hover-lift spotlight-container cursor-pointer',\s+productSurfaceConfig\.categoryHoverShadowClassName,\s+className\s+\)\}\s+>/, '<Card premium interactive spotlight className={cn(\'group cursor-pointer p-0\', productSurfaceConfig.categoryHoverShadowClassName, className)}>\n            <Link\n                to=\"//\"\n                params={{ section, slug: category.slug }}\n                className=\"flex flex-col items-center justify-center gap-5 p-10 text-center w-full h-full relative\"\n            >');
+fs.writeFileSync('src/components/categories/CategoryCard.tsx', content);

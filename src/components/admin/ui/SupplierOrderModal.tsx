@@ -114,8 +114,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
 
                         {/* Phone Input */}
                         <div className="space-y-2">
-                            <label className="text-2xs font-black text-white/40 uppercase tracking-widest ml-1">Teléfono del Proveedor</label>
-                            <Input variant="admin" 
+                            <Input labelClassName="text-2xs font-black text-white/40 uppercase tracking-widest ml-1" label="Teléfono del Proveedor" variant="admin" 
                                 type="text"
                                 placeholder="Ej: 5212281234567"
                                 value={phone}
