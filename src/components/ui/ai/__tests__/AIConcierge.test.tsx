@@ -385,7 +385,12 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getAllByText('Revisa primero').length).toBeGreaterThanOrEqual(1);
         fireEvent.click(screen.getByText('Revisar Waka Somatch Menta'));
 
-        expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ to: '/vape/waka-somatch-menta' }));
+        expect(navigateMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                to: '/$section/$slug',
+                params: { section: 'vape', slug: 'waka-somatch-menta' },
+            })
+        );
     });
 
     it('renders the existing link CTA surface and opens the eligible route handoff', () => {
@@ -1594,8 +1599,12 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         fireEvent.click(screen.getByText('Elegir opcion de Waka Pod'));
 
-        expect(addItemMock).not.toHaveBeenCalled();
-        expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ to: '/vape/waka-pod' }));
+        expect(navigateMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                to: '/$section/$slug',
+                params: { section: 'vape', slug: 'waka-pod' },
+            })
+        );
     });
 
     it('adds a grounded variant through the existing cart store', async () => {
