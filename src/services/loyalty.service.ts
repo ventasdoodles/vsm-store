@@ -272,6 +272,25 @@ export async function getReferralStats(customerId: string): Promise<ReferralStat
     return stats;
 }
 
+export interface AppliedReferral {
+    referrer_id: string;
+    status: string;
+}
+
+/**
+ * Obtiene el referido aplicado a un cliente, si existe.
+ */
+export async function getAppliedReferral(customerId: string): Promise<AppliedReferral | null> {
+    const { data, error } = await supabase
+        .from('referrals')
+        .select('referrer_id, status')
+        .eq('referred_id', customerId)
+        .maybeSingle();
+
+    if (error) throw error;
+    return data;
+}
+
 // ─── AI DRIVE LOYALTY (Consolidated from loyaltyIA.service) ────────
 
 export interface SmartLoyaltyProposition {

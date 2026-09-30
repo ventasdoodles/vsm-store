@@ -6,7 +6,6 @@
  */
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
 import * as loyaltyService from '@/services';
 import { getCustomerStats } from '@/services';
 import { getStoreSettings } from '@/services';
@@ -73,16 +72,7 @@ export function useReferralStats(customerId: string | undefined) {
 export function useAppliedReferral(customerId: string | undefined) {
     return useQuery({
         queryKey: ['loyalty', 'referrals', 'applied', customerId],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from('referrals')
-                .select('referrer_id, status')
-                .eq('referred_id', customerId!)
-                .maybeSingle();
-
-            if (error) throw error;
-            return data;
-        },
+        queryFn: () => loyaltyService.getAppliedReferral(customerId!),
         enabled: !!customerId,
         staleTime: LOYALTY_STALE_TIME,
     });

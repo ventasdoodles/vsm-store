@@ -24,6 +24,7 @@ export * from './stats.service';
 export * from './storage.service';
 export * from './testimonials.service';
 export * from './tracking.service';
+export * from './visual-scanner.service';
 
 export * from './wishlist.service';
 export * from './payments/mercadopago.service';

@@ -169,3 +169,43 @@ export async function markWhatsAppSent(orderId: string) {
     if (error) throw error;
 }
 
+/**
+ * Se suscribe a inserciones de pedidos en tiempo real en la base de datos
+ * y entrega el evento enriquecido a través del callback.
+ * Retorna una función de limpieza para desuscribirse.
+ */
+export function subscribeToRealtimeOrders(
+    onNewOrder: (order: RealtimeOrderEvent) => void,
+    onError?: (err: unknown) => void
+): () => void {
+    const channel = supabase
+        .channel('public:orders_pulse')
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'orders' },
+            async (payload) => {
+                const newOrder = payload.new as { id?: string } | undefined;
+                if (!newOrder?.id) return;
+
+                try {
+                    const eventData = await getOrderNotificationDetails(newOrder.id);
+                    if (eventData) {
+                        onNewOrder(eventData);
+                    }
+                } catch (error) {
+                    if (onError) onError(error);
+                    else console.error('[subscribeToRealtimeOrders] Error enriching order event:', error);
+                }
+            }
+        )
+        .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR') {
+                if (onError) onError(new Error('CHANNEL_ERROR'));
+                else console.error('[subscribeToRealtimeOrders] Realtime connection error');
+            }
+        });
+
+    return () => {
+        supabase.removeChannel(channel);
+    };
+}

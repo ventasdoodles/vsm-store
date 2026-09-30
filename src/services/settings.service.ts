@@ -142,3 +142,18 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
     if (error) throw error;
     return data as StoreSettings;
 }
+
+/**
+ * Heartbeat check: verifies database availability by pinging a lightweight public table.
+ */
+export async function checkBackendHealth(): Promise<boolean> {
+    const { error } = await supabase
+        .from('categories')
+        .select('id', { count: 'exact', head: true })
+        .limit(1);
+
+    if (error) {
+        throw error;
+    }
+    return true;
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { supabase } from '@/lib/supabase';
+import { checkBackendHealth } from '@/services/settings.service';
 
 /**
  * Hook useEmergencyMode
@@ -13,13 +13,7 @@ export function useEmergencyMode() {
 
     const checkHealth = useCallback(async () => {
         try {
-            // Heartbeat: check connection to a small, public table
-            const { error } = await supabase.from('categories').select('id', { count: 'exact', head: true }).limit(1);
-            
-            if (error) {
-                console.error('[HealthCheck] Supabase error:', error);
-                throw error;
-            }
+            await checkBackendHealth();
 
             // Recovery: If it was in emergency, reset it
             if (isEmergency) {

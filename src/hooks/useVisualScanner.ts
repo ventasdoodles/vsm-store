@@ -1,23 +1,11 @@
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import type { Product } from '@/types/product';
+import {
+    invokeVisualCompatibilityScanner,
+    type VisualScannerResult,
+    type VisualScannerAnalysis,
+} from '@/services/visual-scanner.service';
 
-export interface VisualScannerAnalysis {
-    identified: boolean;
-    brand: string | null;
-    model: string | null;
-    confidence: 'high' | 'medium' | 'low';
-    recommended_search_tags: string[];
-    reasoning: string;
-    is_vape_related: boolean;
-}
-
-export interface VisualScannerResult {
-    success: boolean;
-    message?: string;
-    analysis?: VisualScannerAnalysis;
-    suggestedProducts?: Partial<Product>[];
-}
+export type { VisualScannerResult, VisualScannerAnalysis };
 
 export function useVisualScanner() {
     const [isScanning, setIsScanning] = useState(false);
@@ -38,16 +26,7 @@ export function useVisualScanner() {
                 reader.onerror = error => reject(error);
             });
 
-            const { data, error: invokeError } = await supabase.functions.invoke<VisualScannerResult>('visual-compatibility', {
-                body: { 
-                    imageBase64: base64,
-                    mimeType: file.type 
-                }
-            });
-
-            if (invokeError) {
-                throw new Error(invokeError.message || 'Error al conectar con el motor de visión.');
-            }
+            const data = await invokeVisualCompatibilityScanner(base64, file.type);
 
             if (data) {
                 setResult(data);

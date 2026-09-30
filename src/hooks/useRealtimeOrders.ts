@@ -6,8 +6,7 @@
  */
 
 import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { getOrderNotificationDetails } from '@/services';
+import { subscribeToRealtimeOrders } from '@/services/orders.service';
 import type { RealtimeOrderEvent } from '@/types/order';
 
 /**
@@ -16,35 +15,9 @@ import type { RealtimeOrderEvent } from '@/types/order';
  */
 export function useRealtimeOrders(onNewOrder: (order: RealtimeOrderEvent) => void) {
     useEffect(() => {
-        const channel = supabase
-            .channel('public:orders_pulse')
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'orders' },
-                async (payload) => {
-                    const newOrder = payload.new;
-                    if (!newOrder?.id) return;
-                    
-                    try {
-                        // Delega el enriquecimiento de datos al SERVICE layer (§1.1)
-                        const eventData = await getOrderNotificationDetails(newOrder.id);
-                        
-                        if (eventData) {
-                            onNewOrder(eventData);
-                        }
-                    } catch (error) {
-                        console.error('[useRealtimeOrders] Error enriching order event:', error);
-                    }
-                }
-            )
-            .subscribe((status) => {
-                if (status === 'CHANNEL_ERROR') {
-                    console.error('[useRealtimeOrders] Realtime connection error');
-                }
-            });
-
+        const unsubscribe = subscribeToRealtimeOrders(onNewOrder);
         return () => {
-            supabase.removeChannel(channel);
+            unsubscribe();
         };
     }, [onNewOrder]);
 }
