@@ -1,8 +1,8 @@
 /**
- * // â”€â”€â”€ SERVICE: Orders â”€â”€â”€
+ * // --- SERVICE: Orders ---
  * // Arquitectura: Data Access Layer (Service)
- * // Proposito principal: Gestión de pedidos, creación y recuperación de historial.
- * // Regla / Notas: Selectores explícitos en todas las consultas (Â§1.2). Desacoplamiento de infraestructura (Â§1.1).
+ * // Proposito principal: Gestion de pedidos, creacion y recuperacion de historial.
+ * // Regla / Notas: Selectores explicitos en todas las consultas (§1.2). Desacoplamiento de infraestructura (§1.1).
  */
 
 import { supabase } from '@/lib/supabase';
@@ -22,7 +22,7 @@ const ORDER_SELECT = 'id, order_number, customer_id, items, subtotal, shipping_c
  * Crea un nuevo pedido con lógica de lealtad integrada.
  * @param data Datos del pedido
  * @returns El registro del pedido creado
- * @policy Data Integrity Â§1.2
+ * @policy Data Integrity §1.2
  */
 export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
     // === CONTRACT ENFORCEMENT ===
@@ -121,7 +121,7 @@ export async function getOrderById(id: string): Promise<OrderRecord | null> {
 
 /**
  * Obtiene detalles enriquecidos para notificaciones Social Proof.
- * Â§1.1 Architecture: Mueve la lógica de infraestructura fuera de los hooks.
+ * §1.1 Architecture: Mueve la logica de infraestructura fuera de los hooks.
  */
 export async function getOrderNotificationDetails(orderId: string): Promise<RealtimeOrderEvent | null> {
     const { data, error } = await supabase

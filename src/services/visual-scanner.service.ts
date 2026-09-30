@@ -1,7 +1,7 @@
 /**
  * visual-scanner.service - VSM Store
  * 
- * Servicio para el análisis visual de productos y compatibilidad mediante Edge Functions.
+ * Servicio para el analisis visual de productos y compatibilidad mediante Edge Functions.
  * @module services/visual-scanner.service
  */
 
