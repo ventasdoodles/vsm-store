@@ -40,11 +40,11 @@ export async function invokeVisualCompatibilityScanner(
     });
 
     if (invokeError) {
-        throw new Error(invokeError.message || 'Error al conectar con el motor de visión.');
+        throw new Error(invokeError.message || 'Error al conectar con el motor de visi\u00f3n.');
     }
 
     if (!data) {
-        throw new Error('Respuesta vacía del motor de visión.');
+        throw new Error('Respuesta vac\u00eda del motor de visi\u00f3n.');
     }
 
     return data;
