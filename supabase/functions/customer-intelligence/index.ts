@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { enforceAiRateLimit } from '../_shared/ai-rate-limiter.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from './shared/cors.ts';
 import {
@@ -17,6 +18,9 @@ serve(async (req) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
+
+    const rateLimitRes = await enforceAiRateLimit(req);
+    if (rateLimitRes) return rateLimitRes;
 
     const _GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const _SUPABASE_URL = Deno.env.get('SUPABASE_URL') || Deno.env.get('VSM_SUPABASE_URL');

@@ -21,6 +21,7 @@
  * @version 1.0.0 (Phase 3.2B)
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { enforceAiRateLimit } from '../_shared/ai-rate-limiter.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { geminiEmbedText } from '../_shared/gemini-api.ts'
 import {
@@ -235,6 +236,9 @@ serve(async (req) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
+
+    const rateLimitRes = await enforceAiRateLimit(req);
+    if (rateLimitRes) return rateLimitRes;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
