@@ -25,6 +25,40 @@ serve(async (req: Request) => {
             );
         }
 
+        // --- OWNERSHIP CHECK (Tier 2 Security Remediation) ---
+        // Verify that the tracking number actually belongs to an order owned by the requesting user.
+        // The edge function requires JWT via config.toml, and we use the user's token so RLS enforces ownership.
+        const authHeader = req.headers.get('Authorization') || '';
+        const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+        const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+             return new Response(
+                JSON.stringify({ error: 'Servidor mal configurado', code: 'CONFIG_ERROR' }),
+                { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            global: { headers: { Authorization: authHeader } }
+        });
+
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('tracking_number', trackingNumber)
+            .limit(1)
+            .single();
+
+        if (orderError || !order) {
+            return new Response(
+                JSON.stringify({ error: 'No tienes permisos para rastrear esta guía o no existe.', code: 'FORBIDDEN' }),
+                { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+        // --------------------------------------------------------
+
         // La API Key de DHL se guarda como secreto en Supabase:
         // supabase secrets set DHL_API_KEY=tu_api_key
         const DHL_API_KEY = Deno.env.get('DHL_API_KEY');

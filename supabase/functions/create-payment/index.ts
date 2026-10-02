@@ -225,14 +225,37 @@ serve(async (req) => {
             }
         })
 
-        // 4. Guardar preference_id en orden
-        await supabase
-            .from('orders')
-            .update({
-                mp_preference_id: result.id,
-                payment_method: 'mercadopago'
-            })
-            .eq('id', order_id)
+        // 4. Guardar preference_id en orden de forma optimista (evita race condition de doble-clic)
+        const oldPreferenceId = order.mp_preference_id || null;
+        const { data: updated } = await supabase
+            .rpc('assign_mp_preference', {
+                p_order_id: order_id,
+                p_old_preference_id: oldPreferenceId,
+                p_new_preference_id: result.id
+            });
+
+        if (!updated) {
+            // Otra petición concurrente ganó la carrera y guardó su preferencia.
+            // Leemos la orden de nuevo para devolver la preferencia ganadora.
+            const { data: winningOrder } = await supabase
+                .from('orders')
+                .select('mp_preference_id')
+                .eq('id', order_id)
+                .single();
+                
+            if (winningOrder && winningOrder.mp_preference_id && winningOrder.mp_preference_id !== oldPreferenceId) {
+                const winningInitPoint = await getExistingPreferenceInitPoint(winningOrder.mp_preference_id, MERCADOPAGO_ACCESS_TOKEN);
+                if (winningInitPoint) {
+                    return new Response(
+                        JSON.stringify({
+                            init_point: winningInitPoint,
+                            preference_id: winningOrder.mp_preference_id
+                        }),
+                        { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+                    );
+                }
+            }
+        }
 
         // 5. Retornar URL de pago
         return new Response(
