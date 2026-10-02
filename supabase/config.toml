@@ -1,29 +1,45 @@
-[functions.customer-intelligence]
-verify_jwt = false
+# ==============================================================================
+# Supabase Edge Functions Configuration — VSM Store
+# ==============================================================================
+# SECURITY FIX (2026-10-02): Se habilitó verify_jwt = true para TODAS las
+# funciones excepto mercadopago-webhook (que usa HMAC signature verification
+# propia vía signed-request.ts). Antes, 9 funciones tenían verify_jwt = false,
+# permitiendo invocación anónima sin autenticación.
+# ==============================================================================
 
+# --- Webhook de Mercado Pago ---
+# verify_jwt = false porque MP no envía un JWT de Supabase. La autenticación
+# se hace via HMAC x-signature (ver signed-request.ts). Este es el ÚNICO
+# endpoint que legítimamente necesita verify_jwt = false.
 [functions.mercadopago-webhook]
 verify_jwt = false
 
+# --- Funciones de IA/Inteligencia ---
+# Todas requieren JWT válido. Los callers autorizados deben enviar el bearer
+# token del usuario autenticado o del service_role.
+[functions.customer-intelligence]
+verify_jwt = true
+
 [functions.product-intelligence]
-verify_jwt = false
+verify_jwt = true
 
 [functions.embeddings-processor]
-verify_jwt = false
+verify_jwt = true
 
 [functions.inventory-oracle]
-verify_jwt = false
+verify_jwt = true
 
 [functions.dashboard-intelligence]
-verify_jwt = false
+verify_jwt = true
 
 [functions.voice-intelligence]
-verify_jwt = false
+verify_jwt = true
 
 [functions.customer-narrative]
-verify_jwt = false
+verify_jwt = true
 
 [functions.loyalty-intelligence]
-verify_jwt = false
+verify_jwt = true
 
 [functions.knowledge-ingestor]
 verify_jwt = true

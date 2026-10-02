@@ -20,6 +20,8 @@ function createDeps(payment: MercadoPagoPaymentPayload, existingPaymentStatus: s
             payment_status: existingPaymentStatus,
         })),
         updateOrderPayment: vi.fn(async () => undefined),
+        updateOrderPaymentGuarded: vi.fn(async () => undefined),
+        fulfillOrderPayment: vi.fn(async () => ({ success: true, orderId: 'order-123', paymentId: '999', paymentStatus: 'paid', orderStatus: 'processing' })),
         insertConversionEvent: vi.fn(async () => undefined),
         getOrderItems: vi.fn(async () => [
             { product_id: 'prod-1', variant_id: null, quantity: 2 },
@@ -58,7 +60,7 @@ describe('mercadopago webhook contract', () => {
         )).resolves.toMatchObject({ handled: false, ignored: true, reason: 'non_payment_event' });
 
         expect(deps.getPayment).not.toHaveBeenCalled();
-        expect(deps.updateOrderPayment).not.toHaveBeenCalled();
+        expect(deps.fulfillOrderPayment).not.toHaveBeenCalled();
         expect(deps.insertConversionEvent).not.toHaveBeenCalled();
     });
 
@@ -82,13 +84,7 @@ describe('mercadopago webhook contract', () => {
             orderStatus: 'processing',
             conversionInserted: true,
         });
-        expect(deps.updateOrderPayment).toHaveBeenCalledWith('order-123', {
-            payment_status: 'paid',
-            status: 'processing',
-            mp_payment_id: '999',
-            mp_payment_data: payment,
-            updated_at: '2026-05-22T19:00:00.000Z',
-        });
+        expect(deps.fulfillOrderPayment).toHaveBeenCalledWith('order-123', '999', 'paid', 'processing', payment);
         expect(deps.insertConversionEvent).toHaveBeenCalledWith({
             session_id: 'session-1',
             event_type: 'payment_completed',
@@ -119,7 +115,7 @@ describe('mercadopago webhook contract', () => {
             reason: 'missing_external_reference',
             paymentId: '999',
         });
-        expect(deps.updateOrderPayment).not.toHaveBeenCalled();
+        expect(deps.fulfillOrderPayment).not.toHaveBeenCalled();
         expect(deps.insertConversionEvent).not.toHaveBeenCalled();
     });
 
@@ -283,4 +279,5 @@ describe('mercadopago webhook request handler', () => {
         expect(deps.log.error).toHaveBeenCalledWith('No external_reference found in payment');
     });
 });
+
 

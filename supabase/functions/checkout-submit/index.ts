@@ -88,9 +88,13 @@ function validateForm(form: CheckoutForm) {
 
 function validateItems(items: CheckoutItemInput[]) {
     if (!Array.isArray(items) || items.length === 0) return 'El carrito esta vacio';
+    if (items.length > 100) return 'Demasiados items en el carrito';
     for (const item of items) {
         if (!item?.product_id || typeof item.product_id !== 'string') return 'Producto invalido';
-        if (!item?.quantity || item.quantity <= 0) return 'Cantidad invalida';
+        if (typeof item.quantity !== 'number'
+            || !Number.isSafeInteger(item.quantity)
+            || item.quantity < 1
+            || item.quantity > 999) return 'Cantidad invalida';
     }
     return null;
 }
@@ -569,19 +573,16 @@ serve(async (req) => {
         }
 
         if (appliedCoupon) {
-            const { error: couponUseError } = await supabase.from('customer_coupons').insert({
-                customer_id: user.id,
-                coupon_code: appliedCoupon.code,
-                order_id: order.id,
+            // Atomic coupon redemption: validates eligibility, increments usage,
+            // and records redemption in a single locked transaction.
+            // Replaces the old split check/insert/increment flow that had TOCTOU races.
+            const { error: couponRedeemError } = await supabase.rpc('redeem_coupon_for_order', {
+                p_order_id: order.id,
+                p_code: appliedCoupon.code,
             });
 
-            if (couponUseError) {
-                await supabase.from('orders').delete().eq('id', order.id);
-                return jsonResponse({ ok: false, message: 'No se pudo aplicar el cupon' }, 500);
-            }
-
-            const { error: couponRpcError } = await supabase.rpc('increment_coupon_uses', { target_coupon_code: appliedCoupon.code });
-            if (couponRpcError) {
+            if (couponRedeemError) {
+                // Rollback: delete the order if coupon redemption fails
                 await supabase.from('orders').delete().eq('id', order.id);
                 return jsonResponse({ ok: false, message: 'No se pudo aplicar el cupon' }, 500);
             }

@@ -147,7 +147,8 @@ serve(async (req) => {
             )
         }
 
-        if (Number(order.total) <= 0) {
+        const orderTotal = Number(order.total);
+        if (!Number.isFinite(orderTotal) || orderTotal <= 0) {
             return new Response(
                 JSON.stringify({ error: 'El total del pedido debe ser mayor a 0 para pagar con Mercado Pago' }),
                 {
