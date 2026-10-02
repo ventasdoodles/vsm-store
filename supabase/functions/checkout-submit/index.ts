@@ -527,35 +527,7 @@ serve(async (req) => {
 
         const total = Math.max(subtotal - discount, 0);
 
-        const { data: order, error: orderError } = await supabase
-            .from('orders')
-            .insert({
-                customer_id: user.id,
-                customer_name: payload.form.customerName,
-                customer_phone: payload.form.customerPhone,
-                delivery_type: payload.form.deliveryType,
-                items: orderItems,
-                subtotal,
-                shipping_cost: 0,
-                discount,
-                total,
-                status: 'pending',
-                payment_method: payload.form.paymentMethod,
-                payment_status: 'pending',
-                shipping_address_id: shippingAddressId,
-                shipping_address_snapshot: shippingAddressSnapshot,
-                cesarin_session_id: conversionSessionId,
-                conversion_source: conversionSource,
-            })
-            .select('id')
-            .single();
-
-        if (orderError || !order) {
-            return jsonResponse({ ok: false, message: 'No se pudo crear el pedido' }, 500);
-        }
-
         const orderItemsRows = orderItems.map((item) => ({
-            order_id: order.id,
             product_id: item.product_id,
             variant_id: item.variant_id,
             variant_name: item.variant_name,
@@ -566,29 +538,40 @@ serve(async (req) => {
             section: item.section,
         }));
 
-        const { error: orderItemsError } = await supabase.from('order_items').insert(orderItemsRows);
-        if (orderItemsError) {
-            await supabase.from('orders').delete().eq('id', order.id);
-            return jsonResponse({ ok: false, message: 'No se pudo crear el pedido' }, 500);
+        // Atomic checkout creation: single RPC handles order insert, items insert, and coupon redemption
+        const orderPayload = {
+            customer_id: user.id,
+            customer_name: payload.form.customerName,
+            customer_phone: payload.form.customerPhone,
+            delivery_type: payload.form.deliveryType,
+            items: orderItems,
+            subtotal,
+            shipping_cost: 0,
+            discount,
+            total,
+            status: 'pending',
+            payment_method: payload.form.paymentMethod,
+            payment_status: 'pending',
+            shipping_address_id: shippingAddressId,
+            shipping_address_snapshot: shippingAddressSnapshot,
+            cesarin_session_id: conversionSessionId,
+            conversion_source: conversionSource,
+        };
+
+        const { data: orderId, error: orderRpcError } = await supabase.rpc('create_checkout_order', {
+            p_order: orderPayload,
+            p_order_items: orderItemsRows,
+            p_coupon_code: appliedCoupon?.code || null,
+        });
+
+        if (orderRpcError || !orderId) {
+            console.error('Checkout RPC error:', orderRpcError);
+            return jsonResponse({ ok: false, message: 'No se pudo procesar el pedido o el cupon ya no es valido' }, 500);
         }
 
-        if (appliedCoupon) {
-            // Atomic coupon redemption: validates eligibility, increments usage,
-            // and records redemption in a single locked transaction.
-            // Replaces the old split check/insert/increment flow that had TOCTOU races.
-            const { error: couponRedeemError } = await supabase.rpc('redeem_coupon_for_order', {
-                p_order_id: order.id,
-                p_code: appliedCoupon.code,
-            });
+        const finalOrderId = orderId;
 
-            if (couponRedeemError) {
-                // Rollback: delete the order if coupon redemption fails
-                await supabase.from('orders').delete().eq('id', order.id);
-                return jsonResponse({ ok: false, message: 'No se pudo aplicar el cupon' }, 500);
-            }
-        }
-
-        return jsonResponse({ ok: true, orderId: order.id });
+        return jsonResponse({ ok: true, orderId: finalOrderId });
     } catch (error) {
         console.error('Unhandled checkout error:', error);
         return jsonResponse({ ok: false, message: 'Ocurrio un error inesperado al procesar el pedido' }, 500);
