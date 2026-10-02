@@ -198,7 +198,7 @@ serve(async (req) => {
             currency_id: 'MXN'
         }))
 
-        // 3. Crear preferencia en Mercado Pago
+        // 3. Crear preferencia en Mercado Pago (con Idempotency Key para prevenir llamadas dobles reales en MP)
         const preference = new mercadopago.Preference(client);
         const result = await preference.create({
             body: {
@@ -222,11 +222,18 @@ serve(async (req) => {
                         number: order.customer_phone || ''
                     }
                 }
+            },
+            requestOptions: {
+                idempotencyKey: order_id
             }
         })
 
         // 4. Guardar preference_id en orden de forma optimista (evita race condition de doble-clic)
-        const oldPreferenceId = order.mp_preference_id || null;
+        // Manejamos strings vacíos como nulos reales para evitar fallos de IS NOT DISTINCT FROM ""
+        const oldPreferenceId = (typeof order.mp_preference_id === 'string' && order.mp_preference_id.trim() !== '') 
+            ? order.mp_preference_id 
+            : null;
+
         const { data: updated } = await supabase
             .rpc('assign_mp_preference', {
                 p_order_id: order_id,

@@ -3,6 +3,7 @@
 // Docs: https://developer.dhl.com/api-reference/shipment-tracking
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -26,9 +27,14 @@ serve(async (req: Request) => {
         }
 
         // --- OWNERSHIP CHECK (Tier 2 Security Remediation) ---
-        // Verify that the tracking number actually belongs to an order owned by the requesting user.
-        // The edge function requires JWT via config.toml, and we use the user's token so RLS enforces ownership.
         const authHeader = req.headers.get('Authorization') || '';
+        if (!authHeader.startsWith('Bearer ')) {
+            return new Response(
+                JSON.stringify({ error: 'Sesión inválida o faltante', code: 'UNAUTHORIZED' }),
+                { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
         const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
         const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
 
@@ -39,7 +45,6 @@ serve(async (req: Request) => {
             );
         }
 
-        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             global: { headers: { Authorization: authHeader } }
         });

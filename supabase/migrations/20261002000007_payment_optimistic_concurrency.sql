@@ -26,7 +26,9 @@ BEGIN
         payment_method = 'mercadopago',
         updated_at = now()
     WHERE id = p_order_id
-      AND mp_preference_id IS NOT DISTINCT FROM p_old_preference_id;
+      AND mp_preference_id IS NOT DISTINCT FROM p_old_preference_id
+      AND payment_status = 'pending'
+      AND status != 'cancelled';
 
     v_updated := FOUND;
     RETURN v_updated;
