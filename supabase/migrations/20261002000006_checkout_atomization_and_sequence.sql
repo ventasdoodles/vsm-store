@@ -43,7 +43,7 @@ DECLARE
     next_num INTEGER;
 BEGIN
     next_num := nextval('public.vsm_order_number_seq');
-    RETURN 'VSM-' || LPAD(next_num::TEXT, 4, '0');
+    RETURN 'VSM-' || to_char(next_num, 'FM0000');
 END;
 $$;
 

@@ -260,8 +260,17 @@ serve(async (req) => {
             return jsonResponse({ ok: false, message: 'Sesion requerida' }, 401);
         }
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-        const { data: authData, error: authError } = await supabase.auth.getUser(bearerToken);
+        const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+        if (!SUPABASE_ANON_KEY) {
+            return jsonResponse({ ok: false, message: 'Servidor mal configurado (ANON_KEY)' }, 500);
+        }
+
+        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            global: { headers: { Authorization: authHeader } }
+        });
+
+        const { data: authData, error: authError } = await supabase.auth.getUser();
         const user = authData?.user;
         if (authError || !user) {
             return jsonResponse({ ok: false, message: 'Sesion requerida' }, 401);
@@ -558,7 +567,7 @@ serve(async (req) => {
             conversion_source: conversionSource,
         };
 
-        const { data: orderId, error: orderRpcError } = await supabase.rpc('create_checkout_order', {
+        const { data: orderId, error: orderRpcError } = await supabaseAdmin.rpc('create_checkout_order', {
             p_order: orderPayload,
             p_order_items: orderItemsRows,
             p_coupon_code: appliedCoupon?.code || null,
