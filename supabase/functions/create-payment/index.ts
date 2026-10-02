@@ -28,7 +28,7 @@ serve(async (req) => {
     if (req.method === 'OPTIONS') {
         return new Response(null, {
             headers: {
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*',
                 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
                 'Access-Control-Allow-Methods': 'POST, OPTIONS'
             }
@@ -48,7 +48,7 @@ serve(async (req) => {
                     status: 500,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             );
@@ -66,7 +66,7 @@ serve(async (req) => {
                     status: 401,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             )
@@ -86,7 +86,7 @@ serve(async (req) => {
                     status: 401,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             )
@@ -115,7 +115,7 @@ serve(async (req) => {
                     status: 400,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             )
@@ -128,7 +128,7 @@ serve(async (req) => {
                     status: 400,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             )
@@ -141,7 +141,7 @@ serve(async (req) => {
                     status: 400,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             )
@@ -155,7 +155,7 @@ serve(async (req) => {
                     status: 400,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                     }
                 }
             )
@@ -173,7 +173,7 @@ serve(async (req) => {
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
+                            'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                         }
                     }
                 )
@@ -258,7 +258,7 @@ serve(async (req) => {
                             init_point: winningInitPoint,
                             preference_id: winningOrder.mp_preference_id
                         }),
-                        { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+                        { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*' } }
                     );
                 }
             }
@@ -273,7 +273,7 @@ serve(async (req) => {
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                 }
             }
         )
@@ -286,7 +286,7 @@ serve(async (req) => {
                 status: 500,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') || '*'
                 }
             }
         )
