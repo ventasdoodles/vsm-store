@@ -9,6 +9,7 @@
 - Current technical truth is summarized in `AI_CONTEXT.md`.
 
 ## Current Detailed Audit Files
+- META_AUDIT_VSM_STORE_MASTER_REPORT.md (Comprehensive Security Meta-Audit & Remediation: Tier 0-3 completion including admin_users RLS, checkout atomization, MercadoPago TOCTOU concurrency prevention, AI Rate Limiting, Atomic Loyalty Ledger & Wheel Spin, and CORS normalization across all 16 Edge Functions.)
 - `docs/audits/2026-09/storefront-megareadiness-and-hardening.md` (Storefront MegaReadiness, Route Type Safety, Safe Storage & A11y Hardening: TanStack Router typed parameters, payment search schema validation, in-memory safe storage fallback, accessibility labels for 17 interactive buttons, and zero-IO quota-safe storage probe)
 - `docs/audits/2026-09/megareadiness-4lanes-adversarial-hardening.md` (MegaReadiness 4-Lane overhaul & adversarial hardening: Edge Functions strict env validation, UI hex/inline normalization, Concierge God Module modularization, zero-as any route typing, SSE stream parser hardening, and no-write smoke contract enforcement)
 - `docs/audits/2026-09/last-20-commits-adversarial-audit.md` (Exhaustive adversarial audit of the last 20 commits: Edge Functions zero-total guard, token normalization, atomic primitives hardening, BOM handling in codemods, and WorkKit skill unification)
