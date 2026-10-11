@@ -145,23 +145,35 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
 
 /**
  * Heartbeat check: verifies database availability by pinging a lightweight public table with strict 5s timeout.
+ * Guarantees timely completion via Promise.race even if the underlying database driver fails to settle on abort.
  */
 export async function checkBackendHealth(timeoutMs: number = 5000): Promise<boolean> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+            controller.abort();
+            reject(new Error(`[checkBackendHealth] Database ping timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+    });
 
     try {
-        const { error } = await supabase
-            .from('categories')
-            .select('id')
-            .limit(1)
-            .abortSignal(controller.signal);
+        const queryPromise = (async () => {
+            const { error } = await supabase
+                .from('categories')
+                .select('id')
+                .limit(1)
+                .abortSignal(controller.signal);
 
-        if (error) {
-            console.error('[checkBackendHealth] Ping returned error:', error);
-            throw error;
-        }
-        return true;
+            if (error) {
+                console.error('[checkBackendHealth] Ping returned error:', error);
+                throw error;
+            }
+            return true;
+        })();
+
+        return await Promise.race([queryPromise, timeoutPromise]);
     } catch (err) {
         if (controller.signal.aborted) {
             const timeoutError = new Error(`[checkBackendHealth] Database ping timed out after ${timeoutMs}ms`);
@@ -170,6 +182,6 @@ export async function checkBackendHealth(timeoutMs: number = 5000): Promise<bool
         }
         throw err;
     } finally {
-        clearTimeout(timer);
+        if (timer) clearTimeout(timer);
     }
 }

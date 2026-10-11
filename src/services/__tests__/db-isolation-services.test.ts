@@ -33,20 +33,20 @@ describe('Database isolation services', () => {
     describe('Architectural Hook Isolation Guard', () => {
         function detectIllegalSupabaseImports(content: string): string[] {
             const violations: string[] = [];
-            // 1. Side-effect imports: import '@/lib/supabase' or import '@supabase/supabase-js'
-            if (/import\s+['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)['"]/.test(content)) {
+            // 1. Side-effect imports: import '@/lib/supabase' or import '@supabase/supabase-js' (including subpaths like /index)
+            if (/import\s+['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)(?:\/[^'"]*)?['"]/.test(content)) {
                 violations.push('Side-effect import of supabase');
             }
-            // 2. Dynamic imports: import('@/lib/supabase') or import('@supabase/supabase-js')
-            if (/import\s*\(\s*['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)['"]\s*\)/.test(content)) {
+            // 2. Dynamic imports: import('@/lib/supabase') or import('@supabase/supabase-js') (including subpaths like /index)
+            if (/import\s*\(\s*['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)(?:\/[^'"]*)?['"]\s*\)/.test(content)) {
                 violations.push('Dynamic import of supabase');
             }
-            // 3. Static runtime imports from @/lib/supabase or relative to supabase
-            if (/import\s+(?!type\b)[^'"]*from\s+['"][^'"]*lib\/supabase['"]/.test(content)) {
+            // 3. Static runtime imports from @/lib/supabase or relative to supabase (including subpaths like /index)
+            if (/import\s+(?!type\b)[^'"]*from\s+['"][^'"]*lib\/supabase(?:\/[^'"]*)?['"]/.test(content)) {
                 violations.push('Static runtime import from lib/supabase');
             }
-            // 4. Static runtime imports from @supabase/supabase-js
-            if (/import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js['"]/.test(content)) {
+            // 4. Static runtime imports from @supabase/supabase-js (including subpaths)
+            if (/import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js(?:\/[^'"]*)?['"]/.test(content)) {
                 violations.push('Static runtime import from @supabase/supabase-js');
             }
             // 5. CJS require: require('@/lib/supabase') or require('@supabase/...')
@@ -62,13 +62,18 @@ describe('Database isolation services', () => {
 
         it('exhaustively catches side-effect, dynamic, static runtime, require, and re-export imports in synthetic fixtures', () => {
             expect(detectIllegalSupabaseImports("import '@/lib/supabase';")).toContain('Side-effect import of supabase');
+            expect(detectIllegalSupabaseImports("import '@/lib/supabase/index';")).toContain('Side-effect import of supabase');
             expect(detectIllegalSupabaseImports("import '@supabase/supabase-js';")).toContain('Side-effect import of supabase');
             expect(detectIllegalSupabaseImports("const sb = await import('@supabase/supabase-js');")).toContain('Dynamic import of supabase');
             expect(detectIllegalSupabaseImports("const sb = await import('@/lib/supabase');")).toContain('Dynamic import of supabase');
+            expect(detectIllegalSupabaseImports("const sb = await import('@/lib/supabase/index');")).toContain('Dynamic import of supabase');
             expect(detectIllegalSupabaseImports("import { supabase } from '@/lib/supabase';")).toContain('Static runtime import from lib/supabase');
+            expect(detectIllegalSupabaseImports("import { supabase } from '@/lib/supabase/index';")).toContain('Static runtime import from lib/supabase');
             expect(detectIllegalSupabaseImports("import { createClient } from '@supabase/supabase-js';")).toContain('Static runtime import from @supabase/supabase-js');
+            expect(detectIllegalSupabaseImports("import { createClient } from '@supabase/supabase-js/dist/main';")).toContain('Static runtime import from @supabase/supabase-js');
             expect(detectIllegalSupabaseImports("const sb = require('@/lib/supabase');")).toContain('require of supabase');
             expect(detectIllegalSupabaseImports("export { supabase } from '@/lib/supabase';")).toContain('Runtime re-export of supabase');
+            expect(detectIllegalSupabaseImports("export { supabase } from '@/lib/supabase/index';")).toContain('Runtime re-export of supabase');
 
             // Must allow valid type-only imports and local variable names
             expect(detectIllegalSupabaseImports("import type { User } from '@supabase/supabase-js';")).toEqual([]);
@@ -171,6 +176,16 @@ describe('Database isolation services', () => {
             fromMock.mockReturnValue({ select: selectMock });
 
             await expect(checkBackendHealth()).rejects.toThrow('Connection refused');
+        });
+
+        it('times out and aborts if query promise hangs and never resolves', async () => {
+            // Promise that never settles
+            const hangingAbortSignalMock = vi.fn().mockImplementation(() => new Promise(() => {}));
+            const limitMock = vi.fn().mockReturnValue({ abortSignal: hangingAbortSignalMock });
+            const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
+            fromMock.mockReturnValue({ select: selectMock });
+
+            await expect(checkBackendHealth(50)).rejects.toThrow('Database ping timed out after 50ms');
         });
     });
 

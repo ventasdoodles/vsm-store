@@ -181,6 +181,31 @@ describe('turn-advisory service', () => {
             expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
         });
 
+        it('degrades to informational KEEP_EXPLORING without ADD_TO_CART when proposal.quantity is boolean', () => {
+            const boolQtyMsg: ConciergeAssistantMessage = {
+                id: 'bool-qty',
+                role: 'assistant',
+                content: 'Original',
+                timestamp: new Date(),
+                capsule_contract: {
+                    match_strategy: 'EXACT_MUTATION_PROPOSED',
+                    mutation_proposal: {
+                        type: 'ADD',
+                        resolved_product_id: 'prod-1',
+                        product_ref: 'Pod',
+                        quantity: true as any,
+                        section: 'vape',
+                        slug: 'pod-test',
+                    },
+                },
+            };
+
+            const result = convertCartOperatorToAdvisoryCta(boolQtyMsg);
+            expect(result.intent).toBe('info');
+            expect(result.capsule_contract?.next_step_view?.surfaceKind).toBe('INFORMATIONAL');
+            expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
+        });
+
         it('falls back to informational message when proposal is not an exact ADD mutation', () => {
             const message: ConciergeAssistantMessage = {
                 id: '2',
