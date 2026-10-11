@@ -200,6 +200,37 @@ describe('turn-advisory service', () => {
             expect(result.intent).toBe('info');
             expect(result.content).toBe('No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.');
         });
+
+        it('general fallback neutralizes any pre-existing ADD_TO_CART action in next_step_view', () => {
+            const messageWithStaleAction: ConciergeAssistantMessage = {
+                id: 'stale-cta',
+                role: 'assistant',
+                content: 'Previous action proposal',
+                timestamp: new Date(),
+                capsule_contract: {
+                    match_strategy: 'EXPLORE',
+                    mutation_proposal: {
+                        type: 'REMOVE',
+                    },
+                    next_step_view: {
+                        family: 'ADD_READY',
+                        surfaceKind: 'ACTIONABLE',
+                        primaryAction: {
+                            kind: 'ADD_TO_CART',
+                            label: 'Agregar',
+                            product: { id: 'old-1', name: 'Old', slug: 'old', section: 'vape' },
+                            quantity: 1,
+                        },
+                    },
+                },
+            };
+
+            const result = convertCartOperatorToAdvisoryCta(messageWithStaleAction);
+
+            expect(result.intent).toBe('info');
+            expect(result.capsule_contract?.next_step_view?.surfaceKind).toBe('INFORMATIONAL');
+            expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
+        });
     });
 
     describe('isCurrentTurnClearlyNonSearch', () => {

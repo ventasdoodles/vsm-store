@@ -176,7 +176,7 @@ export async function markWhatsAppSent(orderId: string) {
  */
 export function subscribeToRealtimeOrders(
     onNewOrder: (order: RealtimeOrderEvent) => void | Promise<void>,
-    onError?: (err: unknown) => void
+    onError?: (err: unknown) => void | Promise<void>
 ): () => void {
     let disposed = false;
     const channelTopic = `orders_pulse_${
@@ -203,8 +203,13 @@ export function subscribeToRealtimeOrders(
                 } catch (error) {
                     if (!disposed) {
                         try {
-                            if (onError) onError(error);
-                            else console.error('[subscribeToRealtimeOrders] Error enriching or handling order event:', error);
+                            if (onError) {
+                                await Promise.resolve(onError(error)).catch((asyncErr) => {
+                                    console.error('[subscribeToRealtimeOrders] Async rejection in onError callback:', asyncErr);
+                                });
+                            } else {
+                                console.error('[subscribeToRealtimeOrders] Error enriching or handling order event:', error);
+                            }
                         } catch (handlerErr) {
                             console.error('[subscribeToRealtimeOrders] Error in onError callback:', handlerErr);
                         }
@@ -216,8 +221,13 @@ export function subscribeToRealtimeOrders(
             if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 if (!disposed) {
                     try {
-                        if (onError) onError(new Error(`Realtime status: ${status}`));
-                        else console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
+                        if (onError) {
+                            void Promise.resolve(onError(new Error(`Realtime status: ${status}`))).catch((asyncErr) => {
+                                console.error('[subscribeToRealtimeOrders] Async rejection in status onError callback:', asyncErr);
+                            });
+                        } else {
+                            console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
+                        }
                     } catch (handlerErr) {
                         console.error('[subscribeToRealtimeOrders] Error in status onError handler:', handlerErr);
                     }

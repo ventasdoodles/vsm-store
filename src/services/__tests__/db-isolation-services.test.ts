@@ -31,6 +31,50 @@ describe('Database isolation services', () => {
     });
 
     describe('Architectural Hook Isolation Guard', () => {
+        function detectIllegalSupabaseImports(content: string): string[] {
+            const violations: string[] = [];
+            // 1. Side-effect imports: import '@/lib/supabase' or import '@supabase/supabase-js'
+            if (/import\s+['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)['"]/.test(content)) {
+                violations.push('Side-effect import of supabase');
+            }
+            // 2. Dynamic imports: import('@/lib/supabase') or import('@supabase/supabase-js')
+            if (/import\s*\(\s*['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)['"]\s*\)/.test(content)) {
+                violations.push('Dynamic import of supabase');
+            }
+            // 3. Static runtime imports from @/lib/supabase or relative to supabase
+            if (/import\s+(?!type\b)[^'"]*from\s+['"][^'"]*lib\/supabase['"]/.test(content)) {
+                violations.push('Static runtime import from lib/supabase');
+            }
+            // 4. Static runtime imports from @supabase/supabase-js
+            if (/import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js['"]/.test(content)) {
+                violations.push('Static runtime import from @supabase/supabase-js');
+            }
+            // 5. CJS require: require('@/lib/supabase') or require('@supabase/...')
+            if (/require\s*\(\s*['"][^'"]*supabase[^'"]*['"]\s*\)/.test(content)) {
+                violations.push('require of supabase');
+            }
+            // 6. Re-exports: export ... from '...supabase...' (unless export type)
+            if (/export\s+(?!type\b)[^'"]*from\s+['"][^'"]*supabase[^'"]*['"]/.test(content)) {
+                violations.push('Runtime re-export of supabase');
+            }
+            return violations;
+        }
+
+        it('exhaustively catches side-effect, dynamic, static runtime, require, and re-export imports in synthetic fixtures', () => {
+            expect(detectIllegalSupabaseImports("import '@/lib/supabase';")).toContain('Side-effect import of supabase');
+            expect(detectIllegalSupabaseImports("import '@supabase/supabase-js';")).toContain('Side-effect import of supabase');
+            expect(detectIllegalSupabaseImports("const sb = await import('@supabase/supabase-js');")).toContain('Dynamic import of supabase');
+            expect(detectIllegalSupabaseImports("const sb = await import('@/lib/supabase');")).toContain('Dynamic import of supabase');
+            expect(detectIllegalSupabaseImports("import { supabase } from '@/lib/supabase';")).toContain('Static runtime import from lib/supabase');
+            expect(detectIllegalSupabaseImports("import { createClient } from '@supabase/supabase-js';")).toContain('Static runtime import from @supabase/supabase-js');
+            expect(detectIllegalSupabaseImports("const sb = require('@/lib/supabase');")).toContain('require of supabase');
+            expect(detectIllegalSupabaseImports("export { supabase } from '@/lib/supabase';")).toContain('Runtime re-export of supabase');
+
+            // Must allow valid type-only imports and local variable names
+            expect(detectIllegalSupabaseImports("import type { User } from '@supabase/supabase-js';")).toEqual([]);
+            expect(detectIllegalSupabaseImports("const supabaseError = err as { code?: string };")).toEqual([]);
+        });
+
         it('ensures zero hooks in src/hooks/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
             const hooksRoot = path.resolve(process.cwd(), 'src/hooks');
 
@@ -55,13 +99,8 @@ describe('Database isolation services', () => {
 
             for (const filePath of hookFiles) {
                 const content = fs.readFileSync(filePath, 'utf8');
-                // Prohibit static or dynamic imports from supabase lib
-                expect(content).not.toMatch(/from\s+['"].*\/lib\/supabase['"]/);
-                expect(content).not.toMatch(/import\s*\(\s*['"].*\/lib\/supabase['"]\s*\)/);
-                expect(content).not.toMatch(/require\s*\(\s*['"].*\/lib\/supabase['"]\s*\)/);
-                // Prohibit runtime imports from @supabase/supabase-js (only import type allowed)
-                const runtimeSupabaseJsImport = /import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js['"]/;
-                expect(content).not.toMatch(runtimeSupabaseJsImport);
+                const violations = detectIllegalSupabaseImports(content);
+                expect(violations, `Illegal supabase import in ${filePath}`).toEqual([]);
             }
         });
     });
@@ -272,10 +311,7 @@ describe('Database isolation services', () => {
             };
             channelMock.mockReturnValue(channelInstance);
 
-            const singleMock = vi.fn().mockResolvedValue({
-                data: null,
-                error: new Error('DB fetch error'),
-            });
+            const singleMock = vi.fn().mockRejectedValue(new Error('DB fetch error'));
             const eqMock = vi.fn().mockReturnValue({ single: singleMock });
             const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
             fromMock.mockReturnValue({ select: selectMock });
@@ -287,6 +323,48 @@ describe('Database isolation services', () => {
             subscribeToRealtimeOrders(vi.fn(), throwingOnError);
 
             await expect(changeHandler({ new: { id: 'ord-123' } })).resolves.not.toThrow();
+            expect(throwingOnError).toHaveBeenCalled();
+        });
+
+        it('catches and suppresses async rejections from onError in postgres_changes route', async () => {
+            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
+            const channelInstance: any = {
+                on: vi.fn().mockImplementation((_event, _filter, callback) => {
+                    changeHandler = callback;
+                    return channelInstance;
+                }),
+                subscribe: vi.fn().mockReturnThis(),
+            };
+            channelMock.mockReturnValue(channelInstance);
+
+            const singleMock = vi.fn().mockRejectedValue(new Error('DB fetch error'));
+            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
+            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+            fromMock.mockReturnValue({ select: selectMock });
+
+            const asyncRejectingOnError = vi.fn().mockRejectedValue(new Error('Async onError rejected'));
+            subscribeToRealtimeOrders(vi.fn(), asyncRejectingOnError);
+
+            await expect(changeHandler({ new: { id: 'ord-123' } })).resolves.not.toThrow();
+            expect(asyncRejectingOnError).toHaveBeenCalled();
+        });
+
+        it('catches and suppresses async rejections from onError in status error route', async () => {
+            let statusHandler: (status: string) => void = () => {};
+            const channelInstance: any = {
+                on: vi.fn().mockReturnThis(),
+                subscribe: vi.fn().mockImplementation((callback) => {
+                    statusHandler = callback;
+                    return channelInstance;
+                }),
+            };
+            channelMock.mockReturnValue(channelInstance);
+
+            const asyncRejectingOnError = vi.fn().mockRejectedValue(new Error('Async status onError rejected'));
+            subscribeToRealtimeOrders(vi.fn(), asyncRejectingOnError);
+
+            expect(() => statusHandler('CHANNEL_ERROR')).not.toThrow();
+            expect(asyncRejectingOnError).toHaveBeenCalled();
         });
     });
 

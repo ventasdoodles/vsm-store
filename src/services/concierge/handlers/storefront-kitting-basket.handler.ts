@@ -103,7 +103,7 @@ export const handleStorefrontKittingBasket = async (
             response_latency_ms: Date.now() - invokeStart,
             has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0,
             product_card_count: shouldShowCatalogSurfaces ? visibleProducts.length : 0,
-            zero_results: !shouldShowCatalogSurfaces || capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
+            zero_results: visibleProducts.length === 0 || !shouldShowCatalogSurfaces || capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
             error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
             offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
             analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,

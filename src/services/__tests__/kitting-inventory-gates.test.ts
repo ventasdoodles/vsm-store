@@ -4,6 +4,7 @@ import { handleStorefrontInventoryOutlook } from '@/services/concierge/handlers/
 import * as orchestrator from '@/services/ai-capsule-orchestrator.service';
 import * as productsService from '@/services/products.service';
 import * as stage5 from '@/lib/cesarin-stage5';
+import { logAITelemetry } from '@/services/concierge/telemetry';
 import type { DispatchClientCapsuleParams } from '@/services/concierge/dispatch.types';
 
 vi.mock('@/services/concierge/telemetry', () => ({
@@ -147,6 +148,29 @@ describe('Kitting and Inventory Action Publishing Gates (Blocker 1)', () => {
             expect(result?.capsule_contract?.next_step_view).toBeDefined();
             expect(result?.capsule_contract?.next_step_view?.family).toBe('ADD_READY');
         });
+
+        it('suppresses next_step_view and emits zero_results: true when gate is open but 0 products resolved', async () => {
+            vi.spyOn(productsService, 'getProductsByIds').mockResolvedValue([]);
+            vi.spyOn(orchestrator, 'executeStorefrontKittingBasketCapsule').mockResolvedValue({
+                execution_status: 'SUCCESS',
+                match_strategy: 'FULL_KIT',
+                resolved_products: [{ id: 'prod-non-existent' } as any],
+                customer_response_draft: 'Kit no disponible',
+            } as any);
+
+            const result = await handleStorefrontKittingBasket(baseParams, false);
+
+            expect(result?.suggestedProducts).toEqual([]);
+            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
+            expect(logAITelemetry).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    zero_results: true,
+                    product_card_count: 0,
+                    has_product_cards: false,
+                    catalog_gate_open: true,
+                })
+            );
+        });
     });
 
     describe('handleStorefrontInventoryOutlook', () => {
@@ -237,6 +261,30 @@ describe('Kitting and Inventory Action Publishing Gates (Blocker 1)', () => {
             const result = await handleStorefrontInventoryOutlook(baseParams, false);
 
             expect(result?.capsule_contract?.next_step_view).toBeUndefined();
+        });
+
+        it('suppresses next_step_view and emits zero_results: true when gate is open but 0 products resolved', async () => {
+            vi.spyOn(productsService, 'getProductsByIds').mockResolvedValue([]);
+            vi.spyOn(orchestrator, 'executeStorefrontInventoryOutlookCapsule').mockResolvedValue({
+                execution_status: 'SUCCESS',
+                match_strategy: 'EXACT_MATCH',
+                inventory_outlook_signal: { kind: 'IN_STOCK_ONLINE' },
+                resolved_products: [{ id: 'prod-non-existent' } as any],
+                customer_response_draft: 'Producto no disponible',
+            } as any);
+
+            const result = await handleStorefrontInventoryOutlook(baseParams, false);
+
+            expect(result?.suggestedProducts).toEqual([]);
+            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
+            expect(logAITelemetry).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    zero_results: true,
+                    product_card_count: 0,
+                    has_product_cards: false,
+                    catalog_gate_open: true,
+                })
+            );
         });
     });
 });

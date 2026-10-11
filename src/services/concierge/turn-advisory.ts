@@ -123,10 +123,25 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
         };
     }
 
+    const sanitizedContract = message.capsule_contract
+        ? {
+            ...message.capsule_contract,
+            next_step_view: {
+                family: 'KEEP_EXPLORING',
+                guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
+                surfaceKind: 'INFORMATIONAL',
+                primaryAction: null,
+                secondaryAction: null,
+                assistAction: null,
+            },
+        }
+        : undefined;
+
     return {
         ...message,
         intent: 'info',
         content: 'No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.',
+        capsule_contract: sanitizedContract,
     };
 }
 
