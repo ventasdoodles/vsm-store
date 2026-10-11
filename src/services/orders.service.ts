@@ -178,34 +178,43 @@ export function subscribeToRealtimeOrders(
     onNewOrder: (order: RealtimeOrderEvent) => void,
     onError?: (err: unknown) => void
 ): () => void {
+    let disposed = false;
+    const channelTopic = `orders_pulse_${typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)}`;
+
     const channel = supabase
-        .channel('public:orders_pulse')
+        .channel(channelTopic)
         .on(
             'postgres_changes',
             { event: 'INSERT', schema: 'public', table: 'orders' },
             async (payload) => {
+                if (disposed) return;
                 const newOrder = payload.new as { id?: string } | undefined;
                 if (!newOrder?.id) return;
 
                 try {
                     const eventData = await getOrderNotificationDetails(newOrder.id);
-                    if (eventData) {
+                    if (!disposed && eventData) {
                         onNewOrder(eventData);
                     }
                 } catch (error) {
-                    if (onError) onError(error);
-                    else console.error('[subscribeToRealtimeOrders] Error enriching order event:', error);
+                    if (!disposed) {
+                        if (onError) onError(error);
+                        else console.error('[subscribeToRealtimeOrders] Error enriching order event:', error);
+                    }
                 }
             }
         )
         .subscribe((status) => {
-            if (status === 'CHANNEL_ERROR') {
-                if (onError) onError(new Error('CHANNEL_ERROR'));
-                else console.error('[subscribeToRealtimeOrders] Realtime connection error');
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                if (!disposed) {
+                    if (onError) onError(new Error(`Realtime status: ${status}`));
+                    else console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
+                }
             }
         });
 
     return () => {
-        supabase.removeChannel(channel);
+        disposed = true;
+        void supabase.removeChannel(channel).catch(() => {});
     };
 }

@@ -1,4 +1,4 @@
-﻿import { executeProductSearchCapsule } from '@/services/ai-capsule-orchestrator.service';
+import { executeProductSearchCapsule } from '@/services/ai-capsule-orchestrator.service';
 import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import { rerankCesarinSuggestedProducts } from '@/lib/cesarin-stage3';
 import { buildCesarinAdaptiveConversationView } from '@/lib/cesarin-stage4';
@@ -11,13 +11,23 @@ import type { Product } from '@/types/product';
 import { extractTelemetryNextStepTruth, isSearchLeadingIntent, resolveGroundedProductSearchMessage } from '../helpers';
 import { logAITelemetry } from '../telemetry';
 import type { ConciergeProductSearchMemoryContext, ConciergeTurnAnalysis } from '../types';
-import { DispatchClientCapsuleParams, ClientCapsuleDispatchResult } from '../capsule-dispatcher';
+import type { DispatchClientCapsuleParams, ClientCapsuleDispatchResult } from '../dispatch.types';
 
 export const handleProductSearchIntegrity = async (
     params: DispatchClientCapsuleParams,
     noWriteSmokeActive: boolean
 ): Promise<ClientCapsuleDispatchResult | null> => {
-    const data = params.data; const query = params.query; const history = params.history; const customerProfile = params.customerProfile; const catalogGate = params.catalogGate; const turnAnalysis = params.turnAnalysis; const sourceContext = params.sourceContext; const invokeStart = params.invokeStart; const effectiveTelemetrySessionId = params.effectiveTelemetrySessionId;
+    const {
+        data,
+        query,
+        history,
+        customerProfile,
+        catalogGate,
+        turnAnalysis,
+        sourceContext,
+        invokeStart,
+        effectiveTelemetrySessionId,
+    } = params;
     
     const capsuleContract = await executeProductSearchCapsule(data.tool_args, {
         customerId: customerProfile?.id ?? null,
@@ -149,7 +159,7 @@ export const handleProductSearchIntegrity = async (
         assist_action_present: telemetryNextStep.assist_action_present,
         source_context_present: Boolean(sourceContext),
         retrieval_source: capsuleContract.retrieval_source ?? null,
-    });
+    }).catch((err) => console.error('[Telemetry] Failed to log product search:', err));
 
     const effectiveProductSearchPrefix = getEffectiveConversationalPrefix({
         message: productSearchMessageSeed,

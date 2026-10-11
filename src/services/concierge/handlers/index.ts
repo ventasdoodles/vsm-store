@@ -1,4 +1,7 @@
-﻿import { DispatchClientCapsuleParams, ClientCapsuleDispatchResult } from '../capsule-dispatcher';
+import type {
+    CapsuleHandlerFn,
+    CapsuleName,
+} from '../dispatch.types';
 import { handleProductSearchIntegrity } from './product-search-integrity.handler';
 import { handleStorefrontKittingBasket } from './storefront-kitting-basket.handler';
 import { handleStorefrontBudgetRescue } from './storefront-budget-rescue.handler';
@@ -11,21 +14,22 @@ import { handleAuthenticatedLoyaltyStatus } from './authenticated-loyalty-status
 import { handleStorefrontCheckoutReadiness } from './storefront-checkout-readiness.handler';
 import { handleCartOperator } from './cart-operator.handler';
 
+export const capsuleHandlers = Object.freeze({
+    product_search_integrity: handleProductSearchIntegrity,
+    storefront_kitting_basket: handleStorefrontKittingBasket,
+    storefront_budget_rescue: handleStorefrontBudgetRescue,
+    storefront_compatibility_check: handleStorefrontCompatibilityCheck,
+    knowledge_rag_foundation: handleKnowledgeRagFoundation,
+    storefront_inventory_outlook: handleStorefrontInventoryOutlook,
+    authenticated_order_tracking: handleAuthenticatedOrderTracking,
+    authenticated_warranty_triage: handleAuthenticatedWarrantyTriage,
+    authenticated_loyalty_status: handleAuthenticatedLoyaltyStatus,
+    storefront_checkout_readiness: handleStorefrontCheckoutReadiness,
+    cart_operator: handleCartOperator,
+} satisfies Record<CapsuleName, CapsuleHandlerFn>);
 
-export type CapsuleHandlerFn = (params: DispatchClientCapsuleParams, noWriteSmokeActive: boolean) => Promise<ClientCapsuleDispatchResult | null>;
+export function isCapsuleName(name: unknown): name is CapsuleName {
+    return typeof name === 'string' && Object.prototype.hasOwnProperty.call(capsuleHandlers, name);
+}
 
-export const capsuleHandlers: Record<string, CapsuleHandlerFn> = {
-    'product_search_integrity': handleProductSearchIntegrity,
-    'storefront_kitting_basket': handleStorefrontKittingBasket,
-    'storefront_budget_rescue': handleStorefrontBudgetRescue,
-    'storefront_compatibility_check': handleStorefrontCompatibilityCheck,
-    'knowledge_rag_foundation': handleKnowledgeRagFoundation,
-    'storefront_inventory_outlook': handleStorefrontInventoryOutlook,
-    'authenticated_order_tracking': handleAuthenticatedOrderTracking,
-    'authenticated_warranty_triage': handleAuthenticatedWarrantyTriage,
-    'authenticated_loyalty_status': handleAuthenticatedLoyaltyStatus,
-    'storefront_checkout_readiness': handleStorefrontCheckoutReadiness,
-    'cart_operator': handleCartOperator,
-};
-
-
+export type { CapsuleHandlerFn };

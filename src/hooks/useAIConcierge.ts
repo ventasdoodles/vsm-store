@@ -261,7 +261,7 @@ export function useAIConcierge() {
                 clearRequestTimers();
                 setIsSlowResponse(false);
 
-                const assistantMsg: ConciergeAssistantMessage = {
+                let assistantMsg: ConciergeAssistantMessage = {
                     id: assistantMessageId,
                     role: 'assistant',
                     content: response.message,
@@ -302,7 +302,7 @@ export function useAIConcierge() {
                 }
 
                 if (assistantMsg.capsule_contract && assistantMsg.capsule_contract.capsule_name === 'cart_operator') {
-                    convertCartOperatorToAdvisoryCta(assistantMsg);
+                    assistantMsg = convertCartOperatorToAdvisoryCta(assistantMsg);
                 }
 
                 setMessages((prev) => {

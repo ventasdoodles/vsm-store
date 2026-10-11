@@ -1,18 +1,28 @@
-﻿import { executeStorefrontKittingBasketCapsule } from '@/services/ai-capsule-orchestrator.service';
+import { executeStorefrontKittingBasketCapsule } from '@/services/ai-capsule-orchestrator.service';
 import { buildCesarinActionableNextStepView } from '@/lib/cesarin-stage5';
 import { compactCesarinCopy, getEffectiveConversationalPrefix, isMeaningfullyDistinct, mergeConversationalPrefix } from '@/lib/cesarin-text-utils';
 import { getProductsByIds } from '@/services/products.service';
 import { extractTelemetryNextStepTruth } from '../helpers';
 import { logAITelemetry } from '../telemetry';
 import type { ConciergeTurnAnalysis } from '../types';
-import { DispatchClientCapsuleParams, ClientCapsuleDispatchResult } from '../capsule-dispatcher';
+import type { DispatchClientCapsuleParams, ClientCapsuleDispatchResult } from '../dispatch.types';
 
 export const handleStorefrontKittingBasket = async (
     params: DispatchClientCapsuleParams,
     noWriteSmokeActive: boolean
 ): Promise<ClientCapsuleDispatchResult | null> => {
-    const data = params.data; const query = params.query; const history = params.history; const customerProfile = params.customerProfile; const catalogGate = params.catalogGate; const turnAnalysis = params.turnAnalysis; const sourceContext = params.sourceContext; const invokeStart = params.invokeStart; const effectiveTelemetrySessionId = params.effectiveTelemetrySessionId;
-    
+    const {
+        data,
+        query,
+        history,
+        customerProfile,
+        catalogGate,
+        turnAnalysis,
+        sourceContext,
+        invokeStart,
+        effectiveTelemetrySessionId,
+    } = params;
+
     const capsuleContract = await executeStorefrontKittingBasketCapsule(data.tool_args);
     const kitProducts = capsuleContract.resolved_products?.length
         ? await getProductsByIds(capsuleContract.resolved_products.map((product) => product.id))
@@ -50,7 +60,7 @@ export const handleStorefrontKittingBasket = async (
     });
     const compactBaseMessage = compactCesarinCopy(
         adaptiveConversation.message || capsuleContract.customer_response_draft || '',
-        2,
+        visibleProducts.length > 0 ? 2 : 3,
     );
     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
     const renderableNextStepGuidance = compactNextStepGuidance
@@ -62,54 +72,57 @@ export const handleStorefrontKittingBasket = async (
         || adaptiveConversation.nextStep.secondaryAction
         || adaptiveConversation.nextStep.assistAction,
     );
-    const compactNextStepView = shouldShowCatalogSurfaces
-        && adaptiveConversation.nextStep.renderHint === 'SHOW'
-        && (renderableNextStepGuidance || hasMaterialNextStepAction)
+    const compactNextStepView = (adaptiveConversation.nextStep.surfaceKind === 'ACTIONABLE' || hasMaterialNextStepAction)
         ? {
             ...adaptiveConversation.nextStep,
             guidance: renderableNextStepGuidance,
         }
         : undefined;
+
     (capsuleContract as Record<string, any>).resolved_products = visibleProducts;
-    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
     (capsuleContract as Record<string, any>).turn_analysis = kitTurnAnalysis;
     (capsuleContract as Record<string, any>).catalog_gate = catalogGate;
+    (capsuleContract as Record<string, any>).next_step_view = compactNextStepView;
 
-    if (!noWriteSmokeActive) void logAITelemetry({
-        session_id: effectiveTelemetrySessionId,
-        customer_id: customerProfile?.id ?? null,
-        query,
-        response_text: capsuleContract.customer_response_draft ?? null,
-        detected_intent: 'search',
-        routed_capsule: 'storefront_kitting_basket',
-        requires_client_capsule: true,
-        capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
-        fallback_used: capsuleContract.match_strategy !== 'FULL_KIT',
-        response_latency_ms: Date.now() - invokeStart,
-        has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0,
-        product_card_count: shouldShowCatalogSurfaces ? visibleProducts.length : 0,
-        zero_results: !shouldShowCatalogSurfaces || visibleProducts.length === 0,
-        error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
-        offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
-        analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
-        guardrail_overrides: data.debug?.guardrail_telemetry?.guardrail_overrides ?? [],
-        injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
-        capsule_execution_status: capsuleContract.execution_status ?? null,
-        capsule_match_strategy: capsuleContract.match_strategy ?? null,
-        capsule_retrieval_source: capsuleContract.retrieval_source ?? null,
-        routing_path: data.debug?.routing_path ?? null,
-        turn_primary_intent: kitTurnAnalysis.primary_intent,
-        turn_secondary_intents: kitTurnAnalysis.secondary_intents,
-        turn_priority: kitTurnAnalysis.turn_priority,
-        current_turn_decision: kitTurnAnalysis.current_turn_decision,
-        turn_focus: kitTurnAnalysis.turn_focus ?? null,
-        catalog_gate_open: catalogGate.is_open,
-        catalog_gate_reason: catalogGate.reason,
-        next_step_family: extractTelemetryNextStepTruth(compactNextStepView).next_step_family,
-        assist_action_present: extractTelemetryNextStepTruth(compactNextStepView).assist_action_present,
-        source_context_present: Boolean(sourceContext),
-        retrieval_source: capsuleContract.retrieval_source ?? null,
-    });
+    const nextStepTruth = extractTelemetryNextStepTruth(compactNextStepView);
+
+    if (!noWriteSmokeActive) {
+        void logAITelemetry({
+            session_id: effectiveTelemetrySessionId,
+            customer_id: customerProfile?.id ?? null,
+            query,
+            response_text: capsuleContract.customer_response_draft ?? null,
+            detected_intent: 'recommendation',
+            routed_capsule: 'storefront_kitting_basket',
+            requires_client_capsule: true,
+            capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
+            fallback_used: capsuleContract.execution_status !== 'SUCCESS',
+            response_latency_ms: Date.now() - invokeStart,
+            has_product_cards: visibleProducts.length > 0,
+            product_card_count: visibleProducts.length,
+            zero_results: capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
+            error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
+            offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
+            analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
+            guardrail_overrides: data.debug?.guardrail_telemetry?.guardrail_overrides ?? [],
+            injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
+            capsule_execution_status: capsuleContract.execution_status ?? null,
+            capsule_match_strategy: capsuleContract.match_strategy ?? null,
+            capsule_retrieval_source: capsuleContract.retrieval_source ?? null,
+            routing_path: data.debug?.routing_path ?? null,
+            turn_primary_intent: kitTurnAnalysis.primary_intent,
+            turn_secondary_intents: kitTurnAnalysis.secondary_intents,
+            turn_priority: kitTurnAnalysis.turn_priority,
+            current_turn_decision: kitTurnAnalysis.current_turn_decision,
+            turn_focus: kitTurnAnalysis.turn_focus ?? null,
+            catalog_gate_open: catalogGate.is_open,
+            catalog_gate_reason: catalogGate.reason,
+            next_step_family: nextStepTruth.next_step_family,
+            assist_action_present: nextStepTruth.assist_action_present,
+            source_context_present: Boolean(sourceContext),
+            retrieval_source: capsuleContract.retrieval_source ?? null,
+        }).catch((err) => console.error('[Telemetry] Failed to log kitting basket:', err));
+    }
 
     const finalMessage = mergeConversationalPrefix(
         adaptiveConversation.message || capsuleContract.customer_response_draft,
@@ -119,11 +132,11 @@ export const handleStorefrontKittingBasket = async (
             turnAnalysis: kitTurnAnalysis,
             sourceContext,
         }),
-        shouldShowCatalogSurfaces ? 2 : 3,
+        visibleProducts.length > 0 ? 2 : 3,
     );
 
     return {
-        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', shouldShowCatalogSurfaces ? 2 : 3),
+        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', visibleProducts.length > 0 ? 2 : 3),
         suggestedProducts: visibleProducts,
         intent: 'recommendation',
         turn_analysis: kitTurnAnalysis,
@@ -132,5 +145,3 @@ export const handleStorefrontKittingBasket = async (
         capsule_contract: capsuleContract,
     };
 };
-
-

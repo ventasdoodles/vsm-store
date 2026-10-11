@@ -1,0 +1,13 @@
+{
+  "batch_id": "batch-1790964321-HeGgdyz6Jn4Y14yZ7itJ",
+  "model": "anthropic/claude-opus-5.5-20260921",
+  "usage": {
+    "prompt_tokens": 171294,
+    "completion_tokens": 29821,
+    "total_tokens": 201115,
+    "cost": 0.640798,
+    "is_byok": false
+  },
+  "cost": 0.640798,
+  "finalized_at": 1790965122
+}

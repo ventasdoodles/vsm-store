@@ -1599,6 +1599,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         fireEvent.click(screen.getByText('Elegir opcion de Waka Pod'));
 
+        expect(addItemMock).not.toHaveBeenCalled();
         expect(navigateMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 to: '/$section/$slug',

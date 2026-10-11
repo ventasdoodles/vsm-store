@@ -1,78 +1,132 @@
 import type { ConciergeMessage, ConciergeTurnAnalysis } from './types';
 
 export type ConciergeAssistantMessage = ConciergeMessage & {
-    capsule_contract?: Record<string, any>;
+    capsule_contract?: Record<string, unknown>;
 };
+
+export interface AddMutationProposal {
+    type: 'ADD';
+    resolved_product_id: string;
+    product_ref?: string;
+    quantity?: number;
+    resolved_variant_id?: string;
+    variant_name?: string;
+    section?: string;
+    product_section?: string;
+    slug?: string;
+    product_slug?: string;
+}
+
+function isAddMutationProposal(value: unknown): value is AddMutationProposal {
+    if (!value || typeof value !== 'object') return false;
+    const candidate = value as Record<string, unknown>;
+    return (
+        candidate.type === 'ADD'
+        && typeof candidate.resolved_product_id === 'string'
+        && candidate.resolved_product_id.trim().length > 0
+    );
+}
 
 /**
  * Transforms an automatic cart operator proposal into an advisory CTA that requires
  * explicit user interaction before mutating the cart.
+ * Pure function: returns a new message object without mutating the input message.
  */
-export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMessage): void {
+export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMessage): ConciergeAssistantMessage {
     const contract = message.capsule_contract;
     const proposal = contract?.mutation_proposal;
 
     if (
         contract?.match_strategy === 'EXACT_MUTATION_PROPOSED'
-        && proposal?.type === 'ADD'
-        && typeof proposal.resolved_product_id === 'string'
-        && proposal.resolved_product_id.length > 0
+        && isAddMutationProposal(proposal)
     ) {
         const productName = typeof proposal.product_ref === 'string' && proposal.product_ref.trim().length > 0
-            ? proposal.product_ref.trim()
+            ? proposal.product_ref.trim().slice(0, 100)
             : 'este producto';
-        const quantity = Number.isFinite(proposal.quantity) && proposal.quantity > 0
-            ? Math.floor(proposal.quantity)
+
+        // Floor first, then validate strictly >= 1 and clamp to max 99
+        const rawQuantity = Number(proposal.quantity);
+        const flooredQuantity = Math.floor(rawQuantity);
+        const quantity = Number.isFinite(flooredQuantity) && flooredQuantity >= 1
+            ? Math.min(flooredQuantity, 99)
             : 1;
 
-        message.intent = 'search';
-        message.content = 'Lo puedo preparar para carrito, pero solo se agrega si tu confirmas con el boton.';
-        message.capsule_contract = {
-            ...contract,
-            next_step_view: {
-                family: 'ADD_READY',
-                guidance: `Si ${productName} es el correcto, confirmalo desde el boton para agregarlo al carrito.`,
-                surfaceKind: 'ACTIONABLE',
-                primaryAction: {
-                    kind: 'ADD_TO_CART',
-                    label: quantity > 1 ? `Agregar ${quantity} x ${productName}` : `Agregar ${productName}`,
-                    product: {
-                        id: proposal.resolved_product_id,
-                        name: productName,
-                        slug: '',
-                        section: 'vape',
+        const variantId = typeof proposal.resolved_variant_id === 'string' && proposal.resolved_variant_id.trim().length > 0
+            ? proposal.resolved_variant_id.trim()
+            : null;
+
+        const section = typeof (proposal.section ?? proposal.product_section) === 'string'
+            && String(proposal.section ?? proposal.product_section).trim().length > 0
+            ? String(proposal.section ?? proposal.product_section).trim()
+            : 'catalogo';
+
+        const slug = typeof (proposal.slug ?? proposal.product_slug) === 'string'
+            ? String(proposal.slug ?? proposal.product_slug).trim()
+            : '';
+
+        const variantName = typeof proposal.variant_name === 'string' && proposal.variant_name.trim().length > 0
+            ? proposal.variant_name.trim()
+            : 'Opción seleccionada';
+
+        return {
+            ...message,
+            intent: 'search',
+            content: 'Lo puedo preparar para carrito, pero solo se agrega si tú confirmas con el botón.',
+            capsule_contract: {
+                ...contract,
+                next_step_view: {
+                    family: 'ADD_READY',
+                    guidance: `Si ${productName} es el correcto, confírmalo desde el botón para agregarlo al carrito.`,
+                    surfaceKind: 'ACTIONABLE',
+                    primaryAction: {
+                        kind: 'ADD_TO_CART',
+                        label: quantity > 1 ? `Agregar ${quantity} x ${productName}` : `Agregar ${productName}`,
+                        product: {
+                            id: proposal.resolved_product_id.trim(),
+                            name: productName,
+                            slug,
+                            section,
+                        },
+                        quantity,
+                        variantToken: variantId
+                            ? {
+                                id: variantId,
+                                name: variantName,
+                            }
+                            : null,
                     },
-                    quantity,
-                    variantToken: proposal.resolved_variant_id
-                        ? {
-                            id: proposal.resolved_variant_id,
-                            name: 'Variante',
-                        }
-                        : null,
+                    secondaryAction: null,
+                    assistAction: null,
                 },
-                secondaryAction: null,
-                assistAction: null,
             },
         };
-        return;
     }
 
-    message.intent = 'info';
-    message.content = 'No voy a mover tu carrito automaticamente. Dime el producto exacto o abre la ficha para confirmarlo.';
+    return {
+        ...message,
+        intent: 'info',
+        content: 'No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.',
+    };
 }
+
+const NON_SEARCH_SUPPORT_REGEX = /\b(envio|envios|pedido|pedidos|orden|ordenes|tracking|rastreo|rastrear|politica|politicas|garantia|garantias|reembolso|reembolsos|devolucion|devoluciones|cambio|cambios|cancelar|cancelacion|factura|facturacion|compatible|compatibilidad|postventa|whatsapp|soporte)\b/i;
+
+const DISCOVERY_INTENT_REGEX = /\b(recomienda|recomiendame|recomendar|busco|buscar|opciones|catalogo|vape|vapes|vapeador|vapeadores|pod|pods|kit|kits|cartucho|cartuchos|dispositivo|dispositivos|liquido|liquidos|desechable|desechables)\b/i;
 
 /**
  * Lexical heuristic to determine if a turn is unambiguous support / post-sale / policy inquiry
  * rather than a product discovery search query.
+ * Uses bounded length and word boundary tokens to prevent ReDoS and substring false negatives.
  */
 export function isCurrentTurnClearlyNonSearch(content: string): boolean {
-    const normalized = content
+    if (!content || typeof content !== 'string') return false;
+    const truncated = content.slice(0, 2000);
+    const normalized = truncated
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
 
-    return /(envio|pedido|orden|tracking|rastre|politi|garanti|reembolso|devolu|cambio|cancel|factura|compatible|compatibilidad|postventa|whatsapp|soporte)/.test(normalized)
-        && !/(recomi|busco|quiero ver|opciones|vape|pod|kit|cartucho|dispositivo|liquido|desechable)/.test(normalized);
+    return NON_SEARCH_SUPPORT_REGEX.test(normalized) && !DISCOVERY_INTENT_REGEX.test(normalized);
 }
 
 /**
@@ -90,39 +144,48 @@ export function extractTurnAnalysis(response: {
 }
 
 /**
- * Filters out empty and duplicate strings.
+ * Filters out empty and duplicate strings with pre-trimming normalization.
  */
 export function uniqueStringList(values: string[]): string[] {
-    return [...new Set(values.filter((value) => value.trim().length > 0))];
+    if (!Array.isArray(values)) return [];
+    const trimmed = values
+        .map((v) => (typeof v === 'string' ? v.trim() : ''))
+        .filter((v) => v.length > 0);
+    return [...new Set(trimmed)];
 }
 
 /**
  * Computes updated preferences and AI conversation context when a user interacts with product recommendations.
+ * Allows passing an optional clock/date parameter for deterministic testing.
  */
 export function computeUpdatedConciergePreferences(
     currentPrefs: Record<string, any> | null | undefined,
     currentIAContext: Record<string, any> | null | undefined,
     displayContent: string,
-    lastIntent: string
+    lastIntent: string,
+    now: Date = new Date()
 ) {
-    const loweredContent = displayContent.toLowerCase();
-    const hint = loweredContent.includes('vape')
+    const loweredContent = (typeof displayContent === 'string' ? displayContent : '').toLowerCase();
+    const hint = loweredContent.includes('vape') || loweredContent.includes('vapeador')
         ? 'vape'
         : loweredContent.includes('herbal')
             ? 'herbal'
             : undefined;
 
+    const existingInterests = Array.isArray(currentPrefs?.interests) ? currentPrefs.interests : [];
+    const sanitizedInterest = typeof displayContent === 'string' ? displayContent.trim().slice(0, 150) : '';
+
     const newPrefs = {
         ...currentPrefs,
         visual_theme_hint: hint || currentPrefs?.visual_theme_hint,
-        interests: [...(currentPrefs?.interests || []), displayContent].slice(-5),
+        interests: uniqueStringList([...existingInterests, sanitizedInterest]).slice(-5),
     };
 
     const newIAContext = {
         ...currentIAContext,
         last_intent: lastIntent,
-        last_query: displayContent,
-        last_update: new Date().toISOString(),
+        last_query: sanitizedInterest,
+        last_update: now.toISOString(),
     };
 
     return { newPrefs, newIAContext };

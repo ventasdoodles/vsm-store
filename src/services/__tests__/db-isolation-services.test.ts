@@ -1,5 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const fromMock = vi.hoisted(() => vi.fn());
 const channelMock = vi.hoisted(() => vi.fn());
@@ -24,7 +26,20 @@ import { invokeVisualCompatibilityScanner } from '@/services/visual-scanner.serv
 
 describe('Database isolation services', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
+    });
+
+    describe('Architectural Hook Isolation Guard', () => {
+        it('ensures zero hooks in src/hooks directly import @/lib/supabase', () => {
+            const hooksDir = path.resolve(process.cwd(), 'src/hooks');
+            const hookFiles = fs.readdirSync(hooksDir).filter((f) => f.endsWith('.ts') || f.endsWith('.tsx'));
+
+            for (const file of hookFiles) {
+                const content = fs.readFileSync(path.join(hooksDir, file), 'utf8');
+                expect(content).not.toMatch(/from ['"]@\/lib\/supabase['"]/);
+                expect(content).not.toMatch(/from ['"]@supabase\/supabase-js['"]/);
+            }
+        });
     });
 
     describe('getAppliedReferral', () => {
@@ -45,6 +60,19 @@ describe('Database isolation services', () => {
             expect(result).toEqual({ referrer_id: 'ref-1', status: 'completed' });
         });
 
+        it('returns null when no referral exists', async () => {
+            const maybeSingleMock = vi.fn().mockResolvedValue({
+                data: null,
+                error: null,
+            });
+            const eqMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+            fromMock.mockReturnValue({ select: selectMock });
+
+            const result = await getAppliedReferral('customer-non-existent');
+            expect(result).toBeNull();
+        });
+
         it('throws error if supabase query fails', async () => {
             const maybeSingleMock = vi.fn().mockResolvedValue({
                 data: null,
@@ -59,21 +87,23 @@ describe('Database isolation services', () => {
     });
 
     describe('checkBackendHealth', () => {
-        it('performs a lightweight count query on categories', async () => {
-            const limitMock = vi.fn().mockResolvedValue({ error: null });
+        it('performs a lightweight ping query on categories with abortSignal', async () => {
+            const abortSignalMock = vi.fn().mockResolvedValue({ error: null });
+            const limitMock = vi.fn().mockReturnValue({ abortSignal: abortSignalMock });
             const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
             fromMock.mockReturnValue({ select: selectMock });
 
             const result = await checkBackendHealth();
 
             expect(fromMock).toHaveBeenCalledWith('categories');
-            expect(selectMock).toHaveBeenCalledWith('id', { count: 'exact', head: true });
+            expect(selectMock).toHaveBeenCalledWith('id');
             expect(limitMock).toHaveBeenCalledWith(1);
             expect(result).toBe(true);
         });
 
         it('throws if categories heartbeat returns an error', async () => {
-            const limitMock = vi.fn().mockResolvedValue({ error: new Error('Connection refused') });
+            const abortSignalMock = vi.fn().mockResolvedValue({ error: new Error('Connection refused') });
+            const limitMock = vi.fn().mockReturnValue({ abortSignal: abortSignalMock });
             const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
             fromMock.mockReturnValue({ select: selectMock });
 
@@ -82,16 +112,17 @@ describe('Database isolation services', () => {
     });
 
     describe('subscribeToRealtimeOrders', () => {
-        it('registers a realtime channel and returns an unsubscribe function', () => {
+        it('registers a unique realtime channel and returns an unsubscribe function that sets disposed flag', () => {
             const channelInstance: any = {};
             channelInstance.on = vi.fn().mockReturnValue(channelInstance);
             channelInstance.subscribe = vi.fn().mockReturnValue(channelInstance);
             channelMock.mockReturnValue(channelInstance);
+            removeChannelMock.mockResolvedValue('ok');
 
             const onNewOrder = vi.fn();
             const unsubscribe = subscribeToRealtimeOrders(onNewOrder);
 
-            expect(channelMock).toHaveBeenCalledWith('public:orders_pulse');
+            expect(channelMock).toHaveBeenCalledWith(expect.stringMatching(/^orders_pulse_/));
             expect(channelInstance.on).toHaveBeenCalledWith(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'orders' },
@@ -135,15 +166,20 @@ describe('Database isolation services', () => {
             expect(result).toEqual(mockResponse);
         });
 
-        it('throws on edge function invocation error', async () => {
+        it('throws with preserved cause on edge function invocation error', async () => {
+            const invokeErr = { message: 'Function timeout', status: 504 };
             functionsInvokeMock.mockResolvedValue({
                 data: null,
-                error: { message: 'Function timeout' },
+                error: invokeErr,
             });
 
-            await expect(
-                invokeVisualCompatibilityScanner('data:image/png;base64,abc', 'image/png')
-            ).rejects.toThrow('Function timeout');
+            try {
+                await invokeVisualCompatibilityScanner('data:image/png;base64,abc', 'image/png');
+                expect.fail('Should have thrown');
+            } catch (err: any) {
+                expect(err.message).toBe('Function timeout');
+                expect(err.cause).toBe(invokeErr);
+            }
         });
     });
 });

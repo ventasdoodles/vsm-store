@@ -10,8 +10,8 @@ import {
 
 describe('turn-advisory service', () => {
     describe('convertCartOperatorToAdvisoryCta', () => {
-        it('converts an EXACT_MUTATION_PROPOSED ADD proposal into an actionable ADD_READY CTA', () => {
-            const message: ConciergeAssistantMessage = {
+        it('purely converts an EXACT_MUTATION_PROPOSED ADD proposal without mutating input message', () => {
+            const originalMessage: ConciergeAssistantMessage = {
                 id: '1',
                 role: 'assistant',
                 content: 'Original message',
@@ -24,17 +24,25 @@ describe('turn-advisory service', () => {
                         product_ref: 'Caliburn G3',
                         quantity: 2,
                         resolved_variant_id: 'var-456',
+                        variant_name: 'Negro Mate',
+                        section: 'vape',
+                        slug: 'caliburn-g3',
                     },
                 },
             };
 
-            convertCartOperatorToAdvisoryCta(message);
+            const result = convertCartOperatorToAdvisoryCta(originalMessage);
 
-            expect(message.intent).toBe('search');
-            expect(message.content).toContain('solo se agrega si tu confirmas');
-            expect(message.capsule_contract?.next_step_view).toEqual({
+            // Verify immutability
+            expect(originalMessage.content).toBe('Original message');
+            expect(originalMessage.intent).toBeUndefined();
+
+            // Verify transformed result
+            expect(result.intent).toBe('search');
+            expect(result.content).toContain('solo se agrega si tú confirmas con el botón');
+            expect(result.capsule_contract?.next_step_view).toEqual({
                 family: 'ADD_READY',
-                guidance: 'Si Caliburn G3 es el correcto, confirmalo desde el boton para agregarlo al carrito.',
+                guidance: 'Si Caliburn G3 es el correcto, confírmalo desde el botón para agregarlo al carrito.',
                 surfaceKind: 'ACTIONABLE',
                 primaryAction: {
                     kind: 'ADD_TO_CART',
@@ -42,18 +50,56 @@ describe('turn-advisory service', () => {
                     product: {
                         id: 'prod-123',
                         name: 'Caliburn G3',
-                        slug: '',
+                        slug: 'caliburn-g3',
                         section: 'vape',
                     },
                     quantity: 2,
                     variantToken: {
                         id: 'var-456',
-                        name: 'Variante',
+                        name: 'Negro Mate',
                     },
                 },
                 secondaryAction: null,
                 assistAction: null,
             });
+        });
+
+        it('strictly clamps quantities: floor(0.5) falls back to 1, <=0 falls back to 1, and 1e6 clamps to 99', () => {
+            const makeMsg = (quantity: number): ConciergeAssistantMessage => ({
+                id: 'q-test',
+                role: 'assistant',
+                content: '',
+                timestamp: new Date(),
+                capsule_contract: {
+                    match_strategy: 'EXACT_MUTATION_PROPOSED',
+                    mutation_proposal: {
+                        type: 'ADD',
+                        resolved_product_id: 'prod-1',
+                        product_ref: 'Pod',
+                        quantity,
+                    },
+                },
+            });
+
+            // 0.5 must not become 0
+            const res05 = convertCartOperatorToAdvisoryCta(makeMsg(0.5));
+            const action05 = (res05.capsule_contract?.next_step_view as any)?.primaryAction;
+            expect(action05.quantity).toBe(1);
+
+            // 0 must fall back to 1
+            const res0 = convertCartOperatorToAdvisoryCta(makeMsg(0));
+            const action0 = (res0.capsule_contract?.next_step_view as any)?.primaryAction;
+            expect(action0.quantity).toBe(1);
+
+            // negative must fall back to 1
+            const resNeg = convertCartOperatorToAdvisoryCta(makeMsg(-5));
+            const actionNeg = (resNeg.capsule_contract?.next_step_view as any)?.primaryAction;
+            expect(actionNeg.quantity).toBe(1);
+
+            // 1e6 must clamp to 99
+            const resMax = convertCartOperatorToAdvisoryCta(makeMsg(1_000_000));
+            const actionMax = (resMax.capsule_contract?.next_step_view as any)?.primaryAction;
+            expect(actionMax.quantity).toBe(99);
         });
 
         it('falls back to informational message when proposal is not an exact ADD mutation', () => {
@@ -70,25 +116,36 @@ describe('turn-advisory service', () => {
                 },
             };
 
-            convertCartOperatorToAdvisoryCta(message);
+            const result = convertCartOperatorToAdvisoryCta(message);
 
-            expect(message.intent).toBe('info');
-            expect(message.content).toBe('No voy a mover tu carrito automaticamente. Dime el producto exacto o abre la ficha para confirmarlo.');
+            expect(result.intent).toBe('info');
+            expect(result.content).toBe('No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.');
         });
     });
 
     describe('isCurrentTurnClearlyNonSearch', () => {
-        it('identifies shipping and tracking questions as clearly non-search', () => {
-            expect(isCurrentTurnClearlyNonSearch('¿Cual es el estatus de mi envio?')).toBe(true);
+        it('identifies shipping, warranty, and tracking questions as clearly non-search with accents and diacritics', () => {
+            expect(isCurrentTurnClearlyNonSearch('¿Cuál es el estatus de mi envío?')).toBe(true);
             expect(isCurrentTurnClearlyNonSearch('rastreo de mi pedido por favor')).toBe(true);
             expect(isCurrentTurnClearlyNonSearch('necesito mi factura')).toBe(true);
-            expect(isCurrentTurnClearlyNonSearch('politica de garantia')).toBe(true);
+            expect(isCurrentTurnClearlyNonSearch('política de garantía y devolución')).toBe(true);
+        });
+
+        it('correctly handles word boundaries without substring false negatives ("podrías", "podemos")', () => {
+            expect(isCurrentTurnClearlyNonSearch('¿Podrías rastrear mi pedido?')).toBe(true);
+            expect(isCurrentTurnClearlyNonSearch('¿Puedo cancelar? No podemos esperar el envío')).toBe(true);
         });
 
         it('does not classify queries mentioning search/product keywords as non-search', () => {
             expect(isCurrentTurnClearlyNonSearch('busco un vape')).toBe(false);
             expect(isCurrentTurnClearlyNonSearch('quiero ver opciones de pod')).toBe(false);
-            expect(isCurrentTurnClearlyNonSearch('recomiendame un liquido')).toBe(false);
+            expect(isCurrentTurnClearlyNonSearch('recomiéndame un líquido')).toBe(false);
+            expect(isCurrentTurnClearlyNonSearch('busco un kit de inicio')).toBe(false);
+        });
+
+        it('safely handles empty strings and huge inputs', () => {
+            expect(isCurrentTurnClearlyNonSearch('')).toBe(false);
+            expect(isCurrentTurnClearlyNonSearch('a'.repeat(5000))).toBe(false);
         });
     });
 
@@ -109,25 +166,27 @@ describe('turn-advisory service', () => {
     });
 
     describe('uniqueStringList', () => {
-        it('deduplicates and removes empty or whitespace-only strings', () => {
-            expect(uniqueStringList(['a', 'b', 'a', '', '   ', 'c'])).toEqual(['a', 'b', 'c']);
+        it('deduplicates and normalizes strings with leading/trailing whitespace', () => {
+            expect(uniqueStringList(['a', ' a', 'a ', '', '   ', 'b'])).toEqual(['a', 'b']);
         });
     });
 
     describe('computeUpdatedConciergePreferences', () => {
-        it('updates preferences with visual theme hint and limits interests to 5', () => {
+        it('updates preferences with visual theme hint and accepts deterministic now timestamp', () => {
             const currentPrefs = {
                 interests: ['pod', 'salt', 'liquid', 'kit', 'mesh'],
             };
             const currentContext = {
                 last_intent: 'info',
             };
+            const fixedTime = new Date('2026-10-11T12:00:00.000Z');
 
             const result = computeUpdatedConciergePreferences(
                 currentPrefs,
                 currentContext,
                 'me interesa un vape recargable',
-                'recommendation'
+                'recommendation',
+                fixedTime
             );
 
             expect(result.newPrefs.visual_theme_hint).toBe('vape');
@@ -135,6 +194,7 @@ describe('turn-advisory service', () => {
             expect(result.newPrefs.interests[4]).toBe('me interesa un vape recargable');
             expect(result.newIAContext.last_intent).toBe('recommendation');
             expect(result.newIAContext.last_query).toBe('me interesa un vape recargable');
+            expect(result.newIAContext.last_update).toBe('2026-10-11T12:00:00.000Z');
         });
     });
 });

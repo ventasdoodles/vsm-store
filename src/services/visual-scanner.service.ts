@@ -40,7 +40,9 @@ export async function invokeVisualCompatibilityScanner(
     });
 
     if (invokeError) {
-        throw new Error(invokeError.message || 'Error al conectar con el motor de visi\u00f3n.');
+        const error = new Error(invokeError.message || 'Error al conectar con el motor de visión.');
+        (error as any).cause = invokeError;
+        throw error;
     }
 
     if (!data) {

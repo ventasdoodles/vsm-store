@@ -205,8 +205,12 @@ function extractBatchResult(batchData) {
   const firstResult = batchData.results[0];
   const responseBody = firstResult.response?.body;
   const choice = responseBody?.choices?.[0];
-  const content = choice?.message?.content || null;
+  let content = choice?.message?.content || null;
   const reasoning = choice?.message?.reasoning || null;
+
+  if (!content && reasoning) {
+    content = `### Auditor Reasoning\n\n${reasoning}`;
+  }
 
   return {
     custom_id: firstResult.custom_id,

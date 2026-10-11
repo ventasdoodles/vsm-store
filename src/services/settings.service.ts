@@ -144,16 +144,32 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
 }
 
 /**
- * Heartbeat check: verifies database availability by pinging a lightweight public table.
+ * Heartbeat check: verifies database availability by pinging a lightweight public table with strict 5s timeout.
  */
-export async function checkBackendHealth(): Promise<boolean> {
-    const { error } = await supabase
-        .from('categories')
-        .select('id', { count: 'exact', head: true })
-        .limit(1);
+export async function checkBackendHealth(timeoutMs: number = 5000): Promise<boolean> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-    if (error) {
-        throw error;
+    try {
+        const { error } = await supabase
+            .from('categories')
+            .select('id')
+            .limit(1)
+            .abortSignal(controller.signal);
+
+        if (error) {
+            console.error('[checkBackendHealth] Ping returned error:', error);
+            throw error;
+        }
+        return true;
+    } catch (err) {
+        if (controller.signal.aborted) {
+            const timeoutError = new Error(`[checkBackendHealth] Database ping timed out after ${timeoutMs}ms`);
+            console.error(timeoutError.message);
+            throw timeoutError;
+        }
+        throw err;
+    } finally {
+        clearTimeout(timer);
     }
-    return true;
 }
