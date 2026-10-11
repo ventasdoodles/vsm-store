@@ -69,10 +69,16 @@ describe('compactCesarinCopy', () => {
         expect(result.split('.').filter(Boolean).length).toBeLessThanOrEqual(2);
     });
 
-    it('strips redundant closing sentences', () => {
+    it('preserves helpful closing sentences and polite Mexican phrasing without censoring', () => {
         const input = 'Tu pedido va bien. Si quieres te muestro más opciones.';
         const result = compactCesarinCopy(input);
-        expect(result).not.toContain('Si quieres te muestro');
+        expect(result).toBe('Tu pedido va bien. Si quieres te muestro más opciones.');
+    });
+
+    it('strips empty filler closing sentences', () => {
+        const input = 'Tu pedido va bien. Para no hacerla larga.';
+        const result = compactCesarinCopy(input);
+        expect(result).not.toContain('Para no hacerla larga');
     });
 });
 

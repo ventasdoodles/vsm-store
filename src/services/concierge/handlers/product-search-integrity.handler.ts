@@ -101,7 +101,7 @@ export const handleProductSearchIntegrity = async (
     }
     capsuleContract.attachment_offer = attachmentOffer ?? undefined;
     const productSearchMessageSeed = actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '';
-    const compactBaseMessage = compactCesarinCopy(productSearchMessageSeed, 2);
+    const compactBaseMessage = compactCesarinCopy(productSearchMessageSeed, 8);
     const compactNextStepGuidance = compactCesarinCopy(actionableConversation.nextStep.guidance, 1);
     const renderableNextStepGuidance = compactNextStepGuidance
         && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance)

@@ -37,7 +37,7 @@ export function splitIntoSentences(value: string): string[] {
 
 function isRedundantClosingSentence(sentence: string): boolean {
     const normalized = normalizeCompactText(sentence);
-    return /^(si quieres|si ya te gusto|si te late|si gustas|te conviene|vete por|yo arrancaria|yo me iria|para no hacerla larga|para no alargarla|te dejo unas opciones|te dejo unas cercanas|te paso|te muestro|si quieres te muestro|si quieres te paso|si quieres te dejo|si quieres te saco)/.test(normalized);
+    return /^(para no hacerla larga|para no alargarla)$/.test(normalized);
 }
 
 export function compactCesarinCopy(value: string, maxSentences = 8): string {

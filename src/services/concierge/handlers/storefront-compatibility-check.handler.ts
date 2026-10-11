@@ -64,7 +64,7 @@ export const handleStorefrontCompatibilityCheck = async (
 
     const compactBaseMessage = compactCesarinCopy(
         adaptiveConversation.message || capsuleContract.customer_response_draft || '',
-        visibleProducts.length > 0 ? 2 : 3,
+        8,
     );
     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
     const renderableNextStepGuidance = compactNextStepGuidance
@@ -139,11 +139,11 @@ export const handleStorefrontCompatibilityCheck = async (
             turnAnalysis: compatibilityTurnAnalysis,
             sourceContext,
         }),
-        visibleProducts.length > 0 ? 2 : 3,
+        8,
     );
 
     return {
-        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', visibleProducts.length > 0 ? 2 : 3),
+        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', 8),
         suggestedProducts: visibleProducts,
         intent: 'info',
         turn_analysis: compatibilityTurnAnalysis,

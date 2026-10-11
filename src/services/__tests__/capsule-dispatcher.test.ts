@@ -71,7 +71,7 @@ describe('CapsuleDispatcher resilience and security', () => {
         expect(spy).toHaveBeenCalled();
         expect(res).not.toBeNull();
         expect(res?.message).toBe(
-            'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.'
+            'No pude completar esa consulta en este momento. Podemos intentarlo de nuevo o, si me dices el modelo que tienes, te ayudo a ubicar la refacción.'
         );
         expect(res?.intent).toBe('info');
         expect(res?.turn_analysis).toEqual(baseParams.turnAnalysis);
@@ -94,7 +94,7 @@ describe('CapsuleDispatcher resilience and security', () => {
         const res = await dispatchClientCapsule(malformedParams as any);
         expect(res).not.toBeNull();
         expect(res?.message).toBe(
-            'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.'
+            'No pude completar esa consulta en este momento. Podemos intentarlo de nuevo o, si me dices el modelo que tienes, te ayudo a ubicar la refacción.'
         );
     });
 });

@@ -59,7 +59,7 @@ export const handleStorefrontBudgetRescue = async (
     });
     const compactBaseMessage = compactCesarinCopy(
         adaptiveConversation.message || capsuleContract.customer_response_draft || '',
-        visibleProducts.length > 0 ? 2 : 3,
+        8,
     );
     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
     const renderableNextStepGuidance = compactNextStepGuidance
@@ -133,11 +133,11 @@ export const handleStorefrontBudgetRescue = async (
             turnAnalysis: budgetTurnAnalysis,
             sourceContext,
         }),
-        visibleProducts.length > 0 ? 2 : 3,
+        8,
     );
 
     return {
-        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', visibleProducts.length > 0 ? 2 : 3),
+        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', 8),
         suggestedProducts: visibleProducts,
         intent: 'recommendation',
         turn_analysis: budgetTurnAnalysis,

@@ -11,7 +11,7 @@ Sin embargo, identificaste 3 riesgos residuales concretos para alcanzar el **ACC
 2. El timeout de `checkBackendHealth` dependía únicamente de `AbortSignal` y carecía de garantía y test si la consulta se congelaba sin liquidar la promesa al abortar.
 3. Se requería evidencia explícita de test para la cantidad booleana en `turn-advisory.test.ts`.
 
-El equipo de ingeniería ha implementado en el commit `b4d17b6b` la resolución integral y rigurosa de estos 3 puntos, complementando los 4 bloqueos originales. Tu misión es evaluar si la remediación actual satisface tus exigencias y amerita el veredicto definitivo de **ACCEPT**.
+El equipo de ingeniería ha implementado en el commit `fb27139a` la resolución integral y rigurosa de estos 3 puntos, complementando los 4 bloqueos originales. Tu misión es evaluar si la remediación actual satisface tus exigencias y amerita el veredicto definitivo de **ACCEPT**.
 
 ---
 
@@ -110,7 +110,7 @@ El equipo de ingeniería ha implementado en el commit `b4d17b6b` la resolución 
   - `db-isolation-services.test.ts` -> **17/17 PASS**
   - Total en suites afectadas: **46/46 PASS**.
 - **Pruebas de Concierge UI:** `AIConcierge.test.tsx` -> **30/30 PASS**.
-- **Git Hygiene:** Árbol limpio, cero BOM (validado con script binario UTF-8), commit `b4d17b6b` en `origin/main`.
+- **Git Hygiene:** Árbol limpio, cero BOM (validado con script binario UTF-8), commit `fb27139a` en `origin/main`.
 
 ---
 
@@ -304,7 +304,7 @@ index 00000000..cbaaf822
 +    });
 +});
 diff --git a/src/services/__tests__/db-isolation-services.test.ts b/src/services/__tests__/db-isolation-services.test.ts
-index f4566ff0..5c2468e3 100644
+index f4566ff0..c9cc801b 100644
 --- a/src/services/__tests__/db-isolation-services.test.ts
 +++ b/src/services/__tests__/db-isolation-services.test.ts
 @@ -1,5 +1,7 @@
@@ -315,7 +315,7 @@ index f4566ff0..5c2468e3 100644
  
  const fromMock = vi.hoisted(() => vi.fn());
  const channelMock = vi.hoisted(() => vi.fn());
-@@ -24,7 +26,83 @@ import { invokeVisualCompatibilityScanner } from '@/services/visual-scanner.serv
+@@ -24,7 +26,88 @@ import { invokeVisualCompatibilityScanner } from '@/services/visual-scanner.serv
  
  describe('Database isolation services', () => {
      beforeEach(() => {
@@ -327,20 +327,20 @@ index f4566ff0..5c2468e3 100644
 +    describe('Architectural Hook Isolation Guard', () => {
 +        function detectIllegalSupabaseImports(content: string): string[] {
 +            const violations: string[] = [];
-+            // 1. Side-effect imports: import '@/lib/supabase' or import '@supabase/supabase-js'
-+            if (/import\s+['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)['"]/.test(content)) {
++            // 1. Side-effect imports: import '@/lib/supabase' or import '@supabase/supabase-js' (including subpaths like /index)
++            if (/import\s+['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)(?:\/[^'"]*)?['"]/.test(content)) {
 +                violations.push('Side-effect import of supabase');
 +            }
-+            // 2. Dynamic imports: import('@/lib/supabase') or import('@supabase/supabase-js')
-+            if (/import\s*\(\s*['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)['"]\s*\)/.test(content)) {
++            // 2. Dynamic imports: import('@/lib/supabase') or import('@supabase/supabase-js') (including subpaths like /index)
++            if (/import\s*\(\s*['"][^'"]*(?:@\/lib\/supabase|@supabase\/supabase-js)(?:\/[^'"]*)?['"]\s*\)/.test(content)) {
 +                violations.push('Dynamic import of supabase');
 +            }
-+            // 3. Static runtime imports from @/lib/supabase or relative to supabase
-+            if (/import\s+(?!type\b)[^'"]*from\s+['"][^'"]*lib\/supabase['"]/.test(content)) {
++            // 3. Static runtime imports from @/lib/supabase or relative to supabase (including subpaths like /index)
++            if (/import\s+(?!type\b)[^'"]*from\s+['"][^'"]*lib\/supabase(?:\/[^'"]*)?['"]/.test(content)) {
 +                violations.push('Static runtime import from lib/supabase');
 +            }
-+            // 4. Static runtime imports from @supabase/supabase-js
-+            if (/import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js['"]/.test(content)) {
++            // 4. Static runtime imports from @supabase/supabase-js (including subpaths)
++            if (/import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js(?:\/[^'"]*)?['"]/.test(content)) {
 +                violations.push('Static runtime import from @supabase/supabase-js');
 +            }
 +            // 5. CJS require: require('@/lib/supabase') or require('@supabase/...')
@@ -356,13 +356,18 @@ index f4566ff0..5c2468e3 100644
 +
 +        it('exhaustively catches side-effect, dynamic, static runtime, require, and re-export imports in synthetic fixtures', () => {
 +            expect(detectIllegalSupabaseImports("import '@/lib/supabase';")).toContain('Side-effect import of supabase');
++            expect(detectIllegalSupabaseImports("import '@/lib/supabase/index';")).toContain('Side-effect import of supabase');
 +            expect(detectIllegalSupabaseImports("import '@supabase/supabase-js';")).toContain('Side-effect import of supabase');
 +            expect(detectIllegalSupabaseImports("const sb = await import('@supabase/supabase-js');")).toContain('Dynamic import of supabase');
 +            expect(detectIllegalSupabaseImports("const sb = await import('@/lib/supabase');")).toContain('Dynamic import of supabase');
++            expect(detectIllegalSupabaseImports("const sb = await import('@/lib/supabase/index');")).toContain('Dynamic import of supabase');
 +            expect(detectIllegalSupabaseImports("import { supabase } from '@/lib/supabase';")).toContain('Static runtime import from lib/supabase');
++            expect(detectIllegalSupabaseImports("import { supabase } from '@/lib/supabase/index';")).toContain('Static runtime import from lib/supabase');
 +            expect(detectIllegalSupabaseImports("import { createClient } from '@supabase/supabase-js';")).toContain('Static runtime import from @supabase/supabase-js');
++            expect(detectIllegalSupabaseImports("import { createClient } from '@supabase/supabase-js/dist/main';")).toContain('Static runtime import from @supabase/supabase-js');
 +            expect(detectIllegalSupabaseImports("const sb = require('@/lib/supabase');")).toContain('require of supabase');
 +            expect(detectIllegalSupabaseImports("export { supabase } from '@/lib/supabase';")).toContain('Runtime re-export of supabase');
++            expect(detectIllegalSupabaseImports("export { supabase } from '@/lib/supabase/index';")).toContain('Runtime re-export of supabase');
 +
 +            // Must allow valid type-only imports and local variable names
 +            expect(detectIllegalSupabaseImports("import type { User } from '@supabase/supabase-js';")).toEqual([]);
@@ -400,7 +405,7 @@ index f4566ff0..5c2468e3 100644
      });
  
      describe('getAppliedReferral', () => {
-@@ -45,6 +123,19 @@ describe('Database isolation services', () => {
+@@ -45,6 +128,19 @@ describe('Database isolation services', () => {
              expect(result).toEqual({ referrer_id: 'ref-1', status: 'completed' });
          });
  
@@ -420,7 +425,7 @@ index f4566ff0..5c2468e3 100644
          it('throws error if supabase query fails', async () => {
              const maybeSingleMock = vi.fn().mockResolvedValue({
                  data: null,
-@@ -59,21 +150,23 @@ describe('Database isolation services', () => {
+@@ -59,39 +155,52 @@ describe('Database isolation services', () => {
      });
  
      describe('checkBackendHealth', () => {
@@ -448,7 +453,18 @@ index f4566ff0..5c2468e3 100644
              const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
              fromMock.mockReturnValue({ select: selectMock });
  
-@@ -82,16 +175,17 @@ describe('Database isolation services', () => {
+             await expect(checkBackendHealth()).rejects.toThrow('Connection refused');
+         });
++
++        it('times out and aborts if query promise hangs and never resolves', async () => {
++            // Promise that never settles
++            const hangingAbortSignalMock = vi.fn().mockImplementation(() => new Promise(() => {}));
++            const limitMock = vi.fn().mockReturnValue({ abortSignal: hangingAbortSignalMock });
++            const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
++            fromMock.mockReturnValue({ select: selectMock });
++
++            await expect(checkBackendHealth(50)).rejects.toThrow('Database ping timed out after 50ms');
++        });
      });
  
      describe('subscribeToRealtimeOrders', () => {
@@ -468,7 +484,7 @@ index f4566ff0..5c2468e3 100644
              expect(channelInstance.on).toHaveBeenCalledWith(
                  'postgres_changes',
                  { event: 'INSERT', schema: 'public', table: 'orders' },
-@@ -102,6 +196,176 @@ describe('Database isolation services', () => {
+@@ -102,6 +211,176 @@ describe('Database isolation services', () => {
              unsubscribe();
              expect(removeChannelMock).toHaveBeenCalledWith(channelInstance);
          });
@@ -645,7 +661,7 @@ index f4566ff0..5c2468e3 100644
      });
  
      describe('invokeVisualCompatibilityScanner', () => {
-@@ -135,15 +399,20 @@ describe('Database isolation services', () => {
+@@ -135,15 +414,20 @@ describe('Database isolation services', () => {
              expect(result).toEqual(mockResponse);
          });
  
@@ -968,7 +984,7 @@ index 00000000..db8d98b1
 +    });
 +});
 diff --git a/src/services/__tests__/turn-advisory.test.ts b/src/services/__tests__/turn-advisory.test.ts
-index 871e3470..e4c34e22 100644
+index 871e3470..d6ab9ef2 100644
 --- a/src/services/__tests__/turn-advisory.test.ts
 +++ b/src/services/__tests__/turn-advisory.test.ts
 @@ -10,8 +10,8 @@ import {
@@ -1013,7 +1029,7 @@ index 871e3470..e4c34e22 100644
                  surfaceKind: 'ACTIONABLE',
                  primaryAction: {
                      kind: 'ADD_TO_CART',
-@@ -42,13 +50,13 @@ describe('turn-advisory service', () => {
+@@ -42,18 +50,160 @@ describe('turn-advisory service', () => {
                      product: {
                          id: 'prod-123',
                          name: 'Caliburn G3',
@@ -1026,13 +1042,13 @@ index 871e3470..e4c34e22 100644
                          id: 'var-456',
 -                        name: 'Variante',
 +                        name: 'Negro Mate',
-                     },
-                 },
-                 secondaryAction: null,
-@@ -56,6 +64,123 @@ describe('turn-advisory service', () => {
-             });
-         });
- 
++                    },
++                },
++                secondaryAction: null,
++                assistAction: null,
++            });
++        });
++
 +        it('strictly clamps quantities: floor(0.5) falls back to 1, <=0 falls back to 1, and 1e6 clamps to 99', () => {
 +            const makeMsg = (quantity: number): ConciergeAssistantMessage => ({
 +                id: 'q-test',
@@ -1088,8 +1104,8 @@ index 871e3470..e4c34e22 100644
 +                        quantity: 1,
 +                        section: 'vape',
 +                        slug: '',
-+                    },
-+                },
+                     },
+                 },
 +            };
 +
 +            const resultSlug = convertCartOperatorToAdvisoryCta(missingSlugMsg);
@@ -1099,9 +1115,9 @@ index 871e3470..e4c34e22 100644
 +                guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
 +                surfaceKind: 'INFORMATIONAL',
 +                primaryAction: null,
-+                secondaryAction: null,
-+                assistAction: null,
-+            });
+                 secondaryAction: null,
+                 assistAction: null,
+             });
 +
 +            const missingSectionMsg: ConciergeAssistantMessage = {
 +                id: 'no-section',
@@ -1150,10 +1166,33 @@ index 871e3470..e4c34e22 100644
 +            expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
 +        });
 +
++        it('degrades to informational KEEP_EXPLORING without ADD_TO_CART when proposal.quantity is boolean', () => {
++            const boolQtyMsg: ConciergeAssistantMessage = {
++                id: 'bool-qty',
++                role: 'assistant',
++                content: 'Original',
++                timestamp: new Date(),
++                capsule_contract: {
++                    match_strategy: 'EXACT_MUTATION_PROPOSED',
++                    mutation_proposal: {
++                        type: 'ADD',
++                        resolved_product_id: 'prod-1',
++                        product_ref: 'Pod',
++                        quantity: true as any,
++                        section: 'vape',
++                        slug: 'pod-test',
++                    },
++                },
++            };
++
++            const result = convertCartOperatorToAdvisoryCta(boolQtyMsg);
++            expect(result.intent).toBe('info');
++            expect(result.capsule_contract?.next_step_view?.surfaceKind).toBe('INFORMATIONAL');
++            expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
+         });
+ 
          it('falls back to informational message when proposal is not an exact ADD mutation', () => {
-             const message: ConciergeAssistantMessage = {
-                 id: '2',
-@@ -70,25 +195,67 @@ describe('turn-advisory service', () => {
+@@ -70,25 +220,67 @@ describe('turn-advisory service', () => {
                  },
              };
  
@@ -1228,7 +1267,7 @@ index 871e3470..e4c34e22 100644
          });
      });
  
-@@ -109,25 +276,27 @@ describe('turn-advisory service', () => {
+@@ -109,25 +301,27 @@ describe('turn-advisory service', () => {
      });
  
      describe('uniqueStringList', () => {
@@ -1260,7 +1299,7 @@ index 871e3470..e4c34e22 100644
              );
  
              expect(result.newPrefs.visual_theme_hint).toBe('vape');
-@@ -135,6 +304,7 @@ describe('turn-advisory service', () => {
+@@ -135,6 +329,7 @@ describe('turn-advisory service', () => {
              expect(result.newPrefs.interests[4]).toBe('me interesa un vape recargable');
              expect(result.newIAContext.last_intent).toBe('recommendation');
              expect(result.newIAContext.last_query).toBe('me interesa un vape recargable');
@@ -3313,15 +3352,16 @@ index c2b9cde7..9ffebd78 100644
      };
  }
 diff --git a/src/services/settings.service.ts b/src/services/settings.service.ts
-index 1ec46354..f7de1e6b 100644
+index 1ec46354..223baf9e 100644
 --- a/src/services/settings.service.ts
 +++ b/src/services/settings.service.ts
-@@ -144,16 +144,32 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
+@@ -144,16 +144,44 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
  }
  
  /**
 - * Heartbeat check: verifies database availability by pinging a lightweight public table.
 + * Heartbeat check: verifies database availability by pinging a lightweight public table with strict 5s timeout.
++ * Guarantees timely completion via Promise.race even if the underlying database driver fails to settle on abort.
   */
 -export async function checkBackendHealth(): Promise<boolean> {
 -    const { error } = await supabase
@@ -3333,20 +3373,31 @@ index 1ec46354..f7de1e6b 100644
 -        throw error;
 +export async function checkBackendHealth(timeoutMs: number = 5000): Promise<boolean> {
 +    const controller = new AbortController();
-+    const timer = setTimeout(() => controller.abort(), timeoutMs);
++    let timer: ReturnType<typeof setTimeout> | undefined;
++
++    const timeoutPromise = new Promise<never>((_, reject) => {
++        timer = setTimeout(() => {
++            controller.abort();
++            reject(new Error(`[checkBackendHealth] Database ping timed out after ${timeoutMs}ms`));
++        }, timeoutMs);
++    });
 +
 +    try {
-+        const { error } = await supabase
-+            .from('categories')
-+            .select('id')
-+            .limit(1)
-+            .abortSignal(controller.signal);
++        const queryPromise = (async () => {
++            const { error } = await supabase
++                .from('categories')
++                .select('id')
++                .limit(1)
++                .abortSignal(controller.signal);
 +
-+        if (error) {
-+            console.error('[checkBackendHealth] Ping returned error:', error);
-+            throw error;
-+        }
-+        return true;
++            if (error) {
++                console.error('[checkBackendHealth] Ping returned error:', error);
++                throw error;
++            }
++            return true;
++        })();
++
++        return await Promise.race([queryPromise, timeoutPromise]);
 +    } catch (err) {
 +        if (controller.signal.aborted) {
 +            const timeoutError = new Error(`[checkBackendHealth] Database ping timed out after ${timeoutMs}ms`);
@@ -3355,7 +3406,7 @@ index 1ec46354..f7de1e6b 100644
 +        }
 +        throw err;
 +    } finally {
-+        clearTimeout(timer);
++        if (timer) clearTimeout(timer);
      }
 -    return true;
  }

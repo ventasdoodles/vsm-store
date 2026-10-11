@@ -58,12 +58,12 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
             return {
                 ...message,
                 intent: 'info',
-                content: 'No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.',
+                content: 'Claro, te ayudo. Veo más de una opción posible y no quiero agregar la equivocada: dime cuál es o selecciónala desde su ficha.',
                 capsule_contract: {
                     ...contract,
                     next_step_view: {
                         family: 'KEEP_EXPLORING',
-                        guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
+                        guidance: 'Dime cuál es o selecciónala desde su ficha para no agregar la equivocada.',
                         surfaceKind: 'INFORMATIONAL',
                         primaryAction: null,
                         secondaryAction: null,
@@ -128,7 +128,7 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
             ...message.capsule_contract,
             next_step_view: {
                 family: 'KEEP_EXPLORING',
-                guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
+                guidance: 'Dime cuál es o selecciónala desde su ficha para no agregar la equivocada.',
                 surfaceKind: 'INFORMATIONAL',
                 primaryAction: null,
                 secondaryAction: null,
@@ -140,7 +140,7 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
     return {
         ...message,
         intent: 'info',
-        content: 'No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.',
+        content: 'Claro, te ayudo. Veo más de una opción posible y no quiero agregar la equivocada: dime cuál es o selecciónala desde su ficha.',
         capsule_contract: sanitizedContract,
     };
 }

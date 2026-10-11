@@ -36,6 +36,10 @@ import {
     geminiStreamGenerateContent,
     getGeminiRuntimePolicy,
 } from '../../_shared/gemini-api.ts'
+import {
+    generateLlmCompletion,
+    streamLlmCompletion,
+} from '../../_shared/llm-provider.ts'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, buildCesarinNonHollowFallbackText, compactCesarinResponseText } from '../persona.ts'
 import { buildDegradedPolicyInquiryFallback } from '../policy-degraded-fallback.ts'
@@ -1019,7 +1023,7 @@ export async function handleConciergeChat(
                 `PRIORIDAD: ${turnProfile.turn_priority.join(' > ')}`,
                 `DECISION DEL TURNO: ${turnProfile.current_turn_decision}`,
                 `FOCO: ${turnProfile.turn_focus}`,
-                `REGLA DE TURNO:\n- Responde directo cuando baste.\n- Pregunta solo por el dato minimo util.\n- Resuelve primero el intent principal del turno actual.\n- Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.\n- Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.\n- Si no hubo verdad real de catalogo, politica, tracking, compatibilidad o contexto web publico util, no inventes.\n- Haz una sola jugada central por turno.\n- Usa maximo dos frases cortas cuando alcance.\n- Usa maximo una pregunta.\n- No repitas la misma recomendacion en respuesta, resumen y cierre.\n- No cierres con empuje comercial por reflejo.`,
+                `REGLA DE TURNO:\n- Responde directo cuando baste.\n- Da a cada respuesta el espacio que necesite: breve para algo sencillo y más explicativa para una comparación, compatibilidad o decisión con matices.\n- Resuelve primero el intent principal del turno actual con datos confirmados.\n- Si hay intents secundarios, déjalos como cola natural y no los mezcles todos en una sola salida.\n- Si el cliente cambió de carril, sigue el carril del turno actual y no la inercia del historial.\n- Si no hubo verdad real de catálogo, política, tracking, compatibilidad o contexto web público útil, no inventes.\n- Prioriza una recomendación principal clara; si el cliente pide comparar, explica la diferencia que sí cambia la decisión.\n- Pregunta únicamente el dato que realmente impida avanzar.\n- No repitas la misma recomendación en respuesta, resumen y cierre.\n- No cierres con empuje comercial por reflejo.`,
                 `--- CATALOG GATE ---\nABIERTO: ${catalogGate.is_open ? 'SI' : 'NO'}\nRAZON: ${catalogGate.reason}\nREGLA DE CATALOGO:\n- Si el gate esta cerrado, no muestres tarjetas, recuperacion aproximada ni siguiente paso de producto.\n- Si el gate esta abierto, puedes usar catalogo solo para resolver mejor el turno actual.`,
                 `CLIENTE: "${query || 'Audio Context'}"`
             ];
@@ -1416,7 +1420,15 @@ export async function handleConciergeChat(
                         
                         let streamRes: Response;
                         if (!shouldShortCircuitClarification) {
-                            streamRes = await geminiStreamGenerateContent({ ...geminiOptions, signal: controller.signal });
+                            streamRes = await streamLlmCompletion({
+                                systemPrompt: sommelierSystemPrompt,
+                                userPrompt: sommelierUserPromptBlocks.filter(Boolean).join('\n\n'),
+                                history: Array.isArray(history) ? history.slice(-6) : [],
+                                temperature: 0.4,
+                                reasoningEffort: 'low',
+                                signal: controller.signal,
+                                geminiFallback: geminiOptions,
+                            });
                         } else {
                             streamRes = new Response('');
                         }
@@ -1496,19 +1508,26 @@ export async function handleConciergeChat(
                     try {
                         const controller = new AbortController();
                         const timeoutId = setTimeout(() => controller.abort(), 25000);
-                        sommelierResponse = await geminiGenerateContent({ ...geminiOptions, signal: controller.signal });
+                        const completion = await generateLlmCompletion({
+                            systemPrompt: sommelierSystemPrompt,
+                            userPrompt: sommelierUserPromptBlocks.filter(Boolean).join('\n\n'),
+                            history: Array.isArray(history) ? history.slice(-6) : [],
+                            temperature: 0.4,
+                            reasoningEffort: 'low',
+                            signal: controller.signal,
+                            geminiFallback: geminiOptions,
+                        });
                         clearTimeout(timeoutId);
+                        sommelierResponse = completion.response;
+                        sommelierResult = completion.data;
+                        rawText = completion.rawText;
 
                         if (sommelierResponse.status === 429) {
                             sommelier_gemini_error = 'Sommelier rate limit (429)';
                         } else if (sommelierResponse.status >= 500) {
                             sommelier_gemini_error = `Sommelier server error (${sommelierResponse.status})`;
                         } else if (!sommelierResponse.ok) {
-                            sommelierResult = await sommelierResponse.json();
-                            sommelier_gemini_error = sommelierResult.error?.message || `HTTP ${sommelierResponse.status}`;
-                        } else {
-                            sommelierResult = await sommelierResponse.json();
-                            rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                            sommelier_gemini_error = (sommelierResult as any)?.error?.message || `HTTP ${sommelierResponse.status}`;
                         }
                     } catch (e: unknown) {
                         const msg = e instanceof Error ? e.message : String(e);

@@ -60,7 +60,7 @@ export function useAIConcierge() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: 'Que onda, soy Cesarin. Te ayudo a ubicar algo de volada y si no me la se, te lo digo derecho.',
+            content: '¡Qué onda! Soy Cesarin. ¿Buscas algo en particular o te ayudo a encontrar una buena opción?',
             timestamp: new Date(),
         },
     ]);
@@ -107,7 +107,7 @@ export function useAIConcierge() {
                     message.id === 'welcome'
                         ? {
                             ...message,
-                            content: `Que onda ${firstName}. Soy Cesarin; te ayudo a encontrar algo y, si algo me agarra en curva, te lo digo sin inventarte cosas.`,
+                            content: `¡Qué onda, ${firstName}! Soy Cesarin. Cuéntame qué traes en mente y lo vemos juntos.`,
                         }
                         : message,
                 ),
