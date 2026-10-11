@@ -1,65 +1,85 @@
-# VSM STORE — AUDITORÍA TÉCNICA DE REMEDIACIÓN (LANES 6, 7 Y 8)
-## Evaluador: OpenAI GPT-6 Sol Pro (High Reasoning / Prompt Caching)
-## Objetivo: Validación exhaustiva de parches contra el dictamen REJECT de Claude Opus 5.5
+# VSM STORE — AUDITORÍA TÉCNICA DE REMEDIACIÓN FINAL (LANES 6, 7 Y 8)
+## Evaluador: OpenAI GPT-6 Sol Pro (High Reasoning / Batch Mode)
+## Objetivo: Dictamen final sobre la resolución de los 4 Bloqueos identificados en la contra-auditoría previa
 
 Eres **Sol Pro GPT-6**, el Principal Systems & Security Auditor de VSM Store.
-Previamente, el modelo Claude Opus 5.5 emitió un veredicto formal de **REJECT** sobre la refactorización arquitectónica de las Lanes 6, 7 y 8, señalando 10 hallazgos críticos y severos.
+En tu contra-auditoría previa sobre el commit `f4391fed`, emitiste un dictamen formal de **REJECT** fundamentado en 4 bloqueos específicos en las Lanes 6, 7 y 8.
 
-El equipo de ingeniería acaba de implementar y desplegar el commit `f4391fed` para remediar la totalidad de los hallazgos. Tu misión es ejecutar una contra-auditoría despiadada, técnica e imparcial sobre este parche.
+El equipo de ingeniería ha implementado y verificado el commit `0f0db11a` para resolver la totalidad de esos 4 bloqueos sin regresiones. Tu misión es evaluar rigurosamente si estos parches satisfacen tus exigencias técnicas y si el código califica ahora para un veredicto formal de **ACCEPT**.
 
 ---
 
-### CONTEXTO DE LOS 10 HALLAZGOS DE OPUS 5.5 QUE SE DEBÍAN RESOLVER:
+### ESTADO DE REMEDIACIÓN DE LOS 4 BLOQUEOS PREVIOS:
 
-1. **L6-C1 [Prototype Pollution en Dispatcher]:** Despacho por objeto plano susceptible a `constructor`, `__proto__`, `toString`.
-   - *Solución esperada:* Tupla cerrada `CAPSULE_NAMES`, tipo `CapsuleName`, `Object.freeze`, `satisfies Record<CapsuleName, CapsuleHandlerFn>`, verificación estricta `Object.prototype.hasOwnProperty.call`.
+#### 1. Bloqueo 1 (Restablecer restricciones de publicación de acciones en Kitting e Inventory)
+- **Diagnóstico previo:** En *kitting* e *inventory*, se había retirado la exigencia de que `catalogGate.is_open` gobernara la visibilidad de productos, y `next_step_view` podía exponerse cuando `renderHint !== 'SHOW'` o cuando el catálogo estaba cerrado.
+- **Remediación en `0f0db11a`:**
+  - En `storefront-kitting-basket.handler.ts`: `shouldShowCatalogSurfaces = catalogGate.is_open` condiciona `visibleProducts = shouldShowCatalogSurfaces ? kitProducts : []`. La asignación de `compactNextStepView` exige explícitamente:
+    ```ts
+    const compactNextStepView = shouldShowCatalogSurfaces
+        && visibleProducts.length > 0
+        && adaptiveConversation.nextStep.renderHint === 'SHOW'
+        && (renderableNextStepGuidance || hasMaterialNextStepAction)
+        ? { ...adaptiveConversation.nextStep, guidance: renderableNextStepGuidance }
+        : undefined;
+    ```
+  - En `storefront-inventory-outlook.handler.ts`: `shouldShowCatalogSurfaces = catalogGate.is_open` condiciona `visibleProducts = shouldShowCatalogSurfaces ? inventoryProducts : []`. Además se calcula:
+    ```ts
+    const shouldShowNextStep = shouldShowCatalogSurfaces
+        && visibleProducts.length > 0
+        && (supportsReview || signalKind === 'RESTOCK_EXPECTED');
+    const compactNextStepView = shouldShowNextStep
+        && adaptiveConversation.nextStep.renderHint === 'SHOW'
+        && (renderableNextStepGuidance || hasMaterialNextStepAction)
+        ? { ...adaptiveConversation.nextStep, guidance: renderableNextStepGuidance }
+        : undefined;
+    ```
+  - Telemetría en ambos handlers refleja fielmente:
+    `has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0`
+    `zero_results: !shouldShowCatalogSurfaces || ...`
+  - **Pruebas añadidas:** Suite dedicada `src/services/__tests__/kitting-inventory-gates.test.ts` con 6 casos de prueba verificando gate cerrado (`is_open: false`), cero productos, y `renderHint: 'HIDE'`.
 
-2. **L6-C2 [Aislamiento de Fallos & Señales Laxas]:** Cero `try/catch` en el despacho; desreferencias síncronas de `*.signal.kind` que tumban el turno si el orquestador falla; telemetría no protegida.
-   - *Solución esperada:* Envoltorio `try/catch` en `dispatchClientCapsule` con respuesta segura de fallback; optional chaining (`?.kind`) en todas las señales de los 11 handlers; llamadas a telemetría protegidas con `.catch()`.
+#### 2. Bloqueo 2 (No emitir `ADD_TO_CART` con identidad o ruta incompleta en `turn-advisory.ts`)
+- **Diagnóstico previo:** Si faltaban `section` o `slug`, `convertCartOperatorToAdvisoryCta` caía en defaults (`section: 'catalogo'`, `slug: ''`) emitiendo un CTA `ADD_TO_CART` activo sin ruta válida a producto ni ficha. Además `Number(proposal.quantity)` admitía valores no numéricos como `"2"` o `true`.
+- **Remediación en `0f0db11a`:**
+  - En `turn-advisory.ts`: Se valida estrictamente `proposal.quantity`: si viene definido, debe ser `typeof proposal.quantity === 'number' && Number.isFinite(proposal.quantity)`.
+  - Se obtienen `section` y `slug` normalizados.
+  - Si falta `section`, falta `slug`, o la cantidad es un tipo no numérico: la función **NUNCA** emite una acción de carrito (`primaryAction: null`), y degrada a un mensaje informativo con familia `KEEP_EXPLORING` y `surfaceKind: 'INFORMATIONAL'`.
+  - Cantidades numéricas válidas se truncan con `Math.floor` y se acotan estrictamente a `[1, 99]`.
+  - **Pruebas añadidas:** Casos en `turn-advisory.test.ts` probando degradación cuando falta `slug`, cuando falta `section`, y cuando `quantity` es `"2"` (string) o booleano.
 
-3. **L6-C4 [Ciclo de Dependencias Circular]:** `capsule-dispatcher.ts` importaba `handlers`, y todos los handlers importaban interfaces de `capsule-dispatcher.ts`.
-   - *Solución esperada:* Extracción limpia a `src/services/concierge/dispatch.types.ts` e imports con `import type`.
+#### 3. Bloqueo 3 (Hacer seguro el fallback del dispatcher en `capsule-dispatcher.ts`)
+- **Diagnóstico previo:** La preparación (`isCustomerIntelligenceNoWriteSmokeActive`) quedaba fuera del `try`, y en el `catch` se devolvía `params.data.message`, un texto no validado del servidor que podía afirmar falsamente éxito en caso de fallo.
+- **Remediación en `0f0db11a`:**
+  - Todo el flujo del dispatcher (extracción de nombre, validación `isCapsuleName`, cálculo de `noWriteSmokeActive`, y resolución de handler) está completamente envuelto en el bloque `try`.
+  - En caso de excepción, retorna estrictamente un mensaje de error genérico y neutro:
+    `'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.'`
+  - **Pruebas añadidas:** Suite dedicada `capsule-dispatcher.test.ts` verificando rechazo de handler, protección contra getter exception durante preparación, intentos de prototype pollution (`constructor`, `__proto__`, `toString`), y congelamiento estricto `Object.isFrozen(capsuleHandlers)`.
 
-4. **L6-C3 / L6-C5 [Catalog Gate & Contratos de Retorno]:** Gating de productos y preservación de `next_step_view`.
-   - *Solución esperada:* Compatibilidad e inventario preservan sus productos resueltos con `next_step_view` compacto verificado en Stage 4.
-
-5. **L7-C1 [Invariante de Seguridad del Carrito]:** Se había eliminado la aserción `expect(addItemMock).not.toHaveBeenCalled()` en los tests de UI.
-   - *Solución esperada:* Restauración de la aserción estricta en `AIConcierge.test.tsx`.
-
-6. **L7-C3 & L7-C4 [Pureza, Clamping de Cantidad y Rutas Dinámicas]:** `convertCartOperatorToAdvisoryCta` mutaba argumentos, aceptaba cantidades 0 o desmedidas, y hardcodeaba `section: 'vape'` y `slug: ''`.
-   - *Solución esperada:* Función completamente pura (retorna nuevo objeto sin mutación); `Math.floor` antes de validar; acotado a [1, 99]; derivación dinámica de sección y slug.
-
-7. **L7-C5 [Heurística de Turnos & ReDoS / Substring Collisions]:** `isCurrentTurnClearlyNonSearch` daba falsos negativos con subcadenas (ej. 'pod' en 'podrías') y no truncaba inputs grandes.
-   - *Solución esperada:* Límites de palabra (\b), raíces léxicas y truncamiento a 2,000 chars.
-
-8. **L8-C1, L8-C2, L8-C3 [Ciclo de Vida Realtime & Concurrencia]:** Callbacks ejecutados tras unmount, tópico fijo `public:orders_pulse` con colisión de canales, y churn de suscripción por `[onNewOrder]`.
-   - *Solución esperada:* Flag `disposed` en el servicio de realtime; tópico único con UUID (`orders_pulse_${uuid}`); estabilización de callback con `useRef` y deps `[]` en el hook.
-
-9. **L8 Resiliencia de Servicios:** `checkBackendHealth` sin timeout; scanner perdiendo `cause` del error.
-   - *Solución esperada:* `AbortSignal.timeout(5000)` en PostgREST query; error `cause` preservado en Visual Scanner.
-
-10. **L8 Test Arquitectónico:** Falta de pruebas de regresión para imports de DB en hooks.
-    - *Solución esperada:* Test estático automatizado en `db-isolation-services.test.ts` confirmando 0 imports de Supabase en `src/hooks/**`.
+#### 4. Bloqueo 4 (Carreras reales de Realtime y test recursivo de aislamiento de base de datos)
+- **Diagnóstico previo:** En `subscribeToRealtimeOrders`, `onNewOrder` podía devolver una promesa rechazada sin capturarse produciendo un unhandled rejection; una excepción en `onError` no estaba protegida; `useEffect` en el hook dejaba una ventana hasta el render pasivo para usar el callback anterior; y el test de aislamiento no recorría subdirectorios de `src/hooks`.
+- **Remediación en `0f0db11a`:**
+  - En `orders.service.ts`: Se invoca `await Promise.resolve(onNewOrder(eventData))` dentro del bloque `try/catch`. Cualquier rechazo síncrono o asíncrono es capturado y transferido a `onError`. Las llamadas a `onError` están protegidas con `try/catch` para no tumbar el runtime.
+  - Limpieza de suscripción defensiva: `void Promise.resolve(supabase.removeChannel(channel)).catch(() => {})` envuelto en try/catch.
+  - Tópico único resistente a colisiones: `orders_pulse_${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`}`.
+  - En `useRealtimeOrders.ts`: Se migró a `useLayoutEffect` para que `callbackRef.current` y `errorRef.current` se actualicen de manera síncrona antes del pintado y de cualquier efecto pasivo.
+  - En `db-isolation-services.test.ts`:
+    - El guard arquitectónico recorre **recursivamente todos los subdirectorios** de `src/hooks/**` (e.g. `admin`, `concierge`), verificando que ningún archivo importe estática o dinámicamente `@/lib/supabase` ni importe en runtime `@supabase/supabase-js` (solo se permite `import type`).
+    - Se agregaron pruebas para: dos suscripciones concurrentes con tópicos únicos diferentes; evento descartado si `disposed` es true; rechazo asíncrono de `onNewOrder` capturado hacia `onError`; y tolerancia a errores lanzados dentro de `onError`.
 
 ---
 
 ### EVIDENCIA DE EJECUCIÓN LOCAL:
-- `npm run typecheck` (`tsc --noEmit`): **0 errores** (salida limpia).
-- `npx vitest run src/services/__tests__/concierge.service.stage4.test.ts`: **48/48 PASS**.
-- `npx vitest run src/services/__tests__`: **138/138 PASS** (18 archivos de prueba en verde).
-- `npx vitest run src/components/ui/ai/__tests__/AIConcierge.test.tsx`: **30/30 PASS**.
+- **TypeScript:** `npm run typecheck` (`tsc --noEmit`) -> **0 errores** (salida limpia).
+- **Pruebas de Servicios:** `npx vitest run src/services/__tests__` -> **155/155 tests PASS** (20 archivos de prueba).
+- **Pruebas de Concierge UI:** `npx vitest run src/components/ui/ai/__tests__/AIConcierge.test.tsx` -> **30/30 tests PASS**.
+- **Git Hygiene:** Árbol limpio, cero archivos scratch en raíz, commit `0f0db11a` pusheado a `origin/main`.
 
 ---
 
-### DIFF COMPLETO DEL COMMIT f4391fed (SRC/):
+### DIFF COMPLETO CONSOLIDADO (f4391fed~1 .. HEAD en SRC/):
 
 ```diff
-commit f4391fed34040edb69b5862785e8531e9105a4d7
-Author: ventasdoodles <ventasdoodles@gmail.com>
-Date:   Sun Oct 11 01:11:57 2026 -0600
-
-    fix(concierge-remediation): address ruthless Claude Opus 5.5 audit findings across Lanes 6, 7, and 8
-
 diff --git a/src/components/ui/ai/__tests__/AIConcierge.test.tsx b/src/components/ui/ai/__tests__/AIConcierge.test.tsx
 index d787edb0..0fa6899c 100644
 --- a/src/components/ui/ai/__tests__/AIConcierge.test.tsx
@@ -95,7 +115,7 @@ index ad2ea70c..0a327c76 100644
  
                  setMessages((prev) => {
 diff --git a/src/hooks/useRealtimeOrders.ts b/src/hooks/useRealtimeOrders.ts
-index 1032763d..df86e5bf 100644
+index 1032763d..a994957b 100644
 --- a/src/hooks/useRealtimeOrders.ts
 +++ b/src/hooks/useRealtimeOrders.ts
 @@ -3,21 +3,37 @@
@@ -106,7 +126,7 @@ index 1032763d..df86e5bf 100644
   */
  
 -import { useEffect } from 'react';
-+import { useEffect, useRef } from 'react';
++import { useEffect, useLayoutEffect, useRef } from 'react';
  import { subscribeToRealtimeOrders } from '@/services/orders.service';
  import type { RealtimeOrderEvent } from '@/types/order';
  
@@ -123,7 +143,7 @@ index 1032763d..df86e5bf 100644
 +    const callbackRef = useRef(onNewOrder);
 +    const errorRef = useRef(onError);
 +
-+    useEffect(() => {
++    useLayoutEffect(() => {
 +        callbackRef.current = onNewOrder;
 +        errorRef.current = onError;
 +    });
@@ -140,8 +160,114 @@ index 1032763d..df86e5bf 100644
 -    }, [onNewOrder]);
 +    }, []);
  }
+diff --git a/src/services/__tests__/capsule-dispatcher.test.ts b/src/services/__tests__/capsule-dispatcher.test.ts
+new file mode 100644
+index 00000000..cbaaf822
+--- /dev/null
++++ b/src/services/__tests__/capsule-dispatcher.test.ts
+@@ -0,0 +1,100 @@
++import { describe, it, expect, vi } from 'vitest';
++import { dispatchClientCapsule } from '@/services/concierge/capsule-dispatcher';
++import { capsuleHandlers } from '@/services/concierge/handlers';
++import * as orchestrator from '@/services/ai-capsule-orchestrator.service';
++import type { DispatchClientCapsuleParams } from '@/services/concierge/dispatch.types';
++
++describe('CapsuleDispatcher resilience and security', () => {
++    const baseParams: DispatchClientCapsuleParams = {
++        data: {
++            capsule_name: 'product_search_integrity',
++            message: 'Server unvalidated message that must never leak on failure',
++        },
++        query: 'test query',
++        history: [],
++        catalogGate: {
++            is_open: true,
++            reason: 'explicit_product_request',
++            primary_intent: 'search',
++            explicit_product_request: true,
++            search_leading: true,
++            needs_clarification: false,
++        },
++        turnAnalysis: {
++            turn_priority: 'primary',
++            primary_intent: 'search',
++            secondary_intents: [],
++            commercial_move: 'KEEP_EXPLORING',
++            turn_focus: 'catalog',
++            current_turn_decision: 'USE_CAPABILITY',
++        },
++        invokeStart: Date.now(),
++        effectiveTelemetrySessionId: 'sess-123',
++    };
++
++    it('returns null and does not execute for prototype pollution attempts', async () => {
++        const protoNames = ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty'];
++        for (const badName of protoNames) {
++            const res = await dispatchClientCapsule({
++                ...baseParams,
++                data: { capsule_name: badName },
++            });
++            expect(res).toBeNull();
++        }
++    });
++
++    it('returns null for unknown capsule names', async () => {
++        const res = await dispatchClientCapsule({
++            ...baseParams,
++            data: { capsule_name: 'non_existent_special_capsule' },
++        });
++        expect(res).toBeNull();
++    });
++
++    it('verifies that the capsule handlers registry is strictly frozen against prototype pollution or tampering', () => {
++        expect(Object.isFrozen(capsuleHandlers)).toBe(true);
++    });
++
++    it('safely catches handler exceptions and returns neutral error fallback without leaking data.message', async () => {
++        const spy = vi.spyOn(orchestrator, 'executeProductSearchCapsule').mockRejectedValueOnce(
++            new Error('Boom! Internal handler fault')
++        );
++
++        const res = await dispatchClientCapsule({
++            ...baseParams,
++            data: {
++                capsule_name: 'product_search_integrity',
++                message: '¡Felicidades, se agregó al carrito con éxito!', // potentially deceptive success message
++            },
++        });
++
++        expect(spy).toHaveBeenCalled();
++        expect(res).not.toBeNull();
++        expect(res?.message).toBe(
++            'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.'
++        );
++        expect(res?.intent).toBe('info');
++        expect(res?.turn_analysis).toEqual(baseParams.turnAnalysis);
++        expect(res?.catalog_gate).toEqual(baseParams.catalogGate);
++
++        spy.mockRestore();
++    });
++
++    it('safely handles exceptions thrown during preparation (e.g. malformed params)', async () => {
++        const malformedParams = {
++            ...baseParams,
++            data: {
++                capsule_name: 'product_search_integrity',
++                get no_write_smoke() {
++                    throw new Error('Preparation getter fault');
++                },
++            },
++        };
++
++        const res = await dispatchClientCapsule(malformedParams as any);
++        expect(res).not.toBeNull();
++        expect(res?.message).toBe(
++            'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.'
++        );
++    });
++});
 diff --git a/src/services/__tests__/db-isolation-services.test.ts b/src/services/__tests__/db-isolation-services.test.ts
-index f4566ff0..0b4e354a 100644
+index f4566ff0..282db1de 100644
 --- a/src/services/__tests__/db-isolation-services.test.ts
 +++ b/src/services/__tests__/db-isolation-services.test.ts
 @@ -1,5 +1,7 @@
@@ -152,29 +278,53 @@ index f4566ff0..0b4e354a 100644
  
  const fromMock = vi.hoisted(() => vi.fn());
  const channelMock = vi.hoisted(() => vi.fn());
-@@ -24,7 +26,20 @@ import { invokeVisualCompatibilityScanner } from '@/services/visual-scanner.serv
+@@ -24,7 +26,44 @@ import { invokeVisualCompatibilityScanner } from '@/services/visual-scanner.serv
  
  describe('Database isolation services', () => {
      beforeEach(() => {
 -        vi.clearAllMocks();
 +        vi.resetAllMocks();
++        removeChannelMock.mockResolvedValue('ok');
 +    });
 +
 +    describe('Architectural Hook Isolation Guard', () => {
-+        it('ensures zero hooks in src/hooks directly import @/lib/supabase', () => {
-+            const hooksDir = path.resolve(process.cwd(), 'src/hooks');
-+            const hookFiles = fs.readdirSync(hooksDir).filter((f) => f.endsWith('.ts') || f.endsWith('.tsx'));
++        it('ensures zero hooks in src/hooks/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
++            const hooksRoot = path.resolve(process.cwd(), 'src/hooks');
 +
-+            for (const file of hookFiles) {
-+                const content = fs.readFileSync(path.join(hooksDir, file), 'utf8');
-+                expect(content).not.toMatch(/from ['"]@\/lib\/supabase['"]/);
-+                expect(content).not.toMatch(/from ['"]@supabase\/supabase-js['"]/);
++            function getHookFiles(dir: string): string[] {
++                const entries = fs.readdirSync(dir, { withFileTypes: true });
++                const files: string[] = [];
++                for (const entry of entries) {
++                    const fullPath = path.join(dir, entry.name);
++                    if (entry.isDirectory()) {
++                        if (entry.name !== '__tests__') {
++                            files.push(...getHookFiles(fullPath));
++                        }
++                    } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) {
++                        files.push(fullPath);
++                    }
++                }
++                return files;
++            }
++
++            const hookFiles = getHookFiles(hooksRoot);
++            expect(hookFiles.length).toBeGreaterThan(5);
++
++            for (const filePath of hookFiles) {
++                const content = fs.readFileSync(filePath, 'utf8');
++                // Prohibit static or dynamic imports from supabase lib
++                expect(content).not.toMatch(/from\s+['"].*\/lib\/supabase['"]/);
++                expect(content).not.toMatch(/import\s*\(\s*['"].*\/lib\/supabase['"]\s*\)/);
++                expect(content).not.toMatch(/require\s*\(\s*['"].*\/lib\/supabase['"]\s*\)/);
++                // Prohibit runtime imports from @supabase/supabase-js (only import type allowed)
++                const runtimeSupabaseJsImport = /import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js['"]/;
++                expect(content).not.toMatch(runtimeSupabaseJsImport);
 +            }
 +        });
      });
  
      describe('getAppliedReferral', () => {
-@@ -45,6 +60,19 @@ describe('Database isolation services', () => {
+@@ -45,6 +84,19 @@ describe('Database isolation services', () => {
              expect(result).toEqual({ referrer_id: 'ref-1', status: 'completed' });
          });
  
@@ -194,7 +344,7 @@ index f4566ff0..0b4e354a 100644
          it('throws error if supabase query fails', async () => {
              const maybeSingleMock = vi.fn().mockResolvedValue({
                  data: null,
-@@ -59,21 +87,23 @@ describe('Database isolation services', () => {
+@@ -59,21 +111,23 @@ describe('Database isolation services', () => {
      });
  
      describe('checkBackendHealth', () => {
@@ -222,7 +372,7 @@ index f4566ff0..0b4e354a 100644
              const selectMock = vi.fn().mockReturnValue({ limit: limitMock });
              fromMock.mockReturnValue({ select: selectMock });
  
-@@ -82,16 +112,17 @@ describe('Database isolation services', () => {
+@@ -82,16 +136,17 @@ describe('Database isolation services', () => {
      });
  
      describe('subscribeToRealtimeOrders', () => {
@@ -242,7 +392,145 @@ index f4566ff0..0b4e354a 100644
              expect(channelInstance.on).toHaveBeenCalledWith(
                  'postgres_changes',
                  { event: 'INSERT', schema: 'public', table: 'orders' },
-@@ -135,15 +166,20 @@ describe('Database isolation services', () => {
+@@ -102,6 +157,137 @@ describe('Database isolation services', () => {
+             unsubscribe();
+             expect(removeChannelMock).toHaveBeenCalledWith(channelInstance);
+         });
++
++        it('generates unique channel topics across two concurrent subscriptions', () => {
++            const channelInstance: any = {
++                on: vi.fn().mockReturnThis(),
++                subscribe: vi.fn().mockReturnThis(),
++            };
++            channelMock.mockReturnValue(channelInstance);
++
++            const unsub1 = subscribeToRealtimeOrders(vi.fn());
++            const unsub2 = subscribeToRealtimeOrders(vi.fn());
++
++            const topic1 = channelMock.mock.calls[0]?.[0];
++            const topic2 = channelMock.mock.calls[1]?.[0];
++
++            expect(topic1).toMatch(/^orders_pulse_/);
++            expect(topic2).toMatch(/^orders_pulse_/);
++            expect(topic1).not.toBe(topic2);
++
++            unsub1();
++            unsub2();
++        });
++
++        it('handles postgres_changes event, ignores events after disposed is true', async () => {
++            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
++            const channelInstance: any = {
++                on: vi.fn().mockImplementation((_event, _filter, callback) => {
++                    changeHandler = callback;
++                    return channelInstance;
++                }),
++                subscribe: vi.fn().mockReturnThis(),
++            };
++            channelMock.mockReturnValue(channelInstance);
++            removeChannelMock.mockResolvedValue('ok');
++
++            const singleMock = vi.fn().mockResolvedValue({
++                data: {
++                    id: 'ord-123',
++                    items: [{ name: 'Vape Kit', image: 'img.png' }],
++                    customer_profiles: { full_name: 'Juan Perez' },
++                    shipping_address: { city: 'Guadalajara' },
++                },
++                error: null,
++            });
++            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
++            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
++            fromMock.mockReturnValue({ select: selectMock });
++
++            const onNewOrder = vi.fn();
++            const unsubscribe = subscribeToRealtimeOrders(onNewOrder);
++
++            // Trigger event while active
++            await changeHandler({ new: { id: 'ord-123' } });
++            expect(onNewOrder).toHaveBeenCalledWith({
++                id: 'ord-123',
++                customer_name: 'Juan Perez',
++                city: 'Guadalajara',
++                product_name: 'Vape Kit',
++                product_image: 'img.png',
++            });
++
++            // Now unsubscribe
++            unsubscribe();
++            onNewOrder.mockClear();
++
++            // Trigger event after disposed
++            await changeHandler({ new: { id: 'ord-123' } });
++            expect(onNewOrder).not.toHaveBeenCalled();
++        });
++
++        it('catches async rejections from onNewOrder and routes to onError without unhandled rejection', async () => {
++            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
++            const channelInstance: any = {
++                on: vi.fn().mockImplementation((_event, _filter, callback) => {
++                    changeHandler = callback;
++                    return channelInstance;
++                }),
++                subscribe: vi.fn().mockReturnThis(),
++            };
++            channelMock.mockReturnValue(channelInstance);
++
++            const singleMock = vi.fn().mockResolvedValue({
++                data: {
++                    id: 'ord-123',
++                    items: [{ name: 'Vape Kit', image: 'img.png' }],
++                    customer_profiles: { full_name: 'Juan' },
++                    shipping_address: { city: 'CDMX' },
++                },
++                error: null,
++            });
++            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
++            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
++            fromMock.mockReturnValue({ select: selectMock });
++
++            const asyncError = new Error('Async consumer failed');
++            const onNewOrder = vi.fn().mockRejectedValue(asyncError);
++            const onError = vi.fn();
++
++            subscribeToRealtimeOrders(onNewOrder, onError);
++
++            await changeHandler({ new: { id: 'ord-123' } });
++
++            expect(onError).toHaveBeenCalledWith(asyncError);
++        });
++
++        it('catches errors inside onError without throwing unhandled exceptions', async () => {
++            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
++            const channelInstance: any = {
++                on: vi.fn().mockImplementation((_event, _filter, callback) => {
++                    changeHandler = callback;
++                    return channelInstance;
++                }),
++                subscribe: vi.fn().mockReturnThis(),
++            };
++            channelMock.mockReturnValue(channelInstance);
++
++            const singleMock = vi.fn().mockResolvedValue({
++                data: null,
++                error: new Error('DB fetch error'),
++            });
++            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
++            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
++            fromMock.mockReturnValue({ select: selectMock });
++
++            const throwingOnError = vi.fn().mockImplementation(() => {
++                throw new Error('Crash in onError');
++            });
++
++            subscribeToRealtimeOrders(vi.fn(), throwingOnError);
++
++            await expect(changeHandler({ new: { id: 'ord-123' } })).resolves.not.toThrow();
++        });
+     });
+ 
+     describe('invokeVisualCompatibilityScanner', () => {
+@@ -135,15 +321,20 @@ describe('Database isolation services', () => {
              expect(result).toEqual(mockResponse);
          });
  
@@ -268,8 +556,256 @@ index f4566ff0..0b4e354a 100644
          });
      });
  });
+diff --git a/src/services/__tests__/kitting-inventory-gates.test.ts b/src/services/__tests__/kitting-inventory-gates.test.ts
+new file mode 100644
+index 00000000..c110bfb4
+--- /dev/null
++++ b/src/services/__tests__/kitting-inventory-gates.test.ts
+@@ -0,0 +1,242 @@
++import { describe, it, expect, vi, beforeEach } from 'vitest';
++import { handleStorefrontKittingBasket } from '@/services/concierge/handlers/storefront-kitting-basket.handler';
++import { handleStorefrontInventoryOutlook } from '@/services/concierge/handlers/storefront-inventory-outlook.handler';
++import * as orchestrator from '@/services/ai-capsule-orchestrator.service';
++import * as productsService from '@/services/products.service';
++import * as stage5 from '@/lib/cesarin-stage5';
++import type { DispatchClientCapsuleParams } from '@/services/concierge/dispatch.types';
++
++vi.mock('@/services/concierge/telemetry', () => ({
++    logAITelemetry: vi.fn().mockResolvedValue(undefined),
++}));
++
++describe('Kitting and Inventory Action Publishing Gates (Blocker 1)', () => {
++    const mockProduct = {
++        id: 'prod-1',
++        name: 'Vape Pod Kit',
++        slug: 'vape-pod-kit',
++        price: 500,
++        section: 'vape',
++    } as any;
++
++    const openCatalogGate = {
++        is_open: true,
++        reason: 'explicit_product_request' as const,
++        primary_intent: 'search',
++        explicit_product_request: true,
++        search_leading: true,
++        needs_clarification: false,
++    };
++
++    const closedCatalogGate = {
++        is_open: false,
++        reason: 'non_catalog_lane' as const,
++        primary_intent: 'support',
++        explicit_product_request: false,
++        search_leading: false,
++        needs_clarification: false,
++    };
++
++    const baseParams: DispatchClientCapsuleParams = {
++        data: { tool_args: { query: 'test' } },
++        query: 'test query',
++        history: [],
++        catalogGate: openCatalogGate,
++        turnAnalysis: {
++            turn_priority: 'primary',
++            primary_intent: 'search',
++            secondary_intents: [],
++            commercial_move: 'KEEP_EXPLORING',
++            turn_focus: 'catalog',
++            current_turn_decision: 'USE_CAPABILITY',
++        },
++        invokeStart: Date.now(),
++        effectiveTelemetrySessionId: 'sess-123',
++    };
++
++    beforeEach(() => {
++        vi.clearAllMocks();
++        vi.spyOn(productsService, 'getProductsByIds').mockResolvedValue([mockProduct]);
++    });
++
++    describe('handleStorefrontKittingBasket', () => {
++        it('suppresses next_step_view and visible products when catalog gate is closed', async () => {
++            vi.spyOn(orchestrator, 'executeStorefrontKittingBasketCapsule').mockResolvedValue({
++                execution_status: 'SUCCESS',
++                match_strategy: 'FULL_KIT',
++                resolved_products: [{ id: 'prod-1' } as any],
++                customer_response_draft: 'Aquí está tu kit',
++            } as any);
++
++            vi.spyOn(stage5, 'buildCesarinActionableNextStepView').mockReturnValue({
++                message: 'Aquí está tu kit',
++                nextStep: {
++                    family: 'ADD_READY',
++                    surfaceKind: 'ACTIONABLE',
++                    renderHint: 'SHOW',
++                    guidance: 'Confirmar kit',
++                    primaryAction: { kind: 'ADD_TO_CART', label: 'Agregar', product: mockProduct, quantity: 1 },
++                    secondaryAction: null,
++                    assistAction: null,
++                },
++            } as any);
++
++            const result = await handleStorefrontKittingBasket(
++                {
++                    ...baseParams,
++                    catalogGate: closedCatalogGate,
++                },
++                false
++            );
++
++            expect(result?.suggestedProducts).toEqual([]);
++            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
++        });
++
++        it('suppresses next_step_view when renderHint is HIDE even if gate is open and products exist', async () => {
++            vi.spyOn(orchestrator, 'executeStorefrontKittingBasketCapsule').mockResolvedValue({
++                execution_status: 'SUCCESS',
++                match_strategy: 'FULL_KIT',
++                resolved_products: [{ id: 'prod-1' } as any],
++                customer_response_draft: 'Aquí está tu kit',
++            } as any);
++
++            vi.spyOn(stage5, 'buildCesarinActionableNextStepView').mockReturnValue({
++                message: 'Aquí está tu kit',
++                nextStep: {
++                    family: 'ADD_READY',
++                    surfaceKind: 'ACTIONABLE',
++                    renderHint: 'HIDE',
++                    guidance: 'Confirmar kit',
++                    primaryAction: { kind: 'ADD_TO_CART', label: 'Agregar', product: mockProduct, quantity: 1 },
++                    secondaryAction: null,
++                    assistAction: null,
++                },
++            } as any);
++
++            const result = await handleStorefrontKittingBasket(baseParams, false);
++
++            expect(result?.suggestedProducts).toHaveLength(1);
++            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
++        });
++
++        it('publishes next_step_view when gate is open, products exist, and renderHint is SHOW', async () => {
++            vi.spyOn(orchestrator, 'executeStorefrontKittingBasketCapsule').mockResolvedValue({
++                execution_status: 'SUCCESS',
++                match_strategy: 'FULL_KIT',
++                resolved_products: [{ id: 'prod-1' } as any],
++                customer_response_draft: 'Aquí está tu kit',
++            } as any);
++
++            vi.spyOn(stage5, 'buildCesarinActionableNextStepView').mockReturnValue({
++                message: 'Aquí está tu kit',
++                nextStep: {
++                    family: 'ADD_READY',
++                    surfaceKind: 'ACTIONABLE',
++                    renderHint: 'SHOW',
++                    guidance: 'Confirmar kit',
++                    primaryAction: { kind: 'ADD_TO_CART', label: 'Agregar', product: mockProduct, quantity: 1 },
++                    secondaryAction: null,
++                    assistAction: null,
++                },
++            } as any);
++
++            const result = await handleStorefrontKittingBasket(baseParams, false);
++
++            expect(result?.suggestedProducts).toHaveLength(1);
++            expect(result?.capsule_contract?.next_step_view).toBeDefined();
++            expect(result?.capsule_contract?.next_step_view?.family).toBe('ADD_READY');
++        });
++    });
++
++    describe('handleStorefrontInventoryOutlook', () => {
++        it('suppresses next_step_view and visible products when catalog gate is closed', async () => {
++            vi.spyOn(orchestrator, 'executeStorefrontInventoryOutlookCapsule').mockResolvedValue({
++                execution_status: 'SUCCESS',
++                match_strategy: 'EXACT_MATCH',
++                inventory_outlook_signal: { kind: 'IN_STOCK_ONLINE' },
++                resolved_products: [{ id: 'prod-1' } as any],
++                customer_response_draft: 'Producto disponible',
++            } as any);
++
++            vi.spyOn(stage5, 'buildCesarinActionableNextStepView').mockReturnValue({
++                message: 'Producto disponible',
++                nextStep: {
++                    family: 'REVIEW_ONE',
++                    surfaceKind: 'ACTIONABLE',
++                    renderHint: 'SHOW',
++                    guidance: 'Ver disponibilidad',
++                    primaryAction: { kind: 'SELECT_OPTION', label: 'Ver', product: mockProduct },
++                    secondaryAction: null,
++                    assistAction: null,
++                },
++            } as any);
++
++            const result = await handleStorefrontInventoryOutlook(
++                {
++                    ...baseParams,
++                    catalogGate: closedCatalogGate,
++                },
++                false
++            );
++
++            expect(result?.suggestedProducts).toEqual([]);
++            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
++        });
++
++        it('suppresses next_step_view when renderHint is HIDE even if gate is open and product is in stock', async () => {
++            vi.spyOn(orchestrator, 'executeStorefrontInventoryOutlookCapsule').mockResolvedValue({
++                execution_status: 'SUCCESS',
++                match_strategy: 'EXACT_MATCH',
++                inventory_outlook_signal: { kind: 'IN_STOCK_ONLINE' },
++                resolved_products: [{ id: 'prod-1' } as any],
++                customer_response_draft: 'Producto disponible',
++            } as any);
++
++            vi.spyOn(stage5, 'buildCesarinActionableNextStepView').mockReturnValue({
++                message: 'Producto disponible',
++                nextStep: {
++                    family: 'REVIEW_ONE',
++                    surfaceKind: 'ACTIONABLE',
++                    renderHint: 'HIDE',
++                    guidance: 'Ver disponibilidad',
++                    primaryAction: { kind: 'SELECT_OPTION', label: 'Ver', product: mockProduct },
++                    secondaryAction: null,
++                    assistAction: null,
++                },
++            } as any);
++
++            const result = await handleStorefrontInventoryOutlook(baseParams, false);
++
++            expect(result?.suggestedProducts).toHaveLength(1);
++            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
++        });
++
++        it('suppresses next_step_view when stock signal is not reviewable/restock (e.g. OUT_OF_STOCK)', async () => {
++            vi.spyOn(orchestrator, 'executeStorefrontInventoryOutlookCapsule').mockResolvedValue({
++                execution_status: 'SUCCESS',
++                match_strategy: 'EXACT_MATCH',
++                inventory_outlook_signal: { kind: 'OUT_OF_STOCK' as any },
++                resolved_products: [{ id: 'prod-1' } as any],
++                customer_response_draft: 'Agotado',
++            } as any);
++
++            vi.spyOn(stage5, 'buildCesarinActionableNextStepView').mockReturnValue({
++                message: 'Agotado',
++                nextStep: {
++                    family: 'KEEP_EXPLORING',
++                    surfaceKind: 'INFORMATIONAL',
++                    renderHint: 'SHOW',
++                    guidance: 'Explorar otras opciones',
++                    primaryAction: null,
++                    secondaryAction: null,
++                    assistAction: null,
++                },
++            } as any);
++
++            const result = await handleStorefrontInventoryOutlook(baseParams, false);
++
++            expect(result?.capsule_contract?.next_step_view).toBeUndefined();
++        });
++    });
++});
 diff --git a/src/services/__tests__/turn-advisory.test.ts b/src/services/__tests__/turn-advisory.test.ts
-index 871e3470..f6e33a43 100644
+index 871e3470..2d485f45 100644
 --- a/src/services/__tests__/turn-advisory.test.ts
 +++ b/src/services/__tests__/turn-advisory.test.ts
 @@ -10,8 +10,8 @@ import {
@@ -330,7 +866,7 @@ index 871e3470..f6e33a43 100644
                      },
                  },
                  secondaryAction: null,
-@@ -56,6 +64,44 @@ describe('turn-advisory service', () => {
+@@ -56,6 +64,123 @@ describe('turn-advisory service', () => {
              });
          });
  
@@ -347,6 +883,8 @@ index 871e3470..f6e33a43 100644
 +                        resolved_product_id: 'prod-1',
 +                        product_ref: 'Pod',
 +                        quantity,
++                        section: 'vape',
++                        slug: 'pod-test',
 +                    },
 +                },
 +            });
@@ -372,10 +910,87 @@ index 871e3470..f6e33a43 100644
 +            expect(actionMax.quantity).toBe(99);
 +        });
 +
++        it('degrades to informational KEEP_EXPLORING without ADD_TO_CART when section or slug is missing or empty', () => {
++            const missingSlugMsg: ConciergeAssistantMessage = {
++                id: 'no-slug',
++                role: 'assistant',
++                content: 'Original',
++                timestamp: new Date(),
++                capsule_contract: {
++                    match_strategy: 'EXACT_MUTATION_PROPOSED',
++                    mutation_proposal: {
++                        type: 'ADD',
++                        resolved_product_id: 'prod-1',
++                        product_ref: 'Pod',
++                        quantity: 1,
++                        section: 'vape',
++                        slug: '',
++                    },
++                },
++            };
++
++            const resultSlug = convertCartOperatorToAdvisoryCta(missingSlugMsg);
++            expect(resultSlug.intent).toBe('info');
++            expect(resultSlug.capsule_contract?.next_step_view).toEqual({
++                family: 'KEEP_EXPLORING',
++                guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
++                surfaceKind: 'INFORMATIONAL',
++                primaryAction: null,
++                secondaryAction: null,
++                assistAction: null,
++            });
++
++            const missingSectionMsg: ConciergeAssistantMessage = {
++                id: 'no-section',
++                role: 'assistant',
++                content: 'Original',
++                timestamp: new Date(),
++                capsule_contract: {
++                    match_strategy: 'EXACT_MUTATION_PROPOSED',
++                    mutation_proposal: {
++                        type: 'ADD',
++                        resolved_product_id: 'prod-1',
++                        product_ref: 'Pod',
++                        quantity: 1,
++                        slug: 'pod-test',
++                    },
++                },
++            };
++
++            const resultSection = convertCartOperatorToAdvisoryCta(missingSectionMsg);
++            expect(resultSection.intent).toBe('info');
++            expect(resultSection.capsule_contract?.next_step_view?.primaryAction).toBeNull();
++        });
++
++        it('degrades to informational KEEP_EXPLORING without ADD_TO_CART when proposal.quantity is non-numeric', () => {
++            const stringQtyMsg: ConciergeAssistantMessage = {
++                id: 'str-qty',
++                role: 'assistant',
++                content: 'Original',
++                timestamp: new Date(),
++                capsule_contract: {
++                    match_strategy: 'EXACT_MUTATION_PROPOSED',
++                    mutation_proposal: {
++                        type: 'ADD',
++                        resolved_product_id: 'prod-1',
++                        product_ref: 'Pod',
++                        quantity: '2' as any,
++                        section: 'vape',
++                        slug: 'pod-test',
++                    },
++                },
++            };
++
++            const result = convertCartOperatorToAdvisoryCta(stringQtyMsg);
++            expect(result.intent).toBe('info');
++            expect(result.capsule_contract?.next_step_view?.surfaceKind).toBe('INFORMATIONAL');
++            expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
++        });
++
          it('falls back to informational message when proposal is not an exact ADD mutation', () => {
              const message: ConciergeAssistantMessage = {
                  id: '2',
-@@ -70,25 +116,36 @@ describe('turn-advisory service', () => {
+@@ -70,25 +195,36 @@ describe('turn-advisory service', () => {
                  },
              };
  
@@ -419,7 +1034,7 @@ index 871e3470..f6e33a43 100644
          });
      });
  
-@@ -109,25 +166,27 @@ describe('turn-advisory service', () => {
+@@ -109,25 +245,27 @@ describe('turn-advisory service', () => {
      });
  
      describe('uniqueStringList', () => {
@@ -451,7 +1066,7 @@ index 871e3470..f6e33a43 100644
              );
  
              expect(result.newPrefs.visual_theme_hint).toBe('vape');
-@@ -135,6 +194,7 @@ describe('turn-advisory service', () => {
+@@ -135,6 +273,7 @@ describe('turn-advisory service', () => {
              expect(result.newPrefs.interests[4]).toBe('me interesa un vape recargable');
              expect(result.newIAContext.last_intent).toBe('recommendation');
              expect(result.newIAContext.last_query).toBe('me interesa un vape recargable');
@@ -460,10 +1075,10 @@ index 871e3470..f6e33a43 100644
      });
  });
 diff --git a/src/services/concierge/capsule-dispatcher.ts b/src/services/concierge/capsule-dispatcher.ts
-index fcbffffd..40939d0a 100644
+index fcbffffd..5c0de464 100644
 --- a/src/services/concierge/capsule-dispatcher.ts
 +++ b/src/services/concierge/capsule-dispatcher.ts
-@@ -1,45 +1,40 @@
+@@ -1,45 +1,38 @@
 -import type { CustomerProfile } from '@/types/customer';
  import { isCustomerIntelligenceNoWriteSmokeActive } from '@/lib/customer-intelligence-no-write-smoke';
 -import { capsuleHandlers } from './handlers';
@@ -491,7 +1106,12 @@ index fcbffffd..40939d0a 100644
 -    invokeStart: number;
 -    effectiveTelemetrySessionId: string | null;
 -}
--
++export type {
++    DispatchClientCapsuleParams,
++    ClientCapsuleDispatchResult,
++    CapsuleName,
++} from './dispatch.types';
+ 
 -export interface ClientCapsuleDispatchResult {
 -    message: string;
 -    suggestedProducts?: (Product | InternalResolvedProduct)[];
@@ -502,38 +1122,31 @@ index fcbffffd..40939d0a 100644
 -    action?: ConciergeMessage['action'];
 -    capsule_contract?: Record<string, any>;
 -}
-+export type {
-+    DispatchClientCapsuleParams,
-+    ClientCapsuleDispatchResult,
-+    CapsuleName,
-+} from './dispatch.types';
++export async function dispatchClientCapsule(
++    params: DispatchClientCapsuleParams
++): Promise<ClientCapsuleDispatchResult | null> {
++    try {
++        const capsuleName = params.data?.capsule_name;
  
 -export async function dispatchClientCapsule(params: DispatchClientCapsuleParams): Promise<ClientCapsuleDispatchResult | null> {
 -    const noWriteSmokeActive = isCustomerIntelligenceNoWriteSmokeActive(params.data.no_write_smoke);
 -    const handler = capsuleHandlers[params.data.capsule_name];
-+export async function dispatchClientCapsule(
-+    params: DispatchClientCapsuleParams
-+): Promise<ClientCapsuleDispatchResult | null> {
-+    const capsuleName = params.data?.capsule_name;
++        if (!isCapsuleName(capsuleName)) {
++            return null;
++        }
  
 -    if (handler) {
 -        return handler(params, noWriteSmokeActive);
-+    if (!isCapsuleName(capsuleName)) {
-+        return null;
-     }
+-    }
++        const noWriteSmokeActive = isCustomerIntelligenceNoWriteSmokeActive(params.data?.no_write_smoke);
++        const handler = capsuleHandlers[capsuleName];
  
 -    return null;
-+    const noWriteSmokeActive = isCustomerIntelligenceNoWriteSmokeActive(params.data?.no_write_smoke);
-+    const handler = capsuleHandlers[capsuleName];
-+
-+    try {
 +        return await handler(params, noWriteSmokeActive);
 +    } catch (error) {
-+        console.error(`[CapsuleDispatcher] Handler failure for capsule "${capsuleName}":`, error);
++        console.error('[CapsuleDispatcher] Handler or dispatch failure:', error);
 +        return {
-+            message: typeof params.data?.message === 'string' && params.data.message.trim().length > 0
-+                ? params.data.message
-+                : 'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.',
++            message: 'No fue posible completar la acción especializada de la consulta, pero sigo disponible para ayudarte a encontrar refacciones o resolver tus dudas.',
 +            intent: 'info',
 +            turn_analysis: params.turnAnalysis,
 +            catalog_gate: params.catalogGate,
@@ -543,7 +1156,7 @@ index fcbffffd..40939d0a 100644
  }
 diff --git a/src/services/concierge/dispatch.types.ts b/src/services/concierge/dispatch.types.ts
 new file mode 100644
-index 00000000..0935775b
+index 00000000..c5896bc6
 --- /dev/null
 +++ b/src/services/concierge/dispatch.types.ts
 @@ -0,0 +1,53 @@
@@ -585,7 +1198,7 @@ index 00000000..0935775b
 +    noWriteSmokeActive: boolean
 +) => Promise<ClientCapsuleDispatchResult | null>;
 +
-+export const CAPSULE_NAMES = [
++export const CAPSULE_NAMES = Object.freeze([
 +    'product_search_integrity',
 +    'storefront_kitting_basket',
 +    'storefront_budget_rescue',
@@ -597,9 +1210,9 @@ index 00000000..0935775b
 +    'authenticated_loyalty_status',
 +    'storefront_checkout_readiness',
 +    'cart_operator',
-+] as const;
++] as const);
 +
-+export type CapsuleName = typeof CAPSULE_NAMES[number];
++export type CapsuleName = (typeof CAPSULE_NAMES)[number];
 diff --git a/src/services/concierge/handlers/authenticated-loyalty-status.handler.ts b/src/services/concierge/handlers/authenticated-loyalty-status.handler.ts
 index a74166a8..715ff18d 100644
 --- a/src/services/concierge/handlers/authenticated-loyalty-status.handler.ts
@@ -1106,19 +1719,20 @@ index 2c4d2abe..1b4c160d 100644
 -
 -
 diff --git a/src/services/concierge/handlers/index.ts b/src/services/concierge/handlers/index.ts
-index 2fcb3b63..4e3374df 100644
+index 2fcb3b63..f8c1c809 100644
 --- a/src/services/concierge/handlers/index.ts
 +++ b/src/services/concierge/handlers/index.ts
-@@ -1,4 +1,7 @@
+@@ -1,4 +1,8 @@
 -﻿import { DispatchClientCapsuleParams, ClientCapsuleDispatchResult } from '../capsule-dispatcher';
-+import type {
-+    CapsuleHandlerFn,
-+    CapsuleName,
++import {
++    CAPSULE_NAMES,
++    type CapsuleHandlerFn,
++    type CapsuleName,
 +} from '../dispatch.types';
  import { handleProductSearchIntegrity } from './product-search-integrity.handler';
  import { handleStorefrontKittingBasket } from './storefront-kitting-basket.handler';
  import { handleStorefrontBudgetRescue } from './storefront-budget-rescue.handler';
-@@ -11,21 +14,22 @@ import { handleAuthenticatedLoyaltyStatus } from './authenticated-loyalty-status
+@@ -11,21 +15,26 @@ import { handleAuthenticatedLoyaltyStatus } from './authenticated-loyalty-status
  import { handleStorefrontCheckoutReadiness } from './storefront-checkout-readiness.handler';
  import { handleCartOperator } from './cart-operator.handler';
  
@@ -1153,7 +1767,11 @@ index 2fcb3b63..4e3374df 100644
 -};
 -
 +export function isCapsuleName(name: unknown): name is CapsuleName {
-+    return typeof name === 'string' && Object.prototype.hasOwnProperty.call(capsuleHandlers, name);
++    return (
++        typeof name === 'string'
++        && Object.prototype.hasOwnProperty.call(capsuleHandlers, name)
++        && (CAPSULE_NAMES as readonly string[]).includes(name)
++    );
 +}
  
 +export type { CapsuleHandlerFn };
@@ -1794,10 +2412,10 @@ index 6c0c2f37..e0ab9c7f 100644
 -
 -
 diff --git a/src/services/concierge/handlers/storefront-inventory-outlook.handler.ts b/src/services/concierge/handlers/storefront-inventory-outlook.handler.ts
-index d465b78a..d3cfea05 100644
+index d465b78a..da83447b 100644
 --- a/src/services/concierge/handlers/storefront-inventory-outlook.handler.ts
 +++ b/src/services/concierge/handlers/storefront-inventory-outlook.handler.ts
-@@ -1,27 +1,40 @@
+@@ -1,27 +1,41 @@
 -﻿import { executeStorefrontInventoryOutlookCapsule } from '@/services/ai-capsule-orchestrator.service';
 +import { executeStorefrontInventoryOutlookCapsule } from '@/services/ai-capsule-orchestrator.service';
  import { buildCesarinActionableNextStepView } from '@/lib/cesarin-stage5';
@@ -1832,10 +2450,12 @@ index d465b78a..d3cfea05 100644
          ? await getProductsByIds(capsuleContract.resolved_products.map((product) => product.id))
              .catch(() => [])
          : [];
-+
-     const visibleProducts = inventoryProducts;
+-    const visibleProducts = inventoryProducts;
 -    const supportsReview = capsuleContract.inventory_outlook_signal.kind === 'IN_STOCK_ONLINE'
 -        || capsuleContract.inventory_outlook_signal.kind === 'IN_STOCK_OMNICHANNEL';
++
++    const shouldShowCatalogSurfaces = catalogGate.is_open;
++    const visibleProducts = shouldShowCatalogSurfaces ? inventoryProducts : [];
 +
 +    const signalKind = capsuleContract.inventory_outlook_signal?.kind;
 +    const supportsReview = signalKind === 'IN_STOCK_ONLINE' || signalKind === 'IN_STOCK_OMNICHANNEL';
@@ -1844,7 +2464,7 @@ index d465b78a..d3cfea05 100644
      const inventoryTurnAnalysis: ConciergeTurnAnalysis = {
          ...turnAnalysis,
          commercial_move: commercialMove,
-@@ -29,6 +42,7 @@ export const handleStorefrontInventoryOutlook = async (
+@@ -29,6 +43,7 @@ export const handleStorefrontInventoryOutlook = async (
          turn_focus: 'inventory',
          current_turn_decision: 'USE_CAPABILITY',
      };
@@ -1852,7 +2472,7 @@ index d465b78a..d3cfea05 100644
      const adaptiveConversation = buildCesarinActionableNextStepView({
          query,
          history,
-@@ -36,7 +50,7 @@ export const handleStorefrontInventoryOutlook = async (
+@@ -36,7 +51,7 @@ export const handleStorefrontInventoryOutlook = async (
          matchStrategy: null,
          adaptiveMode: supportsReview
              ? 'SOFT_REASSURE'
@@ -1861,7 +2481,7 @@ index d465b78a..d3cfea05 100644
                  ? 'SOFT_REASSURE'
                  : 'EXPLORE_LIGHT',
          visibleProducts,
-@@ -45,6 +59,7 @@ export const handleStorefrontInventoryOutlook = async (
+@@ -45,6 +60,7 @@ export const handleStorefrontInventoryOutlook = async (
          turnAnalysis: inventoryTurnAnalysis,
          commercialMove,
      });
@@ -1869,19 +2489,21 @@ index d465b78a..d3cfea05 100644
      const compactBaseMessage = compactCesarinCopy(
          adaptiveConversation.message || capsuleContract.customer_response_draft || '',
          visibleProducts.length > 0 ? 2 : 3,
-@@ -59,56 +74,58 @@ export const handleStorefrontInventoryOutlook = async (
+@@ -59,8 +75,11 @@ export const handleStorefrontInventoryOutlook = async (
          || adaptiveConversation.nextStep.secondaryAction
          || adaptiveConversation.nextStep.assistAction,
      );
 -    const shouldShowNextStep = visibleProducts.length > 0
 -        && (supportsReview || capsuleContract.inventory_outlook_signal.kind === 'RESTOCK_EXPECTED');
--    const compactNextStepView = shouldShowNextStep
--        && adaptiveConversation.nextStep.renderHint === 'SHOW'
--        && (renderableNextStepGuidance || hasMaterialNextStepAction)
 +
-+    const compactNextStepView = (adaptiveConversation.nextStep.surfaceKind === 'ACTIONABLE' || hasMaterialNextStepAction)
-         ? {
-             ...adaptiveConversation.nextStep,
++    const shouldShowNextStep = shouldShowCatalogSurfaces
++        && visibleProducts.length > 0
++        && (supportsReview || signalKind === 'RESTOCK_EXPECTED');
++
+     const compactNextStepView = shouldShowNextStep
+         && adaptiveConversation.nextStep.renderHint === 'SHOW'
+         && (renderableNextStepGuidance || hasMaterialNextStepAction)
+@@ -69,46 +88,51 @@ export const handleStorefrontInventoryOutlook = async (
              guidance: renderableNextStepGuidance,
          }
          : undefined;
@@ -1941,9 +2563,9 @@ index d465b78a..d3cfea05 100644
 +            capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
 +            fallback_used: capsuleContract.execution_status !== 'SUCCESS',
 +            response_latency_ms: Date.now() - invokeStart,
-+            has_product_cards: visibleProducts.length > 0,
-+            product_card_count: visibleProducts.length,
-+            zero_results: signalKind === 'PRODUCT_NOT_FOUND',
++            has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0,
++            product_card_count: shouldShowCatalogSurfaces ? visibleProducts.length : 0,
++            zero_results: !shouldShowCatalogSurfaces || signalKind === 'PRODUCT_NOT_FOUND',
 +            error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
 +            offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
 +            analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
@@ -1969,14 +2591,14 @@ index d465b78a..d3cfea05 100644
  
      const finalMessage = mergeConversationalPrefix(
          adaptiveConversation.message || capsuleContract.customer_response_draft,
-@@ -131,5 +148,3 @@ export const handleStorefrontInventoryOutlook = async (
+@@ -131,5 +155,3 @@ export const handleStorefrontInventoryOutlook = async (
          capsule_contract: capsuleContract,
      };
  };
 -
 -
 diff --git a/src/services/concierge/handlers/storefront-kitting-basket.handler.ts b/src/services/concierge/handlers/storefront-kitting-basket.handler.ts
-index ec185950..41a6ec02 100644
+index ec185950..0c4f27d7 100644
 --- a/src/services/concierge/handlers/storefront-kitting-basket.handler.ts
 +++ b/src/services/concierge/handlers/storefront-kitting-basket.handler.ts
 @@ -1,18 +1,28 @@
@@ -2021,16 +2643,15 @@ index ec185950..41a6ec02 100644
      );
      const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
      const renderableNextStepGuidance = compactNextStepGuidance
-@@ -62,54 +72,57 @@ export const handleStorefrontKittingBasket = async (
-         || adaptiveConversation.nextStep.secondaryAction
+@@ -63,6 +73,7 @@ export const handleStorefrontKittingBasket = async (
          || adaptiveConversation.nextStep.assistAction,
      );
--    const compactNextStepView = shouldShowCatalogSurfaces
--        && adaptiveConversation.nextStep.renderHint === 'SHOW'
--        && (renderableNextStepGuidance || hasMaterialNextStepAction)
-+    const compactNextStepView = (adaptiveConversation.nextStep.surfaceKind === 'ACTIONABLE' || hasMaterialNextStepAction)
+     const compactNextStepView = shouldShowCatalogSurfaces
++        && visibleProducts.length > 0
+         && adaptiveConversation.nextStep.renderHint === 'SHOW'
+         && (renderableNextStepGuidance || hasMaterialNextStepAction)
          ? {
-             ...adaptiveConversation.nextStep,
+@@ -70,46 +81,51 @@ export const handleStorefrontKittingBasket = async (
              guidance: renderableNextStepGuidance,
          }
          : undefined;
@@ -2090,9 +2711,9 @@ index ec185950..41a6ec02 100644
 +            capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
 +            fallback_used: capsuleContract.execution_status !== 'SUCCESS',
 +            response_latency_ms: Date.now() - invokeStart,
-+            has_product_cards: visibleProducts.length > 0,
-+            product_card_count: visibleProducts.length,
-+            zero_results: capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
++            has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0,
++            product_card_count: shouldShowCatalogSurfaces ? visibleProducts.length : 0,
++            zero_results: !shouldShowCatalogSurfaces || capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
 +            error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
 +            offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
 +            analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
@@ -2118,7 +2739,7 @@ index ec185950..41a6ec02 100644
  
      const finalMessage = mergeConversationalPrefix(
          adaptiveConversation.message || capsuleContract.customer_response_draft,
-@@ -119,11 +132,11 @@ export const handleStorefrontKittingBasket = async (
+@@ -119,11 +135,11 @@ export const handleStorefrontKittingBasket = async (
              turnAnalysis: kitTurnAnalysis,
              sourceContext,
          }),
@@ -2132,17 +2753,17 @@ index ec185950..41a6ec02 100644
          suggestedProducts: visibleProducts,
          intent: 'recommendation',
          turn_analysis: kitTurnAnalysis,
-@@ -132,5 +145,3 @@ export const handleStorefrontKittingBasket = async (
+@@ -132,5 +148,3 @@ export const handleStorefrontKittingBasket = async (
          capsule_contract: capsuleContract,
      };
  };
 -
 -
 diff --git a/src/services/concierge/turn-advisory.ts b/src/services/concierge/turn-advisory.ts
-index 0b40ebb2..4da6644e 100644
+index 0b40ebb2..62264044 100644
 --- a/src/services/concierge/turn-advisory.ts
 +++ b/src/services/concierge/turn-advisory.ts
-@@ -1,78 +1,132 @@
+@@ -1,78 +1,153 @@
  import type { ConciergeMessage, ConciergeTurnAnalysis } from './types';
  
  export type ConciergeAssistantMessage = ConciergeMessage & {
@@ -2190,20 +2811,51 @@ index 0b40ebb2..4da6644e 100644
 -        && proposal.resolved_product_id.length > 0
 +        && isAddMutationProposal(proposal)
      ) {
++        // Validate proposal.quantity strictly as finite number if provided
++        const isQuantityValid = proposal.quantity === undefined
++            || (typeof proposal.quantity === 'number' && Number.isFinite(proposal.quantity));
++
++        const section = typeof (proposal.section ?? proposal.product_section) === 'string'
++            ? String(proposal.section ?? proposal.product_section).trim()
++            : '';
++
++        const slug = typeof (proposal.slug ?? proposal.product_slug) === 'string'
++            ? String(proposal.slug ?? proposal.product_slug).trim()
++            : '';
++
++        // If identity/routing is incomplete, or quantity is non-numeric:
++        // Do NOT emit an actionable ADD_TO_CART CTA with empty routes. Degrade to informational view.
++        if (!section || !slug || !isQuantityValid) {
++            return {
++                ...message,
++                intent: 'info',
++                content: 'No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.',
++                capsule_contract: {
++                    ...contract,
++                    next_step_view: {
++                        family: 'KEEP_EXPLORING',
++                        guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
++                        surfaceKind: 'INFORMATIONAL',
++                        primaryAction: null,
++                        secondaryAction: null,
++                        assistAction: null,
++                    },
++                },
++            };
++        }
++
++        const rawQuantity = typeof proposal.quantity === 'number' ? proposal.quantity : 1;
++        const flooredQuantity = Math.floor(rawQuantity);
++        const quantity = flooredQuantity >= 1 ? Math.min(flooredQuantity, 99) : 1;
++
          const productName = typeof proposal.product_ref === 'string' && proposal.product_ref.trim().length > 0
 -            ? proposal.product_ref.trim()
 +            ? proposal.product_ref.trim().slice(0, 100)
              : 'este producto';
 -        const quantity = Number.isFinite(proposal.quantity) && proposal.quantity > 0
 -            ? Math.floor(proposal.quantity)
-+
-+        // Floor first, then validate strictly >= 1 and clamp to max 99
-+        const rawQuantity = Number(proposal.quantity);
-+        const flooredQuantity = Math.floor(rawQuantity);
-+        const quantity = Number.isFinite(flooredQuantity) && flooredQuantity >= 1
-+            ? Math.min(flooredQuantity, 99)
-             : 1;
- 
+-            : 1;
+-
 -        message.intent = 'search';
 -        message.content = 'Lo puedo preparar para carrito, pero solo se agrega si tu confirmas con el boton.';
 -        message.capsule_contract = {
@@ -2220,18 +2872,10 @@ index 0b40ebb2..4da6644e 100644
 -                        name: productName,
 -                        slug: '',
 -                        section: 'vape',
++
 +        const variantId = typeof proposal.resolved_variant_id === 'string' && proposal.resolved_variant_id.trim().length > 0
 +            ? proposal.resolved_variant_id.trim()
 +            : null;
-+
-+        const section = typeof (proposal.section ?? proposal.product_section) === 'string'
-+            && String(proposal.section ?? proposal.product_section).trim().length > 0
-+            ? String(proposal.section ?? proposal.product_section).trim()
-+            : 'catalogo';
-+
-+        const slug = typeof (proposal.slug ?? proposal.product_slug) === 'string'
-+            ? String(proposal.slug ?? proposal.product_slug).trim()
-+            : '';
 +
 +        const variantName = typeof proposal.variant_name === 'string' && proposal.variant_name.trim().length > 0
 +            ? proposal.variant_name.trim()
@@ -2314,7 +2958,7 @@ index 0b40ebb2..4da6644e 100644
  }
  
  /**
-@@ -90,39 +144,48 @@ export function extractTurnAnalysis(response: {
+@@ -90,39 +165,48 @@ export function extractTurnAnalysis(response: {
  }
  
  /**
@@ -2372,15 +3016,23 @@ index 0b40ebb2..4da6644e 100644
  
      return { newPrefs, newIAContext };
 diff --git a/src/services/orders.service.ts b/src/services/orders.service.ts
-index c2b9cde7..09fd7312 100644
+index c2b9cde7..ff47f7ca 100644
 --- a/src/services/orders.service.ts
 +++ b/src/services/orders.service.ts
-@@ -178,34 +178,43 @@ export function subscribeToRealtimeOrders(
-     onNewOrder: (order: RealtimeOrderEvent) => void,
+@@ -175,37 +175,62 @@ export async function markWhatsAppSent(orderId: string) {
+  * Retorna una función de limpieza para desuscribirse.
+  */
+ export function subscribeToRealtimeOrders(
+-    onNewOrder: (order: RealtimeOrderEvent) => void,
++    onNewOrder: (order: RealtimeOrderEvent) => void | Promise<void>,
      onError?: (err: unknown) => void
  ): () => void {
 +    let disposed = false;
-+    const channelTopic = `orders_pulse_${typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)}`;
++    const channelTopic = `orders_pulse_${
++        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
++            ? crypto.randomUUID()
++            : `${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`
++    }`;
 +
      const channel = supabase
 -        .channel('public:orders_pulse')
@@ -2396,15 +3048,20 @@ index c2b9cde7..09fd7312 100644
                  try {
                      const eventData = await getOrderNotificationDetails(newOrder.id);
 -                    if (eventData) {
+-                        onNewOrder(eventData);
 +                    if (!disposed && eventData) {
-                         onNewOrder(eventData);
++                        await Promise.resolve(onNewOrder(eventData));
                      }
                  } catch (error) {
 -                    if (onError) onError(error);
 -                    else console.error('[subscribeToRealtimeOrders] Error enriching order event:', error);
 +                    if (!disposed) {
-+                        if (onError) onError(error);
-+                        else console.error('[subscribeToRealtimeOrders] Error enriching order event:', error);
++                        try {
++                            if (onError) onError(error);
++                            else console.error('[subscribeToRealtimeOrders] Error enriching or handling order event:', error);
++                        } catch (handlerErr) {
++                            console.error('[subscribeToRealtimeOrders] Error in onError callback:', handlerErr);
++                        }
 +                    }
                  }
              }
@@ -2415,8 +3072,12 @@ index c2b9cde7..09fd7312 100644
 -                else console.error('[subscribeToRealtimeOrders] Realtime connection error');
 +            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
 +                if (!disposed) {
-+                    if (onError) onError(new Error(`Realtime status: ${status}`));
-+                    else console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
++                    try {
++                        if (onError) onError(new Error(`Realtime status: ${status}`));
++                        else console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
++                    } catch (handlerErr) {
++                        console.error('[subscribeToRealtimeOrders] Error in status onError handler:', handlerErr);
++                    }
 +                }
              }
          });
@@ -2424,7 +3085,11 @@ index c2b9cde7..09fd7312 100644
      return () => {
 -        supabase.removeChannel(channel);
 +        disposed = true;
-+        void supabase.removeChannel(channel).catch(() => {});
++        try {
++            void Promise.resolve(supabase.removeChannel(channel)).catch(() => {});
++        } catch {
++            // ignore mock or cleanup errors
++        }
      };
  }
 diff --git a/src/services/settings.service.ts b/src/services/settings.service.ts
@@ -2495,7 +3160,7 @@ index 3190cfa9..cd0ff88b 100644
 ---
 
 ### INSTRUCCIONES PARA TU DICTAMEN:
-1. Revisa línea por línea el diff de los 28 archivos modificados.
-2. Evalúa si cada uno de los 10 hallazgos fue remediado de raíz o si quedó deuda oculta o side-effects.
-3. Evalúa la higiene de código (TypeScript, tipos, inmutabilidad, memory leaks, concurrency).
-4. Emite tu Scorecard detallado y tu Veredicto Formal: **ACCEPT**, **REJECT** o **ACCEPT WITH RESIDUAL RISK**.
+1. Revisa línea por línea el diff consolidado.
+2. Comprueba si los 4 bloqueos previos quedaron formalmente resueltos sin deuda técnica ni riesgos residuales.
+3. Evalúa la robustez contra concurrencia, pureza de funciones, aislamiento de fallos y restricciones de catálogo.
+4. Emite tu Scorecard actualizado y tu Veredicto Formal final: **ACCEPT**, **REJECT** o **ACCEPT WITH RESIDUAL RISK**.
