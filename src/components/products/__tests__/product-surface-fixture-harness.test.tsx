@@ -94,13 +94,13 @@ describe('product surface local fixture harness', () => {
         expect(screen.getByText('$1,000.00')).toBeInTheDocument();
         expect(screen.getByText('Cobertura por confirmar')).toBeInTheDocument();
         expect(screen.getByText('Copy local representativo para quick view.')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Menta/i })).toBeEnabled();
+        expect(screen.getByRole('button', { name: /^Menta/i })).toBeEnabled();
         expect(screen.getByRole('button', { name: /Agotado/i })).toBeDisabled();
         expect(screen.getByRole('link', { name: /Ver detalles completos/i })).toHaveAttribute(
             'href',
             '/vape/producto-fixture-vape',
         );
-        expect(screen.getByRole('button', { name: /Menta/i })).toHaveClass(
+        expect(screen.getByRole('button', { name: /^Menta/i })).toHaveClass(
             'border-vape-500',
             'bg-vape-500/10',
             'text-vape-400',
@@ -112,7 +112,7 @@ describe('product surface local fixture harness', () => {
 
         renderQuickView(product);
 
-        expect(screen.getByRole('button', { name: /Menta/i })).toHaveClass(
+        expect(screen.getByRole('button', { name: /^Menta/i })).toHaveClass(
             'border-herbal-500',
             'bg-herbal-500/10',
             'text-herbal-400',
@@ -134,7 +134,7 @@ describe('product surface local fixture harness', () => {
         fireEvent.click(screen.getByRole('button', { name: /Open quick view/i }));
 
         expect(screen.getByRole('dialog', { name: 'Producto fixture vape' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Menta/i })).toBeEnabled();
+        expect(screen.getByRole('button', { name: /^Menta/i })).toBeEnabled();
         expect(screen.getByRole('button', { name: /Agotado/i })).toBeDisabled();
     });
 });

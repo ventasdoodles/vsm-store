@@ -28,7 +28,7 @@ export async function dispatchClientCapsule(
     } catch (error) {
         console.error('[CapsuleDispatcher] Handler or dispatch failure:', error);
         return {
-            message: 'No pude completar esa consulta en este momento. Podemos intentarlo de nuevo o, si me dices el modelo que tienes, te ayudo a ubicar la refacción.',
+            message: 'No pude completar esa consulta en este momento. Podemos intentarlo de nuevo o, si me dices qué buscas, con gusto te oriento.',
             intent: 'info',
             turn_analysis: params.turnAnalysis,
             catalog_gate: params.catalogGate,

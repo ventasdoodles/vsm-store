@@ -1,0 +1,13 @@
+{
+  "batch_id": "batch-1791712988-koUHdwEmSlbVT2XdKlmW",
+  "model": "openai/gpt-6-sol-pro-20260922",
+  "usage": {
+    "prompt_tokens": 45694,
+    "completion_tokens": 7273,
+    "total_tokens": 52967,
+    "cost": 0.0710277,
+    "is_byok": false
+  },
+  "cost": 0.0710277,
+  "elapsed_seconds": 303
+}

@@ -13,8 +13,10 @@ describe('customer-intelligence persona fallbacks', () => {
       reason: 'empty_model_response',
     });
 
-    expect(fallback).toContain('¡Ups! Me agarraste un poco en curva');
-    expect(fallback).toContain('tienen pods compatibles con mi equipo?');
+    expect(fallback).toContain('producto');
+    expect(fallback).toContain('envío');
+    expect(fallback).toContain('pedido');
+    expect(fallback).not.toContain('tienen pods compatibles con mi equipo?');
     expect(fallback).not.toMatch(/estoy aqui para ayudarte/i);
   });
 
@@ -35,4 +37,3 @@ describe('customer-intelligence persona fallbacks', () => {
     expect(compacted).toBe('Si quieres, te paso una opcion. Te paso una opcion.');
   });
 });
-

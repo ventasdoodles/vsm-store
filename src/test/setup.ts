@@ -1,4 +1,4 @@
-﻿import '@testing-library/jest-dom/vitest';
+import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import React from 'react';
 import { afterEach, vi } from 'vitest';
@@ -55,9 +55,15 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
     const { TestRouterContext } = await import('@/lib/test-router');
     return {
         ...actual,
-        Link: React.forwardRef(({ to, children, className, onClick, ...props }: any, ref: any) => {
+        Link: React.forwardRef(({ to, children, className, onClick, params, ...props }: any, ref: any) => {
+            let href = typeof to === 'string' ? to : (to?.to || '#');
+            if (params && typeof params === 'object') {
+                for (const [key, val] of Object.entries(params)) {
+                    href = href.replace(`$${key}`, String(val)).replace(`:${key}`, String(val));
+                }
+            }
             return React.createElement('a', {
-                href: typeof to === 'string' ? to : (to?.to || '#'),
+                href,
                 className,
                 onClick,
                 ref,

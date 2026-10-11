@@ -1025,7 +1025,7 @@ export async function handleConciergeChat(
                 `FOCO: ${turnProfile.turn_focus}`,
                 `REGLA DE TURNO:\n- Responde directo cuando baste.\n- Da a cada respuesta el espacio que necesite: breve para algo sencillo y más explicativa para una comparación, compatibilidad o decisión con matices.\n- Resuelve primero el intent principal del turno actual con datos confirmados.\n- Si hay intents secundarios, déjalos como cola natural y no los mezcles todos en una sola salida.\n- Si el cliente cambió de carril, sigue el carril del turno actual y no la inercia del historial.\n- Si no hubo verdad real de catálogo, política, tracking, compatibilidad o contexto web público útil, no inventes.\n- Prioriza una recomendación principal clara; si el cliente pide comparar, explica la diferencia que sí cambia la decisión.\n- Pregunta únicamente el dato que realmente impida avanzar.\n- No repitas la misma recomendación en respuesta, resumen y cierre.\n- No cierres con empuje comercial por reflejo.`,
                 `--- CATALOG GATE ---\nABIERTO: ${catalogGate.is_open ? 'SI' : 'NO'}\nRAZON: ${catalogGate.reason}\nREGLA DE CATALOGO:\n- Si el gate esta cerrado, no muestres tarjetas, recuperacion aproximada ni siguiente paso de producto.\n- Si el gate esta abierto, puedes usar catalogo solo para resolver mejor el turno actual.`,
-                `CLIENTE: "${query || 'Audio Context'}"`
+                `--- MENSAJE DEL CLIENTE EN ESTE TURNO ---\n<mensaje_cliente>\n${(query || 'Audio Context').replace(/[\r\n]+/g, ' ').slice(0, 1000)}\n</mensaje_cliente>`
             ];
 
 
@@ -1379,12 +1379,22 @@ export async function handleConciergeChat(
                 return aiData;
             };
 
-            const formattedSommelierHistory = Array.isArray(history) 
-                ? history.slice(-6).map((h: { role: string; content: string }) => ({
-                    role: h.role === 'assistant' ? 'model' : 'user',
-                    parts: [{ text: h.content }]
-                })) 
+            const safeTurnHistory: Array<{ role: 'user' | 'assistant'; content: string }> = Array.isArray(history) 
+                ? history
+                    .filter((h): h is { role: 'user' | 'assistant'; content: string } => 
+                        Boolean(h && (h.role === 'user' || h.role === 'assistant') && typeof h.content === 'string')
+                    )
+                    .slice(-6)
+                    .map((h) => ({
+                        role: h.role,
+                        content: String(h.content || '').slice(0, 2000),
+                    }))
                 : [];
+
+            const formattedSommelierHistory = safeTurnHistory.map((h) => ({
+                role: h.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: h.content }]
+            }));
 
             const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
             if (audio) parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
@@ -1423,10 +1433,11 @@ export async function handleConciergeChat(
                             streamRes = await streamLlmCompletion({
                                 systemPrompt: sommelierSystemPrompt,
                                 userPrompt: sommelierUserPromptBlocks.filter(Boolean).join('\n\n'),
-                                history: Array.isArray(history) ? history.slice(-6) : [],
+                                history: safeTurnHistory,
                                 temperature: 0.4,
                                 reasoningEffort: 'low',
                                 signal: controller.signal,
+                                primaryAttemptTimeoutMs: 8000,
                                 geminiFallback: geminiOptions,
                             });
                         } else {
@@ -1511,10 +1522,11 @@ export async function handleConciergeChat(
                         const completion = await generateLlmCompletion({
                             systemPrompt: sommelierSystemPrompt,
                             userPrompt: sommelierUserPromptBlocks.filter(Boolean).join('\n\n'),
-                            history: Array.isArray(history) ? history.slice(-6) : [],
+                            history: safeTurnHistory,
                             temperature: 0.4,
                             reasoningEffort: 'low',
                             signal: controller.signal,
+                            primaryAttemptTimeoutMs: 8000,
                             geminiFallback: geminiOptions,
                         });
                         clearTimeout(timeoutId);

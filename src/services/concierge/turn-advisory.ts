@@ -58,12 +58,12 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
             return {
                 ...message,
                 intent: 'info',
-                content: 'Claro, te ayudo. Veo más de una opción posible y no quiero agregar la equivocada: dime cuál es o selecciónala desde su ficha.',
+                content: 'Claro, te ayudo. Para no agregar la opción equivocada, dime cuál buscas exactamente o selecciónala directo desde su ficha.',
                 capsule_contract: {
                     ...contract,
                     next_step_view: {
                         family: 'KEEP_EXPLORING',
-                        guidance: 'Dime cuál es o selecciónala desde su ficha para no agregar la equivocada.',
+                        guidance: 'Dime cuál buscas exactamente o selecciónala directo desde su ficha para no agregar la equivocada.',
                         surfaceKind: 'INFORMATIONAL',
                         primaryAction: null,
                         secondaryAction: null,
@@ -128,7 +128,7 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
             ...message.capsule_contract,
             next_step_view: {
                 family: 'KEEP_EXPLORING',
-                guidance: 'Dime cuál es o selecciónala desde su ficha para no agregar la equivocada.',
+                guidance: 'Dime cuál buscas exactamente o selecciónala directo desde su ficha para no agregar la equivocada.',
                 surfaceKind: 'INFORMATIONAL',
                 primaryAction: null,
                 secondaryAction: null,
@@ -140,7 +140,7 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
     return {
         ...message,
         intent: 'info',
-        content: 'Claro, te ayudo. Veo más de una opción posible y no quiero agregar la equivocada: dime cuál es o selecciónala desde su ficha.',
+        content: 'Claro, te ayudo. Para no agregar la opción equivocada, dime cuál buscas exactamente o selecciónala directo desde su ficha.',
         capsule_contract: sanitizedContract,
     };
 }

@@ -127,7 +127,7 @@ describe('turn-advisory service', () => {
             expect(resultSlug.intent).toBe('info');
             expect(resultSlug.capsule_contract?.next_step_view).toEqual({
                 family: 'KEEP_EXPLORING',
-                guidance: 'Dime cuál es o selecciónala desde su ficha para no agregar la equivocada.',
+                guidance: 'Dime cuál buscas exactamente o selecciónala directo desde su ficha para no agregar la equivocada.',
                 surfaceKind: 'INFORMATIONAL',
                 primaryAction: null,
                 secondaryAction: null,
@@ -223,7 +223,7 @@ describe('turn-advisory service', () => {
             const result = convertCartOperatorToAdvisoryCta(message);
 
             expect(result.intent).toBe('info');
-            expect(result.content).toBe('Claro, te ayudo. Veo más de una opción posible y no quiero agregar la equivocada: dime cuál es o selecciónala desde su ficha.');
+            expect(result.content).toBe('Claro, te ayudo. Para no agregar la opción equivocada, dime cuál buscas exactamente o selecciónala directo desde su ficha.');
         });
 
         it('general fallback neutralizes any pre-existing ADD_TO_CART action in next_step_view', () => {
