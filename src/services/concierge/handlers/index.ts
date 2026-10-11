@@ -1,6 +1,7 @@
-import type {
-    CapsuleHandlerFn,
-    CapsuleName,
+import {
+    CAPSULE_NAMES,
+    type CapsuleHandlerFn,
+    type CapsuleName,
 } from '../dispatch.types';
 import { handleProductSearchIntegrity } from './product-search-integrity.handler';
 import { handleStorefrontKittingBasket } from './storefront-kitting-basket.handler';
@@ -29,7 +30,11 @@ export const capsuleHandlers = Object.freeze({
 } satisfies Record<CapsuleName, CapsuleHandlerFn>);
 
 export function isCapsuleName(name: unknown): name is CapsuleName {
-    return typeof name === 'string' && Object.prototype.hasOwnProperty.call(capsuleHandlers, name);
+    return (
+        typeof name === 'string'
+        && Object.prototype.hasOwnProperty.call(capsuleHandlers, name)
+        && (CAPSULE_NAMES as readonly string[]).includes(name)
+    );
 }
 
 export type { CapsuleHandlerFn };

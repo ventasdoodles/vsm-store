@@ -175,11 +175,15 @@ export async function markWhatsAppSent(orderId: string) {
  * Retorna una función de limpieza para desuscribirse.
  */
 export function subscribeToRealtimeOrders(
-    onNewOrder: (order: RealtimeOrderEvent) => void,
+    onNewOrder: (order: RealtimeOrderEvent) => void | Promise<void>,
     onError?: (err: unknown) => void
 ): () => void {
     let disposed = false;
-    const channelTopic = `orders_pulse_${typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)}`;
+    const channelTopic = `orders_pulse_${
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : `${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`
+    }`;
 
     const channel = supabase
         .channel(channelTopic)
@@ -194,12 +198,16 @@ export function subscribeToRealtimeOrders(
                 try {
                     const eventData = await getOrderNotificationDetails(newOrder.id);
                     if (!disposed && eventData) {
-                        onNewOrder(eventData);
+                        await Promise.resolve(onNewOrder(eventData));
                     }
                 } catch (error) {
                     if (!disposed) {
-                        if (onError) onError(error);
-                        else console.error('[subscribeToRealtimeOrders] Error enriching order event:', error);
+                        try {
+                            if (onError) onError(error);
+                            else console.error('[subscribeToRealtimeOrders] Error enriching or handling order event:', error);
+                        } catch (handlerErr) {
+                            console.error('[subscribeToRealtimeOrders] Error in onError callback:', handlerErr);
+                        }
                     }
                 }
             }
@@ -207,14 +215,22 @@ export function subscribeToRealtimeOrders(
         .subscribe((status) => {
             if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 if (!disposed) {
-                    if (onError) onError(new Error(`Realtime status: ${status}`));
-                    else console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
+                    try {
+                        if (onError) onError(new Error(`Realtime status: ${status}`));
+                        else console.error(`[subscribeToRealtimeOrders] Realtime connection issue: ${status}`);
+                    } catch (handlerErr) {
+                        console.error('[subscribeToRealtimeOrders] Error in status onError handler:', handlerErr);
+                    }
                 }
             }
         });
 
     return () => {
         disposed = true;
-        void supabase.removeChannel(channel).catch(() => {});
+        try {
+            void Promise.resolve(supabase.removeChannel(channel)).catch(() => {});
+        } catch {
+            // ignore mock or cleanup errors
+        }
     };
 }

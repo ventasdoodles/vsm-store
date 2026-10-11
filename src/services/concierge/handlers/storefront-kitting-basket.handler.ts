@@ -72,7 +72,10 @@ export const handleStorefrontKittingBasket = async (
         || adaptiveConversation.nextStep.secondaryAction
         || adaptiveConversation.nextStep.assistAction,
     );
-    const compactNextStepView = (adaptiveConversation.nextStep.surfaceKind === 'ACTIONABLE' || hasMaterialNextStepAction)
+    const compactNextStepView = shouldShowCatalogSurfaces
+        && visibleProducts.length > 0
+        && adaptiveConversation.nextStep.renderHint === 'SHOW'
+        && (renderableNextStepGuidance || hasMaterialNextStepAction)
         ? {
             ...adaptiveConversation.nextStep,
             guidance: renderableNextStepGuidance,
@@ -98,9 +101,9 @@ export const handleStorefrontKittingBasket = async (
             capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
             fallback_used: capsuleContract.execution_status !== 'SUCCESS',
             response_latency_ms: Date.now() - invokeStart,
-            has_product_cards: visibleProducts.length > 0,
-            product_card_count: visibleProducts.length,
-            zero_results: capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
+            has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0,
+            product_card_count: shouldShowCatalogSurfaces ? visibleProducts.length : 0,
+            zero_results: !shouldShowCatalogSurfaces || capsuleContract.match_strategy === 'NO_GROUNDED_KIT',
             error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
             offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
             analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,

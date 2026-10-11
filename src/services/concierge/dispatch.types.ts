@@ -36,7 +36,7 @@ export type CapsuleHandlerFn = (
     noWriteSmokeActive: boolean
 ) => Promise<ClientCapsuleDispatchResult | null>;
 
-export const CAPSULE_NAMES = [
+export const CAPSULE_NAMES = Object.freeze([
     'product_search_integrity',
     'storefront_kitting_basket',
     'storefront_budget_rescue',
@@ -48,6 +48,6 @@ export const CAPSULE_NAMES = [
     'authenticated_loyalty_status',
     'storefront_checkout_readiness',
     'cart_operator',
-] as const;
+] as const);
 
-export type CapsuleName = typeof CAPSULE_NAMES[number];
+export type CapsuleName = (typeof CAPSULE_NAMES)[number];

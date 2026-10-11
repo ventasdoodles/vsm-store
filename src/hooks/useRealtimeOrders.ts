@@ -6,7 +6,7 @@
  * // Resiliencia: Utiliza useRef para estabilizar callbacks y evitar reconexiones/churn innecesarios.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { subscribeToRealtimeOrders } from '@/services/orders.service';
 import type { RealtimeOrderEvent } from '@/types/order';
 
@@ -22,7 +22,7 @@ export function useRealtimeOrders(
     const callbackRef = useRef(onNewOrder);
     const errorRef = useRef(onError);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         callbackRef.current = onNewOrder;
         errorRef.current = onError;
     });

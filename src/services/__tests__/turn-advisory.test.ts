@@ -77,6 +77,8 @@ describe('turn-advisory service', () => {
                         resolved_product_id: 'prod-1',
                         product_ref: 'Pod',
                         quantity,
+                        section: 'vape',
+                        slug: 'pod-test',
                     },
                 },
             });
@@ -100,6 +102,83 @@ describe('turn-advisory service', () => {
             const resMax = convertCartOperatorToAdvisoryCta(makeMsg(1_000_000));
             const actionMax = (resMax.capsule_contract?.next_step_view as any)?.primaryAction;
             expect(actionMax.quantity).toBe(99);
+        });
+
+        it('degrades to informational KEEP_EXPLORING without ADD_TO_CART when section or slug is missing or empty', () => {
+            const missingSlugMsg: ConciergeAssistantMessage = {
+                id: 'no-slug',
+                role: 'assistant',
+                content: 'Original',
+                timestamp: new Date(),
+                capsule_contract: {
+                    match_strategy: 'EXACT_MUTATION_PROPOSED',
+                    mutation_proposal: {
+                        type: 'ADD',
+                        resolved_product_id: 'prod-1',
+                        product_ref: 'Pod',
+                        quantity: 1,
+                        section: 'vape',
+                        slug: '',
+                    },
+                },
+            };
+
+            const resultSlug = convertCartOperatorToAdvisoryCta(missingSlugMsg);
+            expect(resultSlug.intent).toBe('info');
+            expect(resultSlug.capsule_contract?.next_step_view).toEqual({
+                family: 'KEEP_EXPLORING',
+                guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
+                surfaceKind: 'INFORMATIONAL',
+                primaryAction: null,
+                secondaryAction: null,
+                assistAction: null,
+            });
+
+            const missingSectionMsg: ConciergeAssistantMessage = {
+                id: 'no-section',
+                role: 'assistant',
+                content: 'Original',
+                timestamp: new Date(),
+                capsule_contract: {
+                    match_strategy: 'EXACT_MUTATION_PROPOSED',
+                    mutation_proposal: {
+                        type: 'ADD',
+                        resolved_product_id: 'prod-1',
+                        product_ref: 'Pod',
+                        quantity: 1,
+                        slug: 'pod-test',
+                    },
+                },
+            };
+
+            const resultSection = convertCartOperatorToAdvisoryCta(missingSectionMsg);
+            expect(resultSection.intent).toBe('info');
+            expect(resultSection.capsule_contract?.next_step_view?.primaryAction).toBeNull();
+        });
+
+        it('degrades to informational KEEP_EXPLORING without ADD_TO_CART when proposal.quantity is non-numeric', () => {
+            const stringQtyMsg: ConciergeAssistantMessage = {
+                id: 'str-qty',
+                role: 'assistant',
+                content: 'Original',
+                timestamp: new Date(),
+                capsule_contract: {
+                    match_strategy: 'EXACT_MUTATION_PROPOSED',
+                    mutation_proposal: {
+                        type: 'ADD',
+                        resolved_product_id: 'prod-1',
+                        product_ref: 'Pod',
+                        quantity: '2' as any,
+                        section: 'vape',
+                        slug: 'pod-test',
+                    },
+                },
+            };
+
+            const result = convertCartOperatorToAdvisoryCta(stringQtyMsg);
+            expect(result.intent).toBe('info');
+            expect(result.capsule_contract?.next_step_view?.surfaceKind).toBe('INFORMATIONAL');
+            expect(result.capsule_contract?.next_step_view?.primaryAction).toBeNull();
         });
 
         it('falls back to informational message when proposal is not an exact ADD mutation', () => {

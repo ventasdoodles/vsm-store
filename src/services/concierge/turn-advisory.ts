@@ -40,29 +40,50 @@ export function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMess
         contract?.match_strategy === 'EXACT_MUTATION_PROPOSED'
         && isAddMutationProposal(proposal)
     ) {
-        const productName = typeof proposal.product_ref === 'string' && proposal.product_ref.trim().length > 0
-            ? proposal.product_ref.trim().slice(0, 100)
-            : 'este producto';
-
-        // Floor first, then validate strictly >= 1 and clamp to max 99
-        const rawQuantity = Number(proposal.quantity);
-        const flooredQuantity = Math.floor(rawQuantity);
-        const quantity = Number.isFinite(flooredQuantity) && flooredQuantity >= 1
-            ? Math.min(flooredQuantity, 99)
-            : 1;
-
-        const variantId = typeof proposal.resolved_variant_id === 'string' && proposal.resolved_variant_id.trim().length > 0
-            ? proposal.resolved_variant_id.trim()
-            : null;
+        // Validate proposal.quantity strictly as finite number if provided
+        const isQuantityValid = proposal.quantity === undefined
+            || (typeof proposal.quantity === 'number' && Number.isFinite(proposal.quantity));
 
         const section = typeof (proposal.section ?? proposal.product_section) === 'string'
-            && String(proposal.section ?? proposal.product_section).trim().length > 0
             ? String(proposal.section ?? proposal.product_section).trim()
-            : 'catalogo';
+            : '';
 
         const slug = typeof (proposal.slug ?? proposal.product_slug) === 'string'
             ? String(proposal.slug ?? proposal.product_slug).trim()
             : '';
+
+        // If identity/routing is incomplete, or quantity is non-numeric:
+        // Do NOT emit an actionable ADD_TO_CART CTA with empty routes. Degrade to informational view.
+        if (!section || !slug || !isQuantityValid) {
+            return {
+                ...message,
+                intent: 'info',
+                content: 'No voy a mover tu carrito automáticamente. Dime el producto exacto o abre la ficha para confirmarlo.',
+                capsule_contract: {
+                    ...contract,
+                    next_step_view: {
+                        family: 'KEEP_EXPLORING',
+                        guidance: 'Dime el producto exacto o abre la ficha de producto para agregarlo al carrito.',
+                        surfaceKind: 'INFORMATIONAL',
+                        primaryAction: null,
+                        secondaryAction: null,
+                        assistAction: null,
+                    },
+                },
+            };
+        }
+
+        const rawQuantity = typeof proposal.quantity === 'number' ? proposal.quantity : 1;
+        const flooredQuantity = Math.floor(rawQuantity);
+        const quantity = flooredQuantity >= 1 ? Math.min(flooredQuantity, 99) : 1;
+
+        const productName = typeof proposal.product_ref === 'string' && proposal.product_ref.trim().length > 0
+            ? proposal.product_ref.trim().slice(0, 100)
+            : 'este producto';
+
+        const variantId = typeof proposal.resolved_variant_id === 'string' && proposal.resolved_variant_id.trim().length > 0
+            ? proposal.resolved_variant_id.trim()
+            : null;
 
         const variantName = typeof proposal.variant_name === 'string' && proposal.variant_name.trim().length > 0
             ? proposal.variant_name.trim()

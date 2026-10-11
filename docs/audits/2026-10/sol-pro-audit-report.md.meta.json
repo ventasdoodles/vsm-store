@@ -1,0 +1,9 @@
+{
+  "model": "OpenAI: GPT-6 Sol Pro (Cache Enabled)",
+  "role": "Auditor Experto Sol Pro (Cache)",
+  "modelId": "openai/gpt-6-sol-pro",
+  "duration_ms": 1113,
+  "total_tokens": 103230,
+  "reasoning_tokens": 3386,
+  "cost": 0.2210414
+}

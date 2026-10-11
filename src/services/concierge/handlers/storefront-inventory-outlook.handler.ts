@@ -29,7 +29,8 @@ export const handleStorefrontInventoryOutlook = async (
             .catch(() => [])
         : [];
 
-    const visibleProducts = inventoryProducts;
+    const shouldShowCatalogSurfaces = catalogGate.is_open;
+    const visibleProducts = shouldShowCatalogSurfaces ? inventoryProducts : [];
 
     const signalKind = capsuleContract.inventory_outlook_signal?.kind;
     const supportsReview = signalKind === 'IN_STOCK_ONLINE' || signalKind === 'IN_STOCK_OMNICHANNEL';
@@ -75,7 +76,13 @@ export const handleStorefrontInventoryOutlook = async (
         || adaptiveConversation.nextStep.assistAction,
     );
 
-    const compactNextStepView = (adaptiveConversation.nextStep.surfaceKind === 'ACTIONABLE' || hasMaterialNextStepAction)
+    const shouldShowNextStep = shouldShowCatalogSurfaces
+        && visibleProducts.length > 0
+        && (supportsReview || signalKind === 'RESTOCK_EXPECTED');
+
+    const compactNextStepView = shouldShowNextStep
+        && adaptiveConversation.nextStep.renderHint === 'SHOW'
+        && (renderableNextStepGuidance || hasMaterialNextStepAction)
         ? {
             ...adaptiveConversation.nextStep,
             guidance: renderableNextStepGuidance,
@@ -101,9 +108,9 @@ export const handleStorefrontInventoryOutlook = async (
             capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
             fallback_used: capsuleContract.execution_status !== 'SUCCESS',
             response_latency_ms: Date.now() - invokeStart,
-            has_product_cards: visibleProducts.length > 0,
-            product_card_count: visibleProducts.length,
-            zero_results: signalKind === 'PRODUCT_NOT_FOUND',
+            has_product_cards: shouldShowCatalogSurfaces && visibleProducts.length > 0,
+            product_card_count: shouldShowCatalogSurfaces ? visibleProducts.length : 0,
+            zero_results: !shouldShowCatalogSurfaces || signalKind === 'PRODUCT_NOT_FOUND',
             error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
             offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
             analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,

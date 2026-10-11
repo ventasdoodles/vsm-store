@@ -36,6 +36,33 @@ const MODELS = {
     role: 'Auditor de Aceptación',
     type: 'chat',
   },
+  'sol-pro': {
+    id: 'openai/gpt-6-sol-pro',
+    name: 'OpenAI: GPT-6 Sol Pro (Cache Enabled)',
+    role: 'Auditor Experto Sol Pro (Cache)',
+    type: 'chat',
+    supportsCache: true,
+  },
+  'sol-6-pro': {
+    id: 'openai/gpt-6-sol-pro',
+    name: 'OpenAI: GPT-6 Sol Pro (Cache Enabled)',
+    role: 'Auditor Experto Sol Pro (Cache)',
+    type: 'chat',
+    supportsCache: true,
+  },
+  'sol-pro-cache': {
+    id: 'openai/gpt-6-sol-pro',
+    name: 'OpenAI: GPT-6 Sol Pro (Cache Enabled)',
+    role: 'Auditor Experto Sol Pro (Cache)',
+    type: 'chat',
+    supportsCache: true,
+  },
+  'sol-pro-batch': {
+    id: 'openai/gpt-6-sol-pro:batch',
+    name: 'OpenAI: GPT-6 Sol Pro (Batch 50% off)',
+    role: 'Auditor Experto Sol Pro (Batch)',
+    type: 'batch',
+  },
   'opus': {
     id: 'anthropic/claude-opus-5.5',
     name: 'Claude Opus 5.5',
@@ -75,23 +102,73 @@ async function invoke(modelAlias, promptText, options = {}) {
 
   const systemPrompt = options.system || null;
   const messages = [];
-  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
-  messages.push({ role: 'user', content: promptText });
+  const sessionId = options.sessionId || 'vsm-sol-pro-audit-cache';
+  const enableCache = Boolean(model.supportsCache || options.cache);
+
+  const headers = {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+    'HTTP-Referer': 'https://vsm-store.local',
+    'X-Title': `vsm-store-${model.role}`,
+  };
+
+  if (enableCache) {
+    headers['x-session-id'] = sessionId;
+    headers['X-OpenRouter-Cache'] = 'true';
+  }
+
+  if (systemPrompt) {
+    if (enableCache) {
+      messages.push({
+        role: 'system',
+        content: [
+          {
+            type: 'text',
+            text: systemPrompt,
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
+      });
+    } else {
+      messages.push({ role: 'system', content: systemPrompt });
+    }
+  }
+
+  if (enableCache) {
+    messages.push({
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: promptText,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+    });
+  } else {
+    messages.push({ role: 'user', content: promptText });
+  }
+
+  const reqBody = {
+    model: model.id,
+    messages,
+    temperature: options.temperature ?? 0.15,
+  };
+
+  if (enableCache) {
+    reqBody.session_id = sessionId;
+    reqBody.prompt_cache_key = sessionId;
+    reqBody.prompt_cache_options = {
+      mode: 'explicit',
+      ttl: '30m',
+    };
+  }
 
   const start = Date.now();
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://vsm-store.local',
-      'X-Title': `vsm-store-${model.role}`,
-    },
-    body: JSON.stringify({
-      model: model.id,
-      messages,
-      temperature: options.temperature ?? 0.15,
-    }),
+    headers,
+    body: JSON.stringify(reqBody),
   });
 
   const duration = Date.now() - start;
@@ -102,6 +179,12 @@ async function invoke(modelAlias, promptText, options = {}) {
     process.exit(1);
   }
 
+  const cachedTokens = data.usage?.prompt_tokens_details?.cached_tokens ?? 0;
+  const cacheWriteTokens = data.usage?.prompt_tokens_details?.cache_write_tokens ?? 0;
+  if (enableCache) {
+    console.error(`💾 [Cache Stats] Cached: ${cachedTokens} tokens | Cache Write: ${cacheWriteTokens} tokens | Cache Discount: ${data.usage?.cache_discount ?? 'N/A'}`);
+  }
+
   return {
     model: model.name,
     role: model.role,
@@ -109,6 +192,8 @@ async function invoke(modelAlias, promptText, options = {}) {
     duration_ms: duration,
     usage: data.usage,
     cost: data.usage?.cost ?? null,
+    cached_tokens: cachedTokens,
+    cache_write_tokens: cacheWriteTokens,
     reasoning_tokens: data.usage?.completion_tokens_details?.reasoning_tokens ?? 0,
     content: data.choices[0].message.content,
   };

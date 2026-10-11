@@ -27,17 +27,41 @@ import { invokeVisualCompatibilityScanner } from '@/services/visual-scanner.serv
 describe('Database isolation services', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        removeChannelMock.mockResolvedValue('ok');
     });
 
     describe('Architectural Hook Isolation Guard', () => {
-        it('ensures zero hooks in src/hooks directly import @/lib/supabase', () => {
-            const hooksDir = path.resolve(process.cwd(), 'src/hooks');
-            const hookFiles = fs.readdirSync(hooksDir).filter((f) => f.endsWith('.ts') || f.endsWith('.tsx'));
+        it('ensures zero hooks in src/hooks/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            const hooksRoot = path.resolve(process.cwd(), 'src/hooks');
 
-            for (const file of hookFiles) {
-                const content = fs.readFileSync(path.join(hooksDir, file), 'utf8');
-                expect(content).not.toMatch(/from ['"]@\/lib\/supabase['"]/);
-                expect(content).not.toMatch(/from ['"]@supabase\/supabase-js['"]/);
+            function getHookFiles(dir: string): string[] {
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                const files: string[] = [];
+                for (const entry of entries) {
+                    const fullPath = path.join(dir, entry.name);
+                    if (entry.isDirectory()) {
+                        if (entry.name !== '__tests__') {
+                            files.push(...getHookFiles(fullPath));
+                        }
+                    } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) {
+                        files.push(fullPath);
+                    }
+                }
+                return files;
+            }
+
+            const hookFiles = getHookFiles(hooksRoot);
+            expect(hookFiles.length).toBeGreaterThan(5);
+
+            for (const filePath of hookFiles) {
+                const content = fs.readFileSync(filePath, 'utf8');
+                // Prohibit static or dynamic imports from supabase lib
+                expect(content).not.toMatch(/from\s+['"].*\/lib\/supabase['"]/);
+                expect(content).not.toMatch(/import\s*\(\s*['"].*\/lib\/supabase['"]\s*\)/);
+                expect(content).not.toMatch(/require\s*\(\s*['"].*\/lib\/supabase['"]\s*\)/);
+                // Prohibit runtime imports from @supabase/supabase-js (only import type allowed)
+                const runtimeSupabaseJsImport = /import\s+(?!type\b)[^'"]*from\s+['"]@supabase\/supabase-js['"]/;
+                expect(content).not.toMatch(runtimeSupabaseJsImport);
             }
         });
     });
@@ -132,6 +156,137 @@ describe('Database isolation services', () => {
 
             unsubscribe();
             expect(removeChannelMock).toHaveBeenCalledWith(channelInstance);
+        });
+
+        it('generates unique channel topics across two concurrent subscriptions', () => {
+            const channelInstance: any = {
+                on: vi.fn().mockReturnThis(),
+                subscribe: vi.fn().mockReturnThis(),
+            };
+            channelMock.mockReturnValue(channelInstance);
+
+            const unsub1 = subscribeToRealtimeOrders(vi.fn());
+            const unsub2 = subscribeToRealtimeOrders(vi.fn());
+
+            const topic1 = channelMock.mock.calls[0]?.[0];
+            const topic2 = channelMock.mock.calls[1]?.[0];
+
+            expect(topic1).toMatch(/^orders_pulse_/);
+            expect(topic2).toMatch(/^orders_pulse_/);
+            expect(topic1).not.toBe(topic2);
+
+            unsub1();
+            unsub2();
+        });
+
+        it('handles postgres_changes event, ignores events after disposed is true', async () => {
+            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
+            const channelInstance: any = {
+                on: vi.fn().mockImplementation((_event, _filter, callback) => {
+                    changeHandler = callback;
+                    return channelInstance;
+                }),
+                subscribe: vi.fn().mockReturnThis(),
+            };
+            channelMock.mockReturnValue(channelInstance);
+            removeChannelMock.mockResolvedValue('ok');
+
+            const singleMock = vi.fn().mockResolvedValue({
+                data: {
+                    id: 'ord-123',
+                    items: [{ name: 'Vape Kit', image: 'img.png' }],
+                    customer_profiles: { full_name: 'Juan Perez' },
+                    shipping_address: { city: 'Guadalajara' },
+                },
+                error: null,
+            });
+            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
+            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+            fromMock.mockReturnValue({ select: selectMock });
+
+            const onNewOrder = vi.fn();
+            const unsubscribe = subscribeToRealtimeOrders(onNewOrder);
+
+            // Trigger event while active
+            await changeHandler({ new: { id: 'ord-123' } });
+            expect(onNewOrder).toHaveBeenCalledWith({
+                id: 'ord-123',
+                customer_name: 'Juan Perez',
+                city: 'Guadalajara',
+                product_name: 'Vape Kit',
+                product_image: 'img.png',
+            });
+
+            // Now unsubscribe
+            unsubscribe();
+            onNewOrder.mockClear();
+
+            // Trigger event after disposed
+            await changeHandler({ new: { id: 'ord-123' } });
+            expect(onNewOrder).not.toHaveBeenCalled();
+        });
+
+        it('catches async rejections from onNewOrder and routes to onError without unhandled rejection', async () => {
+            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
+            const channelInstance: any = {
+                on: vi.fn().mockImplementation((_event, _filter, callback) => {
+                    changeHandler = callback;
+                    return channelInstance;
+                }),
+                subscribe: vi.fn().mockReturnThis(),
+            };
+            channelMock.mockReturnValue(channelInstance);
+
+            const singleMock = vi.fn().mockResolvedValue({
+                data: {
+                    id: 'ord-123',
+                    items: [{ name: 'Vape Kit', image: 'img.png' }],
+                    customer_profiles: { full_name: 'Juan' },
+                    shipping_address: { city: 'CDMX' },
+                },
+                error: null,
+            });
+            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
+            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+            fromMock.mockReturnValue({ select: selectMock });
+
+            const asyncError = new Error('Async consumer failed');
+            const onNewOrder = vi.fn().mockRejectedValue(asyncError);
+            const onError = vi.fn();
+
+            subscribeToRealtimeOrders(onNewOrder, onError);
+
+            await changeHandler({ new: { id: 'ord-123' } });
+
+            expect(onError).toHaveBeenCalledWith(asyncError);
+        });
+
+        it('catches errors inside onError without throwing unhandled exceptions', async () => {
+            let changeHandler: (payload: any) => Promise<void> = () => Promise.resolve();
+            const channelInstance: any = {
+                on: vi.fn().mockImplementation((_event, _filter, callback) => {
+                    changeHandler = callback;
+                    return channelInstance;
+                }),
+                subscribe: vi.fn().mockReturnThis(),
+            };
+            channelMock.mockReturnValue(channelInstance);
+
+            const singleMock = vi.fn().mockResolvedValue({
+                data: null,
+                error: new Error('DB fetch error'),
+            });
+            const eqMock = vi.fn().mockReturnValue({ single: singleMock });
+            const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+            fromMock.mockReturnValue({ select: selectMock });
+
+            const throwingOnError = vi.fn().mockImplementation(() => {
+                throw new Error('Crash in onError');
+            });
+
+            subscribeToRealtimeOrders(vi.fn(), throwingOnError);
+
+            await expect(changeHandler({ new: { id: 'ord-123' } })).resolves.not.toThrow();
         });
     });
 
