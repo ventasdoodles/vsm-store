@@ -187,7 +187,7 @@ describe('product detail presentation boundary', () => {
             </TestRouter>,
         );
 
-        expect(screen.getByRole('button', { name: /Menta/i })).toHaveClass(
+        expect(screen.getByText('Menta').closest('button')).toHaveClass(
             'border-vape-500',
             'bg-vape-500/10',
             'text-vape-400',

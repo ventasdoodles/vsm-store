@@ -205,7 +205,7 @@ describe('CartSidebar transition clarity', () => {
                 'Ya existe una orden pendiente',
                 'Esta cuenta ya tiene un pedido persistido y todavia pagable en Mercado Pago. Continua con esa orden o revisa su estado real antes de iniciar otro checkout.',
             );
-            expect(navigateMock).toHaveBeenCalledWith({ to: '/orders/order-open-1' });
+            expect(navigateMock).toHaveBeenCalledWith({ to: '/orders/$orderId', params: { orderId: 'order-open-1' } });
         });
     });
 
@@ -231,7 +231,13 @@ describe('CartSidebar transition clarity', () => {
         fireEvent.click(screen.getByText(/Ver un pod compatible/i));
 
         await waitFor(() => {
-            expect(navigateMock).toHaveBeenCalledWith({ to: '/vape/pod-compatible' });
+            expect(navigateMock).toHaveBeenCalledWith({
+                to: '/$section/$slug',
+                params: {
+                    section: 'vape',
+                    slug: 'pod-compatible',
+                },
+            });
         });
     });
 
