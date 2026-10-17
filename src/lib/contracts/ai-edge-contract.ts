@@ -4,16 +4,22 @@ import { z } from 'zod';
 // AI Edge Function (customer-intelligence) Contract
 // ==========================================
 
-export const ChatHistoryRoleSchema = z.enum(['user', 'model']);
+export const ChatHistoryRoleSchema = z.enum(['user', 'assistant', 'model', 'system']);
 
-export const ChatHistoryPartSchema = z.object({
-  text: z.string()
-});
-
-export const ChatHistoryItemSchema = z.object({
+export const ChatHistoryStandardItemSchema = z.object({
   role: ChatHistoryRoleSchema,
-  parts: z.array(ChatHistoryPartSchema).min(1)
+  content: z.string(),
 });
+
+export const ChatHistoryGeminiItemSchema = z.object({
+  role: ChatHistoryRoleSchema,
+  parts: z.array(z.object({ text: z.string() })).min(1),
+});
+
+export const ChatHistoryItemSchema = z.union([
+  ChatHistoryStandardItemSchema,
+  ChatHistoryGeminiItemSchema,
+]);
 
 /**
  * Contract for what the Frontend is ALLOWED to send to `customer-intelligence`
@@ -25,9 +31,14 @@ export const CustomerIntelligenceRequestSchema = z.object({
   history: z.array(ChatHistoryItemSchema).optional().default([]),
   stream: z.boolean().optional().default(true),
   visitorId: z.string().optional(),
+  cesarin_session_id: z.string().nullable().optional(),
   cartContext: z.any().optional(), // Can be strictly typed later
   customerId: z.string().uuid().optional(),
+  customerContext: z.any().optional(),
   isTest: z.boolean().optional(),
+  is_pilot: z.boolean().optional(),
+  audio: z.string().optional(),
+  mimeType: z.string().optional(),
 }).passthrough();
 
 export type CustomerIntelligenceRequest = z.infer<typeof CustomerIntelligenceRequestSchema>;
@@ -37,9 +48,11 @@ export type CustomerIntelligenceRequest = z.infer<typeof CustomerIntelligenceReq
  * when `stream` is false.
  */
 export const CustomerIntelligenceResponseSchema = z.object({
-  response: z.string(),
+  response: z.string().optional(),
+  text: z.string().optional(),
+  message: z.string().optional(),
   metadata: z.record(z.string(), z.any()).optional(),
   error: z.string().optional()
-});
+}).passthrough();
 
 export type CustomerIntelligenceResponse = z.infer<typeof CustomerIntelligenceResponseSchema>;
