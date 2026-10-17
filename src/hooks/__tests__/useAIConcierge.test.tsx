@@ -761,6 +761,8 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
                     resolved_product_id: 'prod-1',
                     resolved_variant_id: null,
                     quantity: 2,
+                    section: 'vape',
+                    slug: 'mint-fresh',
                 },
             },
         });
@@ -777,7 +779,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(addItemMock).not.toHaveBeenCalled();
         expect(removeItemMock).not.toHaveBeenCalled();
         expect(updateQuantityMock).not.toHaveBeenCalled();
-        expect(assistantMessage?.content).toContain('solo se agrega si tu confirmas');
+        expect(assistantMessage?.content).toContain('solo se agrega si tú confirmas');
         expect(assistantMessage?.intent).toBe('search');
         expect(assistantMessage?.capsule_contract?.next_step_view?.primaryAction).toMatchObject({
             kind: 'ADD_TO_CART',
