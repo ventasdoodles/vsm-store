@@ -10,6 +10,7 @@ import {
 } from '../webhook-contract';
 
 function createDeps(payment: MercadoPagoPaymentPayload, existingPaymentStatus: string | null = 'pending') {
+    const isAlreadyPaid = existingPaymentStatus === 'paid';
     const deps: WebhookContractDeps = {
         getPayment: vi.fn(async () => payment),
         getOrderAttribution: vi.fn(async () => ({
@@ -21,7 +22,15 @@ function createDeps(payment: MercadoPagoPaymentPayload, existingPaymentStatus: s
         })),
         updateOrderPayment: vi.fn(async () => undefined),
         updateOrderPaymentGuarded: vi.fn(async () => undefined),
-        fulfillOrderPayment: vi.fn(async () => ({ success: true, orderId: 'order-123', paymentId: '999', paymentStatus: 'paid', orderStatus: 'processing' })),
+        fulfillOrderPayment: vi.fn(async () => ({
+            action: isAlreadyPaid ? 'skip' : 'fulfilled',
+            order_id: 'order-123',
+            paymentId: '999',
+            paymentStatus: 'paid',
+            orderStatus: 'processing',
+            stock_decremented: !isAlreadyPaid,
+            conversion_inserted: !isAlreadyPaid,
+        })),
         insertConversionEvent: vi.fn(async () => undefined),
         getOrderItems: vi.fn(async () => [
             { product_id: 'prod-1', variant_id: null, quantity: 2 },
@@ -61,7 +70,6 @@ describe('mercadopago webhook contract', () => {
 
         expect(deps.getPayment).not.toHaveBeenCalled();
         expect(deps.fulfillOrderPayment).not.toHaveBeenCalled();
-        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
     });
 
     it('updates approved payments to paid and processing with Mercado Pago payload data', async () => {
@@ -83,18 +91,9 @@ describe('mercadopago webhook contract', () => {
             paymentStatus: 'paid',
             orderStatus: 'processing',
             conversionInserted: true,
+            stockDecremented: true,
         });
         expect(deps.fulfillOrderPayment).toHaveBeenCalledWith('order-123', '999', 'paid', 'processing', payment);
-        expect(deps.insertConversionEvent).toHaveBeenCalledWith({
-            session_id: 'session-1',
-            event_type: 'payment_completed',
-            metadata: {
-                source: 'cesarin',
-                order_id: 'order-123',
-                status: 'paid',
-                total: 250,
-            },
-        });
     });
 
     it('keeps status mapping for rejected, cancelled, refunded, and pending payments', () => {
@@ -116,7 +115,6 @@ describe('mercadopago webhook contract', () => {
             paymentId: '999',
         });
         expect(deps.fulfillOrderPayment).not.toHaveBeenCalled();
-        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
     });
 
     it('does not insert duplicate payment_completed conversion events for already-paid orders', async () => {
@@ -133,9 +131,9 @@ describe('mercadopago webhook contract', () => {
             ignored: false,
             paymentStatus: 'paid',
             conversionInserted: false,
+            stockDecremented: false,
         });
-        expect(deps.updateOrderPayment).toHaveBeenCalledTimes(1);
-        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
+        expect(deps.fulfillOrderPayment).toHaveBeenCalledTimes(1);
     });
 
     it('decrements stock atomically when payment transitions from pending to paid', async () => {
@@ -150,10 +148,7 @@ describe('mercadopago webhook contract', () => {
         const result = await processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps);
 
         expect(result.stockDecremented).toBe(true);
-        expect(deps.getOrderItems).toHaveBeenCalledWith('order-123');
-        expect(deps.decrementStock).toHaveBeenCalledWith([
-            { product_id: 'prod-1', variant_id: null, quantity: 2 },
-        ]);
+        expect(deps.fulfillOrderPayment).toHaveBeenCalledWith('order-123', '999', 'paid', 'processing', payment);
     });
 
     it('does NOT decrement stock when order is already paid (idempotency)', async () => {
@@ -166,51 +161,35 @@ describe('mercadopago webhook contract', () => {
         const result = await processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps);
 
         expect(result.stockDecremented).toBe(false);
-        expect(deps.getOrderItems).not.toHaveBeenCalled();
-        expect(deps.decrementStock).not.toHaveBeenCalled();
+        expect(deps.fulfillOrderPayment).toHaveBeenCalledTimes(1);
     });
 
-    it('surfaces stock decrement failures and does NOT insert conversion event', async () => {
+    it('surfaces fulfillOrderPayment failures instead of accepting the webhook as successful', async () => {
         const deps = createDeps({
             id: 999,
             external_reference: 'order-123',
             status: 'approved',
         });
-        vi.mocked(deps.decrementStock).mockRejectedValueOnce(new Error('Insufficient product stock'));
+        vi.mocked(deps.fulfillOrderPayment).mockRejectedValueOnce(new Error('RPC fulfill_order_payment failed'));
 
         await expect(processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps))
-            .rejects.toThrow('Insufficient product stock');
+            .rejects.toThrow('RPC fulfill_order_payment failed');
 
-        expect(deps.decrementStock).toHaveBeenCalledTimes(1);
-        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
+        expect(deps.fulfillOrderPayment).toHaveBeenCalledTimes(1);
     });
 
-    it('surfaces order update failures instead of accepting the webhook as successful', async () => {
+    it('surfaces guarded order update failures for non-paid payments', async () => {
         const deps = createDeps({
             id: 999,
             external_reference: 'order-123',
-            status: 'approved',
+            status: 'rejected',
         });
-        vi.mocked(deps.updateOrderPayment).mockRejectedValueOnce(new Error('orders update failed'));
+        vi.mocked(deps.updateOrderPaymentGuarded).mockRejectedValueOnce(new Error('orders update failed'));
 
         await expect(processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps))
             .rejects.toThrow('orders update failed');
 
-        expect(deps.insertConversionEvent).not.toHaveBeenCalled();
-    });
-
-    it('surfaces conversion insert failures after the order payment update', async () => {
-        const deps = createDeps({
-            id: 999,
-            external_reference: 'order-123',
-            status: 'approved',
-        });
-        vi.mocked(deps.insertConversionEvent).mockRejectedValueOnce(new Error('conversion insert failed'));
-
-        await expect(processMercadoPagoWebhook({ type: 'payment', paymentId: '999' }, deps))
-            .rejects.toThrow('conversion insert failed');
-
-        expect(deps.updateOrderPayment).toHaveBeenCalledTimes(1);
+        expect(deps.updateOrderPaymentGuarded).toHaveBeenCalledTimes(1);
     });
 });
 

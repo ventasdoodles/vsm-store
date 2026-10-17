@@ -171,7 +171,9 @@ describe('llm-provider resilience & error classification', () => {
       });
 
       await expect(async () => {
-        for await (const _ of openRouterDeltas(stream)) {}
+        for await (const _ of openRouterDeltas(stream)) {
+          // consume
+        }
       }).rejects.toThrowError('Rate limit exceeded');
     });
 
@@ -185,7 +187,9 @@ describe('llm-provider resilience & error classification', () => {
       });
 
       await expect(async () => {
-        for await (const _ of openRouterDeltas(stream)) {}
+        for await (const _ of openRouterDeltas(stream)) {
+          // consume
+        }
       }).rejects.toThrowError(ProviderError);
     });
   });

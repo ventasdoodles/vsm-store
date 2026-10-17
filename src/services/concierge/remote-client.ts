@@ -211,7 +211,7 @@ export async function executeConciergeRemoteChat({
                 for (const line of consumeCompleteLines()) {
                     processLine(line);
                 }
-            } catch (err) {
+            } catch (_err) {
                 // If a TCP reset or network error occurs during streaming,
                 // we break the loop and rely on the graceful degradation
                 // block below to return partial metadata.
