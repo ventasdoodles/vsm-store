@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { insertConversationConversionEvent } from '@/services/tracking.service';
 
 export type ConversionEventType =
     | 'ai_cta_rendered'
@@ -48,15 +48,7 @@ export async function recordConversationConversionEvent(input: {
     eventType: ConversionEventType;
     metadata?: ConversionEventMetadata;
 }): Promise<void> {
-    try {
-        await supabase.from('conversation_conversion_events').insert({
-            session_id: input.sessionId ?? null,
-            event_type: input.eventType,
-            metadata: input.metadata ?? {},
-        });
-    } catch {
-        // Conversion measurement is causal evidence, not runtime control flow.
-    }
+    await insertConversationConversionEvent(input);
 }
 
 export function emitConversationConversionEvent(input: {

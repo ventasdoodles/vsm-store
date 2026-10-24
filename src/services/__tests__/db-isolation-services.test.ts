@@ -122,6 +122,28 @@ describe('Database isolation services', () => {
         it('ensures zero stores in src/stores/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
             assertZeroViolations('src/stores', 'store');
         });
+
+        it('ensures zero contexts in src/contexts/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            assertZeroViolations('src/contexts', 'context');
+        });
+
+        it('ensures zero actions in src/actions/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            assertZeroViolations('src/actions', 'action');
+        });
+
+        it('ensures App.tsx has zero direct imports of @/lib/supabase or runtime @supabase/supabase-js', () => {
+            const appPath = path.resolve(process.cwd(), 'src/App.tsx');
+            const content = fs.readFileSync(appPath, 'utf8');
+            const violations = detectIllegalSupabaseImports(content);
+            expect(violations, 'Illegal supabase import in App.tsx').toEqual([]);
+        });
+
+        it('ensures conversion-measurement.ts has zero direct imports of @/lib/supabase or runtime @supabase/supabase-js', () => {
+            const filePath = path.resolve(process.cwd(), 'src/lib/conversion-measurement.ts');
+            const content = fs.readFileSync(filePath, 'utf8');
+            const violations = detectIllegalSupabaseImports(content);
+            expect(violations, 'Illegal supabase import in conversion-measurement.ts').toEqual([]);
+        });
     });
 
     describe('getAppliedReferral', () => {

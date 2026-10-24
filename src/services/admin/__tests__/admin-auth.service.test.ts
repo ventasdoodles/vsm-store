@@ -105,4 +105,42 @@ describe('admin-auth.service (checkIsAdmin)', () => {
 
     expect(result).toBe(false);
   });
+
+  it('returns false when DB row exists but has a non-admin role (e.g. viewer)', async () => {
+    const viewerUser = {
+      id: 'user-uuid-viewer',
+      app_metadata: {},
+    } as unknown as User;
+
+    const maybeSingleMock = vi.fn().mockResolvedValue({
+      data: { id: 'user-uuid-viewer', role: 'viewer' },
+      error: null,
+    });
+    const eqMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+    fromMock.mockReturnValue({ select: selectMock });
+
+    const result = await checkIsAdmin(viewerUser);
+
+    expect(result).toBe(false);
+  });
+
+  it('returns true when DB row has super_admin role', async () => {
+    const superAdminUser = {
+      id: 'user-uuid-super',
+      app_metadata: {},
+    } as unknown as User;
+
+    const maybeSingleMock = vi.fn().mockResolvedValue({
+      data: { id: 'user-uuid-super', role: 'super_admin' },
+      error: null,
+    });
+    const eqMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+    fromMock.mockReturnValue({ select: selectMock });
+
+    const result = await checkIsAdmin(superAdminUser);
+
+    expect(result).toBe(true);
+  });
 });

@@ -75,3 +75,22 @@ function _getDemoData(trackingNumber: string): TrackingInfo {
         ]
     };
 }
+
+/**
+ * Registra un evento de conversión de la conversación en la tabla conversation_conversion_events.
+ */
+export async function insertConversationConversionEvent(input: {
+    sessionId?: string | null;
+    eventType: string;
+    metadata?: Record<string, unknown>;
+}): Promise<void> {
+    try {
+        await supabase.from('conversation_conversion_events').insert({
+            session_id: input.sessionId ?? null,
+            event_type: input.eventType,
+            metadata: input.metadata ?? {},
+        });
+    } catch {
+        // Telemetry is causal evidence, not runtime control flow
+    }
+}

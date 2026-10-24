@@ -8,7 +8,6 @@ import type { CustomerProfile } from '@/types/customer';
 
 const getSessionMock = vi.fn();
 const onAuthStateChangeMock = vi.fn();
-const signOutSessionMock = vi.fn();
 
 const signInMock = vi.fn();
 const signUpMock = vi.fn();
@@ -19,22 +18,14 @@ const getCustomerProfileMock = vi.fn();
 const notifySuccessMock = vi.fn();
 const notifyInfoMock = vi.fn();
 
-vi.mock('@/lib/supabase', () => ({
-    supabase: {
-        auth: {
-            getSession: (...args: unknown[]) => getSessionMock(...args),
-            onAuthStateChange: (...args: unknown[]) => onAuthStateChangeMock(...args),
-            signOut: (...args: unknown[]) => signOutSessionMock(...args),
-        },
-    },
-}));
-
 vi.mock('@/services', () => ({
     signIn: (...args: unknown[]) => signInMock(...args),
     signUp: (...args: unknown[]) => signUpMock(...args),
     signOut: (...args: unknown[]) => signOutMock(...args),
     resetPassword: (...args: unknown[]) => resetPasswordMock(...args),
     getCustomerProfile: (...args: unknown[]) => getCustomerProfileMock(...args),
+    getAuthSession: (...args: unknown[]) => getSessionMock(...args),
+    onAuthStateChange: (...args: unknown[]) => onAuthStateChangeMock(...args),
 }));
 
 vi.mock('@/hooks/useNotification', () => ({
@@ -91,7 +82,6 @@ describe('AuthProvider', () => {
     beforeEach(() => {
         getSessionMock.mockReset();
         onAuthStateChangeMock.mockReset();
-        signOutSessionMock.mockReset();
         signInMock.mockReset();
         signUpMock.mockReset();
         signOutMock.mockReset();
@@ -101,22 +91,14 @@ describe('AuthProvider', () => {
         notifyInfoMock.mockReset();
 
         onAuthStateChangeMock.mockImplementation(() => ({
-            data: {
-                subscription: {
-                    unsubscribe: vi.fn(),
-                },
-            },
+            unsubscribe: vi.fn(),
         }));
     });
 
     it('restores the persisted session during StrictMode bootstrap instead of staying unresolved', async () => {
         const user = createUser();
         getSessionMock.mockResolvedValue({
-            data: {
-                session: {
-                    user,
-                },
-            },
+            user,
         });
         getCustomerProfileMock.mockResolvedValue(createProfile());
 
@@ -133,11 +115,7 @@ describe('AuthProvider', () => {
     });
 
     it('hydrates user immediately from the resolved sign-in result under StrictMode', async () => {
-        getSessionMock.mockResolvedValue({
-            data: {
-                session: null,
-            },
-        });
+        getSessionMock.mockResolvedValue(null);
         getCustomerProfileMock.mockResolvedValue(createProfile());
         signInMock.mockResolvedValue({
             user: createUser(),

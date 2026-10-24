@@ -24,7 +24,7 @@ export async function signUp(
         password,
         options: {
             data: { full_name: fullName, phone },
-            emailRedirectTo: `${window.location.origin}/login`,
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login',
         },
     });
 
@@ -65,10 +65,14 @@ export async function signOut() {
 // ─── Reset Password ──────────────────────────────
 export async function resetPassword(email: string) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login',
     });
     if (error) throw error;
 }
+
+// ─── Explicit Selector (§1.2) ───────────────────
+const CUSTOMER_PROFILE_SELECT =
+    'id, email, full_name, phone, whatsapp, birthdate, tier, account_status, suspension_end, total_orders, total_spent, avatar_url, favorite_category_id, points, referral_code, referred_by, ai_preferences, ia_context, segment, health_status, last_interactions, created_at, updated_at';
 
 // ─── Get Current User ────────────────────────────
 export async function getCurrentUser(): Promise<User | null> {
@@ -81,11 +85,30 @@ export async function getCurrentUser(): Promise<User | null> {
     }
 }
 
+// ─── Get Auth Session ────────────────────────────
+export async function getAuthSession(): Promise<{ user: User | null } | null> {
+    try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error || !data.session) return null;
+        return data.session;
+    } catch {
+        return null;
+    }
+}
+
+// ─── On Auth State Change ────────────────────────
+export function onAuthStateChange(
+    callback: (event: string, session: { user: User | null } | null) => void
+): { unsubscribe: () => void } {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(callback);
+    return subscription;
+}
+
 // ─── Get Customer Profile ────────────────────────
 export async function getCustomerProfile(userId: string): Promise<CustomerProfile | null> {
     const { data, error } = await supabase
         .from('customer_profiles')
-        .select('*')
+        .select(CUSTOMER_PROFILE_SELECT)
         .eq('id', userId)
         .maybeSingle();
 

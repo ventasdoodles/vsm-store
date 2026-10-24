@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const getCurrentUserMock = vi.hoisted(() => vi.fn());
 const addToWishlistMock = vi.hoisted(() => vi.fn());
+const addItemsToWishlistMock = vi.hoisted(() => vi.fn());
 const removeFromWishlistMock = vi.hoisted(() => vi.fn());
 const clearWishlistMock = vi.hoisted(() => vi.fn());
 const getWishlistMock = vi.hoisted(() => vi.fn());
@@ -13,6 +14,7 @@ vi.mock('@/services/auth.service', () => ({
 
 vi.mock('@/services', () => ({
     addToWishlist: addToWishlistMock,
+    addItemsToWishlist: addItemsToWishlistMock,
     removeFromWishlist: removeFromWishlistMock,
     clearWishlist: clearWishlistMock,
     getWishlist: getWishlistMock,
@@ -49,6 +51,7 @@ describe('Wishlist Store', () => {
         vi.clearAllMocks();
         getCurrentUserMock.mockResolvedValue(null);
         addToWishlistMock.mockResolvedValue(undefined);
+        addItemsToWishlistMock.mockResolvedValue(undefined);
         removeFromWishlistMock.mockResolvedValue(undefined);
         clearWishlistMock.mockResolvedValue(undefined);
         getWishlistMock.mockResolvedValue([]);
@@ -158,15 +161,14 @@ describe('Wishlist Store', () => {
             expect(clearWishlistMock).toHaveBeenCalledWith('user-auth-123');
         });
 
-        it('syncToDb envía todos los items locales al backend en lote via Promise.allSettled', async () => {
+        it('syncToDb envía todos los items locales al backend en un único lote via addItemsToWishlist', async () => {
             getCurrentUserMock.mockResolvedValue({ id: 'user-batch-1' });
             useWishlistStore.setState({ items: [mockProduct, mockProduct2] });
 
             await useWishlistStore.getState().syncToDb();
 
-            expect(addToWishlistMock).toHaveBeenCalledTimes(2);
-            expect(addToWishlistMock).toHaveBeenCalledWith('user-batch-1', 'prod-1');
-            expect(addToWishlistMock).toHaveBeenCalledWith('user-batch-1', 'prod-2');
+            expect(addItemsToWishlistMock).toHaveBeenCalledTimes(1);
+            expect(addItemsToWishlistMock).toHaveBeenCalledWith('user-batch-1', ['prod-1', 'prod-2']);
         });
 
         it('syncToDb no hace llamadas si el usuario es null', async () => {
@@ -175,6 +177,7 @@ describe('Wishlist Store', () => {
 
             await useWishlistStore.getState().syncToDb();
 
+            expect(addItemsToWishlistMock).not.toHaveBeenCalled();
             expect(addToWishlistMock).not.toHaveBeenCalled();
         });
 

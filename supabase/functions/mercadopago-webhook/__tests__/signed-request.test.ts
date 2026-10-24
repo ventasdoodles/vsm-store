@@ -350,4 +350,78 @@ describe('Mercado Pago Webhook Ingress (signed-request.ts)', () => {
     const result = await authenticateMercadoPagoRequest(req, TEST_SECRET, now);
     expect(result).toBeNull();
   });
+
+  it('handles case-insensitive query parameter keys (e.g. DATA.ID and TYPE)', async () => {
+    const now = 1700000000000;
+    const { signatureHeader } = await generateValidSignature(
+      TEST_SECRET,
+      TEST_PAYMENT_ID,
+      TEST_REQUEST_ID,
+      now,
+    );
+
+    const req = new Request(
+      `https://api.vsm.test/functions/v1/mercadopago-webhook?DATA.ID=${TEST_PAYMENT_ID}&TYPE=PAYMENT`,
+      {
+        method: 'POST',
+        headers: {
+          'x-signature': signatureHeader,
+          'x-request-id': TEST_REQUEST_ID,
+        },
+      },
+    );
+
+    const result = await authenticateMercadoPagoRequest(req, TEST_SECRET, now);
+    expect(result).toEqual({ type: 'payment', paymentId: TEST_PAYMENT_ID });
+  });
+
+  it('handles duplicate identical query parameters gracefully without throwing', async () => {
+    const now = 1700000000000;
+    const { signatureHeader } = await generateValidSignature(
+      TEST_SECRET,
+      TEST_PAYMENT_ID,
+      TEST_REQUEST_ID,
+      now,
+    );
+
+    const req = new Request(
+      `https://api.vsm.test/functions/v1/mercadopago-webhook?id=${TEST_PAYMENT_ID}&id=${TEST_PAYMENT_ID}&type=payment`,
+      {
+        method: 'POST',
+        headers: {
+          'x-signature': signatureHeader,
+          'x-request-id': TEST_REQUEST_ID,
+        },
+      },
+    );
+
+    const result = await authenticateMercadoPagoRequest(req, TEST_SECRET, now);
+    expect(result).toEqual({ type: 'payment', paymentId: TEST_PAYMENT_ID });
+  });
+
+  it('infers payment event type when body action is payment.created even if query type is omitted', async () => {
+    const now = 1700000000000;
+    const { signatureHeader } = await generateValidSignature(
+      TEST_SECRET,
+      TEST_PAYMENT_ID,
+      TEST_REQUEST_ID,
+      now,
+    );
+
+    const req = new Request(
+      `https://api.vsm.test/functions/v1/mercadopago-webhook?data.id=${TEST_PAYMENT_ID}`,
+      {
+        method: 'POST',
+        headers: {
+          'x-signature': signatureHeader,
+          'x-request-id': TEST_REQUEST_ID,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'payment.created', data: { id: TEST_PAYMENT_ID } }),
+      },
+    );
+
+    const result = await authenticateMercadoPagoRequest(req, TEST_SECRET, now);
+    expect(result).toEqual({ type: 'payment', paymentId: TEST_PAYMENT_ID });
+  });
 });

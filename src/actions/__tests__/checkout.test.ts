@@ -2,17 +2,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { submitCheckout } from '../checkout';
 
-const { invokeMock, emitConversationConversionEventMock } = vi.hoisted(() => ({
-    invokeMock: vi.fn(),
+const {
+    invokeCheckoutSubmitMock,
+    createMercadoPagoPaymentMock,
+    emitConversationConversionEventMock,
+} = vi.hoisted(() => ({
+    invokeCheckoutSubmitMock: vi.fn(),
+    createMercadoPagoPaymentMock: vi.fn(),
     emitConversationConversionEventMock: vi.fn(),
 }));
 
-vi.mock('@/lib/supabase', () => ({
-    supabase: {
-        functions: {
-            invoke: invokeMock,
-        },
-    },
+vi.mock('@/services/orders.service', () => ({
+    invokeCheckoutSubmit: (...args: unknown[]) => invokeCheckoutSubmitMock(...args),
+}));
+
+vi.mock('@/services/payments/mercadopago.service', () => ({
+    createMercadoPagoPayment: (...args: unknown[]) => createMercadoPagoPaymentMock(...args),
 }));
 
 vi.mock('@/lib/conversion-measurement', () => ({
@@ -21,20 +26,20 @@ vi.mock('@/lib/conversion-measurement', () => ({
 
 describe('submitCheckout', () => {
     beforeEach(() => {
-        invokeMock.mockReset();
+        invokeCheckoutSubmitMock.mockReset();
+        createMercadoPagoPaymentMock.mockReset();
         emitConversationConversionEventMock.mockReset();
     });
 
     it('returns a ready payment continuation when Mercado Pago init_point is available', async () => {
-        invokeMock
-            .mockResolvedValueOnce({
-                data: { ok: true, orderId: 'order-123' },
-                error: null,
-            })
-            .mockResolvedValueOnce({
-                data: { init_point: 'https://mp.test/pay/order-123', preference_id: 'pref-123' },
-                error: null,
-            });
+        invokeCheckoutSubmitMock.mockResolvedValueOnce({
+            data: { ok: true, orderId: 'order-123' },
+            error: null,
+        });
+        createMercadoPagoPaymentMock.mockResolvedValueOnce({
+            init_point: 'https://mp.test/pay/order-123',
+            preference_id: 'pref-123',
+        });
 
         const result = await submitCheckout({
             form: {
@@ -55,16 +60,13 @@ describe('submitCheckout', () => {
             paymentContinuation: 'ready',
             paymentInitPoint: 'https://mp.test/pay/order-123',
         });
-        expect(invokeMock).toHaveBeenNthCalledWith(1, 'checkout-submit', expect.any(Object));
-        expect(invokeMock).toHaveBeenNthCalledWith(1, 'checkout-submit', {
-            body: expect.objectContaining({
+        expect(invokeCheckoutSubmitMock).toHaveBeenCalledWith(
+            expect.objectContaining({
                 cesarinSessionId: 'session-checkout-1',
                 conversionSource: 'cesarin',
-            }),
-        });
-        expect(invokeMock).toHaveBeenNthCalledWith(2, 'create-payment', {
-            body: { order_id: 'order-123' },
-        });
+            })
+        );
+        expect(createMercadoPagoPaymentMock).toHaveBeenCalledWith('order-123');
         expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
             sessionId: 'session-checkout-1',
             eventType: 'order_created',
@@ -77,15 +79,11 @@ describe('submitCheckout', () => {
     });
 
     it('returns an unavailable continuation when payment init cannot be created after persistence', async () => {
-        invokeMock
-            .mockResolvedValueOnce({
-                data: { ok: true, orderId: 'order-123' },
-                error: null,
-            })
-            .mockResolvedValueOnce({
-                data: null,
-                error: { message: 'boom' },
-            });
+        invokeCheckoutSubmitMock.mockResolvedValueOnce({
+            data: { ok: true, orderId: 'order-123' },
+            error: null,
+        });
+        createMercadoPagoPaymentMock.mockRejectedValueOnce(new Error('boom'));
 
         const result = await submitCheckout({
             form: {
@@ -107,7 +105,7 @@ describe('submitCheckout', () => {
     });
 
     it('marks non-Mercado Pago checkout as not requesting payment continuation', async () => {
-        invokeMock.mockResolvedValueOnce({
+        invokeCheckoutSubmitMock.mockResolvedValueOnce({
             data: { ok: true, orderId: 'order-123' },
             error: null,
         });
@@ -128,11 +126,12 @@ describe('submitCheckout', () => {
             orderId: 'order-123',
             paymentContinuation: 'not_requested',
         });
-        expect(invokeMock).toHaveBeenCalledTimes(1);
+        expect(invokeCheckoutSubmitMock).toHaveBeenCalledTimes(1);
+        expect(createMercadoPagoPaymentMock).not.toHaveBeenCalled();
     });
 
     it('preserves reused pending order guidance for non-Mercado Pago checkout', async () => {
-        invokeMock.mockResolvedValueOnce({
+        invokeCheckoutSubmitMock.mockResolvedValueOnce({
             data: {
                 ok: true,
                 orderId: 'order-123',
@@ -160,24 +159,24 @@ describe('submitCheckout', () => {
             message: 'Ya existe una orden pendiente para este checkout. Continua con esa orden y revisa su estado antes de enviar otro pedido.',
             paymentContinuation: 'not_requested',
         });
-        expect(invokeMock).toHaveBeenCalledTimes(1);
+        expect(invokeCheckoutSubmitMock).toHaveBeenCalledTimes(1);
+        expect(createMercadoPagoPaymentMock).not.toHaveBeenCalled();
     });
 
     it('keeps reused pending Mercado Pago orders on the bounded continuation path', async () => {
-        invokeMock
-            .mockResolvedValueOnce({
-                data: {
-                    ok: true,
-                    orderId: 'order-123',
-                    reusedPendingOrder: true,
-                    message: 'Ya existe una orden pendiente para este checkout. Retomaremos esa orden y su estado real.',
-                },
-                error: null,
-            })
-            .mockResolvedValueOnce({
-                data: { init_point: 'https://mp.test/pay/order-123', preference_id: 'pref-123' },
-                error: null,
-            });
+        invokeCheckoutSubmitMock.mockResolvedValueOnce({
+            data: {
+                ok: true,
+                orderId: 'order-123',
+                reusedPendingOrder: true,
+                message: 'Ya existe una orden pendiente para este checkout. Retomaremos esa orden y su estado real.',
+            },
+            error: null,
+        });
+        createMercadoPagoPaymentMock.mockResolvedValueOnce({
+            init_point: 'https://mp.test/pay/order-123',
+            preference_id: 'pref-123',
+        });
 
         const result = await submitCheckout({
             form: {
@@ -197,9 +196,6 @@ describe('submitCheckout', () => {
             paymentContinuation: 'ready',
             paymentInitPoint: 'https://mp.test/pay/order-123',
         });
-        expect(invokeMock).toHaveBeenNthCalledWith(2, 'create-payment', {
-            body: { order_id: 'order-123' },
-        });
+        expect(createMercadoPagoPaymentMock).toHaveBeenCalledWith('order-123');
     });
 });
-

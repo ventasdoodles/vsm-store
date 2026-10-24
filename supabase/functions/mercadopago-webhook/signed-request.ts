@@ -104,10 +104,17 @@ export async function authenticateMercadoPagoRequest(
   if (!secret) throw new Error("MERCADOPAGO_WEBHOOK_SECRET is not configured");
 
   const url = new URL(req.url);
-  const rawUrlIds = [
-    ...url.searchParams.getAll("data.id"),
-    ...url.searchParams.getAll("id"),
-  ];
+  const rawUrlIds: string[] = [];
+  let queryType: string | null = null;
+  for (const [key, value] of url.searchParams.entries()) {
+    if (/^(?:data\.)?id$/i.test(key)) {
+      rawUrlIds.push(value);
+    }
+    if (/^(?:type|topic)$/i.test(key) && !queryType) {
+      queryType = value.toLowerCase();
+    }
+  }
+
   const urlIds = Array.from(new Set(rawUrlIds));
   if (urlIds.length !== 1 || !/^[0-9]{1,32}$/.test(urlIds[0])) {
     throw new WebhookRequestError(400, "Invalid signed payment ID");
@@ -131,6 +138,7 @@ export async function authenticateMercadoPagoRequest(
     }
     fields.set(match[1], match[2]);
   }
+
   const ts = fields.get("ts");
   const hex = fields.get("v1");
   if (!ts || !/^\d{10}(\d{3})?$/.test(ts) ||
@@ -169,12 +177,14 @@ export async function authenticateMercadoPagoRequest(
   if (bodyId !== null && bodyId !== paymentId) {
     throw new WebhookRequestError(400, "Conflicting payment IDs");
   }
-  const payloadType = record(body)?.type;
-  const queryType = url.searchParams.get("type") ??
-    url.searchParams.get("topic");
+  const bodyRecord = record(body);
+  const payloadType = typeof bodyRecord?.type === "string" ? bodyRecord.type.toLowerCase() : null;
+  const action = typeof bodyRecord?.action === "string" ? bodyRecord.action.toLowerCase() : null;
+  const inferredActionType = action && action.startsWith("payment.") ? "payment" : null;
+
   if (queryType && payloadType && queryType !== payloadType) {
     throw new WebhookRequestError(400, "Conflicting event types");
   }
-  const type = queryType ?? payloadType;
-  return type === "payment" ? { type, paymentId } : null;
+  const type = queryType ?? payloadType ?? inferredActionType;
+  return type === "payment" ? { type: "payment", paymentId } : null;
 }

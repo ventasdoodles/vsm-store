@@ -55,7 +55,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                 <div className="space-y-3">
                     {users.map((user) => {
                         const sessionMinutes = Math.floor((Date.now() - user.session_start) / 1000 / 60);
-                        const isAnonymous = !user.email || user.email === 'Anonimo';
+                        const isAnonymous = !user.email || user.email === 'Anonimo' || user.email === 'Anónimo' || user.email === 'Desconocido';
 
                         return (
                             <div

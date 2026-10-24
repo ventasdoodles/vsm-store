@@ -33,5 +33,5 @@ export async function checkIsAdmin(user?: User | null): Promise<boolean> {
         .maybeSingle();
 
     if (error || !data) return false;
-    return true;
+    return data.role === 'admin' || data.role === 'super_admin';
 }

@@ -51,6 +51,26 @@ export async function addToWishlist(customerId: string, productId: string): Prom
 }
 
 /**
+ * Agrega múltiples productos a la lista de deseos en la DB en un único lote atómico.
+ */
+export async function addItemsToWishlist(customerId: string, productIds: string[]): Promise<void> {
+    if (!productIds || productIds.length === 0) return;
+    const rows = productIds.map((productId) => ({
+        customer_id: customerId,
+        product_id: productId,
+    }));
+
+    const { error } = await supabase
+        .from('customer_wishlists')
+        .upsert(rows, { onConflict: 'customer_id,product_id' });
+
+    if (error) {
+        console.error('[Wishlist] Error batch adding items:', error);
+        throw error;
+    }
+}
+
+/**
  * Elimina un producto de la lista de deseos en la DB.
  */
 export async function removeFromWishlist(customerId: string, productId: string): Promise<void> {

@@ -82,13 +82,12 @@ export const useWishlistStore = create<WishlistState>()(
                 const items = get().items;
                 if (items.length === 0) return;
                 
-                await Promise.allSettled(
-                    items.map((item) =>
-                        wishlistService.addToWishlist(user.id, item.id).catch((err) => {
-                            console.error('Wishlist batch add failed:', err);
-                        })
-                    )
-                );
+                await wishlistService.addItemsToWishlist(
+                    user.id,
+                    items.map((item) => item.id)
+                ).catch((err) => {
+                    console.error('Wishlist batch add failed:', err);
+                });
             },
 
             loadFromDb: async () => {

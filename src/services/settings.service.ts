@@ -5,7 +5,8 @@
  * @module services/settings.service
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+export { isSupabaseConfigured };
 import type { VerticalPackConfig } from '@/config/productization/types';
 import { StoreSettingsUpdateSchema } from '@/lib/contracts/store-settings-contract';
 

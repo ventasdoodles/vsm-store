@@ -3,11 +3,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const fromMock = vi.hoisted(() => vi.fn());
 const channelMock = vi.hoisted(() => vi.fn());
+const removeChannelMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: fromMock,
     channel: channelMock,
+    removeChannel: removeChannelMock,
   },
 }));
 
@@ -24,11 +26,12 @@ import {
 describe('monitoring.service', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    removeChannelMock.mockResolvedValue('ok');
   });
 
   describe('subscribeToMonitoringPresence', () => {
-    it('subscribes to channel and dispatches presence sync events to callback', () => {
-      let syncHandler: (() => void) | undefined;
+    it('subscribes to channel and dispatches presence sync events to callback', async () => {
+      let syncHandler: (() => Promise<void>) | undefined;
       const unsubscribeMock = vi.fn();
       const subscribeMock = vi.fn().mockImplementation((cb) => {
         if (cb) cb('SUBSCRIBED');
@@ -73,7 +76,7 @@ describe('monitoring.service', () => {
 
       // Trigger sync
       expect(syncHandler).toBeDefined();
-      syncHandler!();
+      await syncHandler!();
 
       expect(onSync).toHaveBeenCalledTimes(1);
       const syncedUsers = onSync.mock.calls[0]?.[0] as ActiveMonitoringUser[];
@@ -89,14 +92,67 @@ describe('monitoring.service', () => {
 
       // Cleanup
       cleanup();
-      expect(unsubscribeMock).toHaveBeenCalled();
+      expect(removeChannelMock).toHaveBeenCalledWith(channelObj);
 
       // Trigger sync after cleanup: should not dispatch
-      syncHandler!();
+      await syncHandler!();
       expect(onSync).toHaveBeenCalledTimes(1);
     });
 
-    it('reports subscription errors to onError callback', () => {
+    it('defaults email to Anonimo when not provided in presence state', async () => {
+      let syncHandler: (() => Promise<void>) | undefined;
+      const channelObj = {
+        on: vi.fn().mockImplementation((_event, _filter, handler) => {
+          syncHandler = handler;
+          return channelObj;
+        }),
+        subscribe: vi.fn().mockReturnThis(),
+        unsubscribe: vi.fn(),
+        presenceState: vi.fn().mockReturnValue({
+          'anon-user': [{}],
+        }),
+      };
+      channelMock.mockReturnValue(channelObj);
+
+      const onSync = vi.fn();
+      subscribeToMonitoringPresence(onSync);
+
+      await syncHandler!();
+      expect(onSync).toHaveBeenCalledWith([
+        expect.objectContaining({
+          id: 'anon-user',
+          email: 'Anonimo',
+          path: '/',
+        }),
+      ]);
+    });
+
+    it('catches async rejections from onSync and routes safely to onError', async () => {
+      let syncHandler: (() => Promise<void>) | undefined;
+      const channelObj = {
+        on: vi.fn().mockImplementation((_event, _filter, handler) => {
+          syncHandler = handler;
+          return channelObj;
+        }),
+        subscribe: vi.fn().mockReturnThis(),
+        unsubscribe: vi.fn(),
+        presenceState: vi.fn().mockReturnValue({
+          'u-1': [{ email: 'u1@vsm.test' }],
+        }),
+      };
+      channelMock.mockReturnValue(channelObj);
+
+      const asyncError = new Error('Async handler exploded');
+      const onSync = vi.fn().mockRejectedValue(asyncError);
+      const onError = vi.fn().mockResolvedValue(undefined);
+
+      subscribeToMonitoringPresence(onSync, onError);
+
+      await syncHandler!();
+      expect(onError).toHaveBeenCalledWith(asyncError);
+    });
+
+    it('reports CHANNEL_ERROR and TIMED_OUT subscription statuses to onError', () => {
       let statusCallback: ((status: string) => void) | undefined;
       const channelObj = {
         on: vi.fn().mockReturnThis(),
@@ -107,15 +163,19 @@ describe('monitoring.service', () => {
       };
       channelMock.mockReturnValue(channelObj);
 
-      const onSync = vi.fn();
       const onError = vi.fn();
-
-      subscribeToMonitoringPresence(onSync, onError);
+      subscribeToMonitoringPresence(vi.fn(), onError);
 
       expect(statusCallback).toBeDefined();
       statusCallback!('CHANNEL_ERROR');
+      expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+        message: expect.stringContaining('CHANNEL_ERROR'),
+      }));
 
-      expect(onError).toHaveBeenCalledWith(expect.any(Error));
+      statusCallback!('TIMED_OUT');
+      expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+        message: expect.stringContaining('TIMED_OUT'),
+      }));
     });
   });
 
@@ -196,14 +256,13 @@ describe('monitoring.service', () => {
       expect(trackMock).not.toHaveBeenCalled();
     });
 
-    it('calls channel unsubscribe', () => {
-      const unsubscribeMock = vi.fn();
+    it('calls removeChannel on unsubscribeChannel', () => {
       const mockChannel = {
-        unsubscribe: unsubscribeMock,
+        unsubscribe: vi.fn(),
       } as any;
 
       unsubscribeChannel(mockChannel);
-      expect(unsubscribeMock).toHaveBeenCalled();
+      expect(removeChannelMock).toHaveBeenCalledWith(mockChannel);
     });
   });
 });

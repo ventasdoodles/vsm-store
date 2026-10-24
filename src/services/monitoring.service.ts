@@ -174,7 +174,7 @@ export function subscribeToMonitoringPresence(
     const channel = supabase.channel(MONITORING_CHANNEL);
 
     channel
-        .on('presence', { event: 'sync' }, () => {
+        .on('presence', { event: 'sync' }, async () => {
             if (disposed) return;
             try {
                 const state = channel.presenceState();
@@ -184,7 +184,7 @@ export function subscribeToMonitoringPresence(
                     const presence = (Array.isArray(value) ? value[0] : value) as Record<string, unknown> | undefined;
                     users.push({
                         id: key,
-                        email: (presence?.email as string) ?? 'Desconocido',
+                        email: (presence?.email as string) ?? 'Anonimo',
                         path: (presence?.path as string) ?? '/',
                         joined_at: (presence?.joined_at as string) ?? new Date().toISOString(),
                         session_start: (presence?.session_start as number) ?? Date.now(),
@@ -192,22 +192,40 @@ export function subscribeToMonitoringPresence(
                     });
                 });
 
-                onSync(users);
+                if (!disposed) {
+                    await Promise.resolve(onSync(users)).catch((asyncErr) => {
+                        if (!disposed && onError) {
+                            void Promise.resolve(onError(asyncErr)).catch(() => {});
+                        }
+                    });
+                }
             } catch (err) {
                 if (!disposed && onError) {
-                    onError(err);
+                    try {
+                        void Promise.resolve(onError(err)).catch(() => {});
+                    } catch {
+                        // ignore synchronous callback error
+                    }
                 }
             }
         })
         .subscribe((status) => {
-            if (status === 'CHANNEL_ERROR' && !disposed && onError) {
-                onError(new Error(`Failed to subscribe to ${MONITORING_CHANNEL}`));
+            if ((status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') && !disposed && onError) {
+                try {
+                    void Promise.resolve(onError(new Error(`Failed to subscribe to ${MONITORING_CHANNEL} (status: ${status})`))).catch(() => {});
+                } catch {
+                    // ignore synchronous callback error
+                }
             }
         });
 
     return () => {
         disposed = true;
-        void channel.unsubscribe();
+        try {
+            void Promise.resolve(supabase.removeChannel(channel)).catch(() => {});
+        } catch {
+            void channel.unsubscribe();
+        }
     };
 }
 
@@ -215,5 +233,9 @@ export function subscribeToMonitoringPresence(
  * Desuscribe un canal de Presence.
  */
 export function unsubscribeChannel(channel: ReturnType<typeof supabase.channel>) {
-    channel.unsubscribe();
+    try {
+        void Promise.resolve(supabase.removeChannel(channel)).catch(() => {});
+    } catch {
+        void channel.unsubscribe();
+    }
 }

@@ -9,7 +9,6 @@
 import { createContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
 import * as authService from '@/services';
 import { useNotification } from '@/hooks/useNotification';
 import type { CustomerProfile } from '@/types/customer';
@@ -66,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             // Check Account Status (God Mode Enforcement)
             if (data?.account_status === 'banned') {
-                await supabase.auth.signOut();
+                await authService.signOut();
                 if (!isMountedRef.current) return;
                 setUser(null);
                 setProfile(null);
@@ -77,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 const now = new Date();
                 const end = data.suspension_end ? new Date(data.suspension_end) : null;
                 if (!end || now < end) {
-                    await supabase.auth.signOut();
+                    await authService.signOut();
                     if (!isMountedRef.current) return;
                     setUser(null);
                     setProfile(null);
@@ -100,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const initializeSession = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const session = await authService.getAuthSession();
                 if (!isMountedRef.current) return;
 
                 const currentUser = session?.user ?? null;
@@ -123,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void initializeSession();
 
         // Suscribirse a cambios (NO async para no bloquear Supabase internals)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        const subscription = authService.onAuthStateChange(
             (event, session) => {
                 if (event === 'INITIAL_SESSION') {
                     return;

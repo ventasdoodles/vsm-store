@@ -1,5 +1,6 @@
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
-import { supabase } from '@/lib/supabase';
+import { invokeCheckoutSubmit } from '@/services/orders.service';
+import { createMercadoPagoPayment } from '@/services/payments/mercadopago.service';
 import { emitConversationConversionEvent, type ConversionSource } from '@/lib/conversion-measurement';
 import type { CheckoutFormData } from '@/types/cart';
 
@@ -40,9 +41,7 @@ export async function submitCheckout(input: CheckoutActionInput): Promise<Checko
         return { ok: false, message: 'El carrito esta vacio.' };
     }
 
-    const { data, error } = await supabase.functions.invoke('checkout-submit', {
-        body: input,
-    });
+    const { data, error } = await invokeCheckoutSubmit(input) as { data: unknown; error: unknown };
 
     if (error) {
         return { ok: false, message: 'No se pudo crear el pedido. Intenta de nuevo.' };
@@ -82,14 +81,15 @@ export async function submitCheckout(input: CheckoutActionInput): Promise<Checko
         return { ok: false, message: 'Respuesta invalida del servidor.' };
     }
 
-    const { data: paymentData, error: paymentError } = await supabase.functions.invoke<{
-        init_point?: string;
-        preference_id?: string;
-    }>('create-payment', {
-        body: { order_id: checkoutResult.orderId },
-    });
+    let paymentInitPoint: string | undefined;
+    try {
+        const paymentData = await createMercadoPagoPayment(checkoutResult.orderId);
+        paymentInitPoint = paymentData?.init_point;
+    } catch {
+        paymentInitPoint = undefined;
+    }
 
-    if (paymentError || !paymentData?.init_point) {
+    if (!paymentInitPoint) {
         return {
             ok: true,
             orderId: checkoutResult.orderId,
@@ -104,6 +104,6 @@ export async function submitCheckout(input: CheckoutActionInput): Promise<Checko
         orderId: checkoutResult.orderId,
         reusedPendingOrder: checkoutResult.reusedPendingOrder,
         paymentContinuation: 'ready',
-        paymentInitPoint: paymentData.init_point,
+        paymentInitPoint,
     };
 }

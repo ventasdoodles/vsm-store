@@ -244,3 +244,13 @@ export function subscribeToRealtimeOrders(
         }
     };
 }
+
+/**
+ * Invoca la Edge Function checkout-submit para procesar y crear la orden.
+ */
+export async function invokeCheckoutSubmit(input: object): Promise<{ data: unknown; error: unknown }> {
+    return supabase.functions.invoke('checkout-submit', {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body: input as Record<string, any>,
+    });
+}

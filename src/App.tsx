@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import { Layout } from '@/components/layout/Layout';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
 import { SEO } from '@/components/seo/SEO';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isSupabaseConfigured } from '@/services';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';

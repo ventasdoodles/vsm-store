@@ -33,3 +33,7 @@ export const mercadopagoService = {
         return data;
     }
 };
+
+export async function createMercadoPagoPayment(orderId: string): Promise<CreatePaymentResponse> {
+    return mercadopagoService.createPayment(orderId);
+}
