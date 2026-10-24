@@ -10,22 +10,27 @@ import type { User } from '@supabase/supabase-js';
 /**
  * Verifica si un usuario tiene privilegios de administrador.
  * Optimizado para leer primero del JWT (app_metadata.role) con fallback a DB.
+ * Maneja de forma segura usuarios nulos o sin ID para prevenir excepciones fatales.
  * @param user Objeto de usuario de Supabase Auth
  * @returns boolean indicando si es admin confirmado.
  */
-export async function checkIsAdmin(user: User): Promise<boolean> {
+export async function checkIsAdmin(user?: User | null): Promise<boolean> {
+    if (!user || !user.id) {
+        return false;
+    }
+
     // 1. JWT Fast Path
     const role = user.app_metadata?.role;
     if (role === 'admin' || role === 'super_admin') {
         return true;
     }
 
-    // 2. DB Fallback Path
+    // 2. DB Fallback Path (usando maybeSingle para no generar error PGRST116 en no-admins)
     const { data, error } = await supabase
         .from('admin_users')
         .select('id, role')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
     if (error || !data) return false;
     return true;

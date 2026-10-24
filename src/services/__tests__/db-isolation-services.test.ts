@@ -80,33 +80,47 @@ describe('Database isolation services', () => {
             expect(detectIllegalSupabaseImports("const supabaseError = err as { code?: string };")).toEqual([]);
         });
 
-        it('ensures zero hooks in src/hooks/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
-            const hooksRoot = path.resolve(process.cwd(), 'src/hooks');
-
-            function getHookFiles(dir: string): string[] {
-                const entries = fs.readdirSync(dir, { withFileTypes: true });
-                const files: string[] = [];
-                for (const entry of entries) {
-                    const fullPath = path.join(dir, entry.name);
-                    if (entry.isDirectory()) {
-                        if (entry.name !== '__tests__') {
-                            files.push(...getHookFiles(fullPath));
-                        }
-                    } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) {
-                        files.push(fullPath);
+        function getSourceFiles(dir: string): string[] {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            const files: string[] = [];
+            for (const entry of entries) {
+                const fullPath = path.join(dir, entry.name);
+                if (entry.isDirectory()) {
+                    if (entry.name !== '__tests__') {
+                        files.push(...getSourceFiles(fullPath));
                     }
+                } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) {
+                    files.push(fullPath);
                 }
-                return files;
             }
+            return files;
+        }
 
-            const hookFiles = getHookFiles(hooksRoot);
-            expect(hookFiles.length).toBeGreaterThan(5);
+        function assertZeroViolations(targetDir: string, label: string) {
+            const files = getSourceFiles(path.resolve(process.cwd(), targetDir));
+            expect(files.length, `Target directory ${targetDir} should contain source files`).toBeGreaterThan(0);
 
-            for (const filePath of hookFiles) {
+            for (const filePath of files) {
                 const content = fs.readFileSync(filePath, 'utf8');
                 const violations = detectIllegalSupabaseImports(content);
-                expect(violations, `Illegal supabase import in ${filePath}`).toEqual([]);
+                expect(violations, `Illegal supabase import in ${label} file: ${filePath}`).toEqual([]);
             }
+        }
+
+        it('ensures zero hooks in src/hooks/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            assertZeroViolations('src/hooks', 'hook');
+        });
+
+        it('ensures zero pages in src/pages/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            assertZeroViolations('src/pages', 'page');
+        });
+
+        it('ensures zero components in src/components/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            assertZeroViolations('src/components', 'component');
+        });
+
+        it('ensures zero stores in src/stores/** directly import @/lib/supabase or runtime @supabase/supabase-js', () => {
+            assertZeroViolations('src/stores', 'store');
         });
     });
 

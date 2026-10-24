@@ -9,7 +9,7 @@
  *
  * @requires MERCADOPAGO_WEBHOOK_SECRET (MP's webhook secret from dashboard)
  * @author Sol Pro (auditor) + Claude Opus 4.6 (integration)
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 export interface SignedPaymentNotification {
@@ -66,7 +66,9 @@ async function readBoundedBody(req: Request): Promise<unknown> {
     offset += chunk.byteLength;
   }
   try {
-    return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes).trim();
+    if (text.length === 0) return null;
+    return JSON.parse(text);
   } catch {
     throw new WebhookRequestError(400, "Invalid JSON");
   }
@@ -102,10 +104,11 @@ export async function authenticateMercadoPagoRequest(
   if (!secret) throw new Error("MERCADOPAGO_WEBHOOK_SECRET is not configured");
 
   const url = new URL(req.url);
-  const urlIds = [
+  const rawUrlIds = [
     ...url.searchParams.getAll("data.id"),
     ...url.searchParams.getAll("id"),
   ];
+  const urlIds = Array.from(new Set(rawUrlIds));
   if (urlIds.length !== 1 || !/^[0-9]{1,32}$/.test(urlIds[0])) {
     throw new WebhookRequestError(400, "Invalid signed payment ID");
   }

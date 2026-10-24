@@ -7,6 +7,7 @@
  * @module services/auth.service
  */
 import { supabase } from '@/lib/supabase';
+import type { User } from '@supabase/supabase-js';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 
 // ─── Sign Up ──────────────────────────────────────
@@ -70,10 +71,14 @@ export async function resetPassword(email: string) {
 }
 
 // ─── Get Current User ────────────────────────────
-export async function getCurrentUser() {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) throw error;
-    return user;
+export async function getCurrentUser(): Promise<User | null> {
+    try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data) return null;
+        return data.user ?? null;
+    } catch {
+        return null;
+    }
 }
 
 // ─── Get Customer Profile ────────────────────────

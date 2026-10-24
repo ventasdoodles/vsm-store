@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from '@/lib/supabase';
+import { getCurrentUser } from '@/services/auth.service';
 import * as wishlistService from '@/services';
 import type { Product } from '@/types/product';
 
@@ -25,22 +25,30 @@ export const useWishlistStore = create<WishlistState>()(
                 const currentItems = get().items;
                 if (!currentItems.find((item) => item.id === product.id)) {
                     set({ items: [...currentItems, product] });
-                    // Fire-and-forget sync
-                    supabase.auth.getUser().then(({ data: { user } }) => {
-                        if (user) wishlistService.addToWishlist(user.id, product.id).catch((err) => {
+                    // Fire-and-forget sync via service layer
+                    void getCurrentUser()
+                        .then((user) => {
+                            if (user) {
+                                return wishlistService.addToWishlist(user.id, product.id);
+                            }
+                        })
+                        .catch((err) => {
                             console.error('Wishlist sync add failed:', err);
                         });
-                    });
                 }
             },
             removeItem: (productId) => {
                 set({ items: get().items.filter((item) => item.id !== productId) });
-                // Fire-and-forget sync
-                supabase.auth.getUser().then(({ data: { user } }) => {
-                    if (user) wishlistService.removeFromWishlist(user.id, productId).catch((err) => {
+                // Fire-and-forget sync via service layer
+                void getCurrentUser()
+                    .then((user) => {
+                        if (user) {
+                            return wishlistService.removeFromWishlist(user.id, productId);
+                        }
+                    })
+                    .catch((err) => {
                         console.error('Wishlist sync remove failed:', err);
                     });
-                });
             },
             toggleItem: (product) => {
                 const currentItems = get().items;
@@ -56,32 +64,39 @@ export const useWishlistStore = create<WishlistState>()(
             },
             clearWishlist: () => {
                 set({ items: [] });
-                supabase.auth.getUser().then(({ data: { user } }) => {
-                    if (user) wishlistService.clearWishlist(user.id).catch((err) => {
+                // Fire-and-forget sync via service layer
+                void getCurrentUser()
+                    .then((user) => {
+                        if (user) {
+                            return wishlistService.clearWishlist(user.id);
+                        }
+                    })
+                    .catch((err) => {
                         console.error('Wishlist sync clear failed:', err);
                     });
-                });
             },
 
             syncToDb: async () => {
-                const { data: { user } } = await supabase.auth.getUser();
+                const user = await getCurrentUser().catch(() => null);
                 if (!user) return;
                 const items = get().items;
                 if (items.length === 0) return;
                 
-                for (const item of items) {
-                    await wishlistService.addToWishlist(user.id, item.id).catch((err) => {
-                        console.error('Wishlist batch add failed:', err);
-                    });
-                }
+                await Promise.allSettled(
+                    items.map((item) =>
+                        wishlistService.addToWishlist(user.id, item.id).catch((err) => {
+                            console.error('Wishlist batch add failed:', err);
+                        })
+                    )
+                );
             },
 
             loadFromDb: async () => {
-                const { data: { user } } = await supabase.auth.getUser();
+                const user = await getCurrentUser().catch(() => null);
                 if (!user) return;
                 
-                const dbItems = await wishlistService.getWishlist(user.id);
-                if (dbItems.length === 0) return;
+                const dbItems = await wishlistService.getWishlist(user.id).catch(() => []);
+                if (!dbItems || dbItems.length === 0) return;
 
                 const localItems = get().items;
                 const localIds = new Set(localItems.map(i => i.id));
@@ -97,4 +112,3 @@ export const useWishlistStore = create<WishlistState>()(
         }
     )
 );
-

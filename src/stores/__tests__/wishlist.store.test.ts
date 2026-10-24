@@ -1,5 +1,23 @@
 // @vitest-environment node
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+const getCurrentUserMock = vi.hoisted(() => vi.fn());
+const addToWishlistMock = vi.hoisted(() => vi.fn());
+const removeFromWishlistMock = vi.hoisted(() => vi.fn());
+const clearWishlistMock = vi.hoisted(() => vi.fn());
+const getWishlistMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@/services/auth.service', () => ({
+    getCurrentUser: getCurrentUserMock,
+}));
+
+vi.mock('@/services', () => ({
+    addToWishlist: addToWishlistMock,
+    removeFromWishlist: removeFromWishlistMock,
+    clearWishlist: clearWishlistMock,
+    getWishlist: getWishlistMock,
+}));
+
 import { useWishlistStore } from '../wishlist.store';
 import type { Product } from '@/types/product';
 
@@ -27,9 +45,14 @@ const mockProduct2 = {
 } as unknown as Product;
 
 describe('Wishlist Store', () => {
-    // Limpiar el store antes de cada prueba
     beforeEach(() => {
-        useWishlistStore.getState().clearWishlist();
+        vi.clearAllMocks();
+        getCurrentUserMock.mockResolvedValue(null);
+        addToWishlistMock.mockResolvedValue(undefined);
+        removeFromWishlistMock.mockResolvedValue(undefined);
+        clearWishlistMock.mockResolvedValue(undefined);
+        getWishlistMock.mockResolvedValue([]);
+        useWishlistStore.setState({ items: [] });
     });
 
     it('debería inicializar con una lista vacía', () => {
@@ -37,7 +60,7 @@ describe('Wishlist Store', () => {
         expect(state.items).toEqual([]);
     });
 
-    it('debería agregar un producto a la lista', () => {
+    it('debería agregar un producto a la lista localmente', () => {
         const store = useWishlistStore.getState();
         store.addItem(mockProduct);
 
@@ -96,5 +119,87 @@ describe('Wishlist Store', () => {
 
         expect(useWishlistStore.getState().items).toHaveLength(0);
     });
-});
 
+    describe('Sincronización con base de datos y autenticación', () => {
+        it('sincroniza en segundo plano cuando el usuario está autenticado al agregar', async () => {
+            getCurrentUserMock.mockResolvedValue({ id: 'user-auth-123' });
+            const store = useWishlistStore.getState();
+            store.addItem(mockProduct);
+
+            // Permitir que la promesa fire-and-forget resuelva
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(getCurrentUserMock).toHaveBeenCalled();
+            expect(addToWishlistMock).toHaveBeenCalledWith('user-auth-123', mockProduct.id);
+        });
+
+        it('sincroniza en segundo plano cuando el usuario está autenticado al eliminar', async () => {
+            getCurrentUserMock.mockResolvedValue({ id: 'user-auth-123' });
+            const store = useWishlistStore.getState();
+            store.addItem(mockProduct);
+            store.removeItem(mockProduct.id);
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(removeFromWishlistMock).toHaveBeenCalledWith('user-auth-123', mockProduct.id);
+        });
+
+        it('sincroniza en segundo plano cuando el usuario está autenticado al limpiar lista', async () => {
+            getCurrentUserMock.mockResolvedValue({ id: 'user-auth-123' });
+            const store = useWishlistStore.getState();
+            store.addItem(mockProduct);
+            store.clearWishlist();
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(clearWishlistMock).toHaveBeenCalledWith('user-auth-123');
+        });
+
+        it('syncToDb envía todos los items locales al backend en lote via Promise.allSettled', async () => {
+            getCurrentUserMock.mockResolvedValue({ id: 'user-batch-1' });
+            useWishlistStore.setState({ items: [mockProduct, mockProduct2] });
+
+            await useWishlistStore.getState().syncToDb();
+
+            expect(addToWishlistMock).toHaveBeenCalledTimes(2);
+            expect(addToWishlistMock).toHaveBeenCalledWith('user-batch-1', 'prod-1');
+            expect(addToWishlistMock).toHaveBeenCalledWith('user-batch-1', 'prod-2');
+        });
+
+        it('syncToDb no hace llamadas si el usuario es null', async () => {
+            getCurrentUserMock.mockResolvedValue(null);
+            useWishlistStore.setState({ items: [mockProduct] });
+
+            await useWishlistStore.getState().syncToDb();
+
+            expect(addToWishlistMock).not.toHaveBeenCalled();
+        });
+
+        it('loadFromDb carga productos de la DB y fusiona con los items locales sin duplicar', async () => {
+            getCurrentUserMock.mockResolvedValue({ id: 'user-merge-1' });
+            getWishlistMock.mockResolvedValue([mockProduct, mockProduct2]);
+            useWishlistStore.setState({ items: [mockProduct] }); // Ya tiene mockProduct
+
+            await useWishlistStore.getState().loadFromDb();
+
+            const items = useWishlistStore.getState().items;
+            expect(items).toHaveLength(2);
+            expect(items.map(i => i.id)).toEqual(['prod-1', 'prod-2']);
+        });
+
+        it('maneja errores en llamadas a servicios sin romper el estado del store', async () => {
+            getCurrentUserMock.mockRejectedValue(new Error('Network error'));
+            const store = useWishlistStore.getState();
+
+            // No debe lanzar excepción no manejada
+            expect(() => store.addItem(mockProduct)).not.toThrow();
+            await useWishlistStore.getState().syncToDb();
+            await useWishlistStore.getState().loadFromDb();
+
+            expect(useWishlistStore.getState().items).toHaveLength(1);
+        });
+    });
+});

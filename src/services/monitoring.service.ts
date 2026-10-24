@@ -153,6 +153,64 @@ export async function getAppLogs(limit = 50) {
     return data || [];
 }
 
+export interface ActiveMonitoringUser {
+    id: string;
+    email: string;
+    path: string;
+    joined_at: string;
+    session_start: number;
+    last_active: number;
+}
+
+/**
+ * Se suscribe a la presencia de usuarios en tiempo real en el canal de monitoreo.
+ * Retorna una función de limpieza para desuscribirse de forma segura.
+ */
+export function subscribeToMonitoringPresence(
+    onSync: (users: ActiveMonitoringUser[]) => void,
+    onError?: (err: unknown) => void
+): () => void {
+    let disposed = false;
+    const channel = supabase.channel(MONITORING_CHANNEL);
+
+    channel
+        .on('presence', { event: 'sync' }, () => {
+            if (disposed) return;
+            try {
+                const state = channel.presenceState();
+                const users: ActiveMonitoringUser[] = [];
+
+                Object.entries(state).forEach(([key, value]) => {
+                    const presence = (Array.isArray(value) ? value[0] : value) as Record<string, unknown> | undefined;
+                    users.push({
+                        id: key,
+                        email: (presence?.email as string) ?? 'Desconocido',
+                        path: (presence?.path as string) ?? '/',
+                        joined_at: (presence?.joined_at as string) ?? new Date().toISOString(),
+                        session_start: (presence?.session_start as number) ?? Date.now(),
+                        last_active: (presence?.last_active as number) ?? Date.now(),
+                    });
+                });
+
+                onSync(users);
+            } catch (err) {
+                if (!disposed && onError) {
+                    onError(err);
+                }
+            }
+        })
+        .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR' && !disposed && onError) {
+                onError(new Error(`Failed to subscribe to ${MONITORING_CHANNEL}`));
+            }
+        });
+
+    return () => {
+        disposed = true;
+        void channel.unsubscribe();
+    };
+}
+
 /**
  * Desuscribe un canal de Presence.
  */
