@@ -129,7 +129,7 @@ export function AdminAttributes() {
     }
 
     return (
-        <div className="space-y-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="container-admin">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <Heading as="h1" className="text-3xl font-black tracking-tight text-white sm:text-4xl">

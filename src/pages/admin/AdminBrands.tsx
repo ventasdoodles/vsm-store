@@ -144,7 +144,7 @@ export function AdminBrands() {
     }
 
     return (
-        <div className="space-y-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="container-admin">
             <BrandsHeader onNew={() => handleOpenModal()} />
 
             <BrandsStats stats={stats} />

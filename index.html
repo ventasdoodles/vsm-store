@@ -26,6 +26,36 @@
   
   <!-- LCP Optimization: Preload Hero fallback -->
   <link rel="preload" as="image" href="/images/storefront-fallbacks/hero-vape.svg" type="image/svg+xml" />
+  <!-- Anti-FOUC Theme Hydration Script -->
+  <script>
+    (function() {
+      try {
+        var preset = localStorage.getItem('vsm_theme_preset_id');
+        var presets = {
+          'herbal-420': { bg: '10 15 13', accent: '16 185 129', sec: '5 150 105', fg: '10 15 13' },
+          'amber-motor': { bg: '12 12 14', accent: '245 158 11', sec: '234 88 12', fg: '12 12 14' },
+          'monochrome-minimal': { bg: '9 9 11', accent: '244 244 245', sec: '161 161 170', fg: '9 9 11' },
+          'cyber-crimson': { bg: '11 10 15', accent: '239 68 68', sec: '217 70 239', fg: '255 255 255' }
+        };
+        var root = document.documentElement;
+        if (preset && presets[preset]) {
+          var p = presets[preset];
+          root.style.setProperty('--bg-primary', p.bg);
+          root.style.setProperty('--accent-primary', p.accent);
+          root.style.setProperty('--accent-secondary', p.sec);
+          root.style.setProperty('--accent-foreground', p.fg);
+        }
+        var custom = localStorage.getItem('vsm_custom_theme_tokens');
+        if (preset === 'custom' && custom) {
+          var c = JSON.parse(custom);
+          if (c.bgPrimary) root.style.setProperty('--bg-primary', c.bgPrimary);
+          if (c.accentPrimary) root.style.setProperty('--accent-primary', c.accentPrimary);
+          if (c.accentSecondary) root.style.setProperty('--accent-secondary', c.accentSecondary);
+          if (c.accentForeground) root.style.setProperty('--accent-foreground', c.accentForeground);
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body class="bg-theme-primary text-theme-primary antialiased">

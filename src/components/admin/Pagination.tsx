@@ -64,7 +64,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                             className={cn(
                                 btnBase,
                                 p === currentPage
-                                    ? 'bg-vape-500/20 font-semibold text-vape-400'
+                                    ? 'bg-accent-primary/20 font-semibold text-accent-primary'
                                     : 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary'
                             )}
                         >

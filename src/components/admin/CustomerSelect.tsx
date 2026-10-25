@@ -66,7 +66,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                         onFocus={() => setIsOpen(true)}
                         // Delay blur to allow clicking on items
                         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-                        className="w-full rounded-xl border border-theme bg-theme-primary pl-9 pr-4 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+                        className="w-full rounded-xl border border-theme bg-theme-primary pl-9 pr-4 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none"
                     />
 
                     {isOpen && (

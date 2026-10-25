@@ -61,7 +61,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
         return (
             <div className="flex h-screen items-center justify-center bg-theme-primary">
                 <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-vape-400" />
+                    <Loader2 className="h-8 w-8 animate-spin text-accent-primary" />
                     <p className="text-sm text-theme-secondary">Verificando acceso...</p>
                     <p className="text-xs text-accent-primary font-mono">{debugInfo}</p>
                 </div>
@@ -89,7 +89,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                     <div className="flex gap-3">
                         <Button
                             onClick={() => window.location.reload()}
-                            className="rounded-lg bg-vape-500 px-4 py-2 text-sm font-medium text-primary-950 hover:bg-vape-400 transition-colors"
+                            className="rounded-lg bg-accent-primary px-4 py-2 text-sm font-medium text-primary-950 hover:bg-accent-primary transition-colors"
                         >
                             Reintentar
                         </Button>

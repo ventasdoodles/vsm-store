@@ -31,20 +31,38 @@ describe('ThemeContext & useTheme', () => {
         expect(result.current.activePreset).toBe('herbal-420');
         expect(result.current.themeTokens.accentPrimary).toBe('16 185 129');
         expect(document.documentElement.style.getPropertyValue('--accent-primary')).toBe('16 185 129');
+        expect(document.documentElement.style.getPropertyValue('--accent-foreground')).toBe('10 15 13');
     });
 
-    it('supports custom hex colors', () => {
+    it('supports custom hex colors with automatic contrast foreground calculation', () => {
         const { result } = renderHook(() => useTheme(), { wrapper });
 
         act(() => {
             result.current.setCustomHexColors({
-                accentPrimary: '#ff0055',
+                accentPrimary: '#facc15', // Yellow 400 (light background)
             });
         });
 
         expect(result.current.activePreset).toBe('custom');
-        expect(result.current.themeTokens.accentPrimary).toBe('255 0 85');
-        expect(document.documentElement.style.getPropertyValue('--accent-primary')).toBe('255 0 85');
+        expect(result.current.themeTokens.accentForeground).toBe('9 9 11'); // Dark text on yellow for AAA contrast
+        expect(document.documentElement.style.getPropertyValue('--accent-foreground')).toBe('9 9 11');
+    });
+
+    it('syncs theme across tabs on window storage events', () => {
+        const { result } = renderHook(() => useTheme(), { wrapper });
+
+        act(() => {
+            window.dispatchEvent(
+                new StorageEvent('storage', {
+                    key: 'vsm_theme_preset_id',
+                    newValue: 'cyber-crimson',
+                })
+            );
+        });
+
+        expect(result.current.activePreset).toBe('cyber-crimson');
+        expect(result.current.themeTokens.accentPrimary).toBe('239 68 68');
+        expect(document.documentElement.style.getPropertyValue('--accent-primary')).toBe('239 68 68');
     });
 
     it('resets to default preset', () => {

@@ -50,7 +50,7 @@ export function TabTraining() {
                 <div className="space-y-6">
                     <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02]">
                         <div className="flex items-center gap-3 mb-4">
-                            <Link2 className="h-6 w-6 text-vape-400" />
+                            <Link2 className="h-6 w-6 text-accent-primary" />
                             <Heading as="h3" className="text-lg font-bold text-white">Aprender de Enlace Web</Heading>
                         </div>
                         <p className="text-white/40 text-sm mb-4">
@@ -63,7 +63,7 @@ export function TabTraining() {
                                 placeholder="https://..."
                                 className="flex-1"
                             />
-                            <Button className="px-6 py-3 bg-vape-500 text-white rounded-xl hover:bg-vape-400 transition-colors font-semibold">
+                            <Button className="px-6 py-3 bg-accent-primary text-white rounded-xl hover:bg-accent-primary transition-colors font-semibold">
                                 Ingerir
                             </Button>
                         </div>

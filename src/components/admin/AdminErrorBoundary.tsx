@@ -60,7 +60,7 @@ export class AdminErrorBoundary extends React.Component<Props, State> {
                         </Button>
                         <Button
                             onClick={this.handleRetry}
-                            className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-vape-500 transition-colors"
+                            className="inline-flex items-center gap-2 rounded-xl bg-accent-secondary px-4 py-2 text-sm font-medium text-white shadow hover:bg-accent-primary transition-colors"
                         >
                             <RefreshCw className="h-4 w-4" /> Reintentar
                         </Button>

@@ -236,12 +236,12 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
             {/* 1.5. Sección de Insights Inteligentes (Fase A) */}
             {insights.length > 0 && (
-                <div className="relative overflow-hidden rounded-5xl border border-vape-500/20 bg-gradient-to-br from-vape-950/40 to-black/40 p-1 backdrop-blur-2xl">
+                <div className="relative overflow-hidden rounded-5xl border border-accent-primary/20 bg-gradient-to-br from-accent-primary/10 to-black/40 p-1 backdrop-blur-2xl">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.1),transparent_50%)]" />
                     <div className="relative p-6 px-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <Sparkles className="h-4 w-4 text-vape-400 animate-pulse" />
-                            <span className="text-2xs font-black uppercase tracking-macro text-vape-400/80">Recomendaciones del Sistema</span>
+                            <Sparkles className="h-4 w-4 text-accent-primary animate-pulse" />
+                            <span className="text-2xs font-black uppercase tracking-macro text-accent-primary/80">Recomendaciones del Sistema</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -252,7 +252,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                         insight.type === 'success' && "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
                                         insight.type === 'warning' && "bg-amber-500/10 border-amber-500/20 text-amber-400",
                                         insight.type === 'critical' && "bg-rose-500/10 border-rose-500/20 text-rose-400",
-                                        insight.type === 'info' && "bg-vape-500/10 border-vape-500/20 text-vape-400"
+                                        insight.type === 'info' && "bg-accent-primary/10 border-accent-primary/20 text-accent-primary"
                                     )}>
                                         {insight.type === 'critical' ? <AlertCircle className="h-6 w-6" /> : <Sparkles className="h-5 w-5" />}
                                     </div>
@@ -267,7 +267,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                             handleGenerateWhatsApp(insight.description);
                                                         }
                                                     }}
-                                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors w-fit group/btn"
+                                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-accent-primary hover:text-accent-primary transition-colors w-fit group/btn"
                                                 >
                                                     {insight.actionLabel}
                                                     <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
@@ -290,7 +290,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                             {/* AI Narrative Section */}
                             <div className={cn(
-                                "col-span-1 md:col-span-2 flex gap-6 p-6 rounded-4xl bg-gradient-to-br from-vape-500/5 to-indigo-500/5 border border-vape-500/20 relative group transition-all hover:bg-vape-500/10",
+                                "col-span-1 md:col-span-2 flex gap-6 p-6 rounded-4xl bg-gradient-to-br from-accent-primary/5 to-accent-secondary/5 border border-accent-primary/20 relative group transition-all hover:bg-accent-primary/10",
                                 loadingNarrative && "animate-pulse"
                             )}>
                                 <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-indigo-500 text-2xs font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20">
@@ -357,7 +357,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                    </span>
                                ))}
                                {intelligence.ai_preferences?.preferred_styles?.map((style, i) => (
-                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-vape-500/10 border border-vape-500/20 text-2xs font-bold text-vape-300">
+                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-accent-primary/10 border border-accent-primary/20 text-2xs font-bold text-accent-primary">
                                        {style}
                                    </span>
                                ))}
@@ -371,7 +371,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                         {/* AI Context / Propensity */}
                         <div className="space-y-4">
-                            <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</Heading>
+                            <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-accent-primary/80">Contexto de Compra & Propensiones</Heading>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
                                     <p className="text-2xs font-black uppercase tracking-widest text-white/30 mb-1">Score de Propensión</p>
@@ -396,11 +396,11 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             {/* 1.9 Cesarin Memory Section — Conversational Learning */}
             <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <Activity className="h-32 w-32 text-vape-500" />
+                    <Activity className="h-32 w-32 text-accent-primary" />
                 </div>
                 
                 <Heading as="h4" className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
-                    <Activity className="h-5 w-5 text-vape-400" />
+                    <Activity className="h-5 w-5 text-accent-primary" />
                     Memoria de Cesarin
                 </Heading>
 
@@ -411,7 +411,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 ) : (
                     <div className="space-y-6 relative z-10">
                         <div>
-                            <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-vape-300/80 mb-4">Intereses Detectados (Aprendizaje Activo)</Heading>
+                            <Heading as="h5" className="text-2xs font-black uppercase tracking-widest text-accent-primary/80 mb-4">Intereses Detectados (Aprendizaje Activo)</Heading>
                             <div className="flex flex-wrap gap-3">
                                 {[...customerMemory.detected_interests]
                                     .sort((a, b) => {
@@ -440,7 +440,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                 className={cn(
                                                     "group/interest flex flex-col gap-1.5 p-3 px-4 rounded-2xl transition-all border",
                                                     isLeading 
-                                                        ? "bg-vape-500/10 border-vape-500/30 ring-1 ring-vape-500/10 shadow-lg shadow-vape-500/10" 
+                                                        ? "bg-accent-primary/10 border-accent-primary/30 ring-1 ring-accent-primary/10 shadow-lg shadow-accent-primary/10" 
                                                         : "bg-surface-base/40 border-white/5 hover:border-white/10",
                                                     isLowSignal && "opacity-40 hover:opacity-60"
                                                 )}
@@ -449,21 +449,21 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                     <div className="flex items-center gap-2">
                                                         <span className={cn(
                                                             "text-xs font-bold uppercase tracking-tight",
-                                                            isLeading ? "text-vape-300" : "text-white"
+                                                            isLeading ? "text-accent-primary" : "text-white"
                                                         )}>
                                                             {interest}
                                                         </span>
                                                         {isLeading && (
-                                                            <span className="text-3xs font-black bg-vape-500/20 text-vape-400 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-vape-500/30">
+                                                            <span className="text-3xs font-black bg-accent-primary/20 text-accent-primary px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-accent-primary/30">
                                                                 Foco Superior
                                                             </span>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-1.5">
                                                         <span className="text-3xs font-black uppercase tracking-widest text-white/20">Frecuencia</span>
-                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-vape-500/10 border border-vape-500/20">
-                                                            <TrendingUp className="h-2.5 w-2.5 text-vape-400" />
-                                                            <span className="text-2xs font-black text-vape-400">{meta?.hits || 1}</span>
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-accent-primary/10 border border-accent-primary/20">
+                                                            <TrendingUp className="h-2.5 w-2.5 text-accent-primary" />
+                                                            <span className="text-2xs font-black text-accent-primary">{meta?.hits || 1}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -473,7 +473,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                                         hace {daysAgo === 0 ? 'hoy' : `${daysAgo}d`}
                                                         {/* Soft local qualifier — presentation-layer only, not a product classification */}
                                                         {daysAgo <= 3 && (
-                                                            <span className="italic text-3xs text-vape-400/50 font-normal">&middot; visto recientemente</span>
+                                                            <span className="italic text-3xs text-accent-primary/50 font-normal">&middot; visto recientemente</span>
                                                         )}
                                                         {daysAgo > 21 && (
                                                             <span className="italic text-3xs text-white/20 font-normal">&middot; interés más antiguo</span>
@@ -513,11 +513,11 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             {/* 2. Timeline Unificada */}
             <div className="rounded-5xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl">
                 <Heading as="h4" className="flex items-center gap-3 text-sm font-bold text-white mb-8">
-                    <Activity className="h-5 w-5 text-vape-400" />
+                    <Activity className="h-5 w-5 text-accent-primary" />
                     Línea de Tiempo 360
                 </Heading>
 
-                <div className="relative space-y-8 before:absolute before:inset-0 before:ml-[1.25rem] before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-vape-500/50 before:via-white/5 before:to-transparent">
+                <div className="relative space-y-8 before:absolute before:inset-0 before:ml-[1.25rem] before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-accent-primary/50 before:via-white/5 before:to-transparent">
                     {timeline.length === 0 ? (
                         <div className="text-center py-10">
                             <p className="text-xs text-white/20 uppercase font-black tracking-widest">Sin actividad registrada aún</p>
@@ -544,7 +544,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                 {/* Content */}
                                 <div className="flex-1 pt-1">
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1">
-                                        <Heading as="h5" className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">
+                                        <Heading as="h5" className="text-sm font-bold text-white group-hover:text-accent-primary transition-colors">
                                             {event.title}
                                         </Heading>
                                         <span className="text-2xs font-black uppercase text-white/20 bg-white/5 px-2 py-0.5 rounded-full">

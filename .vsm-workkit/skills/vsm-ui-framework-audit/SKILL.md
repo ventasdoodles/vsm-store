@@ -67,8 +67,8 @@ Para evitar duplicación masiva de clases (utility-soup):
 4. **`<Input>`** (`src/components/ui/Input.tsx`):
    - Envoltorios de accesibilidad ARIA, manejo de foco y variantes de error.
 5. **Layout Containers**:
-   - Storefront: `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8` (o `.vsm-container`).
-   - Admin OS: `.vsm-admin-container` (`max-w-admin mx-auto space-y-6 sm:space-y-8 pb-20`).
+   - Storefront: `.container-vsm` (`max-w-storefront mx-auto px-4 sm:px-6 lg:px-8`).
+   - Admin OS: `.container-admin` (`max-w-admin mx-auto space-y-6 sm:space-y-8 pb-20 px-4 sm:px-6`).
 
 ---
 

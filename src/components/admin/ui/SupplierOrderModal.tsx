@@ -136,7 +136,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     rows={4}
-                                    className="w-full bg-white/5 border border-white/10 rounded-4xl p-6 text-sm text-white/80 leading-relaxed focus:border-vape-500/50 outline-none transition-all resize-none"
+                                    className="w-full bg-white/5 border border-white/10 rounded-4xl p-6 text-sm text-white/80 leading-relaxed focus:border-accent-primary/50 outline-none transition-all resize-none"
                                 />
                                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
                                     <Button 

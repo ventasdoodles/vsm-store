@@ -37,6 +37,21 @@ export function hexToRgbString(hex: string): string | null {
 }
 
 /**
+ * Calculates accessible foreground text color ("255 255 255" or "9 9 11") based on relative luminance.
+ */
+export function calculateContrastForeground(hex: string): string {
+    const rgbStr = hexToRgbString(hex);
+    if (!rgbStr) return '255 255 255';
+    const parts = rgbStr.split(' ').map(Number);
+    const r = parts[0] ?? 0;
+    const g = parts[1] ?? 0;
+    const b = parts[2] ?? 0;
+    // Standard perceptual luminance formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '9 9 11' : '255 255 255';
+}
+
+/**
  * Converts an RGB channel triplet string "R G B" into a hex string "#rrggbb".
  */
 export function rgbStringToHex(rgb: string): string {
@@ -71,6 +86,7 @@ export function applyThemeTokens(tokens: ThemeTokens, target?: HTMLElement): voi
 
     root.style.setProperty('--accent-primary', tokens.accentPrimary);
     root.style.setProperty('--accent-secondary', tokens.accentSecondary);
+    root.style.setProperty('--accent-foreground', tokens.accentForeground);
 
     root.style.setProperty('--vsm-accent-primary', tokens.vsmAccentPrimary);
     root.style.setProperty('--vsm-accent-secondary', tokens.vsmAccentSecondary);

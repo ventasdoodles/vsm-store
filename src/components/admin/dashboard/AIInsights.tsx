@@ -26,13 +26,13 @@ export function AIInsights() {
     return (
         <div className="relative overflow-hidden rounded-5xl border border-white/5 bg-surface-overlay/50 backdrop-blur-3xl p-8 group">
             {/* Ambient background glow */}
-            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-vape-500/10 blur-4xl group-hover:bg-vape-500/20 transition-all duration-700" />
+            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-accent-primary/10 blur-4xl group-hover:bg-accent-primary/20 transition-all duration-700" />
             
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-vape-500/10 border border-vape-500/20">
-                            <Sparkles className="h-5 w-5 text-vape-400" />
+                        <div className="p-2.5 rounded-2xl bg-accent-primary/10 border border-accent-primary/20">
+                            <Sparkles className="h-5 w-5 text-accent-primary" />
                         </div>
                         <div>
                             <Heading as="h2" className="text-lg font-black text-white tracking-tight">AI Insights</Heading>
@@ -58,7 +58,7 @@ export function AIInsights() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="group/card relative p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-vape-500/30 hover:bg-vape-500/[0.02] transition-all duration-500"
+                                className="group/card relative p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-accent-primary/30 hover:bg-accent-primary/[0.02] transition-all duration-500"
                             >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className={cn(
@@ -76,13 +76,13 @@ export function AIInsights() {
                                     <span className="text-2xs font-black text-white/10 uppercase tracking-widest">VSM CORE</span>
                                 </div>
 
-                                <Heading as="h3" className="text-sm font-bold text-white mb-2 group-hover/card:text-vape-300 transition-colors">{insight.title}</Heading>
+                                <Heading as="h3" className="text-sm font-bold text-white mb-2 group-hover/card:text-accent-primary transition-colors">{insight.title}</Heading>
                                 <p className="text-xs text-white/40 font-medium leading-relaxed mb-6">
                                     {insight.description}
                                 </p>
 
                                 {insight.actionLabel && (
-                                    <Button className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 text-2xs font-black text-white/60 uppercase tracking-widest group-hover/card:bg-vape-500 group-hover/card:text-white transition-all">
+                                    <Button className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 text-2xs font-black text-white/60 uppercase tracking-widest group-hover/card:bg-accent-primary group-hover/card:text-white transition-all">
                                         {insight.actionLabel}
                                         <ChevronRight className="h-3 w-3" />
                                     </Button>

@@ -46,7 +46,7 @@ export function HomeEditorHeader({
                     type="button"
                     onClick={onSave}
                     disabled={isPending || !isDirty}
-                    className="flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 font-semibold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+                    className="flex items-center gap-2 rounded-xl bg-accent-primary px-6 py-2.5 font-semibold text-white shadow-lg shadow-accent-primary/20 transition-all hover:bg-accent-secondary hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
                 >
                     {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
                     Guardar Categorías

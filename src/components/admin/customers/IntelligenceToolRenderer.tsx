@@ -17,7 +17,7 @@ export function IntelligenceToolRenderer({
 }: IntelligenceToolRendererProps) {
     return (
         <div className={cn(
-            "col-span-1 md:col-span-2 flex flex-col gap-6 p-8 rounded-5xl bg-gradient-to-br from-indigo-500/10 via-vape-500/5 to-transparent border border-white/10 relative overflow-hidden transition-all duration-700",
+            "col-span-1 md:col-span-2 flex flex-col gap-6 p-8 rounded-5xl bg-gradient-to-br from-indigo-500/10 via-accent-primary/5 to-transparent border border-white/10 relative overflow-hidden transition-all duration-700",
             strategicAnalysis ? "shadow-[0_0_50px_-12px_rgba(99,102,241,0.3)]" : "hover:border-white/20"
         )}>
             {/* Background Glow */}
@@ -111,7 +111,7 @@ export function IntelligenceToolRenderer({
                                             alert('Mensaje copiado al portapapeles');
                                         }
                                     }}
-                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors"
+                                    className="flex items-center gap-2 text-2xs font-black uppercase tracking-widest text-accent-primary hover:text-accent-primary transition-colors"
                                 >
                                     Copiar para WhatsApp
                                     <MessageSquare className="h-3 w-3" />

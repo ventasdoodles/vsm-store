@@ -143,7 +143,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                     </div>
                 </div>
 
-                <div className="relative z-10 mt-8 rounded-[1.75rem] border border-white/5 bg-black/20 p-5">
+                <div className="relative z-10 mt-8 rounded-3.9xl border border-white/5 bg-black/20 p-5">
                     <p className="text-2xs font-black uppercase tracking-macro text-theme-tertiary opacity-50">
                         Estado del pedido
                     </p>
@@ -168,7 +168,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                         <span className="mb-1 block text-2xs font-black uppercase tracking-macro text-theme-tertiary opacity-40">
                             Total
                         </span>
-                        <span className="text-xl font-black text-vape-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                        <span className="text-xl font-black text-accent-primary drop-shadow-[0_0_10px_rgba(var(--accent-primary),0.3)]">
                             {formatPrice(order.total)}
                         </span>
                     </div>
@@ -194,7 +194,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                     <Link
                         to="/orders/$orderId"
                         params={{ orderId: order.id }}
-                        className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 px-5 py-4 text-2xs font-black uppercase tracking-macro text-white transition-colors hover:bg-white/10"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-3.5xl border border-white/10 bg-white/5 px-5 py-4 text-2xs font-black uppercase tracking-macro text-white transition-colors hover:bg-white/10"
                     >
                         <ArrowRight className="h-4 w-4" />
                         {actionView.detailLabel}
@@ -205,7 +205,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                             type="button"
                             onClick={() => onReorder(order)}
                             disabled={reordering}
-                            className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-2xs font-black uppercase tracking-macro text-theme-secondary transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-3.5xl border border-white/10 bg-white/[0.03] px-5 py-4 text-2xs font-black uppercase tracking-macro text-theme-secondary transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <Package className="h-4 w-4" />
                             {reordering ? 'Revisando catalogo...' : 'Reordenar con catalogo actual'}
@@ -217,7 +217,7 @@ function OrderCard({ order, status, continuing, reordering, onContinuePayment, o
                             type="button"
                             onClick={() => onContinuePayment(order)}
                             disabled={continuing}
-                            className="flex flex-1 items-center justify-center gap-2 rounded-[1.25rem] bg-yellow-600 px-5 py-4 text-2xs font-black uppercase tracking-macro text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-3.5xl bg-yellow-600 px-5 py-4 text-2xs font-black uppercase tracking-macro text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <CreditCard className="h-4 w-4" />
                             {continuing ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}

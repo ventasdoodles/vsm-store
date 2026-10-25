@@ -130,9 +130,9 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
             label: 'Productos activos',
             value: stats?.totalProducts ?? 0,
             icon: Package,
-            iconBg: 'bg-vape-500/10',
-            iconColor: 'text-vape-400',
-            gradient: 'from-vape-500/40 to-vape-600/40',
+            iconBg: 'bg-accent-primary/10',
+            iconColor: 'text-accent-primary',
+            gradient: 'from-accent-primary/40 to-accent-secondary/40',
             tooltip: 'Productos visibles en la tienda (no archivados ni borradores).',
         },
         {

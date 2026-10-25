@@ -41,6 +41,7 @@
   /* -- Accents -- */
   --accent-primary: 59 130 246;
   --accent-secondary: 139 92 246;
+  --accent-foreground: 255 255 255;
 
   /* -- Status -- */
   --status-success: 16 185 129;
@@ -112,7 +113,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-vape-500/30 text-white;
+    @apply bg-accent-primary/30 text-white;
   }
 
   /* Focus  keyboard only */

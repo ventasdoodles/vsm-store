@@ -28,6 +28,9 @@ export default {
                 'xl':  '12px',
                 '2xl': '14px',
                 '3xl': '16px',
+                '3.5xl': '1.25rem',
+                '3.75xl': '1.5rem',
+                '3.9xl': '1.75rem',
                 '4xl': '2rem',
                 '5xl': '2.5rem',
                 '6xl': '3rem',
@@ -219,7 +222,7 @@ export default {
                     DEFAULT: 'rgba(255, 255, 255, 0.10)',
                     strong: 'rgba(255, 255, 255, 0.15)',
                 },
-                accent: 'rgb(var(--accent-primary) / <alpha-value>)',
+
             }
         },
     },

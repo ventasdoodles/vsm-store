@@ -33,7 +33,7 @@ import { buildAdminSectionCatalog } from '@/config/productization';
 import { useActiveVerticalPack } from '@/contexts/VerticalPackContext';
 
 const inputCls =
-    'w-full rounded-xl border border-theme bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
+    'w-full rounded-xl border border-theme bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-accent-primary/50 focus:outline-none';
 
 export function AdminProductForm() {
     const { config } = useActiveVerticalPack();
@@ -122,7 +122,7 @@ export function AdminProductForm() {
         mutation.mutate(buildProductSubmitPayload(form));
     };
 
-    if (loadingProduct) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-vape-400" /></div>;
+    if (loadingProduct) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-accent-primary" /></div>;
 
     return (
         <div className="mx-auto max-w-3xl space-y-6">
@@ -139,7 +139,7 @@ export function AdminProductForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
                 <section className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <Heading as="h2" className="flex items-center gap-2 text-sm font-semibold text-theme-secondary"><Package className="h-4 w-4 text-vape-400" />Información básica</Heading>
+                    <Heading as="h2" className="flex items-center gap-2 text-sm font-semibold text-theme-secondary"><Package className="h-4 w-4 text-accent-primary" />Información básica</Heading>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="sm:col-span-2"><Input variant="admin" label="Nombre *" type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Nombre del producto"  /></div>
                         <div>
@@ -326,7 +326,7 @@ export function AdminProductForm() {
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-3 pt-2">
                     <Button type="button" onClick={() => navigate({ to: '/admin/products' })} className="rounded-xl border border-theme px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</Button>
-                    <Button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
+                    <Button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent-primary to-accent-secondary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-primary/20 disabled:opacity-50 transition-all">
                         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isEditing ? 'Guardar cambios' : 'Crear producto'}
                     </Button>

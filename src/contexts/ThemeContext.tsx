@@ -11,6 +11,7 @@ import {
     THEME_PRESET_LIST,
     THEME_PRESETS,
     applyThemeTokens,
+    calculateContrastForeground,
     getStoredCustomTokens,
     getStoredPreset,
     hexToRgbString,
@@ -31,7 +32,7 @@ const defaultContextValue: ThemeContextValue = {
     resetToDefault: () => {},
 };
 
-export const ThemeContext = createContext<ThemeContextValue>(defaultContextValue);
+export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export interface ThemeProviderProps {
     children: ReactNode;
@@ -49,6 +50,25 @@ export function ThemeProvider({ children, initialPreset }: ThemeProviderProps) {
     const [customOverrides, setCustomOverrides] = useState<Partial<ThemeTokens> | null>(() => {
         return getStoredCustomTokens();
     });
+
+    // Multi-tab storage event listener
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'vsm_theme_preset_id' && e.newValue && e.newValue in THEME_PRESETS) {
+                setActivePreset(e.newValue as ThemePresetId);
+            }
+            if (e.key === 'vsm_custom_theme_tokens') {
+                try {
+                    setCustomOverrides(e.newValue ? JSON.parse(e.newValue) : null);
+                } catch {
+                    // Ignore JSON parse error
+                }
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     // Compute active resolved tokens
     const themeTokens = useMemo(() => {
@@ -83,6 +103,8 @@ export function ThemeProvider({ children, initialPreset }: ThemeProviderProps) {
             if (rgb) {
                 overrides.accentPrimary = rgb;
                 overrides.vsmAccentPrimary = rgb;
+                // Auto calculate accessible contrast foreground text
+                overrides.accentForeground = calculateContrastForeground(colors.accentPrimary);
             }
         }
 
@@ -133,6 +155,9 @@ export function ThemeProvider({ children, initialPreset }: ThemeProviderProps) {
 export function useTheme(): ThemeContextValue {
     const context = useContext(ThemeContext);
     if (!context) {
+        if (import.meta.env.DEV) {
+            console.warn('[useTheme] Hook called outside of <ThemeProvider>. Using default theme tokens.');
+        }
         return defaultContextValue;
     }
     return context;

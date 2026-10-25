@@ -25,7 +25,7 @@ export const columns = [
                 type="checkbox"
                 checked={table.getIsAllPageRowsSelected()}
                 onChange={table.getToggleAllPageRowsSelectedHandler()}
-                className="h-4 w-4 rounded border-white/10 bg-white/5 text-vape-500 focus:ring-vape-500/20"
+                className="h-4 w-4 rounded border-white/10 bg-white/5 text-accent-primary focus:ring-accent-primary/20"
             />
         ),
         cell: ({ row }) => (
@@ -33,7 +33,7 @@ export const columns = [
                 type="checkbox"
                 checked={row.getIsSelected()}
                 onChange={row.getToggleSelectedHandler()}
-                className="h-4 w-4 rounded border-white/10 bg-white/5 text-vape-500 focus:ring-vape-500/20"
+                className="h-4 w-4 rounded border-white/10 bg-white/5 text-accent-primary focus:ring-accent-primary/20"
             />
         ),
     }),

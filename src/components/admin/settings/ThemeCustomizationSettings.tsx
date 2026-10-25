@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Palette, Check, Sparkles, RotateCcw } from 'lucide-react';
+import { Palette, Check, Sparkles, RotateCcw, AlertCircle } from 'lucide-react';
 import { Heading } from '@/components/ui/Heading';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { rgbStringToHex } from '@/lib/theme';
 import type { ThemePresetId } from '@/lib/theme/types';
+
+const HEX_COLOR_REGEX = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 export function ThemeCustomizationSettings() {
     const {
@@ -22,11 +24,26 @@ export function ThemeCustomizationSettings() {
     const [customSecondaryHex, setCustomSecondaryHex] = useState(() =>
         rgbStringToHex(themeTokens.accentSecondary)
     );
+    const [hexError, setHexError] = useState<string | null>(null);
 
     const handleApplyCustomColors = () => {
+        const cleanPrimary = customPrimaryHex.trim();
+        const cleanSecondary = customSecondaryHex.trim();
+
+        if (!HEX_COLOR_REGEX.test(cleanPrimary)) {
+            setHexError('El acento primario debe ser un código hexadecimal válido (ej. #3b82f6 o #fff).');
+            return;
+        }
+
+        if (!HEX_COLOR_REGEX.test(cleanSecondary)) {
+            setHexError('El acento secundario debe ser un código hexadecimal válido (ej. #8b5cf6 o #fff).');
+            return;
+        }
+
+        setHexError(null);
         setCustomHexColors({
-            accentPrimary: customPrimaryHex,
-            accentSecondary: customSecondaryHex,
+            accentPrimary: cleanPrimary,
+            accentSecondary: cleanSecondary,
         });
     };
 
@@ -59,7 +76,10 @@ export function ThemeCustomizationSettings() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={resetToDefault}
+                    onClick={() => {
+                        resetToDefault();
+                        setHexError(null);
+                    }}
                     className="text-xs text-theme-secondary hover:text-white flex items-center gap-1.5"
                 >
                     <RotateCcw className="size-3.5" />
@@ -81,6 +101,7 @@ export function ThemeCustomizationSettings() {
                                     setPreset(preset.id as ThemePresetId);
                                     setCustomPrimaryHex(preset.preview.primaryHex);
                                     setCustomSecondaryHex(preset.preview.secondaryHex);
+                                    setHexError(null);
                                 }}
                                 className={`text-left p-4 rounded-2xl border transition-all relative overflow-hidden group/card ${
                                     isSelected
@@ -145,13 +166,19 @@ export function ThemeCustomizationSettings() {
                             <input
                                 type="color"
                                 value={customPrimaryHex}
-                                onChange={(e) => setCustomPrimaryHex(e.target.value)}
+                                onChange={(e) => {
+                                    setCustomPrimaryHex(e.target.value);
+                                    setHexError(null);
+                                }}
                                 className="size-9 rounded-lg border border-white/20 bg-transparent cursor-pointer p-0.5"
                             />
                             <input
                                 type="text"
                                 value={customPrimaryHex}
-                                onChange={(e) => setCustomPrimaryHex(e.target.value)}
+                                onChange={(e) => {
+                                    setCustomPrimaryHex(e.target.value);
+                                    setHexError(null);
+                                }}
                                 placeholder="#3b82f6"
                                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-mono text-white placeholder-white/30 outline-none focus:border-accent-primary"
                             />
@@ -166,13 +193,19 @@ export function ThemeCustomizationSettings() {
                             <input
                                 type="color"
                                 value={customSecondaryHex}
-                                onChange={(e) => setCustomSecondaryHex(e.target.value)}
+                                onChange={(e) => {
+                                    setCustomSecondaryHex(e.target.value);
+                                    setHexError(null);
+                                }}
                                 className="size-9 rounded-lg border border-white/20 bg-transparent cursor-pointer p-0.5"
                             />
                             <input
                                 type="text"
                                 value={customSecondaryHex}
-                                onChange={(e) => setCustomSecondaryHex(e.target.value)}
+                                onChange={(e) => {
+                                    setCustomSecondaryHex(e.target.value);
+                                    setHexError(null);
+                                }}
                                 placeholder="#8b5cf6"
                                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-mono text-white placeholder-white/30 outline-none focus:border-accent-primary"
                             />
@@ -191,6 +224,13 @@ export function ThemeCustomizationSettings() {
                         </Button>
                     </div>
                 </div>
+
+                {hexError && (
+                    <div className="mt-3 flex items-center gap-2 text-2xs text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-xl animate-in fade-in">
+                        <AlertCircle className="size-3.5 shrink-0" />
+                        <span>{hexError}</span>
+                    </div>
+                )}
             </div>
         </div>
     );

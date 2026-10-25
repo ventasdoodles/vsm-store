@@ -112,7 +112,7 @@ export function ProductsFilter({
                         className={cn(
                             'rounded-full px-4 py-1.5 text-2xs font-black uppercase tracking-wider transition-all border shrink-0',
                             quickFilter === f.value
-                                ? 'bg-vape-500/20 text-vape-300 border-vape-500/40 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
+                                ? 'bg-accent-primary/20 text-accent-primary border-accent-primary/40 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
                                 : 'bg-white/5 text-theme-secondary/60 border-white/5 hover:border-white/20'
                         )}
                     >

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
     hexToRgbString,
     rgbStringToHex,
+    calculateContrastForeground,
     resolveTokens,
     applyThemeTokens,
     getStoredPreset,
@@ -45,6 +46,25 @@ describe('theme-injector', () => {
         });
     });
 
+    describe('calculateContrastForeground', () => {
+        it('returns dark text for light background colors (WCAG AA/AAA)', () => {
+            expect(calculateContrastForeground('#f4f4f5')).toBe('9 9 11'); // Zinc 100
+            expect(calculateContrastForeground('#ffffff')).toBe('9 9 11'); // Pure White
+            expect(calculateContrastForeground('#f59e0b')).toBe('9 9 11'); // Amber 500
+            expect(calculateContrastForeground('#10b981')).toBe('9 9 11'); // Emerald 500
+        });
+
+        it('returns white text for dark/saturated background colors', () => {
+            expect(calculateContrastForeground('#3b82f6')).toBe('255 255 255'); // Electric Blue
+            expect(calculateContrastForeground('#ef4444')).toBe('255 255 255'); // Crimson
+            expect(calculateContrastForeground('#09090b')).toBe('255 255 255'); // Dark Slate
+        });
+
+        it('safely falls back to white text on invalid hex', () => {
+            expect(calculateContrastForeground('invalid')).toBe('255 255 255');
+        });
+    });
+
     describe('rgbStringToHex', () => {
         it('converts rgb triplet string to hex', () => {
             expect(rgbStringToHex('59 130 246')).toBe('#3b82f6');
@@ -65,6 +85,7 @@ describe('theme-injector', () => {
             const herbalTokens = resolveTokens('herbal-420');
             expect(herbalTokens.accentPrimary).toBe('16 185 129');
             expect(herbalTokens.bgPrimary).toBe('10 15 13');
+            expect(herbalTokens.accentForeground).toBe('10 15 13');
         });
 
         it('applies partial overrides to preset tokens', () => {
@@ -91,6 +112,7 @@ describe('theme-injector', () => {
 
             expect(element.style.getPropertyValue('--accent-primary')).toBe('245 158 11');
             expect(element.style.getPropertyValue('--accent-secondary')).toBe('234 88 12');
+            expect(element.style.getPropertyValue('--accent-foreground')).toBe('12 12 14');
             expect(element.style.getPropertyValue('--bg-primary')).toBe('12 12 14');
         });
     });

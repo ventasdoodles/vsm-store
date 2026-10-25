@@ -41,7 +41,7 @@ export function TabPerformance() {
                 </div>
 
                 <div className="p-8 rounded-4xl border border-white/5 bg-white/[0.02] flex flex-col gap-4">
-                    <div className="h-12 w-12 bg-vape-500/20 text-vape-400 rounded-2xl flex items-center justify-center">
+                    <div className="h-12 w-12 bg-accent-primary/20 text-accent-primary rounded-2xl flex items-center justify-center">
                         <Users className="h-6 w-6" />
                     </div>
                     <div>

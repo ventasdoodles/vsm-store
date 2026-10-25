@@ -47,7 +47,7 @@ const columns = [
         cell: ({ row }) => (
             <div className="flex flex-col">
                 <span className="text-2xs font-black text-white/60 lowercase">{row.original.id.slice(0, 8)}...</span>
-                <span className="text-2xs font-bold text-vape-400 uppercase tracking-tighter">{row.original.sku}</span>
+                <span className="text-2xs font-bold text-accent-primary uppercase tracking-tighter">{row.original.sku}</span>
             </div>
         )
     }),
@@ -125,7 +125,7 @@ const columns = [
                         value={stock}
                         onChange={(e) => meta.handleUpdateLocal(row.original.id, 'stock', e.target.value)}
                         className={cn(
-                            "w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-vape-500/50 outline-none transition-all",
+                            "w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-accent-primary/50 outline-none transition-all",
                             stock < 5 ? "text-rose-400 font-black" : "text-emerald-400"
                         )}
                     />
@@ -235,7 +235,7 @@ export function AdminBatchManager() {
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-96 gap-4">
-                <Loader2 className="h-10 w-10 text-vape-500 animate-spin" />
+                <Loader2 className="h-10 w-10 text-accent-primary animate-spin" />
                 <p className="text-sm font-bold text-white/40 uppercase tracking-widest">Cargando Inventario Masivo...</p>
             </div>
         );
@@ -251,7 +251,7 @@ export function AdminBatchManager() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Input variant="admin" placeholder="Filtrar por nombre o SKU..." value={search} onChange={(e) => setSearch(e.target.value)} containerClassName="w-64" leftIcon={<Search className="h-4 w-4 text-white/20 group-focus-within:text-vape-400 transition-colors" />} />
+                    <Input variant="admin" placeholder="Filtrar por nombre o SKU..." value={search} onChange={(e) => setSearch(e.target.value)} containerClassName="w-64" leftIcon={<Search className="h-4 w-4 text-white/20 group-focus-within:text-accent-primary transition-colors" />} />
 
                     <AnimatePresence>
                         {isDirty && (
@@ -271,7 +271,7 @@ export function AdminBatchManager() {
                                 <Button 
                                     onClick={handleSave}
                                     disabled={mutation.isPending}
-                                    className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-vape-500 text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-vape-500/20 hover:bg-vape-400 transition-all disabled:opacity-50"
+                                    className="flex items-center gap-2 px-8 py-3 rounded-2xl bg-accent-primary text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-accent-primary/20 hover:bg-accent-primary transition-all disabled:opacity-50"
                                 >
                                     {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                                     Aplicar {countModifiedBatchRows(localProducts)} cambios
@@ -313,7 +313,7 @@ export function AdminBatchManager() {
                                 key={row.id}
                                 className={cn(
                                     "group transition-colors",
-                                    row.original.isModified ? "bg-vape-500/5" : "hover:bg-white/[0.01]"
+                                    row.original.isModified ? "bg-accent-primary/5" : "hover:bg-white/[0.01]"
                                 )}
                             >
                                 {row.getVisibleCells().map(cell => (

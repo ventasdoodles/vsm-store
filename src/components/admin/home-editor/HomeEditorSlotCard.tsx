@@ -31,7 +31,7 @@ export function HomeEditorSlotCard({
     return (
         <div className="p-5 rounded-xl border border-theme bg-theme-primary/50 relative">
             {/* Badge numérico */}
-            <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-vape-500 text-white flex items-center justify-center font-bold text-sm shadow-lg">
+            <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-accent-primary text-white flex items-center justify-center font-bold text-sm shadow-lg">
                 {index + 1}
             </div>
 
@@ -44,7 +44,7 @@ export function HomeEditorSlotCard({
                     <select
                         value={selectedCategoryId}
                         onChange={(e) => onCategorySelect(index, e.target.value)}
-                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-accent-primary"
                     >
                         <option value="">— Elegir categoría existente —</option>
                         {storeCategories.map((cat) => (
@@ -73,7 +73,7 @@ export function HomeEditorSlotCard({
                                 value={slot.image || ''}
                                 onChange={(e) => onUpdateSlot(index, 'image', e.target.value)}
                                 placeholder="https://..."
-                                className="flex-1 rounded-lg border border-theme bg-theme-secondary px-3 py-1.5 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                                className="flex-1 rounded-lg border border-theme bg-theme-secondary px-3 py-1.5 text-theme-primary outline-none focus:border-accent-primary font-mono text-xs"
                             />
                         </div>
                     </div>
@@ -87,7 +87,7 @@ export function HomeEditorSlotCard({
                             type="text"
                             value={slot.name}
                             onChange={(e) => onUpdateSlot(index, 'name', e.target.value)}
-                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-accent-primary"
                             placeholder="Ej. Líquidos"
                         />
                     </div>
@@ -97,7 +97,7 @@ export function HomeEditorSlotCard({
                             <select
                                 value={slot.iconName || 'Box'}
                                 onChange={(e) => onUpdateSlot(index, 'iconName', e.target.value)}
-                                className="w-full rounded-lg border border-theme bg-theme-secondary pl-10 pr-3 py-2 text-theme-primary outline-none focus:border-vape-500 appearance-none"
+                                className="w-full rounded-lg border border-theme bg-theme-secondary pl-10 pr-3 py-2 text-theme-primary outline-none focus:border-accent-primary appearance-none"
                             >
                                 {Object.keys(CATEGORY_ICONS).map((iconKey) => (
                                     <option key={iconKey} value={iconKey}>{iconKey}</option>
@@ -117,7 +117,7 @@ export function HomeEditorSlotCard({
                         <select
                             value={slot.section}
                             onChange={(e) => onUpdateSlot(index, 'section', e.target.value)}
-                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-accent-primary"
                         >
                             {adminSectionCatalog?.sections.map((section) => (
                                 <option key={section.slug} value={section.slug}>
@@ -132,7 +132,7 @@ export function HomeEditorSlotCard({
                             type="text"
                             value={slot.slug}
                             onChange={(e) => onUpdateSlot(index, 'slug', e.target.value)}
-                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-accent-primary font-mono text-xs"
                             placeholder="liquidos"
                         />
                     </div>
@@ -149,7 +149,7 @@ export function HomeEditorSlotCard({
                                 onClick={() => onUpdateSlot(index, 'presetId', preset.id)}
                                 className={`h-8 rounded-lg border-2 transition-all ${
                                     slot.presetId === preset.id
-                                        ? 'border-vape-500 scale-110 shadow-lg'
+                                        ? 'border-accent-primary scale-110 shadow-lg'
                                         : 'border-transparent hover:border-white/20 hover:scale-105'
                                 }`}
                                 title={preset.name}

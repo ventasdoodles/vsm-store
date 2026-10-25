@@ -29,6 +29,9 @@ export interface ThemeTokens {
     accentPrimary: string;
     accentSecondary: string;
 
+    // Contrast text on top of accentPrimary (RGB channel triplet: "R G B" for WCAG AA/AAA)
+    accentForeground: string;
+
     // Adaptive Identity Accents
     vsmAccentPrimary: string;
     vsmAccentSecondary: string;

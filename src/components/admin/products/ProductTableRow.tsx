@@ -37,7 +37,7 @@ export function ProductTableRow({ row }: ProductTableRowProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                     'group relative transition-colors overflow-hidden',
-                    row.getIsSelected() ? 'bg-vape-500/10' : 'hover:bg-white/[0.02]',
+                    row.getIsSelected() ? 'bg-accent-primary/10' : 'hover:bg-white/[0.02]',
                     !product.is_active && 'opacity-40'
                 )}
                 style={{

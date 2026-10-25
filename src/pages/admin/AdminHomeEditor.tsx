@@ -96,7 +96,7 @@ export function AdminHomeEditor() {
     if (isLoading) {
         return (
             <div className="flex h-96 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-vape-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-accent-primary" />
             </div>
         );
     }

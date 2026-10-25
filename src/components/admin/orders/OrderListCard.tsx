@@ -156,7 +156,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                                 value={order.status}
                                 onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
                                 disabled={isUpdating}
-                                className="rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs font-medium text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50 transition-colors hover:border-white/20"
+                                className="rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs font-medium text-theme-primary focus:border-accent-primary/50 focus:outline-none disabled:opacity-50 transition-colors hover:border-white/20"
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.map((s) => {
                                     const isCurrent = order.status === s.value;
@@ -183,7 +183,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                                 placeholder="Número de guía..."
                                 value={trackingInput}
                                 onChange={(e) => setTrackingInput(e.target.value)}
-                                className="w-36 rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs text-theme-primary placeholder-theme-secondary/30 focus:border-vape-500/50 focus:outline-none transition-colors hover:border-white/20"
+                                className="w-36 rounded-lg border border-white/10 bg-surface-card px-3 py-1.5 text-xs text-theme-primary placeholder-theme-secondary/30 focus:border-accent-primary/50 focus:outline-none transition-colors hover:border-white/20"
                             />
                             <Button
                                 onClick={handleSaveTracking}
