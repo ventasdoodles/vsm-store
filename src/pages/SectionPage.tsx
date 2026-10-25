@@ -91,7 +91,7 @@ export function SectionPage() {
             {/* ═══ HERO BANNER ═══ */}
             <div className="relative overflow-hidden">
                 {/* Blobs decorativos */}
-                <div className={cn('absolute -top-20 -left-20 h-[400px] w-[400px] rounded-full blur-5xl opacity-30', cfg.heroBlobClassName)} />
+                <div className={cn('absolute -top-20 -left-20 size-96 rounded-full blur-5xl opacity-30', cfg.heroBlobClassName)} />
                 <div className={cn('absolute -bottom-20 -right-20 h-72 w-72 rounded-full blur-4xl opacity-20', cfg.heroBlobClassName)} />
 
                 <div className={cn('relative bg-gradient-to-br py-12 sm:py-16', cfg.heroGradientClassName)}>

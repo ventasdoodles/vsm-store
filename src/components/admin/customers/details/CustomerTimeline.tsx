@@ -108,10 +108,10 @@ export function CustomerTimeline({ customer }: Props) {
                             return (
                                 <div key={order.id} className="relative group perspective">
                                     {/* Line Connection to Dot */}
-                                    <div className={`absolute top-6 left-[-23px] sm:left-[-31px] w-6 sm:w-8 h-px ${config.line} opacity-20`} />
+                                    <div className={`absolute top-6 -left-6 sm:-left-8 w-6 sm:w-8 h-px ${config.line} opacity-20`} />
 
                                     {/* Dot Indicator */}
-                                    <div className={`absolute left-[-35px] sm:left-[-43px] top-4 w-10 h-10 rounded-xl border flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 z-10 
+                                    <div className={`absolute -left-9 sm:-left-11 top-4 w-10 h-10 rounded-xl border flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 z-10 
                                                   ${config.bg} ${config.border} ${config.color} backdrop-blur-md`}>
                                         {config.icon}
                                     </div>

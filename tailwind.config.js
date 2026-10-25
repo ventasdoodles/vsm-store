@@ -28,12 +28,32 @@ export default {
                 'xl':  '12px',
                 '2xl': '14px',
                 '3xl': '16px',
-            },
-            borderRadius: {
                 '4xl': '2rem',
                 '5xl': '2.5rem',
                 '6xl': '3rem',
                 '7xl': '4rem',
+            },
+            maxWidth: {
+                'admin': '1400px',
+                'storefront': '1440px',
+            },
+            height: {
+                'hero-mobile': 'calc(100svh - 8rem)',
+                'hero-desktop': 'calc(100vh - 7rem)',
+            },
+            minHeight: {
+                'hero-mobile': '560px',
+                'hero-desktop': '620px',
+            },
+            maxHeight: {
+                'hero': '860px',
+            },
+            spacing: {
+                '100': '25rem',
+                '112': '28rem',
+                '128': '32rem',
+                '144': '36rem',
+                '160': '40rem',
             },
             zIndex: {
                 '60': '60',

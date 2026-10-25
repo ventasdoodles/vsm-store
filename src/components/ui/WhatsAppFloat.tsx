@@ -39,7 +39,7 @@ export const WhatsAppFloat = () => {
                 <div className="absolute -left-40 top-1/2 -translate-y-1/2 animate-fade-in">
                     <div className="relative whitespace-nowrap rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-gray-800 shadow-xl">
                         ¿Necesitas ayuda? 💬
-                        <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-[6px] border-transparent border-l-white" />
+                        <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 border-4 border-transparent border-l-white" />
                     </div>
                 </div>
             )}

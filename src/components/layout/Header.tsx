@@ -48,7 +48,7 @@ export function Header() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 0.4 }}
                                 exit={{ opacity: 0 }}
-                                className="absolute -inset-[1px] bg-gradient-to-r from-accent-primary/20 via-vape-500/10 to-accent-primary/20 rounded-full blur-sm pointer-events-none"
+                                className="absolute -inset-px bg-gradient-to-r from-accent-primary/20 via-accent-secondary/10 to-accent-primary/20 rounded-full blur-sm pointer-events-none"
                             />
                         )}
                     </AnimatePresence>

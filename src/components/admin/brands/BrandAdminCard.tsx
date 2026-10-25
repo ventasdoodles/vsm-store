@@ -49,7 +49,7 @@ export function BrandAdminCard({ brand, onEdit, onDuplicate, onDelete, onToggleA
                 )}
 
                 {/* Desktop Hover Actions (over image) */}
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">
                      <ActionBtn icon={<Edit2 className="w-4 h-4" />} onClick={() => onEdit(brand)} color="blue" tooltip="Editar" />
                      <ActionBtn icon={<Copy className="w-4 h-4" />} onClick={() => onDuplicate(brand)} color="white" tooltip="Duplicar" />
                      <ActionBtn icon={brand.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />} onClick={() => onToggleActive(brand.id, !brand.is_active)} color="amber" tooltip={brand.is_active ? "Ocultar" : "Mostrar"} />

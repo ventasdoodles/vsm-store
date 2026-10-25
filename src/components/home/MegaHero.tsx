@@ -136,7 +136,7 @@ export const MegaHero = () => {
             role="region"
             aria-roledescription="carrusel"
             aria-label="Promociones destacadas"
-            className="relative w-full h-[calc(100svh-8rem)] min-h-[560px] max-h-[860px] md:h-[calc(100vh-7rem)] md:min-h-[620px] mb-8 bg-theme-primary flex overflow-hidden group cursor-crosshair"
+            className="relative w-full h-hero-mobile min-h-hero-mobile max-h-hero md:h-hero-desktop md:min-h-hero-desktop mb-8 bg-theme-primary flex overflow-hidden group cursor-crosshair"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => {
                 setIsAutoPlaying(true);

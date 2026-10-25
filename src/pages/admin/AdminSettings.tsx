@@ -1,5 +1,5 @@
 /**
- * // â”€â”€â”€ COMPONENTE: AdminSettings â”€â”€â”€
+ * // ─── COMPONENTE: AdminSettings ───
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar el formulario de configuracion de la tienda.
  *    Gestiona formData (state), handleChange con prefix routing, handleSubmit con mutation.
@@ -26,6 +26,7 @@ import { WhatsAppSettings } from '@/components/admin/settings/WhatsAppSettings';
 import { SocialSettings } from '@/components/admin/settings/SocialSettings';
 import { PaymentSettings } from '@/components/admin/settings/PaymentSettings';
 import { GeneralSettings } from '@/components/admin/settings/GeneralSettings';
+import { ThemeCustomizationSettings } from '@/components/admin/settings/ThemeCustomizationSettings';
 import { VerticalPackConfigSettings } from '@/components/admin/settings/VerticalPackConfigSettings';
 import { SettingsSaveBar } from '@/components/admin/settings/SettingsSaveBar';
 
@@ -73,7 +74,7 @@ export function AdminSettings() {
     if (isLoading) {
         return (
             <div className="flex h-96 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-accent-primary" />
             </div>
         );
     }
@@ -87,6 +88,7 @@ export function AdminSettings() {
                 <SocialSettings formData={formData} handleChange={handleChange} />
                 <PaymentSettings formData={formData} handleChange={handleChange} />
                 <GeneralSettings formData={formData} handleChange={handleChange} />
+                <ThemeCustomizationSettings />
                 <VerticalPackConfigSettings formData={formData} handleChange={handleChange} />
                 <SettingsSaveBar isPending={updateMutation.isPending} />
             </form>

@@ -49,7 +49,7 @@ export function AdminCustomers() {
 
     if (isLoading) {
         return (
-            <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-pulse">
+            <div className="container-admin animate-pulse">
                 <div className="h-20 w-full mb-4 bg-white/5 rounded-5xl" />
                 <div className="h-32 w-full mb-4 bg-white/5 rounded-5xl" />
                 <div className="bg-surface-base rounded-5xl p-8 border border-white/5 space-y-4">
@@ -63,7 +63,7 @@ export function AdminCustomers() {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20">
+        <div className="container-admin animate-in fade-in duration-500">
             {/* Header del Módulo */}
             <CustomerDirectoryHeader onNewCustomer={() => setIsModalOpen(true)} />
 

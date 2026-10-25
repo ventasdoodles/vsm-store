@@ -153,8 +153,12 @@
 @layer components {
 
   /* -- Layout -- */
+  .container-admin {
+    @apply w-full max-w-admin mx-auto space-y-6 sm:space-y-8 pb-20 px-4 sm:px-6;
+  }
+
   .container-vsm {
-    @apply w-full max-w-[1440px] mx-auto px-4;
+    @apply w-full max-w-storefront mx-auto px-4;
   }
 
 
@@ -219,8 +223,8 @@
   .vsm-surface-inset { @apply rounded-xl  p-4;  border: 1px solid rgb(var(--border-primary) / 0.06); }
 
   /* -- Pills and Tags -- */
-  .vsm-pill { @apply inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider; border: 1px solid rgb(var(--border-primary) / 0.10); }
-  .vsm-tag  { @apply inline-flex items-center rounded-lg   px-3   py-1.5 text-[10px] font-medium uppercase tracking-wider; border: 1px solid rgb(var(--border-primary) / 0.10); }
+  .vsm-pill { @apply inline-flex items-center rounded-full px-3.5 py-1.5 text-2xs font-bold uppercase tracking-wider; border: 1px solid rgb(var(--border-primary) / 0.10); }
+  .vsm-tag  { @apply inline-flex items-center rounded-lg   px-3   py-1.5 text-2xs font-medium uppercase tracking-wider; border: 1px solid rgb(var(--border-primary) / 0.10); }
 
   /* -- Buttons -- */
   .vsm-btn      { @apply rounded-xl font-black uppercase tracking-widest transition-all; }
@@ -241,7 +245,7 @@
   .vsm-progress-fill  { @apply h-full rounded-full relative overflow-hidden; }
 
   /* -- Typography -- */
-  .vsm-label   { @apply text-[11px] font-black uppercase tracking-[0.2em]; }
+  .vsm-label   { @apply text-2xs font-black uppercase tracking-macro; }
   .vsm-heading { @apply text-3xl font-black tracking-tight leading-tight sm:text-4xl; }
   .vsm-price   { @apply text-4xl font-black tracking-tight; }
 

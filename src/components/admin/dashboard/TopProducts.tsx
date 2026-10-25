@@ -63,7 +63,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                                         className="h-full rounded-full bg-gradient-to-r from-amber-500/60 to-amber-400 transition-all duration-1000 ease-out relative"
                                         style={{ width: `${barWidth}%` }}
                                     >
-                                        <div className="absolute inset-0 bg-white/20 blur-[2px] w-full" />
+                                        <div className="absolute inset-0 bg-white/20 blur-sm w-full" />
                                     </div>
                                 </div>
                             </div>

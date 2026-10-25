@@ -151,7 +151,7 @@ const columns = [
                             <select
                                 value={row.original.status}
                                 onChange={e => meta.handleStatusChange(row.original, e.target.value)}
-                                className={cn("appearance-none rounded-lg border border-white/10 bg-surface-card pl-7 pr-6 py-1.5 text-xs font-bold text-theme-primary focus:outline-none focus:border-accent-primary/40 cursor-pointer transition-colors hover:border-white/20 border-l-[2px]", getBorderHighlightClass(statusInfo?.color))}
+                                className={cn("appearance-none rounded-lg border border-white/10 bg-surface-card pl-7 pr-6 py-1.5 text-xs font-bold text-theme-primary focus:outline-none focus:border-accent-primary/40 cursor-pointer transition-colors hover:border-white/20 border-l-2", getBorderHighlightClass(statusInfo?.color))}
                             >
                                 {ADMIN_ORDER_STATUSES_LIST.map(s => {
                                     const isCurrent = s.value === row.original.status;

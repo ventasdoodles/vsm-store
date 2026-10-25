@@ -158,7 +158,7 @@ export const Footer = memo(function Footer() {
                         y: [0, -50, 0]
                     }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-primary rounded-full blur-[150px] opacity-10" 
+                    className="absolute top-0 left-1/4 size-128 bg-accent-primary rounded-full blur-6xl opacity-10" 
                 />
                 <m.div 
                     animate={{ 
@@ -168,7 +168,7 @@ export const Footer = memo(function Footer() {
                         y: [0, 50, 0]
                     }}
                     transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-vape-500 rounded-full blur-[180px] opacity-10" 
+                    className="absolute bottom-0 right-1/4 size-144 bg-accent-secondary rounded-full blur-6xl opacity-10" 
                 />
             </div>
 

@@ -123,7 +123,7 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
             </div>
 
             {/* Logs Feed */}
-            <div className="max-h-[600px] overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <div className="max-h-144 overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-16 rounded-3xl border border-white/5 bg-surface-base/40 backdrop-blur-md">
                         <Search className="h-8 w-8 text-theme-secondary/30 animate-pulse" />

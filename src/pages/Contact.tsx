@@ -81,8 +81,8 @@ export function Contact() {
     return (
         <div className="relative min-h-screen overflow-hidden bg-noise pb-20">
             {/* Background Aesthetic Blobs */}
-            <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-vape-500/10 blur-[130px] animate-pulse-slow pointer-events-none" />
-            <div className="absolute bottom-0 left-0 -z-10 h-[400px] w-[400px] rounded-full bg-herbal-500/10 blur-[110px] animate-pulse-slow pointer-events-none" style={{ animationDelay: '3s' }} />
+            <div className="absolute top-0 right-0 -z-10 size-128 rounded-full bg-accent-primary/10 blur-6xl animate-pulse-slow pointer-events-none" />
+            <div className="absolute bottom-0 left-0 -z-10 size-96 rounded-full bg-accent-secondary/10 blur-5xl animate-pulse-slow pointer-events-none" style={{ animationDelay: '3s' }} />
 
             <SEO
                 title={`Contacto | ${SITE_CONFIG.name}`}

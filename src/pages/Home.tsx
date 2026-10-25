@@ -165,7 +165,7 @@ export function Home() {
                 return (
                     <DeferredSection key={id} minHeight="400px">
                         <SectionErrorBoundary name="SocialProof">
-                            <Suspense fallback={<div className="h-[400px] skeleton-shimmer rounded-2xl" />}>
+                            <Suspense fallback={<div className="h-96 skeleton-shimmer rounded-2xl" />}>
                                 <SocialProof limit={6} />
                             </Suspense>
                         </SectionErrorBoundary>

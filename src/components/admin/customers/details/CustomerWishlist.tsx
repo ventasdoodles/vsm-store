@@ -66,7 +66,7 @@ export function CustomerWishlist({ customer }: Props) {
                 </div>
             </div>
 
-            <div className="relative z-10 space-y-2 max-h-[400px] overflow-y-auto scrollbar-hide">
+            <div className="relative z-10 space-y-2 max-h-96 overflow-y-auto scrollbar-hide">
                 {items.map(({ product, created_at }) => (
                     <div
                         key={product.id}

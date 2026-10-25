@@ -135,7 +135,7 @@ const Breadcrumbs = React.memo(() => {
 
     return (
         <nav className="flex items-center gap-2 mb-6 text-xs font-bold animate-in fade-in slide-in-from-left-2 duration-500">
-            <Link to={"/admin" as any} className="flex items-center gap-1.5 text-theme-secondary hover:text-vape-400 transition-colors">
+            <Link to={"/admin" as any} className="flex items-center gap-1.5 text-theme-secondary hover:text-accent-primary transition-colors">
                 <HomeIcon className="h-3 w-3" />
                 <span>Admin</span>
             </Link>
@@ -149,9 +149,9 @@ const Breadcrumbs = React.memo(() => {
                     <div key={path} className="flex items-center gap-2">
                         <ChevronRight className="h-3 w-3 text-theme-secondary/30" />
                         {isLast ? (
-                            <span className="text-white bg-vape-500/10 px-2 py-0.5 rounded-lg border border-vape-500/20">{displayLabel}</span>
+                            <span className="text-white bg-accent-primary/10 px-2 py-0.5 rounded-lg border border-accent-primary/20">{displayLabel}</span>
                         ) : (
-                            <Link to={route} className="text-theme-secondary hover:text-vape-400 transition-colors capitalize">
+                            <Link to={route} className="text-theme-secondary hover:text-accent-primary transition-colors capitalize">
                                 {displayLabel}
                             </Link>
                         )}
@@ -185,20 +185,20 @@ const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSys
             className={cn(
                 'group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-300',
                 active
-                    ? 'bg-vape-500/10 text-vape-400 shadow-[inset_0_1px_10px_rgba(168,85,247,0.05)] border border-vape-500/10'
+                    ? 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20'
                     : 'text-theme-secondary hover:bg-white/[0.03] hover:text-white'
             )}
         >
             {active && (
                 <m.div
                     layoutId="active-pill"
-                    className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-full bg-vape-500 shadow-[0_0_15px_rgba(168,85,247,0.8)]"
+                    className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-full bg-accent-primary"
                 />
             )}
 
             <div className={cn(
                 "relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-500 shrink-0",
-                active ? "bg-vape-500/20 text-vape-300 shadow-inner border border-vape-500/20" : "bg-white/[0.02] group-hover:bg-white/[0.05] border border-transparent group-hover:border-white/5"
+                active ? "bg-accent-primary/20 text-accent-primary border border-accent-primary/20" : "bg-white/[0.02] group-hover:bg-white/[0.05] border border-transparent group-hover:border-white/5"
             )}>
                 <item.icon
                     className={cn(
@@ -216,8 +216,8 @@ const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSys
                 </span>
             ) : item.isPendingOrders ? (
                 <span className="ml-auto relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-500 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500 shadow-[0_0_10px_rgba(168,85,247,1)]"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-primary"></span>
                 </span>
             ) : item.path === '/admin/monitoring' ? (
                 <div className="ml-auto relative flex h-2 w-2">
@@ -231,7 +231,7 @@ const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSys
                     )}></span>
                 </div>
             ) : active ? (
-                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_10px_rgba(168,85,247,1)] shrink-0" />
+                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-accent-primary shrink-0" />
             ) : null}
         </Link>
     );
@@ -282,7 +282,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <TacticalProvider>
-            <div className="relative flex h-screen overflow-hidden bg-surface-overlay text-theme-primary selection:bg-vape-500/30">
+            <div className="relative flex h-screen overflow-hidden bg-surface-overlay text-theme-primary selection:bg-accent-primary/30">
                 {/* 🌌 Admin Liquid Mesh Background */}
                 <AnimatedAtmosphere />
 
@@ -315,14 +315,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 >
                     <div className="flex items-center justify-between border-b border-white/5 px-6 py-6">
                         <Link to={"/admin" as any} className="flex items-center gap-3 transition-transform hover:scale-[1.02] active:scale-95">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-vape-500 to-vape-600 shadow-[0_0_20px_rgba(168,85,247,0.3)] border border-white/10">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary border border-white/10">
                                 <Store className="h-5 w-5 text-white" />
                             </div>
                             <div>
                                 <span className="text-sm font-black tracking-tight text-white uppercase italic">VSM Admin</span>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-vape-400 animate-pulse" />
-                                    <span className="text-2xs font-black uppercase tracking-macro text-vape-400/80">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-accent-primary animate-pulse" />
+                                    <span className="text-2xs font-black uppercase tracking-macro text-accent-primary/80">
                                         Control
                                     </span>
                                 </div>
@@ -391,13 +391,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                         {/* Omnisearch */}
                         <form onSubmit={handleOmniSearch} className="hidden md:flex relative max-w-xs w-full group mx-4">
-                            <Search className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/20 group-focus-within:text-vape-400 transition-colors" />
+                            <Search className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/20 group-focus-within:text-accent-primary transition-colors" />
                             <input
                                 type="text"
                                 placeholder="Buscar pedido o cliente..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-xl border border-white/5 bg-white/5 py-2 pl-10 pr-4 text-2xs text-white placeholder-white/20 focus:border-vape-500/30 focus:bg-white/[0.07] focus:outline-none transition-all"
+                                className="w-full rounded-xl border border-white/5 bg-white/5 py-2 pl-10 pr-4 text-2xs text-white placeholder-white/20 focus:border-accent-primary/30 focus:bg-white/[0.07] focus:outline-none transition-all"
                             />
                         </form>
 
@@ -408,7 +408,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                         <div className="flex-1" />
 
                         <div className="flex items-center gap-3 rounded-2xl bg-theme-primary/30 p-1.5 pr-4 border border-theme">
-                            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-vape-400 to-vape-600 flex items-center justify-center text-xs font-bold text-white shadow-inner">
+                            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-xs font-bold text-white shadow-inner">
                                 {user?.email?.charAt(0).toUpperCase() ?? 'A'}
                             </div>
                             <div className="hidden flex-col sm:flex">

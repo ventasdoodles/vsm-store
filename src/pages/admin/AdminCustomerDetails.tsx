@@ -56,7 +56,7 @@ export function AdminCustomerDetails() {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20">
+        <div className="container-admin animate-in fade-in duration-500">
             {/* Header */}
             <CustomerHeader customer={customer} />
 
@@ -67,7 +67,7 @@ export function AdminCustomerDetails() {
             <CustomerIntelligencePanel customerId={customer.id} />
 
             {/* Main Orchestrator Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-6 xl:gap-8 xl:items-start pl-1 pr-1">
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_25rem] gap-6 xl:gap-8 xl:items-start pl-1 pr-1">
 
                 {/* Left Column (Operations & Evidence) */}
                 <div className="space-y-6 flex flex-col min-w-0">

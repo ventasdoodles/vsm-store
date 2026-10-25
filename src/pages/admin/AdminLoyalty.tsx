@@ -93,7 +93,7 @@ export function AdminLoyalty() {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+        <div className="container-admin animate-in fade-in duration-500">
             {/* Header + Master Switch */}
             <LoyaltyHeader
                 loyaltyConfig={config}

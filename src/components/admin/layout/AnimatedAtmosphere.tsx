@@ -87,7 +87,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                             delay: 1
                         }}
                         className={cn(
-                            "absolute bottom-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[70px] will-change-transform transform-gpu",
+                            "absolute bottom-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-4xl will-change-transform transform-gpu",
                             colors.secondary
                         )}
                     />
@@ -104,7 +104,7 @@ export const AnimatedAtmosphere = React.memo(() => {
                             ease: "linear"
                         }}
                         className={cn(
-                            "absolute top-[25%] left-[20%] h-[25%] w-[25%] rounded-full blur-[90px] will-change-transform transform-gpu",
+                            "absolute top-[25%] left-[20%] h-[25%] w-[25%] rounded-full blur-5xl will-change-transform transform-gpu",
                             colors.accent
                         )}
                     />

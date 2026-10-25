@@ -26,8 +26,8 @@ export function WheelInvitation() {
         >
             {/* ── Background: Cinematic Auras ── */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] rounded-full bg-vape-500/20 blur-6xl group-hover:bg-vape-500/30 transition-all duration-1000" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-theme-tertiary/10 blur-5xl animate-pulse" />
+                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 size-144 rounded-full bg-accent-primary/20 blur-6xl group-hover:bg-accent-primary/30 transition-all duration-1000" />
+                <div className="absolute bottom-[-10%] left-[-10%] size-96 rounded-full bg-theme-tertiary/10 blur-5xl animate-pulse" />
                 
                 {/* ── Cinematic Particles [Wave 125] ── */}
                 {[...Array(6)].map((_, i) => (
@@ -82,12 +82,12 @@ export function WheelInvitation() {
                             scale: [1, 1.05, 1],
                         }}
                         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                        className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center rounded-full border-[6px] border-white/20 shadow-[0_0_60px_rgba(234,88,12,0.5)] overflow-hidden group-hover:border-white/40 transition-colors duration-700"
+                        className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center rounded-full border-4 border-white/20 shadow-[0_0_60px_rgba(234,88,12,0.5)] overflow-hidden group-hover:border-white/40 transition-colors duration-700"
                         style={{
                             background: 'conic-gradient(from 0deg, #f59e0b, #fbbf24, #f59e0b, #ea580c, #c2410c, #f59e0b)',
                         }}
                     >
-                        <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+                        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm" />
                         <m.div
                              animate={{ 
                                 scale: [1, 1.15, 1],

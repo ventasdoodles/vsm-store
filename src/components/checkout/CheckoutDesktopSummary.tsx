@@ -16,7 +16,7 @@ export function CheckoutDesktopSummary({
     canContinueCheckout,
 }: CheckoutDesktopSummaryProps) {
     return (
-        <div className="hidden lg:block w-full lg:w-[400px] xl:w-[450px]">
+        <div className="hidden lg:block w-full lg:w-96 xl:w-112">
             <div className="sticky top-28 xl:top-32 space-y-6">
                 <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-2xl shadow-2xl">
                     <div className="border-b border-white/5 bg-white/[0.02] px-8 py-6">

@@ -283,7 +283,7 @@ export const ConciergeMessageItem: React.FC<ConciergeMessageItemProps> = ({
                                     {chunk.category}
                                 </span>
                             </div>
-                            <p className="text-[11.5px] text-white/80 leading-relaxed font-medium">
+                            <p className="text-xs text-white/80 leading-relaxed font-medium">
                                 {chunk.content}
                             </p>
                         </div>

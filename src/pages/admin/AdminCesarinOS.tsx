@@ -172,7 +172,7 @@ export function AdminCesarinOS() {
             </nav>
 
             {/* Contenido Principal */}
-            <div className="rounded-6xl border border-white/5 bg-surface-overlay p-10 min-h-[500px]">
+            <div className="rounded-6xl border border-white/5 bg-surface-overlay p-10 min-h-128">
                 <AnimatePresence mode="wait">
                     {renderActiveTab()}
                 </AnimatePresence>

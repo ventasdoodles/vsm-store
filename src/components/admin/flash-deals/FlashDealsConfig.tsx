@@ -77,7 +77,7 @@ export function FlashDealsConfig({ deals }: FlashDealsConfigProps) {
     return (
         <div className="group relative overflow-hidden rounded-3xl border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-orange-500/10 h-full">
             {/* Orbe */}
-            <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-orange-500/8 blur-[70px]" />
+            <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-orange-500/8 blur-4xl" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center justify-between mb-5">

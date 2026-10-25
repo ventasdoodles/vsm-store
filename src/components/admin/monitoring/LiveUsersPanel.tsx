@@ -63,7 +63,7 @@ export function LiveUsersPanel({ users }: LiveUsersPanelProps) {
                                 className="group relative overflow-hidden rounded-3xl border border-white/5 bg-surface-base/40 hover:bg-surface-base/70 backdrop-blur-md p-5 transition-all duration-500 hover:border-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/5"
                             >
                                 {/* Ambient Glow */}
-                                <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-emerald-500/5 blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                                <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-emerald-500/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                                 <div className="relative z-10 flex items-center gap-4">
                                     {/* Avatar + Pulse */}

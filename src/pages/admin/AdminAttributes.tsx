@@ -404,7 +404,7 @@ export function AdminAttributes() {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex h-[400px] flex-col items-center justify-center rounded-4xl border border-dashed border-white/10 bg-white/[0.01]">
+                        <div className="flex h-96 flex-col items-center justify-center rounded-4xl border border-dashed border-white/10 bg-white/[0.01]">
                             <div className="rounded-full bg-white/5 p-4 mb-4">
                                 <Settings2 className="h-8 w-8 text-white/20" />
                             </div>

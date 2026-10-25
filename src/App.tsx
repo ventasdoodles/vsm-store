@@ -51,7 +51,7 @@ const SecondVerticalProofFixture = import.meta.env.DEV
 function PageLoader() {
     return (
         <div className="flex min-h-[60vh] items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-theme border-t-vape-500" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-theme border-t-accent-primary" />
         </div>
     );
 }

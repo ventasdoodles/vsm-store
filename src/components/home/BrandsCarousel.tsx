@@ -79,8 +79,8 @@ export const BrandsCarousel = () => {
     return (
         <section className="relative py-24 sm:py-32 overflow-hidden bg-theme-primary">
             {/* Background elements */}
-            <div className="absolute top-0 left-1/4 w-[1000px] h-full bg-vape-500/[0.05] -skew-x-12 blur-[150px] pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-[800px] h-full bg-theme-tertiary/[0.03] skew-x-12 blur-6xl pointer-events-none" />
+            <div className="absolute top-0 left-1/4 max-w-5xl h-full bg-accent-primary/[0.05] -skew-x-12 blur-6xl pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 max-w-4xl h-full bg-theme-tertiary/[0.03] skew-x-12 blur-6xl pointer-events-none" />
 
             {/* Header Premium */}
             <div className="container-vsm relative z-10 text-center mb-16">
@@ -115,7 +115,7 @@ export const BrandsCarousel = () => {
             {/* Carousel Track with Glass Track Effect */}
             <div className="relative group/track">
                 {/* Horizontal Glass Track Background */}
-                <div className="absolute inset-y-0 left-0 right-0 bg-white/[0.01] backdrop-blur-[2px] border-y border-white/[0.05] pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 right-0 bg-white/[0.01] backdrop-blur-sm border-y border-white/[0.05] pointer-events-none" />
 
                 <div className="flex overflow-hidden relative">
                     {/* Infinite Scrolling Container */}

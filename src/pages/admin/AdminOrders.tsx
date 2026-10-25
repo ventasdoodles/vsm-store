@@ -27,7 +27,7 @@ export function AdminOrders() {
     const endItem = Math.min(safePage * PAGE_SIZE, admin.orders.length);
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20 px-4 sm:px-6">
+        <div className="container-admin animate-in fade-in duration-500">
             <OrdersHeader
                 totalOrders={admin.orders.length}
                 search={admin.search}
