@@ -43,3 +43,8 @@ supabase/.branches/
 # QA scripts
 qa-*.js
 qa-*.ts
+
+# Test and simulation artifacts
+test-results*.json
+simulation_report.json
+qa-*.png
